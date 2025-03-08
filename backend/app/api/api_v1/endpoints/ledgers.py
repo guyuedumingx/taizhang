@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 import pandas as pd
 from io import BytesIO
 from datetime import datetime
+from urllib.parse import quote
 
 from app import models, schemas
 from app.api import deps
@@ -314,7 +315,7 @@ def export_ledger(
     导出台账数据
     """
     # 检查权限
-    if not deps.check_permissions("ledger", "view", current_user):
+    if not deps.check_permissions("ledger", "export", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取台账
@@ -327,12 +328,16 @@ def export_ledger(
     if not template:
         raise HTTPException(status_code=404, detail="模板不存在")
     
-    fields = db.query(models.Field).filter(models.Field.template_id == template.id).all()
+    # 只获取关键字段
+    fields = db.query(models.Field).filter(
+        models.Field.template_id == template.id,
+        models.Field.is_key_field == True
+    ).all()
     
     # 准备数据
     data = {
         "台账ID": ledger.id,
-        "标题": ledger.title,
+        "标题": ledger.name,
         "描述": ledger.description,
         "创建时间": ledger.created_at.strftime("%Y-%m-%d %H:%M:%S") if ledger.created_at else "",
         "更新时间": ledger.updated_at.strftime("%Y-%m-%d %H:%M:%S") if ledger.updated_at else "",
@@ -365,10 +370,11 @@ def export_ledger(
         
         output.seek(0)
         filename = f"台账_{ledger.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx"
+        encoded_filename = quote(filename)
         return Response(
             content=output.getvalue(),
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
         )
     
     elif format.lower() == "csv":
@@ -376,10 +382,11 @@ def export_ledger(
         df.to_csv(output, index=False, encoding="utf-8-sig")
         output.seek(0)
         filename = f"台账_{ledger.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+        encoded_filename = quote(filename)
         return Response(
             content=output.getvalue(),
             media_type="text/csv",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
         )
     
     elif format.lower() == "txt":
@@ -387,16 +394,18 @@ def export_ledger(
         df.to_csv(output, index=False, sep="\t", encoding="utf-8")
         output.seek(0)
         filename = f"台账_{ledger.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
+        encoded_filename = quote(filename)
         return Response(
             content=output.getvalue(),
             media_type="text/plain",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
         )
     
     else:
         raise HTTPException(status_code=400, detail="不支持的导出格式，支持的格式：excel、csv、txt")
 
 
+# 导出所有台账
 @router.get("/export-all", response_class=Response)
 def export_all_ledgers(
     *,
@@ -409,7 +418,7 @@ def export_all_ledgers(
     导出所有台账数据
     """
     # 检查权限
-    if not deps.check_permissions("ledger", "view", current_user):
+    if not deps.check_permissions("ledger", "export", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取台账列表
@@ -430,11 +439,15 @@ def export_all_ledgers(
         if not template:
             continue
         
-        fields = db.query(models.Field).filter(models.Field.template_id == template.id).all()
+        # 只获取关键字段
+        fields = db.query(models.Field).filter(
+            models.Field.template_id == template.id,
+            models.Field.is_key_field == True
+        ).all()
         
         data = {
             "台账ID": ledger.id,
-            "标题": ledger.title,
+            "标题": ledger.name,
             "描述": ledger.description,
             "模板": template.name,
             "创建时间": ledger.created_at.strftime("%Y-%m-%d %H:%M:%S") if ledger.created_at else "",
@@ -470,10 +483,11 @@ def export_all_ledgers(
         
         output.seek(0)
         filename = f"台账列表_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx"
+        encoded_filename = quote(filename)
         return Response(
             content=output.getvalue(),
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
         )
     
     elif format.lower() == "csv":
@@ -481,10 +495,11 @@ def export_all_ledgers(
         df.to_csv(output, index=False, encoding="utf-8-sig")
         output.seek(0)
         filename = f"台账列表_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+        encoded_filename = quote(filename)
         return Response(
             content=output.getvalue(),
             media_type="text/csv",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
         )
     
     elif format.lower() == "txt":
@@ -492,10 +507,11 @@ def export_all_ledgers(
         df.to_csv(output, index=False, sep="\t", encoding="utf-8")
         output.seek(0)
         filename = f"台账列表_{datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
+        encoded_filename = quote(filename)
         return Response(
             content=output.getvalue(),
             media_type="text/plain",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
         )
     
     else:

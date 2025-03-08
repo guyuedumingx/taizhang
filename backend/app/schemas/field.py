@@ -12,6 +12,7 @@ class FieldBase(BaseModel):
     options: Optional[List[str]] = None
     default_value: Optional[str] = None
     order: int = 0
+    is_key_field: bool = True  # 默认为关键字段
 
 
 # 创建字段时的属性

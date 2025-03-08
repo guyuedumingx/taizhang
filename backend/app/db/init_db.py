@@ -19,6 +19,7 @@ def init_permissions():
             ("ledger", "create"),
             ("ledger", "edit"),
             ("ledger", "delete"),
+            ("ledger", "export"),
             ("template", "view"),
             ("template", "create"),
             ("template", "edit"),
@@ -42,6 +43,7 @@ def init_permissions():
             ("ledger", "create"),
             ("ledger", "edit"),
             ("ledger", "delete"),
+            ("ledger", "export"),
             ("template", "view"),
             ("template", "create"),
             ("template", "edit"),
@@ -52,6 +54,7 @@ def init_permissions():
             ("ledger", "view"),
             ("ledger", "create"),
             ("ledger", "edit"),
+            ("ledger", "export"),
             ("template", "view"),
         ],
     }
@@ -86,7 +89,7 @@ def init_admin_user(db: Session):
     if not admin:
         admin_user = models.User(
             username="admin",
-            email="admin@example.com",
+            ehr_id="0000001",
             hashed_password=get_password_hash("admin123"),
             name="系统管理员",
             department="系统",

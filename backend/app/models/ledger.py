@@ -23,11 +23,12 @@ class Ledger(Base):
     data = Column(JSON, nullable=True)
     
     # 时间戳
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
     
     # 关系
     team = relationship("Team", back_populates="ledgers")
     template = relationship("Template", back_populates="ledgers")
     creator = relationship("User", foreign_keys=[created_by_id], back_populates="created_ledgers")
-    updater = relationship("User", foreign_keys=[updated_by_id], back_populates="updated_ledgers") 
+    updater = relationship("User", foreign_keys=[updated_by_id], back_populates="updated_ledgers")
+    field_values = relationship("FieldValue", back_populates="ledger", cascade="all, delete-orphan") 

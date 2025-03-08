@@ -1,13 +1,13 @@
 from typing import Optional, List
 from datetime import datetime, timedelta
 
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, validator, constr
 
 
 # 共享属性
 class UserBase(BaseModel):
     username: Optional[str] = None
-    email: Optional[EmailStr] = None
+    ehr_id: Optional[str] = None
     name: Optional[str] = None
     department: Optional[str] = None
     is_active: Optional[bool] = True
@@ -18,9 +18,15 @@ class UserBase(BaseModel):
 # 创建用户时的属性
 class UserCreate(UserBase):
     username: str
-    email: EmailStr
+    ehr_id: constr(min_length=7, max_length=7, pattern=r'^\d{7}$')
     password: str
     role: Optional[str] = None
+    
+    @validator('ehr_id')
+    def ehr_id_must_be_7_digits(cls, v):
+        if not v.isdigit() or len(v) != 7:
+            raise ValueError('EHR号必须是7位数字')
+        return v
 
 
 # 更新用户时的属性

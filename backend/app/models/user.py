@@ -10,7 +10,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
+    ehr_id = Column(String(7), unique=True, index=True, nullable=False)  # 7位数字的EHR号
     hashed_password = Column(String, nullable=False)
     name = Column(String)
     department = Column(String)

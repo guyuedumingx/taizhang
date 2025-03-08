@@ -1,4 +1,4 @@
-from app.schemas.token import Token, TokenPayload
+from app.schemas.token import Token, TokenPayload, PasswordChange, PasswordChangeResponse, PasswordExpiredResponse
 from app.schemas.user import User, UserCreate, UserUpdate
 from app.schemas.team import Team, TeamCreate, TeamUpdate
 from app.schemas.role import Role, RoleCreate, RoleUpdate

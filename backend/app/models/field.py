@@ -15,9 +15,11 @@ class Field(Base):
     options = Column(JSON, nullable=True)  # 用于select类型的选项
     default_value = Column(String, nullable=True)
     order = Column(Integer, default=0)
+    is_key_field = Column(Boolean, default=True)  # 是否为关键字段，默认为是
     
     # 外键
-    template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
+    template_id = Column(Integer, ForeignKey("templates.id", ondelete="CASCADE"), nullable=False)
     
     # 关系
-    template = relationship("Template", back_populates="fields") 
+    template = relationship("Template", back_populates="fields")
+    field_values = relationship("FieldValue", back_populates="field", cascade="all, delete-orphan") 

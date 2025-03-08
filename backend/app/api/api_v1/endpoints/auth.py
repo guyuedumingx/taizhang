@@ -85,18 +85,18 @@ def register_user(
             detail="用户名已存在",
         )
     
-    # 检查邮箱是否已存在
-    user = db.query(models.User).filter(models.User.email == user_in.email).first()
+    # 检查EHR号是否已存在
+    user = db.query(models.User).filter(models.User.ehr_id == user_in.ehr_id).first()
     if user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="邮箱已存在",
+            detail="EHR号已存在",
         )
     
     # 创建新用户
     user = models.User(
         username=user_in.username,
-        email=user_in.email,
+        ehr_id=user_in.ehr_id,
         hashed_password=get_password_hash(user_in.password),
         name=user_in.name,
         department="未分配",
