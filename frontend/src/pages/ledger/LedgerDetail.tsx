@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Descriptions, Button, Space, Tag, Divider, Table, message, Popconfirm, Dropdown, Menu } from 'antd';
-import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, DownloadOutlined, MoreOutlined } from '@ant-design/icons';
+import { Card, Typography, Descriptions, Button, Space, Tag, Divider, Table, message, Popconfirm, Dropdown } from 'antd';
+import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
+import { ledgerApi } from '../../api';
+import { Ledger } from '../../types';
 
 const { Title } = Typography;
 
@@ -29,11 +31,53 @@ interface LedgerDetail {
 }
 
 const LedgerDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { hasPermission, token } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [ledger, setLedger] = useState<LedgerDetail | null>(null);
+
+  const fetchLedger = async () => {
+    // 检查是否已登录
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const data = await ledgerApi.getLedger(Number(id));
+      
+      // 将 API 返回的数据转换为 LedgerDetail 类型
+      const ledgerDetail: LedgerDetail = {
+        id: data.id,
+        title: data.name || '',
+        department: data.team_id ? '财务部' : '', // 假设的部门
+        teamName: data.team_name || '',
+        description: data.description || '',
+        date: data.created_at ? new Date(data.created_at).toLocaleDateString() : '',
+        status: data.status || '',
+        createdBy: data.created_by_name || '',
+        createdAt: data.created_at || '',
+        updatedBy: data.updated_by_name || '',
+        updatedAt: data.updated_at || '',
+        fields: [] // 假设的字段列表
+      };
+      
+      setLedger(ledgerDetail);
+    } catch (error: unknown) {
+      console.error('获取台账详情失败:', error);
+      message.error('获取台账详情失败');
+      // 如果是认证错误，不要重复尝试获取数据
+      if (error && typeof error === 'object' && 'response' in error && 
+          error.response && typeof error.response === 'object' && 
+          'status' in error.response && error.response.status === 401) {
+        return;
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // 检查权限
@@ -43,35 +87,8 @@ const LedgerDetailPage: React.FC = () => {
       return;
     }
 
-    // 模拟获取台账详情
-    setLoading(true);
-    setTimeout(() => {
-      const mockData: LedgerDetail = {
-        id: Number(id),
-        title: `台账示例 ${id}`,
-        department: '财务部',
-        teamName: '财务团队',
-        description: '这是一个示例台账描述，详细记录了财务部门在第一季度发现的差错问题。',
-        date: '2023-05-15',
-        status: '已完成',
-        createdBy: '张三',
-        createdAt: '2023-05-15 10:30:00',
-        updatedBy: '李四',
-        updatedAt: '2023-05-20 14:20:00',
-        fields: [
-          { id: 'field1', name: '问题类型', value: '数据错误' },
-          { id: 'field2', name: '严重程度', value: '中等' },
-          { id: 'field3', name: '责任人', value: '张三' },
-          { id: 'field4', name: '解决方案', value: '重新核对数据并更正' },
-          { id: 'field5', name: '复核人', value: '李四' },
-          { id: 'field6', name: '复核结果', value: '已解决' },
-        ],
-      };
-      
-      setLedger(mockData);
-      setLoading(false);
-    }, 1000);
-  }, [hasPermission, id, navigate]);
+    fetchLedger();
+  }, [id, hasPermission, navigate]);
 
   const handleEdit = () => {
     navigate(`/ledgers/edit/${id}`);
@@ -139,27 +156,23 @@ const LedgerDetailPage: React.FC = () => {
   };
   
   // 导出菜单
-  const exportMenu = (
-    <Menu
-      items={[
-        {
-          key: 'excel',
-          label: 'Excel格式',
-          onClick: () => handleExport('excel')
-        },
-        {
-          key: 'csv',
-          label: 'CSV格式',
-          onClick: () => handleExport('csv')
-        },
-        {
-          key: 'txt',
-          label: 'TXT格式',
-          onClick: () => handleExport('txt')
-        }
-      ]}
-    />
-  );
+  const exportMenu = [
+    {
+      key: 'excel',
+      label: 'Excel格式',
+      onClick: () => handleExport('excel')
+    },
+    {
+      key: 'csv',
+      label: 'CSV格式',
+      onClick: () => handleExport('csv')
+    },
+    {
+      key: 'txt',
+      label: 'TXT格式',
+      onClick: () => handleExport('txt')
+    }
+  ];
 
   if (loading) {
     return <Card loading={true} />;
@@ -199,7 +212,7 @@ const LedgerDetailPage: React.FC = () => {
           <Title level={4} style={{ margin: 0 }}>{ledger.title}</Title>
         </Space>
         <Space>
-          <Dropdown overlay={exportMenu} placement="bottomRight">
+          <Dropdown menu={{ items: exportMenu }} placement="bottomRight">
             <Button icon={<DownloadOutlined />}>导出</Button>
           </Dropdown>
           {hasPermission(PERMISSIONS.LEDGER_EDIT) && (

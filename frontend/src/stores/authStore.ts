@@ -28,8 +28,8 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-      token: localStorage.getItem('token'),
-      isAuthenticated: !!localStorage.getItem('token'),
+      token: localStorage.getItem('auth-storage') ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token : null,
+      isAuthenticated: !!localStorage.getItem('auth-storage') && !!JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token,
       passwordExpired: false,
       
       login: async (username: string, password: string) => {
@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
           
           const data = await response.json();
           
-          localStorage.setItem('token', data.access_token);
+          
           
           set({
             user: {
@@ -77,11 +77,11 @@ export const useAuthStore = create<AuthState>()(
       },
       
       logout: () => {
-        localStorage.removeItem('token');
+        
         set({
           user: null,
-          token: null,
-          isAuthenticated: false,
+          token: localStorage.getItem('auth-storage') ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token : null,
+          isAuthenticated: !!localStorage.getItem('auth-storage') && !!JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token,
           passwordExpired: false,
         });
       },
@@ -98,25 +98,13 @@ export const useAuthStore = create<AuthState>()(
       },
       
       checkPasswordExpired: async () => {
-        const { token } = get();
-        if (!token) return false;
+        if (!get().token) return false;
         
         try {
-          const response = await fetch('/api/v1/auth/check-password-expired', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (!response.ok) {
-            throw new Error('检查密码过期失败');
-          }
-          
-          const data = await response.json();
-          set({ passwordExpired: data.password_expired });
-          return data.password_expired;
+          // 使用 authApi 来发送请求
+          const response = await authApi.checkPasswordExpired();
+          set({ passwordExpired: response.password_expired });
+          return response.password_expired;
         } catch (error) {
           console.error('检查密码过期失败:', error);
           return false;
@@ -124,27 +112,11 @@ export const useAuthStore = create<AuthState>()(
       },
       
       changePassword: async (currentPassword, newPassword) => {
-        const { token } = get();
-        if (!token) return false;
+        if (!get().token) return false;
         
         try {
-          const response = await fetch('/api/v1/auth/change-password', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              current_password: currentPassword,
-              new_password: newPassword,
-            }),
-          });
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || '修改密码失败');
-          }
-          
+          // 使用 authApi 来发送请求
+          await authApi.changePassword(currentPassword, newPassword);
           set({ passwordExpired: false });
           message.success('密码修改成功');
           return true;

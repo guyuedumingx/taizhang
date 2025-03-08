@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Space, Card, Typography, Tag, Popconfirm, message, Dropdown, Menu } from 'antd';
+import { Table, Button, Input, Space, Card, Typography, Tag, Popconfirm, message, Dropdown } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -17,17 +17,27 @@ const LedgerList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [ledgers, setLedgers] = useState<Ledger[]>([]);
   const [searchText, setSearchText] = useState('');
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
 
   const fetchLedgers = async () => {
+    // 检查是否已登录
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    
     setLoading(true);
     try {
       const data = await ledgerApi.getLedgers();
       setLedgers(data);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('获取台账列表失败:', error);
       message.error('获取台账列表失败');
+      // 如果是认证错误，不要重复尝试获取数据
+      if (error && typeof error === 'object' && 'response' in error && 
+          error.response && typeof error.response === 'object' && 
+          'status' in error.response && error.response.status === 401) {
+        return;
+      }
     } finally {
       setLoading(false);
     }
@@ -35,7 +45,7 @@ const LedgerList: React.FC = () => {
 
   useEffect(() => {
     fetchLedgers();
-  }, []);
+  }, [token, navigate]);
 
   const handleSearch = (value: string) => {
     setSearchText(value);
@@ -147,92 +157,12 @@ const LedgerList: React.FC = () => {
     },
   ];
 
-  // 导出所有台账
-  const handleExportAll = async (format: string) => {
-    try {
-      // 构建URL，如果有模板筛选，则添加参数
-      let apiUrl = `/api/v1/ledgers/export-all?format=${format}`;
-      if (selectedTemplateId) {
-        apiUrl += `&template_id=${selectedTemplateId}`;
-      }
-      
-      // 使用fetch API直接下载文件
-      const response = await fetch(apiUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || '导出失败');
-      }
-      
-      // 获取文件名
-      const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = `台账列表.${format}`;
-      
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename=(.+)/);
-        if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1].replace(/["']/g, '');
-        }
-      }
-      
-      // 创建Blob对象
-      const blob = await response.blob();
-      const downloadUrl = URL.createObjectURL(blob);
-      
-      // 创建下载链接
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      
-      // 清理
-      document.body.removeChild(link);
-      URL.revokeObjectURL(downloadUrl);
-      
-      message.success(`台账列表已导出为${format.toUpperCase()}格式`);
-    } catch (error) {
-      console.error('导出台账列表失败:', error);
-      message.error('导出台账列表失败: ' + (error as Error).message);
-    }
-  };
-  
-  // 导出菜单
-  const exportMenu = (
-    <Menu
-      items={[
-        {
-          key: 'excel',
-          label: 'Excel格式',
-          onClick: () => handleExportAll('excel')
-        },
-        {
-          key: 'csv',
-          label: 'CSV格式',
-          onClick: () => handleExportAll('csv')
-        },
-        {
-          key: 'txt',
-          label: 'TXT格式',
-          onClick: () => handleExportAll('txt')
-        }
-      ]}
-    />
-  );
-
   return (
     <div>
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
           <Title level={4}>台账列表</Title>
           <Space>
-            <Dropdown overlay={exportMenu} placement="bottomRight">
-              <Button icon={<DownloadOutlined />}>导出</Button>
-            </Dropdown>
             <Search
               placeholder="搜索台账"
               allowClear

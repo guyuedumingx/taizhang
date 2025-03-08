@@ -4,7 +4,7 @@ import { LockOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../stores/authStore';
 
 const PasswordExpiredModal: React.FC = () => {
-  const { passwordExpired, changePassword, checkPasswordExpired } = useAuthStore();
+  const { passwordExpired, changePassword, checkPasswordExpired, isAuthenticated, token } = useAuthStore();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -12,12 +12,13 @@ const PasswordExpiredModal: React.FC = () => {
   useEffect(() => {
     // 登录后检查密码是否过期
     const checkPassword = async () => {
+      if (!isAuthenticated || !token) return;
       const expired = await checkPasswordExpired();
       setVisible(expired);
     };
     
     checkPassword();
-  }, [checkPasswordExpired]);
+  }, [checkPasswordExpired, isAuthenticated, token]);
   
   useEffect(() => {
     setVisible(passwordExpired);

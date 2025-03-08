@@ -104,6 +104,27 @@ export const authApi = {
     });
     return response.data;
   }
+},
+
+  // 导出台账
+  exportLedger: async (id: number, format: string): Promise<Blob> => {
+    const response = await api.get(`/ledgers/${id}/export?format=${format}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // 导出所有台账
+  exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
+    let url = `/ledgers/export-all?format=${format}`;
+    if (templateId) {
+      url += `};template_id=${templateId}`;
+    }
+    const response = await api.get(url, {
+      responseType: 'blob'
+    });
+    return response.data;
+  }
 };
 
 // 用户管理API
@@ -135,6 +156,27 @@ export const userApi = {
   // 删除用户
   deleteUser: async (id: number): Promise<User> => {
     const response = await api.delete<User>(`/users/${id}`);
+    return response.data;
+  }
+},
+
+  // 导出台账
+  exportLedger: async (id: number, format: string): Promise<Blob> => {
+    const response = await api.get(`/ledgers/${id}/export?format=${format}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // 导出所有台账
+  exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
+    let url = `/ledgers/export-all?format=${format}`;
+    if (templateId) {
+      url += `};template_id=${templateId}`;
+    }
+    const response = await api.get(url, {
+      responseType: 'blob'
+    });
     return response.data;
   }
 };
@@ -174,6 +216,27 @@ export const teamApi = {
   // 获取团队成员
   getTeamMembers: async (id: number): Promise<User[]> => {
     const response = await api.get<User[]>(`/teams/${id}/members`);
+    return response.data;
+  }
+},
+
+  // 导出台账
+  exportLedger: async (id: number, format: string): Promise<Blob> => {
+    const response = await api.get(`/ledgers/${id}/export?format=${format}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // 导出所有台账
+  exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
+    let url = `/ledgers/export-all?format=${format}`;
+    if (templateId) {
+      url += `};template_id=${templateId}`;
+    }
+    const response = await api.get(url, {
+      responseType: 'blob'
+    });
     return response.data;
   }
 };
@@ -227,6 +290,27 @@ export const roleApi = {
     const response = await api.delete<string[]>(`/roles/user/${userId}/roles/${roleName}`);
     return response.data;
   }
+},
+
+  // 导出台账
+  exportLedger: async (id: number, format: string): Promise<Blob> => {
+    const response = await api.get(`/ledgers/${id}/export?format=${format}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // 导出所有台账
+  exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
+    let url = `/ledgers/export-all?format=${format}`;
+    if (templateId) {
+      url += `};template_id=${templateId}`;
+    }
+    const response = await api.get(url, {
+      responseType: 'blob'
+    });
+    return response.data;
+  }
 };
 
 // 台账管理API
@@ -258,6 +342,26 @@ export const ledgerApi = {
   // 删除台账
   deleteLedger: async (id: number): Promise<Ledger> => {
     const response = await api.delete<Ledger>(`/ledgers/${id}`);
+    return response.data;
+  },
+
+  // 导出台账
+  exportLedger: async (id: number, format: string): Promise<Blob> => {
+    const response = await api.get(`/ledgers/${id}/export?format=${format}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // 导出所有台账
+  exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
+    let url = `/ledgers/export-all?format=${format}`;
+    if (templateId) {
+      url += `&template_id=${templateId}`;
+    }
+    const response = await api.get(url, {
+      responseType: 'blob'
+    });
     return response.data;
   }
 };
@@ -315,6 +419,27 @@ export const templateApi = {
   // 删除模板字段
   deleteTemplateField: async (templateId: number, fieldId: number): Promise<Field> => {
     const response = await api.delete<Field>(`/templates/${templateId}/fields/${fieldId}`);
+    return response.data;
+  }
+},
+
+  // 导出台账
+  exportLedger: async (id: number, format: string): Promise<Blob> => {
+    const response = await api.get(`/ledgers/${id}/export?format=${format}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
+  // 导出所有台账
+  exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
+    let url = `/ledgers/export-all?format=${format}`;
+    if (templateId) {
+      url += `};template_id=${templateId}`;
+    }
+    const response = await api.get(url, {
+      responseType: 'blob'
+    });
     return response.data;
   }
 };
