@@ -7,8 +7,9 @@ from io import BytesIO
 from datetime import datetime
 from urllib.parse import quote
 
-from app import models, schemas
+from app import models, schemas, crud
 from app.api import deps
+from app.utils.logger import LoggerService
 
 router = APIRouter()
 
@@ -21,6 +22,9 @@ def read_ledgers(
     team_id: Optional[int] = None,
     template_id: Optional[int] = None,
     search: Optional[str] = None,
+    status: Optional[str] = None,
+    approval_status: Optional[str] = None,
+    workflow_id: Optional[int] = None,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -41,6 +45,18 @@ def read_ledgers(
     if template_id:
         query = query.filter(models.Ledger.template_id == template_id)
     
+    # 按状态筛选
+    if status:
+        query = query.filter(models.Ledger.status == status)
+    
+    # 按审批状态筛选
+    if approval_status:
+        query = query.filter(models.Ledger.approval_status == approval_status)
+    
+    # 按工作流筛选
+    if workflow_id:
+        query = query.filter(models.Ledger.workflow_id == workflow_id)
+    
     # 搜索
     if search:
         query = query.filter(models.Ledger.name.ilike(f"%{search}%"))
@@ -49,32 +65,52 @@ def read_ledgers(
     if not current_user.is_superuser and not team_id:
         query = query.filter(models.Ledger.team_id == current_user.team_id)
     
-    # 获取总数
-    total = query.count()
+    # 记录日志
+    LoggerService.log_info(
+        db=db,
+        module="ledger",
+        action="list",
+        message="查询台账列表",
+        user_id=current_user.id,
+    )
     
-    # 分页
-    ledgers = query.offset(skip).limit(limit).all()
+    # 获取台账列表
+    ledgers = query.order_by(models.Ledger.updated_at.desc()).offset(skip).limit(limit).all()
     
-    # 获取关联信息
+    # 获取台账的相关数据（团队名称、模板名称等）
     for ledger in ledgers:
-        # 获取创建者和更新者信息
-        if ledger.created_by_id:
-            creator = db.query(models.User).filter(models.User.id == ledger.created_by_id).first()
-            ledger.created_by_name = creator.name if creator else None
-        
-        if ledger.updated_by_id:
-            updater = db.query(models.User).filter(models.User.id == ledger.updated_by_id).first()
-            ledger.updated_by_name = updater.name if updater else None
-        
-        # 获取团队信息
+        # 获取团队名称
         if ledger.team_id:
             team = db.query(models.Team).filter(models.Team.id == ledger.team_id).first()
-            ledger.team_name = team.name if team else None
+            if team:
+                ledger.team_name = team.name
         
-        # 获取模板信息
+        # 获取模板名称
         if ledger.template_id:
             template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
-            ledger.template_name = template.name if template else None
+            if template:
+                ledger.template_name = template.name
+        
+        # 获取创建人和更新人姓名
+        creator = db.query(models.User).filter(models.User.id == ledger.created_by_id).first()
+        if creator:
+            ledger.created_by_name = creator.name
+        
+        updater = db.query(models.User).filter(models.User.id == ledger.updated_by_id).first()
+        if updater:
+            ledger.updated_by_name = updater.name
+        
+        # 获取当前审批人姓名
+        if ledger.current_approver_id:
+            approver = db.query(models.User).filter(models.User.id == ledger.current_approver_id).first()
+            if approver:
+                ledger.current_approver_name = approver.name
+        
+        # 获取工作流名称
+        if ledger.workflow_id:
+            workflow = db.query(models.Workflow).filter(models.Workflow.id == ledger.workflow_id).first()
+            if workflow:
+                ledger.workflow_name = workflow.name
     
     return ledgers
 
@@ -105,19 +141,42 @@ def create_ledger(
         if not template:
             raise HTTPException(status_code=404, detail="模板不存在")
     
+    # 检查工作流是否存在
+    if ledger_in.workflow_id:
+        workflow = db.query(models.Workflow).filter(
+            models.Workflow.id == ledger_in.workflow_id,
+            models.Workflow.is_active == True
+        ).first()
+        if not workflow:
+            raise HTTPException(status_code=404, detail="工作流不存在或未激活")
+    
     # 创建台账
     ledger = models.Ledger(
         name=ledger_in.name,
         description=ledger_in.description,
         team_id=ledger_in.team_id or current_user.team_id,
         template_id=ledger_in.template_id,
+        workflow_id=ledger_in.workflow_id,
         data=ledger_in.data or {},
+        status="draft",
+        approval_status="pending",
         created_by_id=current_user.id,
         updated_by_id=current_user.id,
     )
     db.add(ledger)
     db.commit()
     db.refresh(ledger)
+    
+    # 记录日志
+    LoggerService.log_info(
+        db=db,
+        module="ledger",
+        action="create",
+        message=f"创建台账 {ledger.name}",
+        user_id=current_user.id,
+        resource_type="ledger",
+        resource_id=str(ledger.id),
+    )
     
     # 获取关联信息
     if ledger.created_by_id:
@@ -135,6 +194,10 @@ def create_ledger(
     if ledger.template_id:
         template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
         ledger.template_name = template.name if template else None
+    
+    if ledger.workflow_id:
+        workflow = db.query(models.Workflow).filter(models.Workflow.id == ledger.workflow_id).first()
+        ledger.workflow_name = workflow.name if workflow else None
     
     return ledger
 
@@ -160,6 +223,17 @@ def read_ledger(
     if not current_user.is_superuser and ledger.team_id != current_user.team_id:
         raise HTTPException(status_code=403, detail="没有权限查看其他团队的台账")
     
+    # 记录日志
+    LoggerService.log_info(
+        db=db,
+        module="ledger",
+        action="read",
+        message=f"查看台账 {ledger.name}",
+        user_id=current_user.id,
+        resource_type="ledger",
+        resource_id=str(ledger.id),
+    )
+    
     # 获取关联信息
     if ledger.created_by_id:
         creator = db.query(models.User).filter(models.User.id == ledger.created_by_id).first()
@@ -176,6 +250,28 @@ def read_ledger(
     if ledger.template_id:
         template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
         ledger.template_name = template.name if template else None
+    
+    # 获取当前审批人姓名
+    if ledger.current_approver_id:
+        approver = db.query(models.User).filter(models.User.id == ledger.current_approver_id).first()
+        if approver:
+            ledger.current_approver_name = approver.name
+    
+    # 获取工作流名称
+    if ledger.workflow_id:
+        workflow = db.query(models.Workflow).filter(models.Workflow.id == ledger.workflow_id).first()
+        if workflow:
+            ledger.workflow_name = workflow.name
+    
+    # 获取活动的工作流实例
+    if ledger.status == "active" and ledger.approval_status == "pending":
+        workflow_instance = crud.workflow_instance.get_active_by_ledger(db, ledger_id=ledger_id)
+        if workflow_instance:
+            # 获取工作流实例节点
+            workflow_instance.nodes = crud.workflow_instance_node.get_by_instance(
+                db, instance_id=workflow_instance.id
+            )
+            ledger.active_workflow_instance = workflow_instance
     
     return ledger
 
@@ -203,6 +299,10 @@ def update_ledger(
     if not current_user.is_superuser and ledger.team_id != current_user.team_id:
         raise HTTPException(status_code=403, detail="没有权限更新其他团队的台账")
     
+    # 检查台账状态，如果不是草稿状态且不是管理员，则不能更新
+    if ledger.status != "draft" and not current_user.is_superuser:
+        raise HTTPException(status_code=400, detail="只有草稿状态的台账可以更新")
+    
     # 检查团队是否存在
     if ledger_in.team_id and ledger_in.team_id != ledger.team_id:
         team = db.query(models.Team).filter(models.Team.id == ledger_in.team_id).first()
@@ -214,6 +314,15 @@ def update_ledger(
         template = db.query(models.Template).filter(models.Template.id == ledger_in.template_id).first()
         if not template:
             raise HTTPException(status_code=404, detail="模板不存在")
+    
+    # 检查工作流是否存在
+    if ledger_in.workflow_id and ledger_in.workflow_id != ledger.workflow_id:
+        workflow = db.query(models.Workflow).filter(
+            models.Workflow.id == ledger_in.workflow_id,
+            models.Workflow.is_active == True
+        ).first()
+        if not workflow:
+            raise HTTPException(status_code=404, detail="工作流不存在或未激活")
     
     # 更新台账信息
     update_data = ledger_in.dict(exclude_unset=True)
@@ -237,6 +346,17 @@ def update_ledger(
     db.commit()
     db.refresh(ledger)
     
+    # 记录日志
+    LoggerService.log_info(
+        db=db,
+        module="ledger",
+        action="update",
+        message=f"更新台账 {ledger.name}",
+        user_id=current_user.id,
+        resource_type="ledger",
+        resource_id=str(ledger.id),
+    )
+    
     # 获取关联信息
     if ledger.created_by_id:
         creator = db.query(models.User).filter(models.User.id == ledger.created_by_id).first()
@@ -253,6 +373,16 @@ def update_ledger(
     if ledger.template_id:
         template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
         ledger.template_name = template.name if template else None
+    
+    if ledger.current_approver_id:
+        approver = db.query(models.User).filter(models.User.id == ledger.current_approver_id).first()
+        if approver:
+            ledger.current_approver_name = approver.name
+    
+    if ledger.workflow_id:
+        workflow = db.query(models.Workflow).filter(models.Workflow.id == ledger.workflow_id).first()
+        if workflow:
+            ledger.workflow_name = workflow.name
     
     return ledger
 
