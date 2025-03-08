@@ -15,6 +15,7 @@ import RoleManagement from './pages/admin/RoleManagement';
 import PermissionManagement from './pages/admin/PermissionManagement';
 import TeamManagement from './pages/admin/TeamManagement';
 import HelpPage from './pages/HelpPage';
+import PasswordExpiredModal from './components/PasswordExpiredModal';
 import './App.css';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -32,7 +33,10 @@ function App() {
             path="/"
             element={
               <PrivateRoute>
-                <Layout />
+                <>
+                  <Layout />
+                  <PasswordExpiredModal />
+                </>
               </PrivateRoute>
             }
           >

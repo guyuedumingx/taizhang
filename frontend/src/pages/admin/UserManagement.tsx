@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Space, Card, Typography, Tag, Modal, Form, Select, message, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { Table, Button, Input, Space, Card, Typography, Tag, Modal, Form, Select, message, Popconfirm, Row, Col, Upload, Tooltip } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, UnlockOutlined, ExclamationCircleOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import type { ColumnsType } from 'antd/es/table';
@@ -33,8 +33,18 @@ interface Role {
   description: string;
 }
 
+interface ImportResult {
+  success_count: number;
+  failed_count: number;
+  failed_users: Array<{
+    row: number;
+    username: string;
+    reason: string;
+  }>;
+}
+
 const UserManagement: React.FC = () => {
-  const { hasPermission } = useAuthStore();
+  const { hasPermission, token } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -44,6 +54,9 @@ const UserManagement: React.FC = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
   const [form] = Form.useForm();
+  const [importModalVisible, setImportModalVisible] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
 
   // 检查权限
   useEffect(() => {
@@ -303,8 +316,97 @@ const UserManagement: React.FC = () => {
     },
   ];
 
+  // 添加导入用户的方法
+  const handleImportUsers = async (options: any) => {
+    const { file, onSuccess, onError } = options;
+    
+    setImportLoading(true);
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await fetch('/api/v1/users/import', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.detail || '导入失败');
+      }
+      
+      setImportResult(result);
+      onSuccess(result, file);
+      message.success(`成功导入 ${result.success_count} 个用户`);
+      
+      // 如果有失败的用户，显示警告
+      if (result.failed_count > 0) {
+        message.warning(`${result.failed_count} 个用户导入失败`);
+      }
+      
+      // 刷新用户列表
+      fetchUsers();
+    } catch (error) {
+      console.error('导入用户失败:', error);
+      message.error('导入用户失败: ' + (error as Error).message);
+      onError(error);
+    } finally {
+      setImportLoading(false);
+    }
+  };
+  
+  // 下载导入模板
+  const handleDownloadTemplate = () => {
+    // 创建一个包含标题行的CSV内容
+    const csvContent = 'username,email,password,name,department,role,team_id\n' +
+                      'user1,user1@example.com,password123,用户1,技术部,user,1\n' +
+                      'user2,user2@example.com,password123,用户2,市场部,user,2';
+    
+    // 创建Blob对象
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // 创建下载链接
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.href = url;
+    link.setAttribute('download', '用户导入模板.csv');
+    document.body.appendChild(link);
+    link.click();
+    
+    // 清理
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div>
+    <div className="container">
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <Typography.Title level={3}>用户管理</Typography.Title>
+        <Space>
+          <Button
+            type="primary"
+            icon={<UploadOutlined />}
+            onClick={() => setImportModalVisible(true)}
+            disabled={!hasPermission(PERMISSIONS.USER_CREATE)}
+          >
+            批量导入
+          </Button>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={showAddModal}
+            disabled={!hasPermission(PERMISSIONS.USER_CREATE)}
+          >
+            创建用户
+          </Button>
+        </Space>
+      </div>
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
           <Title level={4}>用户管理</Title>
@@ -315,14 +417,6 @@ const UserManagement: React.FC = () => {
               onSearch={handleSearch}
               style={{ width: 250 }}
             />
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={showAddModal}
-              disabled={!hasPermission(PERMISSIONS.USER_CREATE)}
-            >
-              添加用户
-            </Button>
           </Space>
         </div>
         <Table
@@ -440,6 +534,101 @@ const UserManagement: React.FC = () => {
             </Select>
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* 导入用户模态框 */}
+      <Modal
+        title="批量导入用户"
+        open={importModalVisible}
+        onCancel={() => {
+          setImportModalVisible(false);
+          setImportResult(null);
+        }}
+        footer={[
+          <Button 
+            key="download" 
+            icon={<DownloadOutlined />}
+            onClick={handleDownloadTemplate}
+          >
+            下载模板
+          </Button>,
+          <Button 
+            key="close" 
+            onClick={() => {
+              setImportModalVisible(false);
+              setImportResult(null);
+            }}
+          >
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        <Typography.Paragraph>
+          请上传用户数据文件，支持Excel和CSV格式。文件必须包含以下列：username、email、password、name。
+          其他可选列：department、role、team_id。
+        </Typography.Paragraph>
+        
+        <Upload.Dragger
+          name="file"
+          accept=".xlsx,.xls,.csv"
+          customRequest={handleImportUsers}
+          showUploadList={false}
+          disabled={importLoading}
+        >
+          <p className="ant-upload-drag-icon">
+            <UploadOutlined />
+          </p>
+          <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+          <p className="ant-upload-hint">支持Excel和CSV格式</p>
+        </Upload.Dragger>
+        
+        {importLoading && (
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <Typography.Text>正在导入，请稍候...</Typography.Text>
+          </div>
+        )}
+        
+        {importResult && (
+          <Card style={{ marginTop: 16 }}>
+            <Typography.Title level={4}>导入结果</Typography.Title>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Card title="成功" bordered={false}>
+                  <Typography.Text style={{ fontSize: 24, color: '#52c41a' }}>
+                    {importResult.success_count}
+                  </Typography.Text>
+                  <Typography.Text> 个用户</Typography.Text>
+                </Card>
+              </Col>
+              <Col span={12}>
+                <Card title="失败" bordered={false}>
+                  <Typography.Text style={{ fontSize: 24, color: '#f5222d' }}>
+                    {importResult.failed_count}
+                  </Typography.Text>
+                  <Typography.Text> 个用户</Typography.Text>
+                </Card>
+              </Col>
+            </Row>
+            
+            {importResult.failed_count > 0 && (
+              <>
+                <Typography.Title level={5} style={{ marginTop: 16 }}>失败详情</Typography.Title>
+                <Table
+                  dataSource={importResult.failed_users}
+                  columns={[
+                    { title: '行号', dataIndex: 'row', key: 'row' },
+                    { title: '用户名', dataIndex: 'username', key: 'username' },
+                    { title: '失败原因', dataIndex: 'reason', key: 'reason' }
+                  ]}
+                  size="small"
+                  pagination={false}
+                  rowKey={(record) => `${record.row}-${record.username}`}
+                />
+              </>
+            )}
+          </Card>
+        )}
       </Modal>
     </div>
   );

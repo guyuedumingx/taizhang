@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Descriptions, Button, Space, Tag, Divider, Table, message } from 'antd';
-import { EditOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Card, Typography, Descriptions, Button, Space, Tag, Divider, Table, message, Popconfirm, Dropdown, Menu } from 'antd';
+import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, DownloadOutlined, MoreOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
@@ -31,7 +31,7 @@ interface LedgerDetail {
 const LedgerDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { hasPermission } = useAuthStore();
+  const { hasPermission, token } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [ledger, setLedger] = useState<LedgerDetail | null>(null);
 
@@ -90,6 +90,77 @@ const LedgerDetailPage: React.FC = () => {
     navigate('/ledgers');
   };
 
+  // 导出台账
+  const handleExport = async (format: string) => {
+    try {
+      // 使用fetch API直接下载文件
+      const response = await fetch(`/api/v1/ledgers/${id}/export?format=${format}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '导出失败');
+      }
+      
+      // 获取文件名
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `台账_${id}.${format}`;
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename=(.+)/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/["']/g, '');
+        }
+      }
+      
+      // 创建Blob对象
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      // 创建下载链接
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      
+      // 清理
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      message.success(`台账已导出为${format.toUpperCase()}格式`);
+    } catch (error) {
+      console.error('导出台账失败:', error);
+      message.error('导出台账失败: ' + (error as Error).message);
+    }
+  };
+  
+  // 导出菜单
+  const exportMenu = (
+    <Menu
+      items={[
+        {
+          key: 'excel',
+          label: 'Excel格式',
+          onClick: () => handleExport('excel')
+        },
+        {
+          key: 'csv',
+          label: 'CSV格式',
+          onClick: () => handleExport('csv')
+        },
+        {
+          key: 'txt',
+          label: 'TXT格式',
+          onClick: () => handleExport('txt')
+        }
+      ]}
+    />
+  );
+
   if (loading) {
     return <Card loading={true} />;
   }
@@ -128,22 +199,28 @@ const LedgerDetailPage: React.FC = () => {
           <Title level={4} style={{ margin: 0 }}>{ledger.title}</Title>
         </Space>
         <Space>
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={handleEdit}
-            disabled={!hasPermission(PERMISSIONS.LEDGER_EDIT)}
-          >
-            编辑
-          </Button>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            onClick={handleDelete}
-            disabled={!hasPermission(PERMISSIONS.LEDGER_DELETE)}
-          >
-            删除
-          </Button>
+          <Dropdown overlay={exportMenu} placement="bottomRight">
+            <Button icon={<DownloadOutlined />}>导出</Button>
+          </Dropdown>
+          {hasPermission(PERMISSIONS.LEDGER_EDIT) && (
+            <Button 
+              type="primary" 
+              icon={<EditOutlined />} 
+              onClick={handleEdit}
+            >
+              编辑
+            </Button>
+          )}
+          {hasPermission(PERMISSIONS.LEDGER_DELETE) && (
+            <Popconfirm
+              title="确定要删除这个台账吗？"
+              onConfirm={handleDelete}
+              okText="确定"
+              cancelText="取消"
+            >
+              <Button danger icon={<DeleteOutlined />}>删除</Button>
+            </Popconfirm>
+          )}
         </Space>
       </div>
 
