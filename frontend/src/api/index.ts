@@ -1,0 +1,300 @@
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
+import {
+  User, UserCreate, UserUpdate,
+  Team, TeamCreate, TeamUpdate,
+  Role, RoleCreate, RoleUpdate,
+  Template, TemplateDetail, TemplateCreate, TemplateUpdate,
+  Field, FieldCreate, FieldUpdate,
+  Ledger, LedgerCreate, LedgerUpdate,
+  LoginResponse, RegisterRequest
+} from '../types';
+
+// 定义查询参数类型
+type QueryParams = Record<string, string | number | boolean | undefined>;
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// 请求拦截器，添加token到请求头
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('auth-storage')
+      ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
+      : null;
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 响应拦截器，处理错误
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // 清除本地存储的token
+      localStorage.removeItem('auth-storage');
+      // 重定向到登录页
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// 认证相关API
+export const authApi = {
+  // 登录接口
+  login: async (username: string, password: string): Promise<LoginResponse> => {
+    // 使用表单数据格式发送请求
+    const formData = new URLSearchParams();
+    formData.append('username', username);
+    formData.append('password', password);
+    
+    const response = await api.post<LoginResponse>('/auth/login', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    return response.data;
+  },
+
+  // 登出接口
+  logout: async (): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>('/auth/logout');
+    return response.data;
+  },
+
+  // 获取当前用户信息
+  getCurrentUser: async (): Promise<User> => {
+    const response = await api.get<User>('/auth/me');
+    return response.data;
+  },
+
+  // 注册接口
+  register: async (userData: RegisterRequest): Promise<User> => {
+    const response = await api.post<User>('/auth/register', userData);
+    return response.data;
+  }
+};
+
+// 用户管理API
+export const userApi = {
+  // 获取用户列表
+  getUsers: async (params?: QueryParams): Promise<User[]> => {
+    const response = await api.get<User[]>('/users', { params });
+    return response.data;
+  },
+
+  // 获取用户详情
+  getUser: async (id: number): Promise<User> => {
+    const response = await api.get<User>(`/users/${id}`);
+    return response.data;
+  },
+
+  // 创建用户
+  createUser: async (userData: UserCreate): Promise<User> => {
+    const response = await api.post<User>('/users', userData);
+    return response.data;
+  },
+
+  // 更新用户
+  updateUser: async (id: number, userData: UserUpdate): Promise<User> => {
+    const response = await api.put<User>(`/users/${id}`, userData);
+    return response.data;
+  },
+
+  // 删除用户
+  deleteUser: async (id: number): Promise<User> => {
+    const response = await api.delete<User>(`/users/${id}`);
+    return response.data;
+  }
+};
+
+// 团队管理API
+export const teamApi = {
+  // 获取团队列表
+  getTeams: async (params?: QueryParams): Promise<Team[]> => {
+    const response = await api.get<Team[]>('/teams', { params });
+    return response.data;
+  },
+
+  // 获取团队详情
+  getTeam: async (id: number): Promise<Team> => {
+    const response = await api.get<Team>(`/teams/${id}`);
+    return response.data;
+  },
+
+  // 创建团队
+  createTeam: async (teamData: TeamCreate): Promise<Team> => {
+    const response = await api.post<Team>('/teams', teamData);
+    return response.data;
+  },
+
+  // 更新团队
+  updateTeam: async (id: number, teamData: TeamUpdate): Promise<Team> => {
+    const response = await api.put<Team>(`/teams/${id}`, teamData);
+    return response.data;
+  },
+
+  // 删除团队
+  deleteTeam: async (id: number): Promise<Team> => {
+    const response = await api.delete<Team>(`/teams/${id}`);
+    return response.data;
+  },
+
+  // 获取团队成员
+  getTeamMembers: async (id: number): Promise<User[]> => {
+    const response = await api.get<User[]>(`/teams/${id}/members`);
+    return response.data;
+  }
+};
+
+// 角色管理API
+export const roleApi = {
+  // 获取角色列表
+  getRoles: async (): Promise<Role[]> => {
+    const response = await api.get<Role[]>('/roles');
+    return response.data;
+  },
+
+  // 获取角色详情
+  getRole: async (id: number): Promise<Role> => {
+    const response = await api.get<Role>(`/roles/${id}`);
+    return response.data;
+  },
+
+  // 创建角色
+  createRole: async (roleData: RoleCreate): Promise<Role> => {
+    const response = await api.post<Role>('/roles', roleData);
+    return response.data;
+  },
+
+  // 更新角色
+  updateRole: async (id: number, roleData: RoleUpdate): Promise<Role> => {
+    const response = await api.put<Role>(`/roles/${id}`, roleData);
+    return response.data;
+  },
+
+  // 删除角色
+  deleteRole: async (id: number): Promise<Role> => {
+    const response = await api.delete<Role>(`/roles/${id}`);
+    return response.data;
+  },
+
+  // 获取用户角色
+  getUserRoles: async (userId: number): Promise<string[]> => {
+    const response = await api.get<string[]>(`/roles/user/${userId}`);
+    return response.data;
+  },
+
+  // 分配角色给用户
+  assignRoleToUser: async (userId: number, roleName: string): Promise<string[]> => {
+    const response = await api.post<string[]>(`/roles/user/${userId}/roles`, { role_name: roleName });
+    return response.data;
+  },
+
+  // 从用户移除角色
+  removeRoleFromUser: async (userId: number, roleName: string): Promise<string[]> => {
+    const response = await api.delete<string[]>(`/roles/user/${userId}/roles/${roleName}`);
+    return response.data;
+  }
+};
+
+// 台账管理API
+export const ledgerApi = {
+  // 获取台账列表
+  getLedgers: async (params?: QueryParams): Promise<Ledger[]> => {
+    const response = await api.get<Ledger[]>('/ledgers', { params });
+    return response.data;
+  },
+
+  // 获取台账详情
+  getLedger: async (id: number): Promise<Ledger> => {
+    const response = await api.get<Ledger>(`/ledgers/${id}`);
+    return response.data;
+  },
+
+  // 创建台账
+  createLedger: async (ledgerData: LedgerCreate): Promise<Ledger> => {
+    const response = await api.post<Ledger>('/ledgers', ledgerData);
+    return response.data;
+  },
+
+  // 更新台账
+  updateLedger: async (id: number, ledgerData: LedgerUpdate): Promise<Ledger> => {
+    const response = await api.put<Ledger>(`/ledgers/${id}`, ledgerData);
+    return response.data;
+  },
+
+  // 删除台账
+  deleteLedger: async (id: number): Promise<Ledger> => {
+    const response = await api.delete<Ledger>(`/ledgers/${id}`);
+    return response.data;
+  }
+};
+
+// 模板管理API
+export const templateApi = {
+  // 获取模板列表
+  getTemplates: async (params?: QueryParams): Promise<Template[]> => {
+    const response = await api.get<Template[]>('/templates', { params });
+    return response.data;
+  },
+
+  // 获取模板详情
+  getTemplate: async (id: number): Promise<TemplateDetail> => {
+    const response = await api.get<TemplateDetail>(`/templates/${id}`);
+    return response.data;
+  },
+
+  // 创建模板
+  createTemplate: async (templateData: TemplateCreate): Promise<Template> => {
+    const response = await api.post<Template>('/templates', templateData);
+    return response.data;
+  },
+
+  // 更新模板
+  updateTemplate: async (id: number, templateData: TemplateUpdate): Promise<Template> => {
+    const response = await api.put<Template>(`/templates/${id}`, templateData);
+    return response.data;
+  },
+
+  // 删除模板
+  deleteTemplate: async (id: number): Promise<Template> => {
+    const response = await api.delete<Template>(`/templates/${id}`);
+    return response.data;
+  },
+
+  // 获取模板字段
+  getTemplateFields: async (id: number): Promise<Field[]> => {
+    const response = await api.get<Field[]>(`/templates/${id}/fields`);
+    return response.data;
+  },
+
+  // 创建模板字段
+  createTemplateField: async (templateId: number, fieldData: FieldCreate): Promise<Field> => {
+    const response = await api.post<Field>(`/templates/${templateId}/fields`, fieldData);
+    return response.data;
+  },
+
+  // 更新模板字段
+  updateTemplateField: async (templateId: number, fieldId: number, fieldData: FieldUpdate): Promise<Field> => {
+    const response = await api.put<Field>(`/templates/${templateId}/fields/${fieldId}`, fieldData);
+    return response.data;
+  },
+
+  // 删除模板字段
+  deleteTemplateField: async (templateId: number, fieldId: number): Promise<Field> => {
+    const response = await api.delete<Field>(`/templates/${templateId}/fields/${fieldId}`);
+    return response.data;
+  }
+};
+
+export default api; 

@@ -1,0 +1,23 @@
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+
+from app.db.session import Base
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    name = Column(String)
+    department = Column(String)
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
+    team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
+    
+    # 关系
+    team = relationship("Team", back_populates="members", foreign_keys=[team_id])
+    created_ledgers = relationship("Ledger", foreign_keys="[Ledger.created_by_id]", back_populates="creator")
+    updated_ledgers = relationship("Ledger", foreign_keys="[Ledger.updated_by_id]", back_populates="updater") 
