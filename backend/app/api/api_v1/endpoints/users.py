@@ -1,7 +1,10 @@
-from typing import Any, List
+from typing import Any, List, Dict
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
+import pandas as pd
+import io
+from datetime import datetime
 
 from app import models, schemas
 from app.api import deps
@@ -198,4 +201,125 @@ def delete_user(
     db.delete(user)
     db.commit()
     
-    return user 
+    return user
+
+
+@router.post("/import", response_model=Dict[str, Any])
+def import_users(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+    file: UploadFile = File(...),
+) -> Any:
+    """
+    批量导入用户
+    """
+    # 检查权限
+    if not deps.check_permissions("user", "create", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    # 检查文件类型
+    if file.content_type not in [
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/csv",
+    ]:
+        raise HTTPException(status_code=400, detail="只支持Excel或CSV文件")
+    
+    try:
+        # 读取文件内容
+        contents = file.file.read()
+        buffer = io.BytesIO(contents)
+        
+        # 根据文件类型读取数据
+        if file.content_type == "text/csv":
+            df = pd.read_csv(buffer)
+        else:
+            df = pd.read_excel(buffer)
+        
+        # 验证必要的列
+        required_columns = ["username", "email", "password", "name"]
+        for column in required_columns:
+            if column not in df.columns:
+                raise HTTPException(
+                    status_code=400, detail=f"缺少必要的列: {column}"
+                )
+        
+        # 处理导入结果
+        success_count = 0
+        failed_users = []
+        
+        # 处理每一行数据
+        for index, row in df.iterrows():
+            try:
+                # 检查用户名和邮箱是否已存在
+                user_by_username = db.query(models.User).filter(models.User.username == row["username"]).first()
+                user_by_email = db.query(models.User).filter(models.User.email == row["email"]).first()
+                
+                if user_by_username:
+                    failed_users.append({
+                        "row": index + 2,  # Excel行号从1开始，标题占一行
+                        "username": row["username"],
+                        "reason": "用户名已存在"
+                    })
+                    continue
+                
+                if user_by_email:
+                    failed_users.append({
+                        "row": index + 2,
+                        "username": row["username"],
+                        "reason": "邮箱已存在"
+                    })
+                    continue
+                
+                # 创建用户
+                user = models.User(
+                    username=row["username"],
+                    email=row["email"],
+                    hashed_password=get_password_hash(row["password"]),
+                    name=row["name"],
+                    department=row.get("department", ""),
+                    is_active=True,
+                    is_superuser=False,
+                    team_id=None,
+                    last_password_change=datetime.now()
+                )
+                
+                # 添加团队（如果提供）
+                if "team_id" in df.columns and not pd.isna(row["team_id"]):
+                    team = db.query(models.Team).filter(models.Team.id == row["team_id"]).first()
+                    if team:
+                        user.team_id = team.id
+                
+                db.add(user)
+                db.commit()
+                db.refresh(user)
+                
+                # 添加角色（如果提供）
+                if "role" in df.columns and not pd.isna(row["role"]):
+                    add_role_for_user(str(user.id), row["role"])
+                else:
+                    # 默认角色为普通用户
+                    add_role_for_user(str(user.id), "user")
+                
+                success_count += 1
+                
+            except Exception as e:
+                failed_users.append({
+                    "row": index + 2,
+                    "username": row["username"] if "username" in row else "未知",
+                    "reason": str(e)
+                })
+        
+        return {
+            "success_count": success_count,
+            "failed_count": len(failed_users),
+            "failed_users": failed_users
+        }
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"导入用户时发生错误: {str(e)}"
+        )
+    finally:
+        file.file.close() 

@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -7,39 +7,36 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.api import deps
-from app.core import security
-from app.core.config import settings
-from app.core.security import get_password_hash
+from app.core.security import create_access_token, verify_password, get_password_hash
 from app.services.casbin_service import get_roles_for_user, get_permissions_for_role, add_role_for_user
 
 router = APIRouter()
 
 
 @router.post("/login", response_model=schemas.Token)
-def login_access_token(
-    db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
+def login(
+    db: Session = Depends(deps.get_db),
+    form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
-    获取OAuth2访问令牌
+    用户登录
     """
     user = db.query(models.User).filter(models.User.username == form_data.username).first()
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="用户名或密码错误",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    if not security.verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="用户名或密码错误",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise HTTPException(status_code=400, detail="用户名或密码错误")
+    if not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="用户名或密码错误")
     if not user.is_active:
-        raise HTTPException(status_code=400, detail="用户未激活")
+        raise HTTPException(status_code=400, detail="用户已被禁用")
     
     # 获取用户角色
     roles = get_roles_for_user(str(user.id))
+    
+    # 检查密码是否过期
+    password_expired = False
+    if user.last_password_change:
+        three_months_ago = datetime.now() - timedelta(days=90)
+        password_expired = user.last_password_change < three_months_ago
     
     # 获取用户权限
     permissions = []
@@ -56,25 +53,20 @@ def login_access_token(
     if user.is_superuser:
         permissions = ["*:*"]
     
-    # 创建访问令牌
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
-    # 构建用户信息
-    user_data = {
-        "id": user.id,
-        "username": user.username,
-        "name": user.name,
-        "role": roles[0] if roles else "user",  # 使用第一个角色作为主角色
-        "permissions": permissions,
-        "teamId": user.team_id,
-    }
+    access_token = create_access_token(
+        data={"sub": str(user.id), "roles": roles}
+    )
     
     return {
-        "access_token": security.create_access_token(
-            user.id, expires_delta=access_token_expires
-        ),
+        "access_token": access_token,
         "token_type": "bearer",
-        "user": user_data,
+        "user_id": user.id,
+        "username": user.username,
+        "name": user.name,
+        "roles": roles,
+        "password_expired": password_expired,
+        "permissions": permissions,
+        "teamId": user.team_id
     }
 
 
@@ -136,4 +128,46 @@ def read_users_me(
     """
     获取当前用户信息
     """
-    return current_user 
+    return current_user
+
+
+@router.post("/check-password-expired", response_model=schemas.PasswordExpiredResponse)
+def check_password_expired(
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    检查当前用户的密码是否过期
+    """
+    password_expired = False
+    if current_user.last_password_change:
+        three_months_ago = datetime.now() - timedelta(days=90)
+        password_expired = current_user.last_password_change < three_months_ago
+    
+    return {
+        "password_expired": password_expired,
+        "days_until_expiry": -1 if not password_expired else 0,  # 如果已过期，则为0
+        "last_password_change": current_user.last_password_change
+    }
+
+
+@router.post("/change-password", response_model=schemas.PasswordChangeResponse)
+def change_password(
+    password_data: schemas.PasswordChange,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    修改当前用户的密码
+    """
+    # 验证当前密码
+    if not verify_password(password_data.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="当前密码不正确")
+    
+    # 更新密码
+    current_user.hashed_password = get_password_hash(password_data.new_password)
+    current_user.last_password_change = datetime.now()
+    
+    db.add(current_user)
+    db.commit()
+    
+    return {"success": True, "message": "密码修改成功"} 

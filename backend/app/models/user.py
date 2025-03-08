@@ -1,5 +1,6 @@
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 from app.db.session import Base
 
@@ -16,6 +17,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
+    last_password_change = Column(DateTime, default=datetime.now)
     
     # 关系
     team = relationship("Team", back_populates="members", foreign_keys=[team_id])

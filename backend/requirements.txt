@@ -9,4 +9,7 @@ casbin==1.33.0
 casbin-sqlalchemy-adapter==0.5.0
 cx_Oracle==8.3.0
 alembic==1.13.1
-pytest==8.0.0 
+pytest==8.0.0
+pandas==2.2.0
+xlsxwriter==3.1.9
+openpyxl==3.1.2 

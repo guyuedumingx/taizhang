@@ -1,7 +1,10 @@
 from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Path, Response
 from sqlalchemy.orm import Session
+import pandas as pd
+from io import BytesIO
+from datetime import datetime
 
 from app import models, schemas
 from app.api import deps
@@ -296,4 +299,204 @@ def delete_ledger(
     db.delete(ledger)
     db.commit()
     
-    return ledger 
+    return ledger
+
+
+@router.get("/{ledger_id}/export", response_class=Response)
+def export_ledger(
+    *,
+    ledger_id: int = Path(...),
+    format: str = Query(..., description="导出格式，支持excel、csv、txt"),
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    导出台账数据
+    """
+    # 检查权限
+    if not deps.check_permissions("ledger", "view", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    # 获取台账
+    ledger = db.query(models.Ledger).filter(models.Ledger.id == ledger_id).first()
+    if not ledger:
+        raise HTTPException(status_code=404, detail="台账不存在")
+    
+    # 获取台账字段
+    template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="模板不存在")
+    
+    fields = db.query(models.Field).filter(models.Field.template_id == template.id).all()
+    
+    # 准备数据
+    data = {
+        "台账ID": ledger.id,
+        "标题": ledger.title,
+        "描述": ledger.description,
+        "创建时间": ledger.created_at.strftime("%Y-%m-%d %H:%M:%S") if ledger.created_at else "",
+        "更新时间": ledger.updated_at.strftime("%Y-%m-%d %H:%M:%S") if ledger.updated_at else "",
+        "创建人": db.query(models.User).filter(models.User.id == ledger.created_by_id).first().name if ledger.created_by_id else "",
+        "更新人": db.query(models.User).filter(models.User.id == ledger.updated_by_id).first().name if ledger.updated_by_id else "",
+    }
+    
+    # 添加自定义字段数据
+    for field in fields:
+        field_value = db.query(models.FieldValue).filter(
+            models.FieldValue.ledger_id == ledger.id,
+            models.FieldValue.field_id == field.id
+        ).first()
+        
+        data[field.name] = field_value.value if field_value else ""
+    
+    # 创建DataFrame
+    df = pd.DataFrame([data])
+    
+    # 根据格式导出
+    if format.lower() == "excel":
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+            df.to_excel(writer, index=False, sheet_name="台账数据")
+            # 调整列宽
+            worksheet = writer.sheets["台账数据"]
+            for i, col in enumerate(df.columns):
+                max_len = max(df[col].astype(str).map(len).max(), len(col)) + 2
+                worksheet.set_column(i, i, max_len)
+        
+        output.seek(0)
+        filename = f"台账_{ledger.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx"
+        return Response(
+            content=output.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    
+    elif format.lower() == "csv":
+        output = BytesIO()
+        df.to_csv(output, index=False, encoding="utf-8-sig")
+        output.seek(0)
+        filename = f"台账_{ledger.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+        return Response(
+            content=output.getvalue(),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    
+    elif format.lower() == "txt":
+        output = BytesIO()
+        df.to_csv(output, index=False, sep="\t", encoding="utf-8")
+        output.seek(0)
+        filename = f"台账_{ledger.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
+        return Response(
+            content=output.getvalue(),
+            media_type="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    
+    else:
+        raise HTTPException(status_code=400, detail="不支持的导出格式，支持的格式：excel、csv、txt")
+
+
+@router.get("/export-all", response_class=Response)
+def export_all_ledgers(
+    *,
+    format: str = Query(..., description="导出格式，支持excel、csv、txt"),
+    template_id: Optional[int] = Query(None, description="模板ID，用于筛选特定模板的台账"),
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    导出所有台账数据
+    """
+    # 检查权限
+    if not deps.check_permissions("ledger", "view", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    # 获取台账列表
+    query = db.query(models.Ledger)
+    if template_id:
+        query = query.filter(models.Ledger.template_id == template_id)
+    
+    ledgers = query.all()
+    if not ledgers:
+        raise HTTPException(status_code=404, detail="没有找到符合条件的台账")
+    
+    # 准备数据
+    all_data = []
+    
+    for ledger in ledgers:
+        # 获取台账字段
+        template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
+        if not template:
+            continue
+        
+        fields = db.query(models.Field).filter(models.Field.template_id == template.id).all()
+        
+        data = {
+            "台账ID": ledger.id,
+            "标题": ledger.title,
+            "描述": ledger.description,
+            "模板": template.name,
+            "创建时间": ledger.created_at.strftime("%Y-%m-%d %H:%M:%S") if ledger.created_at else "",
+            "更新时间": ledger.updated_at.strftime("%Y-%m-%d %H:%M:%S") if ledger.updated_at else "",
+            "创建人": db.query(models.User).filter(models.User.id == ledger.created_by_id).first().name if ledger.created_by_id else "",
+            "更新人": db.query(models.User).filter(models.User.id == ledger.updated_by_id).first().name if ledger.updated_by_id else "",
+        }
+        
+        # 添加自定义字段数据
+        for field in fields:
+            field_value = db.query(models.FieldValue).filter(
+                models.FieldValue.ledger_id == ledger.id,
+                models.FieldValue.field_id == field.id
+            ).first()
+            
+            data[f"{template.name}_{field.name}"] = field_value.value if field_value else ""
+        
+        all_data.append(data)
+    
+    # 创建DataFrame
+    df = pd.DataFrame(all_data)
+    
+    # 根据格式导出
+    if format.lower() == "excel":
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+            df.to_excel(writer, index=False, sheet_name="台账数据")
+            # 调整列宽
+            worksheet = writer.sheets["台账数据"]
+            for i, col in enumerate(df.columns):
+                max_len = max(df[col].astype(str).map(len).max(), len(col)) + 2
+                worksheet.set_column(i, i, max_len)
+        
+        output.seek(0)
+        filename = f"台账列表_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx"
+        return Response(
+            content=output.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    
+    elif format.lower() == "csv":
+        output = BytesIO()
+        df.to_csv(output, index=False, encoding="utf-8-sig")
+        output.seek(0)
+        filename = f"台账列表_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+        return Response(
+            content=output.getvalue(),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    
+    elif format.lower() == "txt":
+        output = BytesIO()
+        df.to_csv(output, index=False, sep="\t", encoding="utf-8")
+        output.seek(0)
+        filename = f"台账列表_{datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
+        return Response(
+            content=output.getvalue(),
+            media_type="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    
+    else:
+        raise HTTPException(status_code=400, detail="不支持的导出格式，支持的格式：excel、csv、txt") 
