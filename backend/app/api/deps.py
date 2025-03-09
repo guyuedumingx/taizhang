@@ -76,4 +76,36 @@ def check_permissions(
         return True
     
     # 使用Casbin检查权限
-    return check_permission(str(current_user.id), resource, action) 
+    return check_permission(str(current_user.id), resource, action)
+
+
+def get_roles_for_user(user_id: str):
+    """
+    获取用户的所有角色
+    
+    Args:
+        user_id: 用户ID
+    
+    Returns:
+        角色列表
+    """
+    from app.db.session import SessionLocal
+    from app.models.user_role import UserRole
+    from app.models.role import Role
+    
+    db = SessionLocal()
+    try:
+        # 查询用户角色关系
+        user_roles = db.query(UserRole).filter(UserRole.user_id == user_id).all()
+        
+        # 获取角色名称
+        role_ids = [ur.role_id for ur in user_roles]
+        roles = db.query(Role.name).filter(Role.id.in_(role_ids)).all()
+        
+        # 返回角色名称列表
+        return [role[0] for role in roles]
+    except Exception as e:
+        print(f"获取用户角色失败: {str(e)}")
+        return []
+    finally:
+        db.close() 

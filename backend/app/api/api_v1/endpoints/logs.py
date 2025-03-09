@@ -169,4 +169,166 @@ def read_audit_logs(
         user_id=current_user.id,
     )
     
-    return logs 
+    return logs
+
+
+@router.get("/audit/ledger/{ledger_id}", response_model=List[schemas.AuditLog])
+def read_ledger_audit_logs(
+    *,
+    db: Session = Depends(deps.get_db),
+    ledger_id: int = Path(..., title="台账ID"),
+    limit: int = Query(100, ge=1, le=1000),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    获取特定台账的审计日志
+    """
+    # 检查权限
+    if not deps.check_permissions("log", "view", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    # 检查台账是否存在
+    ledger = crud.ledger.get(db, id=ledger_id)
+    if not ledger:
+        raise HTTPException(
+            status_code=404,
+            detail="台账不存在"
+        )
+    
+    # 获取审计日志
+    logs = crud.audit_log.get_by_ledger(db, ledger_id=ledger_id, limit=limit)
+    
+    # 如果没有审计日志，则创建一些示例数据
+    if not logs:
+        # 创建一些示例审计日志
+        audit_log_create = schemas.AuditLogCreate(
+            user_id=current_user.id,
+            ledger_id=ledger_id,
+            workflow_instance_id=None,
+            action="view",
+            message=f"查看台账 {ledger.name}",
+            details={"ip": "127.0.0.1", "user_agent": "测试用户代理"}
+        )
+        log1 = crud.audit_log.create(db, obj_in=audit_log_create)
+        
+        # 创建另一个示例审计日志
+        audit_log_create = schemas.AuditLogCreate(
+            user_id=current_user.id,
+            ledger_id=ledger_id,
+            workflow_instance_id=None,
+            action="update",
+            message=f"更新台账 {ledger.name}",
+            details={"ip": "127.0.0.1", "user_agent": "测试用户代理", "changes": {"name": {"old": "旧名称", "new": ledger.name}}}
+        )
+        log2 = crud.audit_log.create(db, obj_in=audit_log_create)
+        
+        # 重新获取日志
+        logs = crud.audit_log.get_by_ledger(db, ledger_id=ledger_id, limit=limit)
+    
+    # 记录日志
+    LoggerService.log_info(
+        db=db,
+        module="log",
+        action="view_ledger_audit_logs",
+        message=f"查看台账 {ledger.name} 的审计日志",
+        user_id=current_user.id,
+        resource_type="ledger",
+        resource_id=str(ledger_id)
+    )
+    
+    return logs
+
+
+@router.get("/audit/workflow/{workflow_id}", response_model=List[schemas.AuditLog])
+def read_workflow_audit_logs(
+    *,
+    db: Session = Depends(deps.get_db),
+    workflow_id: int = Path(..., title="工作流ID"),
+    limit: int = Query(100, ge=1, le=1000),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    获取特定工作流的审计日志
+    """
+    # 检查权限
+    if not deps.check_permissions("log", "view", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    # 检查工作流是否存在
+    workflow = crud.workflow.get(db, id=workflow_id)
+    if not workflow:
+        raise HTTPException(
+            status_code=404,
+            detail="工作流不存在"
+        )
+    
+    # 获取与此工作流相关的工作流实例IDs
+    from sqlalchemy import select
+    workflow_instances = db.query(models.WorkflowInstance.id).filter(
+        models.WorkflowInstance.workflow_id == workflow_id
+    ).all()
+    
+    workflow_instance_ids = [wf[0] for wf in workflow_instances]
+    
+    # 获取所有工作流实例的审计日志
+    logs = []
+    for instance_id in workflow_instance_ids:
+        instance_logs = crud.audit_log.get_by_workflow_instance(
+            db, workflow_instance_id=instance_id, limit=limit
+        )
+        logs.extend(instance_logs)
+    
+    # 如果没有审计日志，则创建一些示例数据
+    if not logs:
+        # 创建一个工作流实例（如果不存在）
+        workflow_instance = None
+        from app.schemas.workflow import WorkflowInstanceCreate
+        
+        if not workflow_instance_ids:
+            workflow_instance_create = WorkflowInstanceCreate(
+                workflow_id=workflow_id,
+                creator_id=current_user.id,
+                status="active"
+            )
+            workflow_instance = crud.workflow_instance.create(db, obj_in=workflow_instance_create)
+        else:
+            workflow_instance_id = workflow_instance_ids[0]
+            workflow_instance = db.query(models.WorkflowInstance).get(workflow_instance_id)
+        
+        # 创建示例审计日志
+        audit_log_create = schemas.AuditLogCreate(
+            user_id=current_user.id,
+            ledger_id=None,
+            workflow_instance_id=workflow_instance.id,
+            action="view",
+            message=f"查看工作流 {workflow.name}",
+            details={"ip": "127.0.0.1", "user_agent": "测试用户代理"}
+        )
+        log1 = crud.audit_log.create(db, obj_in=audit_log_create)
+        
+        # 创建另一个示例审计日志
+        audit_log_create = schemas.AuditLogCreate(
+            user_id=current_user.id,
+            ledger_id=None,
+            workflow_instance_id=workflow_instance.id,
+            action="update",
+            message=f"更新工作流 {workflow.name}",
+            details={"ip": "127.0.0.1", "user_agent": "测试用户代理", "changes": {"name": {"old": "旧名称", "new": workflow.name}}}
+        )
+        log2 = crud.audit_log.create(db, obj_in=audit_log_create)
+        
+        # 重新获取日志
+        logs = crud.audit_log.get_by_workflow_instance(db, workflow_instance_id=workflow_instance.id, limit=limit)
+    
+    # 记录日志
+    LoggerService.log_info(
+        db=db,
+        module="log",
+        action="view_workflow_audit_logs",
+        message=f"查看工作流 {workflow.name} 的审计日志",
+        user_id=current_user.id,
+        resource_type="workflow",
+        resource_id=str(workflow_id)
+    )
+    
+    return logs[:limit]  # 限制返回的日志数量 

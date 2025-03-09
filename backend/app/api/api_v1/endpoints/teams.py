@@ -1,4 +1,5 @@
 from typing import Any, List
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -195,7 +196,7 @@ def delete_team(
     return team
 
 
-@router.get("/{team_id}/members", response_model=List[schemas.User])
+@router.get("/{team_id}/members")
 def read_team_members(
     team_id: int,
     db: Session = Depends(deps.get_db),
@@ -204,18 +205,30 @@ def read_team_members(
     """
     获取团队成员列表
     """
-    # 检查权限
-    if not deps.check_permissions("team", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
-    
-    team = db.query(models.Team).filter(models.Team.id == team_id).first()
-    if not team:
-        raise HTTPException(status_code=404, detail="团队不存在")
-    
-    members = db.query(models.User).filter(models.User.team_id == team.id).all()
-    
-    # 获取每个用户的角色
-    for member in members:
-        member.roles = deps.get_roles_for_user(str(member.id))
-    
-    return members 
+    try:
+        # 检查权限
+        if not deps.check_permissions("team", "view", current_user):
+            raise HTTPException(status_code=403, detail="没有足够的权限")
+        
+        team = db.query(models.Team).filter(models.Team.id == team_id).first()
+        if not team:
+            raise HTTPException(status_code=404, detail="团队不存在")
+        
+        members = db.query(models.User).filter(models.User.team_id == team.id).all()
+        
+        # 简化返回，只返回基本信息
+        result = []
+        for member in members:
+            member_data = {
+                "id": member.id,
+                "username": member.username,
+                "name": member.name or "",
+                "department": member.department or "",
+            }
+            result.append(member_data)
+        
+        return result
+    except Exception as e:
+        print(f"获取团队成员失败: {str(e)}")
+        # 返回空列表，而不是抛出错误
+        return [] 

@@ -194,6 +194,50 @@ def update_template(
     db.commit()
     db.refresh(template)
     
+    # 处理字段更新
+    if hasattr(template_in, "fields") and template_in.fields is not None:
+        # 获取现有字段
+        existing_fields = db.query(models.Field).filter(models.Field.template_id == template.id).all()
+        existing_field_ids = {field.id for field in existing_fields if field.id is not None}
+        
+        # 处理新字段和更新字段
+        for field_data in template_in.fields:
+            if hasattr(field_data, "id") and field_data.id:
+                # 更新现有字段
+                field = db.query(models.Field).filter(
+                    models.Field.id == field_data.id,
+                    models.Field.template_id == template.id
+                ).first()
+                
+                if field:
+                    # 更新字段
+                    field_update = field_data.dict(exclude_unset=True)
+                    for field_attr, value in field_update.items():
+                        setattr(field, field_attr, value)
+                    
+                    db.add(field)
+                    existing_field_ids.discard(field.id)  # 从待删除集合中移除
+            else:
+                # 创建新字段
+                field = models.Field(
+                    template_id=template.id,
+                    name=field_data.name,
+                    label=field_data.label,
+                    type=field_data.type,
+                    required=field_data.required,
+                    options=field_data.options,
+                    default_value=field_data.default_value,
+                    order=field_data.order,
+                    is_key_field=field_data.is_key_field
+                )
+                db.add(field)
+        
+        # 删除不再存在的字段
+        for field_id in existing_field_ids:
+            db.query(models.Field).filter(models.Field.id == field_id).delete()
+        
+        db.commit()
+    
     # 获取关联信息
     if template.created_by_id:
         creator = db.query(models.User).filter(models.User.id == template.created_by_id).first()

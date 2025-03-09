@@ -7,7 +7,7 @@ from app.schemas.template import Template, TemplateCreate, TemplateUpdate, Templ
 from app.schemas.field import Field, FieldCreate, FieldUpdate
 from app.schemas.workflow import (
     Workflow, WorkflowCreate, WorkflowUpdate, 
-    WorkflowNode, WorkflowNodeCreate, WorkflowNodeUpdate,
+    WorkflowNode, WorkflowNodeCreate, WorkflowNodeCreateWithId, WorkflowNodeUpdate,
     WorkflowInstance, WorkflowInstanceCreate, WorkflowInstanceUpdate,
     WorkflowInstanceNode, WorkflowInstanceNodeCreate, WorkflowInstanceNodeUpdate,
     ApprovalAction

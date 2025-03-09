@@ -231,7 +231,7 @@ def create_workflow_node(
     *,
     db: Session = Depends(deps.get_db),
     workflow_id: int = Path(...),
-    node_in: schemas.WorkflowNodeCreate,
+    node_in: schemas.WorkflowNodeCreateWithId,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -358,4 +358,43 @@ def delete_workflow_node(
         resource_id=str(node_id),
     )
     
-    return node 
+    return node
+
+
+@router.post("/{workflow_id}/deactivate", response_model=schemas.Workflow)
+def deactivate_workflow(
+    *,
+    db: Session = Depends(deps.get_db),
+    workflow_id: int = Path(...),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    停用工作流（即使正在被使用）
+    """
+    # 检查权限
+    if not deps.check_permissions("workflow", "edit", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    # 获取工作流
+    workflow = crud.workflow.get(db, id=workflow_id)
+    if not workflow:
+        raise HTTPException(status_code=404, detail="工作流不存在")
+    
+    # 停用工作流
+    workflow = crud.workflow.deactivate(db, workflow_id=workflow_id)
+    
+    # 记录日志
+    LoggerService.log_info(
+        db=db,
+        module="workflow",
+        action="deactivate",
+        message=f"停用工作流 {workflow.name}",
+        user_id=current_user.id,
+        resource_type="workflow",
+        resource_id=str(workflow_id),
+    )
+    
+    # 获取工作流节点
+    workflow.nodes = crud.workflow_node.get_by_workflow(db, workflow_id=workflow_id)
+    
+    return workflow 

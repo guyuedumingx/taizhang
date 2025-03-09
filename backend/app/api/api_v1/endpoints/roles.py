@@ -148,12 +148,16 @@ def update_role(
                 detail="角色名称已存在",
             )
     
+    # 保存原始角色名称，以防更新
+    original_role_name = role.name
+    
     # 更新角色信息
     update_data = role_in.dict(exclude_unset=True)
     
     # 处理权限更新
+    permissions_to_set = []
     if "permissions" in update_data:
-        permissions = update_data.pop("permissions")
+        permissions_to_set = update_data.pop("permissions")
         
         # 获取当前权限
         current_permissions = get_permissions_for_role(role.name)
@@ -164,14 +168,14 @@ def update_role(
                 current_permission_strs.append(f"{p[1]}:{p[2]}")
         
         # 添加新权限
-        for permission in permissions:
+        for permission in permissions_to_set:
             if permission not in current_permission_strs:
                 resource, action = permission.split(":")
                 add_permission_for_role(role.name, resource, action)
         
         # 删除移除的权限
         for permission in current_permission_strs:
-            if permission not in permissions:
+            if permission not in permissions_to_set:
                 resource, action = permission.split(":")
                 remove_permission_for_role(role.name, resource, action)
     
@@ -183,15 +187,31 @@ def update_role(
     db.commit()
     db.refresh(role)
     
-    # 获取更新后的权限
-    permissions = get_permissions_for_role(role.name)
-    # 转换权限格式
-    role.permissions = []
-    for p in permissions:
-        if len(p) >= 3:
-            role.permissions.append(f"{p[1]}:{p[2]}")
+    # 如果角色名称已更改，需要更新Casbin中的权限
+    if original_role_name != role.name and permissions_to_set:
+        # 为新角色名称添加权限
+        for permission in permissions_to_set:
+            resource, action = permission.split(":")
+            add_permission_for_role(role.name, resource, action)
+        
+        # 删除旧角色名称的权限
+        old_permissions = get_permissions_for_role(original_role_name)
+        for p in old_permissions:
+            if len(p) >= 3:
+                remove_permission_for_role(original_role_name, p[1], p[2])
     
-    return role
+    # 创建一个新的响应对象，包含角色信息和权限
+    response = {
+        "id": role.id,
+        "name": role.name,
+        "description": role.description,
+        "is_system": role.is_system,
+        "created_at": role.created_at,
+        "updated_at": role.updated_at,
+        "permissions": permissions_to_set if permissions_to_set else []
+    }
+    
+    return response
 
 
 @router.delete("/{role_id}", response_model=schemas.Role)

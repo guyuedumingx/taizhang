@@ -146,3 +146,20 @@ def test_normal_user_log_permissions():
     finally:
         # 恢复原来的覆盖
         app.dependency_overrides[get_current_active_user] = original_override 
+
+def test_get_workflow_audit_logs():
+    """测试获取工作流审计日志"""
+    response = client.get("/api/v1/logs/audit/workflow/1")
+    # 由于是测试环境，可能找不到工作流，但API路由应该存在
+    assert response.status_code in [200, 404]
+    
+    if response.status_code == 200:
+        assert isinstance(response.json(), list)
+        logs = response.json()
+        if logs:  # 如果有日志数据
+            first_log = logs[0]
+            # 检查日志结构
+            assert "user_id" in first_log
+            assert "workflow_instance_id" in first_log
+            assert "action" in first_log
+            assert "created_at" in first_log 

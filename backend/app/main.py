@@ -28,6 +28,11 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 async def root():
     return {"message": "台账管理系统API服务"}
 
+@app.get("/health")
+async def health_check():
+    """健康检查接口"""
+    return {"status": "ok", "message": "服务正常运行"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="0.0.0.0", port=8080, reload=True) 

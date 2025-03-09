@@ -40,7 +40,7 @@ def create_test_users():
         # 1. 管理员用户 - 密码正常
         admin = User(
             username="admin",
-            email="admin@example.com",
+            ehr_id="1000001",
             hashed_password=get_password_hash("admin123"),
             name="系统管理员",
             department="IT部门",
@@ -53,7 +53,7 @@ def create_test_users():
         # 2. 经理用户 - 密码过期
         manager = User(
             username="manager",
-            email="manager@example.com",
+            ehr_id="1000002",
             hashed_password=get_password_hash("manager123"),
             name="部门经理",
             department="财务部",
@@ -66,7 +66,7 @@ def create_test_users():
         # 3. 普通用户 - 密码正常
         user = User(
             username="user",
-            email="user@example.com",
+            ehr_id="1000003",
             hashed_password=get_password_hash("user123"),
             name="普通用户",
             department="技术部",
@@ -79,7 +79,7 @@ def create_test_users():
         # 4. 即将过期用户 - 密码即将过期
         expiring_user = User(
             username="expiring",
-            email="expiring@example.com",
+            ehr_id="1000004",
             hashed_password=get_password_hash("expiring123"),
             name="即将过期用户",
             department="技术部",

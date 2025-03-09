@@ -59,18 +59,18 @@ def create_user(
             detail="用户名已存在",
         )
     
-    # 检查邮箱是否已存在
-    user = db.query(models.User).filter(models.User.email == user_in.email).first()
+    # 检查EHR号是否已存在
+    user = db.query(models.User).filter(models.User.ehr_id == user_in.ehr_id).first()
     if user:
         raise HTTPException(
             status_code=400,
-            detail="邮箱已存在",
+            detail="EHR号已存在",
         )
     
     # 创建用户
     user = models.User(
         username=user_in.username,
-        email=user_in.email,
+        ehr_id=user_in.ehr_id,
         hashed_password=get_password_hash(user_in.password),
         name=user_in.name,
         department=user_in.department,
@@ -238,7 +238,7 @@ def import_users(
             df = pd.read_excel(buffer)
         
         # 验证必要的列
-        required_columns = ["username", "email", "password", "name"]
+        required_columns = ["username", "ehr_id", "password", "name"]
         for column in required_columns:
             if column not in df.columns:
                 raise HTTPException(
@@ -252,9 +252,9 @@ def import_users(
         # 处理每一行数据
         for index, row in df.iterrows():
             try:
-                # 检查用户名和邮箱是否已存在
+                # 检查用户名和EHR号是否已存在
                 user_by_username = db.query(models.User).filter(models.User.username == row["username"]).first()
-                user_by_email = db.query(models.User).filter(models.User.email == row["email"]).first()
+                user_by_ehr_id = db.query(models.User).filter(models.User.ehr_id == row["ehr_id"]).first()
                 
                 if user_by_username:
                     failed_users.append({
@@ -264,18 +264,18 @@ def import_users(
                     })
                     continue
                 
-                if user_by_email:
+                if user_by_ehr_id:
                     failed_users.append({
                         "row": index + 2,
                         "username": row["username"],
-                        "reason": "邮箱已存在"
+                        "reason": "EHR号已存在"
                     })
                     continue
                 
                 # 创建用户
                 user = models.User(
                     username=row["username"],
-                    email=row["email"],
+                    ehr_id=row["ehr_id"],
                     hashed_password=get_password_hash(row["password"]),
                     name=row["name"],
                     department=row.get("department", ""),

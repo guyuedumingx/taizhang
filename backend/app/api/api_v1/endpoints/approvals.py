@@ -340,20 +340,20 @@ def cancel_approval(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    取消审批流程
+    取消台账的审批流程
     """
     # 获取台账
     ledger = crud.ledger.get(db, id=ledger_id)
     if not ledger:
         raise HTTPException(status_code=404, detail="台账不存在")
     
-    # 检查是否为台账创建者或有管理员权限
+    # 检查是否为台账创建者或有管理权限
     if ledger.created_by_id != current_user.id and not deps.check_permissions("ledger", "admin_approve", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 检查台账状态
-    if ledger.approval_status != "pending":
-        raise HTTPException(status_code=400, detail="台账当前不在待审批状态")
+    if ledger.status != "active" or ledger.approval_status != "pending":
+        raise HTTPException(status_code=400, detail="只有处于审批中的台账可以取消审批")
     
     # 获取活动的工作流实例
     workflow_instance = crud.workflow_instance.get_active_by_ledger(db, ledger_id=ledger_id)
@@ -365,9 +365,10 @@ def cancel_approval(
     
     # 更新台账状态
     ledger_update = {
+        "status": "draft",
         "approval_status": "cancelled",
-        "status": "draft",  # 退回草稿状态
-        "current_approver_id": None,
+        "workflow_id": None,
+        "current_approver_id": None
     }
     
     ledger = crud.ledger.update(db, db_obj=ledger, obj_in=ledger_update)

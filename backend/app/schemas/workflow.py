@@ -13,8 +13,12 @@ class WorkflowNodeBase(BaseModel):
     is_final: bool = False
     reject_to_node_id: Optional[int] = None
 
-# 创建工作流节点模型
+# 创建工作流节点模型 - 用于创建工作流时使用，不需要workflow_id
 class WorkflowNodeCreate(WorkflowNodeBase):
+    pass
+
+# 创建工作流节点模型 - 用于单独创建节点时使用，需要workflow_id
+class WorkflowNodeCreateWithId(WorkflowNodeBase):
     workflow_id: int
 
 # 更新工作流节点模型

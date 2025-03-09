@@ -14,14 +14,9 @@ class Template(Base):
     department = Column(String, nullable=False)
     is_system = Column(Boolean, default=False)
     
-    # 台账类型
-    type = Column(String, nullable=False, default="standard")  # standard, no_rejection, auto_approval
-    require_approval = Column(Boolean, default=True)  # 是否需要审批流程
-    
     # 外键
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     updated_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    default_workflow_id = Column(Integer, ForeignKey("workflows.id"), nullable=True)  # 默认工作流
     
     # 时间戳
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -32,5 +27,4 @@ class Template(Base):
     ledgers = relationship("Ledger", back_populates="template")
     creator = relationship("User", foreign_keys=[created_by_id])
     updater = relationship("User", foreign_keys=[updated_by_id])
-    default_workflow = relationship("Workflow", foreign_keys=[default_workflow_id])
     workflows = relationship("Workflow", back_populates="template", foreign_keys="Workflow.template_id") 

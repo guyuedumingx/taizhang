@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app.crud.base import CRUDBase
 from app.models.workflow import Workflow, WorkflowNode, WorkflowInstance, WorkflowInstanceNode, ApprovalStatus
-from app.schemas.workflow import WorkflowCreate, WorkflowUpdate, WorkflowNodeCreate, WorkflowNodeUpdate, WorkflowInstanceCreate, WorkflowInstanceUpdate, WorkflowInstanceNodeCreate, WorkflowInstanceNodeUpdate
+from app.schemas.workflow import WorkflowCreate, WorkflowUpdate, WorkflowNodeCreate, WorkflowNodeCreateWithId, WorkflowNodeUpdate, WorkflowInstanceCreate, WorkflowInstanceUpdate, WorkflowInstanceNodeCreate, WorkflowInstanceNodeUpdate
 from app.models.user import User
 from app.models.role import Role
 from app.models.ledger import Ledger
@@ -23,6 +23,7 @@ class CRUDWorkflow(CRUDBase[Workflow, WorkflowCreate, WorkflowUpdate]):
         # 然后创建工作流节点
         if obj_in.nodes:
             for node_data in obj_in.nodes:
+                # 创建节点数据字典，添加workflow_id
                 node_dict = node_data.dict()
                 node_dict["workflow_id"] = db_obj.id  # 使用新创建的工作流ID
                 db_node = WorkflowNode(**node_dict)
@@ -54,18 +55,16 @@ class CRUDWorkflow(CRUDBase[Workflow, WorkflowCreate, WorkflowUpdate]):
         return db_obj
 
 
-class CRUDWorkflowNode(CRUDBase[WorkflowNode, WorkflowNodeCreate, WorkflowNodeUpdate]):
+class CRUDWorkflowNode(CRUDBase[WorkflowNode, WorkflowNodeCreateWithId, WorkflowNodeUpdate]):
     def get_by_workflow(self, db: Session, *, workflow_id: int) -> List[WorkflowNode]:
-        """获取工作流的所有节点，按顺序排序"""
-        return db.query(WorkflowNode).filter(
-            WorkflowNode.workflow_id == workflow_id
-        ).order_by(WorkflowNode.order_index).all()
+        """获取工作流的所有节点"""
+        return db.query(WorkflowNode).filter(WorkflowNode.workflow_id == workflow_id).order_by(WorkflowNode.order_index).all()
     
     def get_start_node(self, db: Session, *, workflow_id: int) -> Optional[WorkflowNode]:
         """获取工作流的开始节点"""
         return db.query(WorkflowNode).filter(
             WorkflowNode.workflow_id == workflow_id,
-            WorkflowNode.order_index == 0
+            WorkflowNode.node_type == "start"
         ).first()
     
     def get_next_node(self, db: Session, *, current_node_id: int) -> Optional[WorkflowNode]:
@@ -74,13 +73,16 @@ class CRUDWorkflowNode(CRUDBase[WorkflowNode, WorkflowNodeCreate, WorkflowNodeUp
         if not current_node:
             return None
         
-        return db.query(WorkflowNode).filter(
+        # 获取下一个节点
+        next_node = db.query(WorkflowNode).filter(
             WorkflowNode.workflow_id == current_node.workflow_id,
-            WorkflowNode.order_index == current_node.order_index + 1
-        ).first()
+            WorkflowNode.order_index > current_node.order_index
+        ).order_by(WorkflowNode.order_index).first()
+        
+        return next_node
     
     def get_reject_node(self, db: Session, *, current_node_id: int) -> Optional[WorkflowNode]:
-        """获取拒绝后应该跳转的节点"""
+        """获取拒绝后的节点"""
         current_node = db.query(WorkflowNode).filter(WorkflowNode.id == current_node_id).first()
         if not current_node or not current_node.reject_to_node_id:
             return None
