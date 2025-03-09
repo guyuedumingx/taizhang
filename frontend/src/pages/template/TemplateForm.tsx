@@ -5,7 +5,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import { TemplateService } from '../../services/TemplateService';
-import { TemplateCreate, TemplateUpdate, FieldCreate, TemplateDetail } from '../../types';
+import { TeamService } from '../../services/TeamService';
+import { TemplateCreate, TemplateUpdate, FieldCreate, Team } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
@@ -19,6 +20,7 @@ const TemplateForm: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [teams, setTeams] = useState<Team[]>([]);
   
   const isEdit = !!id;
 
@@ -31,16 +33,30 @@ const TemplateForm: React.FC = () => {
       return;
     }
 
+    // 获取团队列表
+    fetchTeams();
+
     if (isEdit) {
       fetchTemplate(parseInt(id));
     }
   }, [isEdit, id, hasPermission, navigate]);
 
+  // 获取团队列表
+  const fetchTeams = async () => {
+    try {
+      const teamsData = await TeamService.getTeams();
+      setTeams(teamsData);
+    } catch (error) {
+      console.error('获取团队列表失败:', error);
+      message.error('获取团队列表失败');
+    }
+  };
+
   // 获取模板详情
   const fetchTemplate = async (templateId: number) => {
     setLoading(true);
     try {
-      const template = await TemplateService.getTemplate(templateId);
+      const template = await TemplateService.getTemplateDetail(templateId);
       
       // 转换字段数据格式以适应表单
       const fieldsData = template.fields.map(field => ({
@@ -57,6 +73,10 @@ const TemplateForm: React.FC = () => {
         name: template.name,
         department: template.department,
         description: template.description || '',
+        default_ledger_name: template.default_ledger_name || '',
+        default_description: template.default_description || '',
+        default_status: template.default_status || 'draft',
+        default_team_id: template.default_team_id || null,
         fields: fieldsData
       });
     } catch (error) {
@@ -68,20 +88,20 @@ const TemplateForm: React.FC = () => {
   };
 
   // 提交表单
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Record<string, unknown>) => {
     // 转换字段数据
-    const fields = values.fields.map((field: any) => {
+    const fields = (values.fields as Array<Record<string, unknown>>).map((field) => {
       const fieldData: FieldCreate = {
-        name: field.name,
-        label: field.label,
-        type: field.type,
-        required: field.required || false,
-        is_key_field: field.is_key_field || false
+        name: field.name as string,
+        label: field.label as string,
+        type: field.type as string,
+        required: field.required as boolean || false,
+        is_key_field: field.is_key_field as boolean || false
       };
       
       // 处理选项类型的字段
       if (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox') {
-        fieldData.options = field.options ? field.options.split(',').map((opt: string) => opt.trim()) : [];
+        fieldData.options = field.options ? (field.options as string).split(',').map((opt: string) => opt.trim()) : [];
       }
       
       return fieldData;
@@ -93,9 +113,13 @@ const TemplateForm: React.FC = () => {
       if (isEdit) {
         // 更新模板
         const updateData: TemplateUpdate = {
-          name: values.name,
-          department: values.department,
-          description: values.description,
+          name: values.name as string,
+          department: values.department as string,
+          description: values.description as string,
+          default_ledger_name: values.default_ledger_name as string,
+          default_description: values.default_description as string,
+          default_status: values.default_status as string,
+          default_team_id: values.default_team_id as number,
           fields: fields
         };
         
@@ -104,9 +128,13 @@ const TemplateForm: React.FC = () => {
       } else {
         // 创建模板
         const createData: TemplateCreate = {
-          name: values.name,
-          department: values.department,
-          description: values.description,
+          name: values.name as string,
+          department: values.department as string,
+          description: values.description as string,
+          default_ledger_name: values.default_ledger_name as string,
+          default_description: values.default_description as string,
+          default_status: values.default_status as string,
+          default_team_id: values.default_team_id as number,
           fields: fields
         };
         
@@ -117,8 +145,8 @@ const TemplateForm: React.FC = () => {
       // 返回模板列表页面
       navigate('/dashboard/templates');
     } catch (error) {
-      console.error('操作失败:', error);
-      message.error('提交失败，请检查数据后重试');
+      console.error('模板操作失败:', error);
+      message.error('操作失败，请重试');
     } finally {
       setSubmitting(false);
     }
@@ -131,15 +159,19 @@ const TemplateForm: React.FC = () => {
           { title: '模板管理', path: '/dashboard/templates' },
           { title: isEdit ? '编辑模板' : '创建模板' }
         ]}
+        backButtonText="返回列表"
+        onBack={() => navigate('/dashboard/templates')}
       />
       
-      <Card loading={loading} title={<Title level={4}>{isEdit ? '编辑模板' : '创建模板'}</Title>}>
+      <Card loading={loading}>
+        <Title level={4}>{isEdit ? '编辑模板' : '创建模板'}</Title>
         <Form
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
           initialValues={{
-            fields: [{ type: 'input', required: true }]
+            default_status: 'draft',
+            fields: []
           }}
         >
           <Form.Item
@@ -170,6 +202,44 @@ const TemplateForm: React.FC = () => {
             <TextArea rows={4} placeholder="请输入模板描述" />
           </Form.Item>
           
+          <Divider orientation="left">台账默认值设置</Divider>
+          
+          <Form.Item
+            name="default_ledger_name"
+            label="默认台账名称"
+          >
+            <Input placeholder="请输入默认台账名称" />
+          </Form.Item>
+          
+          <Form.Item
+            name="default_description"
+            label="默认台账描述"
+          >
+            <TextArea rows={2} placeholder="请输入默认台账描述" />
+          </Form.Item>
+          
+          <Form.Item
+            name="default_status"
+            label="默认台账状态"
+          >
+            <Select placeholder="选择默认状态">
+              <Option value="draft">草稿</Option>
+              <Option value="active">处理中</Option>
+              <Option value="completed">已完成</Option>
+            </Select>
+          </Form.Item>
+          
+          <Form.Item
+            name="default_team_id"
+            label="默认所属团队"
+          >
+            <Select placeholder="选择默认团队" allowClear>
+              {teams.map(team => (
+                <Option key={team.id} value={team.id}>{team.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          
           <Divider orientation="left">字段配置</Divider>
           
           <Form.List
@@ -187,11 +257,11 @@ const TemplateForm: React.FC = () => {
           >
             {(fields, { add, remove }, { errors }) => (
               <>
-                {fields.map((field, index) => (
+                {fields.map((field) => (
                   <Card
-                    key={field.key}
+                    key={field.key.toString()}
                     size="small"
-                    title={`字段 ${index + 1}`}
+                    title={`字段 ${field.name + 1}`}
                     style={{ marginBottom: 16 }}
                     extra={
                       fields.length > 1 ? (
@@ -204,7 +274,7 @@ const TemplateForm: React.FC = () => {
                     <Form.Item
                       {...field}
                       name={[field.name, 'name']}
-                      fieldKey={[field.fieldKey, 'name']}
+                      fieldKey={[field.key, 'name']}
                       label="字段名称"
                       rules={[{ required: true, message: '请输入字段名称' }]}
                     >
@@ -214,7 +284,7 @@ const TemplateForm: React.FC = () => {
                     <Form.Item
                       {...field}
                       name={[field.name, 'label']}
-                      fieldKey={[field.fieldKey, 'label']}
+                      fieldKey={[field.key, 'label']}
                       label="显示名称"
                       rules={[{ required: true, message: '请输入显示名称' }]}
                     >
@@ -224,7 +294,7 @@ const TemplateForm: React.FC = () => {
                     <Form.Item
                       {...field}
                       name={[field.name, 'type']}
-                      fieldKey={[field.fieldKey, 'type']}
+                      fieldKey={[field.key, 'type']}
                       label="字段类型"
                       rules={[{ required: true, message: '请选择字段类型' }]}
                     >
@@ -253,7 +323,7 @@ const TemplateForm: React.FC = () => {
                             <Form.Item
                               {...field}
                               name={[field.name, 'options']}
-                              fieldKey={[field.fieldKey, 'options']}
+                              fieldKey={[field.key, 'options']}
                               label="选项值 (用逗号分隔)"
                               rules={[{ required: true, message: '请输入选项值' }]}
                             >
@@ -268,7 +338,7 @@ const TemplateForm: React.FC = () => {
                     <Form.Item
                       {...field}
                       name={[field.name, 'required']}
-                      fieldKey={[field.fieldKey, 'required']}
+                      fieldKey={[field.key, 'required']}
                       label="是否必填"
                       valuePropName="checked"
                     >
@@ -281,7 +351,7 @@ const TemplateForm: React.FC = () => {
                     <Form.Item
                       {...field}
                       name={[field.name, 'is_key_field']}
-                      fieldKey={[field.fieldKey, 'is_key_field']}
+                      fieldKey={[field.key, 'is_key_field']}
                       label="是否为关键字段"
                       valuePropName="checked"
                     >

@@ -1,11 +1,11 @@
-import api from '../api';
-import { Workflow, WorkflowCreate, WorkflowUpdate, WorkflowNodeCreate, WorkflowNode, Template, User, Role } from '../types';
+import * as workflowsApi from '../api/workflows';
+import { Workflow, WorkflowCreate, WorkflowUpdate, WorkflowNode, WorkflowNodeCreate, LedgerApproval, Template, User, Role } from '../types';
 
 export class WorkflowService {
   // 获取工作流列表
   static async getWorkflows(): Promise<Workflow[]> {
     try {
-      return await api.workflows.getWorkflows();
+      return await workflowsApi.getWorkflows();
     } catch (error) {
       console.error('获取工作流列表失败:', error);
       throw error;
@@ -16,7 +16,7 @@ export class WorkflowService {
   static async getWorkflow(id: number): Promise<Workflow> {
     try {
       console.log(`开始获取工作流 ${id} 详情`);
-      const workflow = await api.workflows.getWorkflow(id);
+      const workflow = await workflowsApi.getWorkflow(id);
       
       // 确保工作流对象有效
       if (!workflow || !workflow.id) {
@@ -26,7 +26,7 @@ export class WorkflowService {
       // 获取工作流节点
       try {
         console.log(`获取工作流 ${id} 的节点`);
-        const nodes = await api.workflows.getWorkflowNodes(id);
+        const nodes = await workflowsApi.getWorkflowNodes(id);
         workflow.nodes = nodes; // 将节点添加到工作流对象
         console.log(`工作流 ${id} 的节点数量: ${nodes.length}`);
       } catch (nodeError) {
@@ -45,7 +45,7 @@ export class WorkflowService {
   // 创建工作流
   static async createWorkflow(workflow: WorkflowCreate): Promise<Workflow> {
     try {
-      return await api.workflows.createWorkflow(workflow);
+      return await workflowsApi.createWorkflow(workflow);
     } catch (error) {
       console.error('创建工作流失败:', error);
       throw error;
@@ -55,7 +55,7 @@ export class WorkflowService {
   // 更新工作流
   static async updateWorkflow(id: number, workflow: WorkflowUpdate): Promise<Workflow> {
     try {
-      return await api.workflows.updateWorkflow(id, workflow);
+      return await workflowsApi.updateWorkflow(id, workflow);
     } catch (error) {
       console.error(`更新工作流 ${id} 失败:`, error);
       throw error;
@@ -65,7 +65,7 @@ export class WorkflowService {
   // 删除工作流
   static async deleteWorkflow(id: number): Promise<void> {
     try {
-      await api.workflows.deleteWorkflow(id);
+      await workflowsApi.deleteWorkflow(id);
     } catch (error) {
       console.error(`删除工作流 ${id} 失败:`, error);
       throw error;
@@ -75,7 +75,7 @@ export class WorkflowService {
   // 获取模板列表
   static async getTemplates(): Promise<Template[]> {
     try {
-      return await api.templates.getTemplates();
+      return await workflowsApi.getTemplates();
     } catch (error) {
       console.error('获取模板列表失败:', error);
       throw error;
@@ -85,7 +85,7 @@ export class WorkflowService {
   // 获取角色列表
   static async getRoles(): Promise<Role[]> {
     try {
-      return await api.roles.getRoles();
+      return await workflowsApi.getRoles();
     } catch (error) {
       console.error('获取角色列表失败:', error);
       throw error;
@@ -95,7 +95,7 @@ export class WorkflowService {
   // 获取用户列表
   static async getUsers(): Promise<User[]> {
     try {
-      return await api.users.getUsers();
+      return await workflowsApi.getUsers();
     } catch (error) {
       console.error('获取用户列表失败:', error);
       throw error;
@@ -111,6 +111,9 @@ export class WorkflowService {
         description: '工作流开始',
         node_type: 'start',
         order_index: 0,
+        multi_approve_type: 'any',
+        need_select_next_approver: false,
+        approver_ids: [],
       },
       {
         workflow_id: 0,
@@ -120,6 +123,9 @@ export class WorkflowService {
         approver_role_id: null,
         approver_user_id: null,
         order_index: 1,
+        multi_approve_type: 'any',
+        need_select_next_approver: false,
+        approver_ids: [],
       },
       {
         workflow_id: 0,
@@ -128,6 +134,9 @@ export class WorkflowService {
         node_type: 'end',
         order_index: 2,
         is_final: true,
+        multi_approve_type: 'any',
+        need_select_next_approver: false,
+        approver_ids: [],
       },
     ];
   }
@@ -144,6 +153,9 @@ export class WorkflowService {
       approver_user_id: null,
       order_index: nodes.length - 1, // 插入到结束节点之前
       is_final: false,
+      multi_approve_type: 'any',
+      need_select_next_approver: false,
+      approver_ids: [],
     };
     
     // 更新结束节点的顺序
@@ -235,6 +247,18 @@ export class WorkflowService {
       case 'is_final':
         node.is_final = value as boolean | undefined;
         break;
+      case 'multi_approve_type':
+        node.multi_approve_type = value as string;
+        break;
+      case 'need_select_next_approver':
+        node.need_select_next_approver = value as boolean;
+        break;
+      case 'approver_ids':
+        node.approver_ids = value as number[];
+        break;
+      case 'reject_to_node_id':
+        node.reject_to_node_id = value as number | null | undefined;
+        break;
       // 可以根据需要添加更多字段
     }
     
@@ -244,7 +268,7 @@ export class WorkflowService {
   // 获取工作流节点
   static async getWorkflowNodes(workflowId: number): Promise<WorkflowNode[]> {
     try {
-      return await api.workflows.getWorkflowNodes(workflowId);
+      return await workflowsApi.getWorkflowNodes(workflowId);
     } catch (error) {
       console.error(`获取工作流 ${workflowId} 节点失败:`, error);
       throw error;
@@ -254,7 +278,7 @@ export class WorkflowService {
   // 创建工作流节点
   static async createWorkflowNode(workflowId: number, node: WorkflowNodeCreate): Promise<WorkflowNode> {
     try {
-      return await api.workflows.createWorkflowNode(workflowId, node);
+      return await workflowsApi.createWorkflowNode(workflowId, node);
     } catch (error) {
       console.error(`创建工作流 ${workflowId} 节点失败:`, error);
       throw error;
@@ -264,10 +288,50 @@ export class WorkflowService {
   // 删除工作流节点
   static async deleteWorkflowNode(workflowId: number, nodeId: number): Promise<void> {
     try {
-      await api.workflows.deleteWorkflowNode(workflowId, nodeId);
+      await workflowsApi.deleteWorkflowNode(workflowId, nodeId);
     } catch (error) {
       console.error(`删除工作流节点 ${nodeId} 失败:`, error);
       throw error;
+    }
+  }
+
+  // 处理审批
+  static async processApproval(ledgerId: number, data: LedgerApproval): Promise<void> {
+    try {
+      await workflowsApi.processApproval(ledgerId, data);
+    } catch (error) {
+      console.error(`处理台账 ${ledgerId} 审批失败:`, error);
+      throw error;
+    }
+  }
+
+  // 保存工作流节点的审批人
+  static async saveNodeApprovers(nodeId: number, approverIds: number[]): Promise<void> {
+    try {
+      console.log(`正在保存节点ID=${nodeId}的审批人列表:`, approverIds);
+      
+      if (!nodeId || nodeId <= 0) {
+        console.warn('节点ID无效，跳过保存审批人');
+        return;
+      }
+      
+      // 使用更新API直接设置全部审批人
+      await workflowsApi.updateNodeApprovers(nodeId, approverIds);
+      console.log(`保存节点ID=${nodeId}的审批人列表成功`);
+    } catch (error) {
+      console.error(`保存节点ID=${nodeId}的审批人列表失败:`, error);
+      throw error;
+    }
+  }
+
+  // 获取工作流节点的审批人
+  static async getNodeApprovers(nodeId: number): Promise<User[]> {
+    try {
+      console.log(`获取节点ID=${nodeId}的审批人`);
+      return await workflowsApi.getNodeApprovers(nodeId);
+    } catch (error) {
+      console.error(`获取节点ID=${nodeId}的审批人失败:`, error);
+      return [];
     }
   }
 } 

@@ -9,7 +9,7 @@ from app.schemas.workflow import WorkflowInstance
 class LedgerBase(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    status: Optional[str] = "draft"
+    status: Optional[str] = None
     team_id: Optional[int] = None
     template_id: Optional[int] = None
     data: Optional[Dict[str, Any]] = None
@@ -19,10 +19,8 @@ class LedgerBase(BaseModel):
 
 # 创建台账时的属性
 class LedgerCreate(LedgerBase):
-    name: str
-    team_id: Optional[int] = None
-    template_id: Optional[int] = None
-    workflow_id: Optional[int] = None
+    # 名称可选，可以从模板获取默认值
+    template_id: int  # 必须指定模板ID
 
 
 # 更新台账时的属性

@@ -66,21 +66,41 @@ const LedgerList: React.FC = () => {
   // 处理导出单个台账
   const handleExport = async (id: number, format: string) => {
     try {
+      message.loading({ content: '正在导出...', key: 'export' });
       const blob = await LedgerService.exportLedger(id, format);
+      
+      // 检查服务器返回的内容类型
+      if (blob.type.includes('json')) {
+        // 如果返回的是JSON（可能是错误信息），转换成文本并显示
+        const text = await blob.text();
+        const response = JSON.parse(text);
+        message.error({ content: response.detail || '导出失败', key: 'export' });
+        return;
+      }
+      
+      // 根据格式确定文件扩展名
+      let fileExtension = format;
+      if (format.toLowerCase() === 'excel') {
+        fileExtension = 'xlsx';
+      }
+      
       // 创建下载链接
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `台账_${id}.${format}`;
+      const filename = `台账_${id}.${fileExtension}`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
+      message.success({ content: '导出成功', key: 'export' });
     } catch (error: unknown) {
       if (error instanceof Error) {
-        message.error(`导出失败: ${error.message}`);
+        message.error({ content: `导出失败: ${error.message}`, key: 'export' });
       } else {
-        message.error('导出失败');
+        message.error({ content: '导出失败', key: 'export' });
       }
     }
   };
@@ -88,21 +108,41 @@ const LedgerList: React.FC = () => {
   // 处理导出所有台账
   const handleExportAll = async (format: string) => {
     try {
+      message.loading({ content: '正在导出...', key: 'exportAll' });
       const blob = await LedgerService.exportAllLedgers(format);
+      
+      // 检查服务器返回的内容类型
+      if (blob.type.includes('json')) {
+        // 如果返回的是JSON（可能是错误信息），转换成文本并显示
+        const text = await blob.text();
+        const response = JSON.parse(text);
+        message.error({ content: response.detail || '导出失败', key: 'exportAll' });
+        return;
+      }
+      
+      // 根据格式确定文件扩展名
+      let fileExtension = format;
+      if (format.toLowerCase() === 'excel') {
+        fileExtension = 'xlsx';
+      }
+      
       // 创建下载链接
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `台账_全部.${format}`;
+      const filename = `台账_全部.${fileExtension}`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
+      message.success({ content: '导出成功', key: 'exportAll' });
     } catch (error: unknown) {
       if (error instanceof Error) {
-        message.error(`导出失败: ${error.message}`);
+        message.error({ content: `导出失败: ${error.message}`, key: 'exportAll' });
       } else {
-        message.error('导出失败');
+        message.error({ content: '导出失败', key: 'exportAll' });
       }
     }
   };

@@ -8,7 +8,7 @@ import {
   Field, FieldCreate, FieldUpdate,
   Ledger, LedgerCreate, LedgerUpdate, LedgerSubmit, LedgerApproval,
   Workflow, WorkflowCreate, WorkflowUpdate,
-  WorkflowNode, WorkflowNodeCreate, WorkflowNodeUpdate,
+  WorkflowNode, WorkflowNodeCreate,
   WorkflowInstance,
   SystemLog, AuditLog, LogQueryParams,
   LoginResponse, RegisterRequest
@@ -248,7 +248,13 @@ export default {
     },
     
     // 获取模板详情
-    getTemplate: async (id: number): Promise<TemplateDetail> => {
+    getTemplate: async (id: number): Promise<Template> => {
+      const response = await api.get(`/templates/${id}`);
+      return response.data;
+    },
+    
+    // 获取模板详情（包含字段）
+    getTemplateDetail: async (id: number): Promise<TemplateDetail> => {
       const response = await api.get(`/templates/${id}`);
       return response.data;
     },
@@ -311,6 +317,12 @@ export default {
       return response.data;
     },
     
+    // 获取台账审计日志
+    getLedgerAuditLogs: async (id: number): Promise<AuditLog[]> => {
+      const response = await api.get(`/logs/audit/ledger/${id}`);
+      return response.data;
+    },
+    
     // 创建台账
     createLedger: async (data: LedgerCreate): Promise<Ledger> => {
       const response = await api.post('/ledgers/', data);
@@ -332,21 +344,55 @@ export default {
     // 导出台账
     exportLedger: async (id: number, format: string): Promise<Blob> => {
       const response = await api.get(`/ledgers/${id}/export?format=${format}`, {
-        responseType: 'blob'
+        responseType: 'blob',
+        headers: {
+          'Accept': format.toLowerCase() === 'excel' ? 
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
+            format.toLowerCase() === 'csv' ? 
+              'text/csv' : 'text/plain'
+        }
       });
       return response.data;
     },
     
     // 导出所有台账
     exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
-      let url = `/ledgers/export-all?format=${format}`;
-      if (templateId) {
-        url += `&template_id=${templateId}`;
+      // 记录请求参数
+      console.log('导出所有台账请求参数:', { format, templateId });
+      
+      // 确保format参数是正确的值
+      const safeFormat = format.toLowerCase();
+      if (!['excel', 'csv', 'txt'].includes(safeFormat)) {
+        throw new Error(`不支持的导出格式: ${format}，支持的格式：excel、csv、txt`);
       }
-      const response = await api.get(url, {
-        responseType: 'blob'
-      });
-      return response.data;
+      
+      // 构建查询参数
+      const params = new URLSearchParams();
+      params.append('format', safeFormat);
+      
+      // 只有当templateId有效时才添加到请求
+      if (templateId !== undefined && templateId !== null && !isNaN(templateId)) {
+        params.append('template_id', templateId.toString());
+      }
+      
+      const url = `/ledgers/export-all?${params.toString()}`;
+      console.log('导出所有台账请求URL:', url);
+      
+      try {
+        const response = await api.get(url, {
+          responseType: 'blob',
+          headers: {
+            'Accept': safeFormat === 'excel' ? 
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
+              safeFormat === 'csv' ? 
+                'text/csv' : 'text/plain'
+          }
+        });
+        return response.data;
+      } catch (error) {
+        console.error('API调用失败:', error);
+        throw error;
+      }
     }
   },
   
@@ -378,9 +424,8 @@ export default {
     },
     
     // 删除工作流
-    deleteWorkflow: async (id: number): Promise<Workflow> => {
-      const response = await api.delete(`/workflows/${id}`);
-      return response.data;
+    deleteWorkflow: async (id: number): Promise<void> => {
+      await api.delete(`/workflows/${id}`);
     },
     
     // 获取工作流节点
@@ -395,17 +440,15 @@ export default {
       return response.data;
     },
     
-    // 更新工作流节点
-    updateWorkflowNode: async (workflowId: number, nodeId: number, data: WorkflowNodeUpdate): Promise<WorkflowNode> => {
-      const response = await api.put(`/workflows/${workflowId}/nodes/${nodeId}`, data);
-      return response.data;
+    // 删除工作流节点
+    deleteWorkflowNode: async (workflowId: number, nodeId: number): Promise<void> => {
+      await api.delete(`/workflows/${workflowId}/nodes/${nodeId}`);
     },
     
-    // 删除工作流节点
-    deleteWorkflowNode: async (workflowId: number, nodeId: number): Promise<WorkflowNode> => {
-      const response = await api.delete(`/workflows/${workflowId}/nodes/${nodeId}`);
-      return response.data;
-    }
+    // 处理审批
+    processApproval: async (ledgerId: number, data: LedgerApproval): Promise<void> => {
+      await api.post(`/ledgers/${ledgerId}/approve`, data);
+    },
   },
   
   // 审批管理API

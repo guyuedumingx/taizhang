@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -11,7 +11,14 @@ class TemplateBase(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     department: Optional[str] = None
-    is_system: bool = False
+    is_system: Optional[bool] = False
+    
+    # 台账元字段（默认值）
+    default_ledger_name: Optional[str] = None
+    default_description: Optional[str] = None
+    default_status: Optional[str] = "draft"
+    default_team_id: Optional[int] = None
+    default_metadata: Optional[Dict[str, Any]] = None
 
 
 # 创建模板时的属性
@@ -30,6 +37,7 @@ class TemplateUpdate(TemplateBase):
 class TemplateInDBBase(TemplateBase):
     id: int
     created_by_id: int
+    updated_by_id: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -41,7 +49,9 @@ class TemplateInDBBase(TemplateBase):
 class Template(TemplateInDBBase):
     created_by_name: Optional[str] = None
     updated_by_name: Optional[str] = None
-    field_count: int = 0
+    default_team_name: Optional[str] = None
+    fields_count: Optional[int] = None
+    ledgers_count: Optional[int] = None
 
 
 # 返回给API的模板详情

@@ -215,7 +215,13 @@ const AppLayout: React.FC = () => {
             <Dropdown menu={{ 
               items: [
                 {
-                  key: '1',
+                  key: 'profile',
+                  icon: <UserOutlined />,
+                  label: '个人中心',
+                  onClick: () => navigate('/dashboard/user-profile')
+                },
+                {
+                  key: 'logout',
                   icon: <LogoutOutlined />,
                   label: '退出登录',
                   onClick: handleLogout

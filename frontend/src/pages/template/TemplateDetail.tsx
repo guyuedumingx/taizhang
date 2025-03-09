@@ -32,7 +32,7 @@ const TemplateDetail: React.FC = () => {
   const fetchTemplateDetails = async (templateId: number) => {
     setLoading(true);
     try {
-      const response = await TemplateService.getTemplate(templateId);
+      const response = await TemplateService.getTemplateDetail(templateId);
       setTemplate(response);
     } catch (error) {
       console.error('获取模板详情失败:', error);

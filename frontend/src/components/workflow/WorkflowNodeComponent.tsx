@@ -1,7 +1,8 @@
 import React from 'react';
-import { Form, Input, Select, Button, Space, Typography } from 'antd';
+import { Form, Input, Select, Button, Space, Typography, Radio, Row, Col, Switch, message } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined } from '@ant-design/icons';
 import { WorkflowNodeCreate, User, Role } from '../../types';
+import ApproverSelector from './ApproverSelector';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -16,6 +17,11 @@ const nodeTypes: NodeType[] = [
   { value: 'start', label: '开始节点' },
   { value: 'approval', label: '审批节点' },
   { value: 'end', label: '结束节点' },
+];
+
+const approveTypes = [
+  { label: '任一审批人通过即可', value: 'any' },
+  { label: '所有审批人必须通过', value: 'all' },
 ];
 
 interface WorkflowNodeComponentProps {
@@ -44,6 +50,29 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
   const isApproval = node.node_type === 'approval';
   const isFirst = index === 0;
   const isLast = index === totalNodes - 1;
+
+  // 确保审批人IDs是数组
+  const approverIds = Array.isArray(node.approver_ids) ? node.approver_ids : [];
+
+  // 处理审批人变更
+  const handleApproversChange = (selectedIds: number | number[]) => {
+    // 确保始终传递数组给onUpdate
+    const ids = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
+    onUpdate(index, 'approver_ids', ids);
+  };
+
+  // 更新节点属性
+  const handleUpdateNode = (index: number, field: string, value: unknown) => {
+    try {
+      onUpdate(index, field, value);
+    } catch (error) {
+      if (error instanceof Error) {
+        message.error(error.message);
+      } else {
+        message.error('更新节点失败');
+      }
+    }
+  };
 
   return (
     <div className="workflow-node" style={{ marginBottom: 16, padding: 16, border: '1px solid #f0f0f0', borderRadius: 4, background: '#fafafa' }}>
@@ -80,7 +109,7 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
           <Select
             value={node.node_type}
             disabled={isStart || isEnd}
-            onChange={(value) => onUpdate(index, 'node_type', value)}
+            onChange={(value) => handleUpdateNode(index, 'node_type', value)}
             style={{ width: '100%' }}
           >
             {nodeTypes.map((type) => (
@@ -94,7 +123,7 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
         <Form.Item label="节点名称" className="mb-2">
           <Input
             value={node.name}
-            onChange={(e) => onUpdate(index, 'name', e.target.value)}
+            onChange={(e) => handleUpdateNode(index, 'name', e.target.value)}
             placeholder="请输入节点名称"
           />
         </Form.Item>
@@ -102,7 +131,7 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
         <Form.Item label="节点描述" className="mb-2">
           <TextArea
             value={node.description}
-            onChange={(e) => onUpdate(index, 'description', e.target.value)}
+            onChange={(e) => handleUpdateNode(index, 'description', e.target.value)}
             placeholder="请输入节点描述"
             rows={2}
           />
@@ -113,7 +142,7 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
             <Form.Item label="审批角色" className="mb-2">
               <Select
                 value={node.approver_role_id}
-                onChange={(value) => onUpdate(index, 'approver_role_id', value)}
+                onChange={(value) => handleUpdateNode(index, 'approver_role_id', value)}
                 placeholder="请选择审批角色"
                 allowClear
                 style={{ width: '100%' }}
@@ -124,22 +153,61 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
                   </Option>
                 ))}
               </Select>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                选择审批角色后，该角色下所有用户都可以审批。可与审批人一起使用。
+              </Text>
             </Form.Item>
 
             <Form.Item label="审批人" className="mb-2">
-              <Select
-                value={node.approver_user_id}
-                onChange={(value) => onUpdate(index, 'approver_user_id', value)}
-                placeholder="请选择审批人"
-                allowClear
-                style={{ width: '100%' }}
-              >
-                {users.map((user) => (
-                  <Option key={user.id} value={user.id}>
-                    {user.name} ({user.username})
-                  </Option>
-                ))}
-              </Select>
+              <ApproverSelector
+                mode="multiple"
+                value={approverIds}
+                onChange={handleApproversChange}
+                allUsers={users}
+                nodeId={0}
+                label=""
+              />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                可以选择多个审批人。
+              </Text>
+            </Form.Item>
+
+            <Form.Item label="审批方式" className="mb-2">
+              <Radio.Group
+                options={approveTypes}
+                value={node.multi_approve_type || 'any'}
+                onChange={(e) => handleUpdateNode(index, 'multi_approve_type', e.target.value)}
+              />
+              <div>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {node.multi_approve_type === 'all' 
+                    ? '需要所有选定的审批人都通过，才能进入下一节点' 
+                    : '只需要任意一个审批人通过即可进入下一节点'}
+                </Text>
+              </div>
+            </Form.Item>
+
+            <Form.Item label="下级审批人" className="mb-2">
+              <Row>
+                <Col span={24}>
+                  <Switch
+                    checked={node.need_select_next_approver}
+                    onChange={(checked) => handleUpdateNode(index, 'need_select_next_approver', checked)}
+                  />
+                  <Text style={{ marginLeft: 8 }}>
+                    {node.need_select_next_approver 
+                      ? '需要选择下级审批人' 
+                      : '自动流转到下级审批人'}
+                  </Text>
+                </Col>
+                <Col span={24}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {node.need_select_next_approver 
+                      ? '审批通过时需要选择下一个节点的审批人' 
+                      : '审批通过后自动流转到下个节点，如果下级节点有多个审批人，将自动分配'}
+                  </Text>
+                </Col>
+              </Row>
             </Form.Item>
           </>
         )}

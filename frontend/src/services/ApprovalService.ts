@@ -1,14 +1,14 @@
-import api from '../api';
-import { Ledger, LedgerSubmit, LedgerApproval, AuditLog, WorkflowInstance } from '../types';
-
-// 定义查询参数类型
-type QueryParams = Record<string, string | number | boolean | undefined>;
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export class ApprovalService {
   // 获取待办任务
-  static async getPendingTasks(): Promise<Record<string, unknown>[]> {
+  static async getPendingTasks() {
     try {
-      return await api.approvals.getPendingTasks();
+      const response = await axios.get(`${API_BASE_URL}/approvals/tasks`, {
+        headers: this.getAuthHeader()
+      });
+      return response.data;
     } catch (error) {
       console.error('获取待办任务失败:', error);
       throw error;
@@ -16,9 +16,12 @@ export class ApprovalService {
   }
 
   // 获取待审批台账
-  static async getApprovalLedgers(params?: QueryParams): Promise<Ledger[]> {
+  static async getPendingLedgers() {
     try {
-      return await api.approvals.getApprovalLedgers(params);
+      const response = await axios.get(`${API_BASE_URL}/approvals/ledgers`, {
+        headers: this.getAuthHeader()
+      });
+      return response.data;
     } catch (error) {
       console.error('获取待审批台账失败:', error);
       throw error;
@@ -26,52 +29,84 @@ export class ApprovalService {
   }
 
   // 提交台账审批
-  static async submitLedger(ledgerId: number, data: LedgerSubmit): Promise<Ledger> {
+  static async submitLedgerForApproval(ledgerId: number, workflowId: number) {
     try {
-      return await api.approvals.submitLedger(ledgerId, data);
+      const response = await axios.post(
+        `${API_BASE_URL}/approvals/ledgers/${ledgerId}/submit`,
+        { workflow_id: workflowId },
+        { headers: this.getAuthHeader() }
+      );
+      return response.data;
     } catch (error) {
-      console.error(`提交台账 ${ledgerId} 审批失败:`, error);
+      console.error('提交台账审批失败:', error);
       throw error;
     }
   }
 
-  // 审批台账
-  static async approveLedger(ledgerId: number, data: LedgerApproval): Promise<Ledger> {
+  // 审批通过工作流节点
+  static async approveWorkflowNode(instanceId: number, nodeId: number, data: { comment: string, next_approver_id?: number }) {
     try {
-      return await api.approvals.approveLedger(ledgerId, data);
+      const response = await axios.post(
+        `${API_BASE_URL}/approvals/workflow-instances/${instanceId}/nodes/${nodeId}/approve`,
+        data,
+        { headers: this.getAuthHeader() }
+      );
+      return response.data;
     } catch (error) {
-      console.error(`审批台账 ${ledgerId} 失败:`, error);
+      console.error('审批通过工作流节点失败:', error);
       throw error;
     }
   }
 
-  // 取消审批
-  static async cancelApproval(ledgerId: number): Promise<Ledger> {
+  // 拒绝工作流节点
+  static async rejectWorkflowNode(instanceId: number, nodeId: number, data: { comment: string }) {
     try {
-      return await api.approvals.cancelApproval(ledgerId);
+      const response = await axios.post(
+        `${API_BASE_URL}/approvals/workflow-instances/${instanceId}/nodes/${nodeId}/reject`,
+        data,
+        { headers: this.getAuthHeader() }
+      );
+      return response.data;
     } catch (error) {
-      console.error(`取消台账 ${ledgerId} 审批失败:`, error);
+      console.error('拒绝工作流节点失败:', error);
       throw error;
     }
   }
 
   // 获取工作流实例
-  static async getWorkflowInstance(instanceId: number): Promise<WorkflowInstance> {
+  static async getWorkflowInstance(instanceId: number) {
     try {
-      return await api.approvals.getWorkflowInstance(instanceId);
+      const response = await axios.get(`${API_BASE_URL}/workflow-instances/${instanceId}`, {
+        headers: this.getAuthHeader()
+      });
+      return response.data;
     } catch (error) {
-      console.error(`获取工作流实例 ${instanceId} 失败:`, error);
+      console.error('获取工作流实例失败:', error);
       throw error;
     }
   }
 
-  // 获取台账审计日志
-  static async getLedgerAuditLogs(ledgerId: number): Promise<AuditLog[]> {
+  // 获取台账的工作流实例
+  static async getLedgerWorkflowInstance(ledgerId: number) {
     try {
-      return await api.approvals.getLedgerAuditLogs(ledgerId);
+      const response = await axios.get(`${API_BASE_URL}/workflow-instances/ledger/${ledgerId}`, {
+        headers: this.getAuthHeader()
+      });
+      return response.data;
     } catch (error) {
-      console.error(`获取台账 ${ledgerId} 审计日志失败:`, error);
+      console.error('获取台账工作流实例失败:', error);
       throw error;
     }
+  }
+
+  // 获取认证头
+  private static getAuthHeader() {
+    const token = localStorage.getItem('auth-storage')
+      ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
+      : null;
+    
+    return {
+      Authorization: `Bearer ${token}`
+    };
   }
 } 

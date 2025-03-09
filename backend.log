@@ -439,3 +439,875 @@
 2025-03-09 15:56:03 - watchfiles.main - INFO - 2 changes detected
 2025-03-09 15:56:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
 2025-03-09 15:56:10 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:00:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:00:47 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:00:49 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:00:49 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:01:23 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:01:23 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:01:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:01:26 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:02:29 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:02:29 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:02:29 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:02:33 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 16:02:33 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:02:35 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:02:35 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:02:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:02:40 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:02:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:02:46 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:03:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:03:24 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:04:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:04:42 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:04:47 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:04:47 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:04:49 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 16:04:49 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:04:50 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:04:50 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:04:50 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:05:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:05:20 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:05:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:05:31 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:05:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:05:33 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:05:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:05:35 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:05:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:05:43 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:05:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:05:49 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:05:51 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:05:51 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:06:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:06:18 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:06:21 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:06:21 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:06:22 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 16:06:22 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:06:25 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:06:25 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:07:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:07:14 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:07:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:07:17 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:07:21 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:07:21 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:07:23 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 16:07:23 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:07:25 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:07:25 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:07:25 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:08:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:08:35 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:08:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:08:36 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:08:41 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 16:08:42 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:08:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:08:44 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:08:45 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 16:08:45 - taizhang - INFO - [INFO] approval.view_audit_logs: 查看台账 测试台账 的审计日志 - ledger:1 - User:1
+2025-03-09 16:08:45 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:08:49 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:08:49 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:08:54 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:08:54 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:08:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:08:57 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:09:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:09:02 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:09:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:09:07 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:10:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:10:12 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:10:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:10:15 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:10:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:10:20 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:13:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:13:06 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:13:24 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:13:24 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:13:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:13:48 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:15:09 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:15:09 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:15:24 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:15:24 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:15:28 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:15:28 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:15:37 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 16:15:37 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:15:39 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:15:39 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:15:39 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:15:48 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:15:48 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:15:50 - taizhang - INFO - [INFO] workflow.read: 查看工作流 测试工作流-更新 - workflow:1 - User:1
+2025-03-09 16:15:50 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:16:12 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:16:12 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:16:18 - taizhang - INFO - [INFO] workflow.read: 查看工作流 测试工作流 - workflow:2 - User:1
+2025-03-09 16:16:18 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:16:35 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:16:35 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:18:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:18:24 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:22:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:22:32 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:22:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:22:41 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:24:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:24:28 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:24:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:24:57 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:25:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:25:01 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:25:03 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:25:03 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:25:05 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 16:25:05 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:25:06 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:25:06 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:25:06 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:25:39 - watchfiles.main - INFO - 1 change detected
+2025-03-09 16:25:39 - root - INFO - 服务关闭
+2025-03-09 16:25:40 - watchfiles.main - INFO - 1 change detected
+2025-03-09 16:25:40 - watchfiles.main - INFO - 3 changes detected
+2025-03-09 16:25:42 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:25:42 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:25:42 - root - INFO - 服务启动
+2025-03-09 16:26:10 - watchfiles.main - INFO - 1 change detected
+2025-03-09 16:26:10 - root - INFO - 服务关闭
+2025-03-09 16:26:11 - watchfiles.main - INFO - 3 changes detected
+2025-03-09 16:27:06 - watchfiles.main - INFO - 1 change detected
+2025-03-09 16:34:16 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:34:17 - root - INFO - 启动服务器...
+2025-03-09 16:34:18 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:34:18 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:34:18 - root - INFO - 服务启动
+2025-03-09 16:34:25 - root - INFO - 服务关闭
+2025-03-09 16:34:43 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:34:43 - root - INFO - 启动服务器...
+2025-03-09 16:34:44 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:34:44 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:34:44 - root - INFO - 服务启动
+2025-03-09 16:35:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:35:37 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:35:41 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:35:41 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:36:06 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:36:06 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:36:09 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:36:09 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:36:35 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:36:35 - root - INFO - 启动服务器...
+2025-03-09 16:36:49 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:36:50 - root - INFO - 启动服务器...
+2025-03-09 16:36:51 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:36:51 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:36:51 - root - INFO - 服务启动
+2025-03-09 16:37:01 - root - INFO - 服务关闭
+2025-03-09 16:37:19 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:37:19 - root - INFO - 启动服务器...
+2025-03-09 16:37:21 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:37:21 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:37:21 - root - INFO - 服务启动
+2025-03-09 16:37:48 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:37:48 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 16:38:27 - watchfiles.main - INFO - 1 change detected
+2025-03-09 16:38:27 - root - INFO - 服务关闭
+2025-03-09 16:38:27 - watchfiles.main - INFO - 1 change detected
+2025-03-09 16:38:29 - watchfiles.main - INFO - 3 changes detected
+2025-03-09 16:38:29 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:38:29 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:38:29 - root - INFO - 服务启动
+2025-03-09 16:38:48 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:40:11 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:40:11 - root - INFO - 启动服务器...
+2025-03-09 16:40:16 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:41:04 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:41:04 - root - INFO - 启动服务器...
+2025-03-09 16:41:08 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:41:51 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:41:51 - root - INFO - 启动服务器...
+2025-03-09 16:41:57 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:42:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:43:10 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 16:43:10 - root - INFO - 启动服务器...
+2025-03-09 16:43:15 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:43:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:46:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:46:19 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:46:22 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:46:27 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:46:27 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:46:34 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:46:34 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:46:35 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:46:37 - taizhang - INFO - [INFO] workflow.read: 查看工作流 测试工作流-更新 - workflow:1 - User:1
+2025-03-09 16:47:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:48:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:48:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:48:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:48:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:48:53 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:48:59 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:48:59 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:52:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:52:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:54:02 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:54:47 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:58:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:58:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 16:58:15 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:58:23 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:58:23 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:58:26 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:58:26 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:59:23 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 16:59:23 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 16:59:49 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 16:59:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:00:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:00:19 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:00:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:01:26 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:03:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:03:50 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:03:55 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:03:59 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:03:59 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:05:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:05:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:05:22 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:05:44 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:05:44 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:05:54 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:06:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:06:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:06:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:06:24 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:06:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:07:01 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:07:01 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:07:09 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:07:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:07:55 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:07:56 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:07:58 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:08:25 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:08:25 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:10:37 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:10:37 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:10:38 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:10:38 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:13:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:13:11 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 17:14:56 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 17:14:56 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:14:56 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 17:17:49 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:19:01 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:19:27 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:19:28 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:19:38 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:19:40 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:19:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:19:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:20:01 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:20:01 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:20:03 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:20:04 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:20:06 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:20:06 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:20:09 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:20:12 - taizhang - INFO - [INFO] workflow.read: 查看工作流 测试工作流-更新 - workflow:1 - User:1
+2025-03-09 17:21:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:21:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:21:39 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:21:42 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:21:43 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:21:43 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:22:06 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:22:09 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:22:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:22:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:22:39 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:22:39 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:22:42 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:22:44 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:22:55 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:22:59 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:23:03 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:23:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:23:38 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:27:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:27:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:27:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:27:31 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:27:32 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:27:34 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:27:34 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:27:46 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:27:48 - taizhang - INFO - [INFO] workflow.read: 查看工作流 测试工作流-更新 - workflow:1 - User:1
+2025-03-09 17:27:58 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:28:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:28:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:28:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:37:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:37:54 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 17:38:05 - taizhang - INFO - [INFO] ledger.create: 创建台账 API测试台账 - ledger:4 - User:1
+2025-03-09 17:38:15 - taizhang - INFO - [INFO] ledger.update: 更新台账 更新后的API测试台账 - ledger:4 - User:1
+2025-03-09 17:40:07 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:40:18 - taizhang - INFO - [INFO] workflow.read: 查看工作流 测试工作流-更新 - workflow:1 - User:1
+2025-03-09 17:40:59 - taizhang - INFO - [INFO] workflow.create: 创建工作流 API测试工作流 - workflow:7 - User:1
+2025-03-09 17:42:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:42:49 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:42:51 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:42:52 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:42:53 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:42:54 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:42:54 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:43:02 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:43:04 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:43:05 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:43:06 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:43:09 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:43:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:44:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:44:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 17:44:38 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 17:44:40 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:44:42 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 17:44:42 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 17:54:01 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 17:59:13 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 18:03:30 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 18:03:30 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 18:03:31 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 18:03:32 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 18:03:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:03:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:08:54 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 18:08:54 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 18:08:59 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:12:58 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 18:13:10 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 18:13:40 - taizhang - INFO - [INFO] workflow.create: 创建工作流 测试工作流 - workflow:8 - User:1
+2025-03-09 18:14:00 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 18:22:19 - taizhang - INFO - [INFO] workflow.create: 创建工作流 审批测试工作流 - workflow:9 - User:1
+2025-03-09 18:22:46 - taizhang - INFO - [INFO] workflow.create: 创建工作流 审批测试工作流 - workflow:10 - User:1
+2025-03-09 18:22:58 - taizhang - INFO - [INFO] workflow.create: 创建工作流 审批测试工作流 - workflow:11 - User:1
+2025-03-09 18:23:18 - taizhang - INFO - [INFO] workflow.create: 创建工作流 审批测试工作流 - workflow:12 - User:1
+2025-03-09 18:23:34 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 18:24:42 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:5 - User:1
+2025-03-09 18:24:55 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:25:56 - taizhang - INFO - [INFO] workflow.create: 创建工作流 审批测试工作流 - workflow:13 - User:1
+2025-03-09 18:26:10 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 18:26:32 - taizhang - INFO - AUDIT: submit - Ledger:5 - WorkflowInstance:4 - User:1 - Status:draft->pending
+2025-03-09 18:26:32 - taizhang - INFO - [INFO] approval.submit: 提交台账 测试台账 进入审批流程 - ledger:5 - User:1
+2025-03-09 18:28:09 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账2 - ledger:6 - User:1
+2025-03-09 18:28:21 - taizhang - INFO - AUDIT: submit - Ledger:6 - WorkflowInstance:5 - User:1 - Status:draft->pending
+2025-03-09 18:28:21 - taizhang - INFO - [INFO] approval.submit: 提交台账 测试台账2 进入审批流程 - ledger:6 - User:1
+2025-03-09 18:28:35 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账2 - ledger:6 - User:1
+2025-03-09 18:30:38 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 18:32:36 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 18:33:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:33:32 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:33:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:33:57 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 18:33:57 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 18:34:00 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 18:34:04 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 18:34:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:34:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 18:37:03 - taizhang - INFO - [INFO] workflow.create: 创建工作流 测试审批工作流 - workflow:14 - User:1
+2025-03-09 18:41:46 - taizhang - INFO - [INFO] workflow.create: 创建工作流 测试审批工作流 - workflow:15 - User:1
+2025-03-09 18:43:25 - taizhang - INFO - [INFO] ledger.create: 创建台账 审批流程测试台账 - ledger:7 - User:1
+2025-03-09 18:43:38 - taizhang - INFO - AUDIT: submit - Ledger:7 - WorkflowInstance:6 - User:1 - Status:draft->pending
+2025-03-09 18:43:38 - taizhang - INFO - [INFO] approval.submit: 提交台账 审批流程测试台账 进入审批流程 - ledger:7 - User:1
+2025-03-09 18:49:21 - taizhang - INFO - [INFO] ledger.read: 查看台账 审批流程测试台账 - ledger:7 - User:1
+2025-03-09 18:49:36 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 20:00:56 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:01:05 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:02:48 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:02:48 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:03:36 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:03:36 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:04:14 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:04:14 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:04:57 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:04:57 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:05:37 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:05:38 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:06:13 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:06:13 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:06:13 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 20:06:13 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/1 "HTTP/1.1 200 OK"
+2025-03-09 20:06:13 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/1/nodes "HTTP/1.1 200 OK"
+2025-03-09 20:06:13 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 403 Forbidden"
+2025-03-09 20:06:13 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:06:13 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 20:07:11 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/1 "HTTP/1.1 200 OK"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/1/nodes "HTTP/1.1 200 OK"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 403 Forbidden"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: PUT http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 20:07:11 - httpx - INFO - HTTP Request: DELETE http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 20:07:32 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:08:04 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:08:04 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 20:08:33 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:08:33 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 20:08:33 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 20:08:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:08:33 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 20:08:33 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/approvals/ledgers/4/submit "HTTP/1.1 400 Bad Request"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/approvals/ledgers/4/submit "HTTP/1.1 400 Bad Request"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/workflow-instances/ledger/4 "HTTP/1.1 404 Not Found"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 20:09:07 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 20:09:16 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:10:01 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:10:01 - root - INFO - 服务启动
+2025-03-09 20:10:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:10:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:10:32 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 20:10:32 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 20:10:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:11:15 - root - INFO - 服务关闭
+2025-03-09 20:11:25 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:11:25 - root - INFO - 服务启动
+2025-03-09 20:11:49 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:12:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:12:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:12:24 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 20:12:24 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 20:12:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:12:59 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:13:09 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 20:13:09 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 20:13:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:13:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:42:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:42:29 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 20:42:29 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 20:42:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:43:19 - taizhang - INFO - [INFO] ledger.create: 创建台账 通过 - ledger:8 - User:1
+2025-03-09 20:43:19 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:43:26 - taizhang - INFO - [INFO] ledger.read: 查看台账 通过 - ledger:8 - User:1
+2025-03-09 20:43:26 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 通过 的审计日志 - ledger:8 - User:1
+2025-03-09 20:43:45 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:43:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:43:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:47:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 20:48:02 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 20:48:09 - taizhang - INFO - AUDIT: submit - Ledger:9 - WorkflowInstance:8 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 8
+2025-03-09 20:48:51 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 20:50:33 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 20:53:41 - root - INFO - 服务关闭
+2025-03-09 20:58:42 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 20:58:42 - root - INFO - 服务启动
+2025-03-09 20:59:32 - root - INFO - 服务关闭
+2025-03-09 21:01:17 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:01:17 - root - INFO - 服务启动
+2025-03-09 21:04:38 - root - INFO - 服务关闭
+2025-03-09 21:04:51 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:04:51 - root - INFO - 服务启动
+2025-03-09 21:06:00 - root - INFO - 服务关闭
+2025-03-09 21:06:02 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:06:02 - root - INFO - 服务启动
+2025-03-09 21:06:39 - root - INFO - 服务关闭
+2025-03-09 21:06:53 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/approvals/ledgers/9/submit "HTTP/1.1 400 Bad Request"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/approvals/ledgers/9/submit "HTTP/1.1 400 Bad Request"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/workflow-instances/ledger/9 "HTTP/1.1 404 Not Found"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:06:53 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 21:07:01 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/1 "HTTP/1.1 200 OK"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/1/nodes "HTTP/1.1 200 OK"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 403 Forbidden"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: PUT http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 21:07:01 - httpx - INFO - HTTP Request: DELETE http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 21:07:15 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:07:15 - root - INFO - 服务启动
+2025-03-09 21:08:52 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/approvals/ledgers/9/submit "HTTP/1.1 400 Bad Request"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/approvals/ledgers/9/submit "HTTP/1.1 400 Bad Request"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/workflow-instances/ledger/9 "HTTP/1.1 404 Not Found"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:08:52 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 21:09:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:10:02 - taizhang - INFO - [INFO] ledger.update: 更新台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 21:10:22 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 21:10:36 - taizhang - INFO - AUDIT: submit - Ledger:10 - WorkflowInstance:9 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 9
+2025-03-09 21:10:56 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 21:11:53 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:11:53 - root - INFO - 服务启动
+2025-03-09 21:12:10 - root - INFO - 服务关闭
+2025-03-09 21:12:17 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:12:18 - root - INFO - 服务启动
+2025-03-09 21:12:44 - root - INFO - 服务关闭
+2025-03-09 21:12:46 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:12:46 - root - INFO - 服务启动
+2025-03-09 21:13:03 - root - INFO - 服务关闭
+2025-03-09 21:14:14 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:14:14 - root - INFO - 服务启动
+2025-03-09 21:15:02 - root - INFO - 服务关闭
+2025-03-09 21:15:04 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:15:05 - root - INFO - 服务启动
+2025-03-09 21:16:18 - root - INFO - 服务关闭
+2025-03-09 21:16:20 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:16:20 - root - INFO - 服务启动
+2025-03-09 21:16:41 - root - INFO - 服务关闭
+2025-03-09 21:16:42 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:16:43 - root - INFO - 服务启动
+2025-03-09 21:16:53 - root - INFO - 服务关闭
+2025-03-09 21:16:55 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:16:55 - root - INFO - 服务启动
+2025-03-09 21:17:03 - root - INFO - 服务关闭
+2025-03-09 21:17:14 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:17:14 - root - INFO - 服务启动
+2025-03-09 21:17:22 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 21:18:21 - root - INFO - 服务关闭
+2025-03-09 21:18:23 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:18:23 - root - INFO - 服务启动
+2025-03-09 21:18:44 - root - INFO - 服务关闭
+2025-03-09 21:18:46 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:18:46 - root - INFO - 服务启动
+2025-03-09 21:18:52 - root - INFO - 服务关闭
+2025-03-09 21:19:05 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:19:05 - root - INFO - 服务启动
+2025-03-09 21:19:19 - root - INFO - 服务关闭
+2025-03-09 21:19:33 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:19:33 - root - INFO - 服务启动
+2025-03-09 21:21:25 - root - INFO - 服务关闭
+2025-03-09 21:22:58 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:22:58 - root - INFO - 服务启动
+2025-03-09 21:24:16 - root - INFO - 服务关闭
+2025-03-09 21:24:19 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:24:20 - root - INFO - 服务启动
+2025-03-09 21:24:26 - root - INFO - 服务关闭
+2025-03-09 21:24:28 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:24:28 - root - INFO - 服务启动
+2025-03-09 21:25:05 - root - INFO - 服务关闭
+2025-03-09 21:25:07 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:25:07 - root - INFO - 服务启动
+2025-03-09 21:25:50 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/approvals/ledgers/10/submit "HTTP/1.1 400 Bad Request"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/approvals/ledgers/10/submit "HTTP/1.1 400 Bad Request"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/ledgers/ "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/workflow-instances/ledger/10 "HTTP/1.1 404 Not Found"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/tasks "HTTP/1.1 200 OK"
+2025-03-09 21:25:50 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/approvals/ledgers "HTTP/1.1 200 OK"
+2025-03-09 21:25:57 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:25:57 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 21:25:57 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 200 OK"
+2025-03-09 21:25:58 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/1 "HTTP/1.1 200 OK"
+2025-03-09 21:25:58 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/1/nodes "HTTP/1.1 200 OK"
+2025-03-09 21:25:58 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/ "HTTP/1.1 403 Forbidden"
+2025-03-09 21:25:58 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 21:25:58 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/workflows/ "HTTP/1.1 422 Unprocessable Entity"
+2025-03-09 21:25:58 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 21:25:58 - httpx - INFO - HTTP Request: PUT http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 21:25:58 - httpx - INFO - HTTP Request: DELETE http://testserver/api/v1/workflows/99999 "HTTP/1.1 404 Not Found"
+2025-03-09 21:27:46 - root - INFO - 服务关闭
+2025-03-09 21:27:48 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:27:48 - root - INFO - 服务启动
+2025-03-09 21:28:19 - root - INFO - 服务关闭
+2025-03-09 21:28:20 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:28:20 - root - INFO - 服务启动
+2025-03-09 21:28:44 - root - INFO - 服务关闭
+2025-03-09 21:28:45 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:28:46 - root - INFO - 服务启动
+2025-03-09 21:28:53 - root - INFO - 服务关闭
+2025-03-09 21:29:05 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:29:05 - root - INFO - 服务启动
+2025-03-09 21:31:39 - root - INFO - 服务关闭
+2025-03-09 21:31:41 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:31:41 - root - INFO - 服务启动
+2025-03-09 21:32:02 - root - INFO - 服务关闭
+2025-03-09 21:32:03 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:32:03 - root - INFO - 服务启动
+2025-03-09 21:32:09 - root - INFO - 服务关闭
+2025-03-09 21:32:11 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:32:11 - root - INFO - 服务启动
+2025-03-09 21:33:01 - root - INFO - 服务关闭
+2025-03-09 21:33:04 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:33:04 - root - INFO - 服务启动
+2025-03-09 21:33:05 - root - INFO - 服务关闭
+2025-03-09 21:33:06 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:33:06 - root - INFO - 服务启动
+2025-03-09 21:33:26 - root - INFO - 服务关闭
+2025-03-09 21:33:28 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:33:28 - root - INFO - 服务启动
+2025-03-09 21:34:03 - root - INFO - 服务关闭
+2025-03-09 21:34:05 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:34:05 - root - INFO - 服务启动
+2025-03-09 21:34:26 - root - INFO - 服务关闭
+2025-03-09 21:34:28 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:34:28 - root - INFO - 服务启动
+2025-03-09 21:34:43 - root - INFO - 服务关闭
+2025-03-09 21:34:56 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:34:56 - root - INFO - 服务启动
+2025-03-09 21:35:54 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 21:40:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:40:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:40:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:40:45 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:40:49 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 21:40:49 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试审批API台账 的审计日志 - ledger:10 - User:1
+2025-03-09 21:40:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:40:54 - taizhang - INFO - [INFO] ledger.read: 查看台账 更新后的API测试台账 - ledger:4 - User:1
+2025-03-09 21:40:54 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 更新后的API测试台账 的审计日志 - ledger:4 - User:1
+2025-03-09 21:40:56 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:41:08 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 21:41:08 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 21:41:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:41:37 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 21:41:39 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:41:41 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 21:41:41 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试审批API台账 的审计日志 - ledger:10 - User:1
+2025-03-09 21:41:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:41:49 - taizhang - INFO - [INFO] ledger.read: 查看台账 更新后的API测试台账 - ledger:4 - User:1
+2025-03-09 21:41:49 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 更新后的API测试台账 的审计日志 - ledger:4 - User:1
+2025-03-09 21:41:54 - taizhang - INFO - [INFO] ledger.read: 查看台账 更新后的API测试台账 - ledger:4 - User:1
+2025-03-09 21:41:54 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 更新后的API测试台账 的审计日志 - ledger:4 - User:1
+2025-03-09 21:41:56 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:42:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:45:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:46:02 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 21:46:02 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 21:46:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:46:16 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 21:46:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:46:21 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 21:46:21 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试审批API台账 的审计日志 - ledger:10 - User:1
+2025-03-09 21:46:45 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:46:47 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:2 - User:1
+2025-03-09 21:46:47 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试台账 的审计日志 - ledger:2 - User:1
+2025-03-09 21:47:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:47:14 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 21:47:14 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试审批流程台账 的审计日志 - ledger:9 - User:1
+2025-03-09 21:47:24 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:47:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:47:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:47:37 - taizhang - INFO - [INFO] ledger.read: 查看台账 更新后的API测试台账 - ledger:4 - User:1
+2025-03-09 21:47:37 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 更新后的API测试台账 的审计日志 - ledger:4 - User:1
+2025-03-09 21:47:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:48:15 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 21:48:15 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 21:48:16 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 21:48:16 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 21:48:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:48:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:48:50 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试审批流程台账 的审计日志 - ledger:9 - User:1
+2025-03-09 21:48:50 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 21:48:55 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:49:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:49:08 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 21:49:08 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 21:49:44 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 21:54:46 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 21:54:46 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 21:54:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:55:09 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:55:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:56:46 - root - INFO - 服务关闭
+2025-03-09 21:56:48 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 21:56:48 - root - INFO - 服务启动
+2025-03-09 21:58:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:58:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 21:58:58 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 21:58:58 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 22:10:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:10:13 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:10:23 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 22:10:23 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 22:10:39 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:10:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:11:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:11:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:11:30 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 22:11:30 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 22:11:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:11:49 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 22:11:49 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试审批API台账 的审计日志 - ledger:10 - User:1
+2025-03-09 22:11:55 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:11:57 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批流程台账 - ledger:9 - User:1
+2025-03-09 22:11:57 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试审批流程台账 的审计日志 - ledger:9 - User:1
+2025-03-09 22:12:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:12:02 - taizhang - INFO - [INFO] ledger.read: 查看台账 更新后的API测试台账 - ledger:4 - User:1
+2025-03-09 22:12:02 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 更新后的API测试台账 的审计日志 - ledger:4 - User:1
+2025-03-09 22:12:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:14:20 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 22:14:20 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 22:14:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:14:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:14:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:18:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:22:24 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 22:22:24 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 22:22:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:22:38 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:25:19 - root - INFO - 服务关闭
+2025-03-09 22:25:21 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 22:25:21 - root - INFO - 服务启动
+2025-03-09 22:25:43 - root - INFO - 服务关闭
+2025-03-09 22:25:45 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 22:25:45 - root - INFO - 服务启动
+2025-03-09 22:25:47 - root - INFO - 服务关闭
+2025-03-09 22:25:49 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 22:25:49 - root - INFO - 服务启动
+2025-03-09 22:26:18 - root - INFO - 服务关闭
+2025-03-09 22:26:20 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 22:26:20 - root - INFO - 服务启动
+2025-03-09 22:26:54 - root - INFO - 服务关闭
+2025-03-09 22:26:56 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 22:26:56 - root - INFO - 服务启动
+2025-03-09 22:27:13 - root - INFO - 服务关闭
+2025-03-09 22:27:15 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 22:27:15 - root - INFO - 服务启动
+2025-03-09 22:30:28 - root - INFO - 服务关闭
+2025-03-09 22:30:30 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 22:30:30 - root - INFO - 服务启动
+2025-03-09 22:51:45 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 22:51:45 - root - INFO - 服务启动
+2025-03-09 22:51:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:51:49 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:51:50 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:51:51 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:52:03 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:52:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:52:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:55:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:56:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:56:08 - taizhang - INFO - [INFO] ledger.read: 查看台账 更新后的API测试台账 - ledger:4 - User:1
+2025-03-09 22:56:08 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 更新后的API测试台账 的审计日志 - ledger:4 - User:1
+2025-03-09 22:56:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:56:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:56:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:56:22 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:59:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 22:59:32 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:02:10 - root - INFO - 服务关闭
+2025-03-09 23:02:12 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 23:02:12 - root - INFO - 服务启动
+2025-03-09 23:26:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:26:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:26:51 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:26:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:27:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:28:38 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:28:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:29:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:29:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:33:29 - root - INFO - 服务关闭
+2025-03-09 23:33:30 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 23:33:31 - root - INFO - 服务启动
+2025-03-09 23:46:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:48:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:48:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:48:49 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 23:48:49 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 23:49:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:49:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:49:12 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 23:49:12 - taizhang - INFO - [INFO] log.view_ledger_audit_logs: 查看台账 测试审批API台账 的审计日志 - ledger:10 - User:1
+2025-03-09 23:49:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:49:17 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试审批API台账 - ledger:10 - User:1
+2025-03-09 23:49:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:49:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:49:49 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:49:56 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 23:49:56 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 23:54:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:54:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:55:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:56:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:56:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:56:25 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:56:29 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 23:56:29 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 23:56:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:56:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:57:00 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 23:57:00 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 23:57:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:58:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:58:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:58:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:58:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:58:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:58:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:58:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:59:38 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 23:59:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-10 00:01:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-10 00:02:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1

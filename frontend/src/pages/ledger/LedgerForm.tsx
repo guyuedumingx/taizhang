@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, Button, Card, Typography, DatePicker, message, Space, Divider } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import { LedgerService } from '../../services/LedgerService';
 import { TemplateService } from '../../services/TemplateService';
 import { TeamService } from '../../services/TeamService';
-import { Ledger, LedgerCreate, LedgerUpdate, Template, Team, Field } from '../../types';
+import { Template, Team, Field } from '../../types';
 import dayjs from 'dayjs';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
@@ -27,6 +27,7 @@ interface FormValues {
 const LedgerForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { hasPermission } = useAuthStore();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -37,6 +38,14 @@ const LedgerForm: React.FC = () => {
   const [templateFields, setTemplateFields] = useState<Field[]>([]);
   
   const isEdit = !!id;
+  
+  // 从URL参数获取template_id和name
+  const getUrlParams = () => {
+    const queryParams = new URLSearchParams(location.search);
+    const templateId = queryParams.get('template_id');
+    const name = queryParams.get('name');
+    return { templateId, name };
+  };
   
   // 检查权限
   useEffect(() => {
@@ -53,8 +62,22 @@ const LedgerForm: React.FC = () => {
     // 如果是编辑模式，获取台账数据
     if (isEdit) {
       fetchLedger(parseInt(id));
+    } else {
+      // 如果是新建模式，检查URL参数
+      const { templateId, name } = getUrlParams();
+      if (templateId) {
+        const parsedTemplateId = parseInt(templateId);
+        setSelectedTemplate(parsedTemplateId);
+        fetchTemplateFields(parsedTemplateId);
+        
+        // 设置初始表单值
+        form.setFieldsValue({
+          template_id: parsedTemplateId,
+          name: name ? decodeURIComponent(name) : '',
+        });
+      }
     }
-  }, [hasPermission, isEdit, id, navigate]);
+  }, [hasPermission, isEdit, id, navigate, form, location.search]);
 
   // 获取模板和团队数据
   const fetchTemplatesAndTeams = async () => {
@@ -104,31 +127,51 @@ const LedgerForm: React.FC = () => {
     }
   };
 
-  // 处理模板选择
-  const handleTemplateChange = async (templateId: number) => {
-    setSelectedTemplate(templateId);
-    await fetchTemplateFields(templateId);
-  };
-
   // 获取模板字段
   const fetchTemplateFields = async (templateId: number) => {
+    setLoading(true);
     try {
-      const templateDetail = await TemplateService.getTemplate(templateId);
-      
-      if (templateDetail.fields) {
-        setTemplateFields(templateDetail.fields);
+      const template = await TemplateService.getTemplateDetail(templateId);
+      if (template) {
+        setTemplateFields(template.fields || []);
         
-        // 重置表单中的数据字段
-        const currentValues = form.getFieldsValue();
-        form.setFieldsValue({
-          ...currentValues,
-          data: {}
-        });
+        // 使用模板默认值填充表单
+        const formValues: Record<string, unknown> = {
+          template_id: templateId,
+        };
+        
+        // 如果有默认值且当前表单中没有值，则使用默认值
+        if (template.default_ledger_name && !form.getFieldValue('name')) {
+          formValues.name = template.default_ledger_name;
+        }
+        
+        if (template.default_description && !form.getFieldValue('description')) {
+          formValues.description = template.default_description;
+        }
+        
+        if (template.default_status && !form.getFieldValue('status')) {
+          formValues.status = template.default_status;
+        }
+        
+        if (template.default_team_id && !form.getFieldValue('team_id')) {
+          formValues.team_id = template.default_team_id;
+        }
+        
+        // 更新表单值
+        form.setFieldsValue(formValues);
       }
     } catch (error) {
       console.error('获取模板字段失败:', error);
       message.error('获取模板字段失败');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // 处理模板变更
+  const handleTemplateChange = (value: number) => {
+    setSelectedTemplate(value);
+    fetchTemplateFields(value);
   };
 
   // 提交表单
@@ -141,23 +184,26 @@ const LedgerForm: React.FC = () => {
     setSubmitting(true);
     
     try {
-      // 准备提交数据
+      // 获取当前选中的模板详情
+      const template = await TemplateService.getTemplateDetail(selectedTemplate);
+      
+      // 准备提交数据，使用合适的类型
       const submitData = {
-        name: values.name,
-        description: values.description,
-        team_id: values.team_id,
         template_id: values.template_id,
-        status: values.status,
-        data: values.data
+        data: values.data || {},
+        name: values.name || template.default_ledger_name || '',
+        description: values.description || template.default_description || '',
+        status: values.status || template.default_status || 'draft',
+        team_id: values.team_id || template.default_team_id || null
       };
       
       if (isEdit) {
         // 更新台账
-        await LedgerService.updateLedger(parseInt(id), submitData as LedgerUpdate);
+        await LedgerService.updateLedger(parseInt(id), submitData);
         message.success('台账更新成功');
       } else {
         // 创建台账
-        await LedgerService.createLedger(submitData as LedgerCreate);
+        await LedgerService.createLedger(submitData);
         message.success('台账创建成功');
       }
       
@@ -307,46 +353,52 @@ const LedgerForm: React.FC = () => {
             </Select>
           </Form.Item>
           
-          <Form.Item
-            label="台账名称"
-            name="name"
-            rules={[{ required: true, message: '请输入台账名称' }]}
-          >
-            <Input />
-          </Form.Item>
+          {/* 仅在编辑模式或未选择模板时显示通用字段 */}
+          {(!selectedTemplate || isEdit) && (
+            <>
+              <Form.Item
+                label="台账名称"
+                name="name"
+                rules={[{ required: true, message: '请输入台账名称' }]}
+              >
+                <Input />
+              </Form.Item>
+              
+              <Form.Item
+                label="所属团队"
+                name="team_id"
+                rules={[{ required: true, message: '请选择所属团队' }]}
+              >
+                <Select placeholder="选择团队">
+                  {teams.map(team => (
+                    <Option key={team.id} value={team.id}>{team.name}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              
+              <Form.Item
+                label="台账描述"
+                name="description"
+              >
+                <TextArea rows={4} />
+              </Form.Item>
+              
+              <Form.Item
+                label="状态"
+                name="status"
+                rules={[{ required: true, message: '请选择状态' }]}
+              >
+                <Select>
+                  <Option value="draft">草稿</Option>
+                  <Option value="active">处理中</Option>
+                  <Option value="completed">已完成</Option>
+                </Select>
+              </Form.Item>
+            </>
+          )}
           
-          <Form.Item
-            label="所属团队"
-            name="team_id"
-            rules={[{ required: true, message: '请选择所属团队' }]}
-          >
-            <Select placeholder="选择团队">
-              {teams.map(team => (
-                <Option key={team.id} value={team.id}>{team.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            label="台账描述"
-            name="description"
-          >
-            <TextArea rows={4} />
-          </Form.Item>
-          
-          <Form.Item
-            label="状态"
-            name="status"
-            rules={[{ required: true, message: '请选择状态' }]}
-          >
-            <Select>
-              <Option value="draft">草稿</Option>
-              <Option value="active">处理中</Option>
-              <Option value="completed">已完成</Option>
-            </Select>
-          </Form.Item>
-          
-          {renderTemplateFields()}
+          {/* 仅在选择模板后显示模板字段 */}
+          {selectedTemplate && renderTemplateFields()}
           
           <Divider />
           

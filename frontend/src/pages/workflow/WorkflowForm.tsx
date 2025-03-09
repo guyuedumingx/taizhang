@@ -192,80 +192,68 @@ const WorkflowForm: React.FC = () => {
     }
   };
 
-  // 提交表单
-  const handleSubmit = async (values: FormValues) => {
+  // 保存工作流
+  const saveWorkflow = async (values: FormValues) => {
     setLoading(true);
     try {
-      console.log('提交表单数据:', values);
-      console.log('节点数据:', nodes);
+      console.log('保存工作流:', values);
+      console.log('节点配置:', nodes);
       
-      // 准备节点数据
-      const formattedNodes = nodes.map((node, index) => ({
-        ...node,
-        order_index: index,
-      }));
+      // 准备工作流数据
+      const workflowData = {
+        ...values,
+        nodes: nodes.map(node => ({
+          ...node,
+          workflow_id: isEdit ? parseInt(id!, 10) : 0, // 编辑模式使用现有ID，创建模式使用0（后端会替换）
+        }))
+      };
       
-      if (isEdit && id) {
-        console.log(`更新工作流 ID: ${id}`);
-        // 更新工作流基本信息
-        const workflowUpdateData = {
+      console.log('提交的工作流数据:', workflowData);
+      
+      let savedWorkflow;
+      if (isEdit) {
+        // 更新工作流
+        savedWorkflow = await WorkflowService.updateWorkflow(parseInt(id!, 10), {
           name: values.name,
           description: values.description,
           is_active: values.is_active
-        };
+        });
         
-        await WorkflowService.updateWorkflow(parseInt(id), workflowUpdateData);
-        message.success('工作流基本信息更新成功');
-        
-        // 获取已有节点
-        try {
-          const existingNodes = await WorkflowService.getWorkflowNodes(parseInt(id));
-          console.log(`获取到 ${existingNodes.length} 个现有节点`);
-          
-          // 删除所有已有节点
-          await Promise.all(
-            existingNodes.map(node => WorkflowService.deleteWorkflowNode(parseInt(id), node.id))
-          );
-          console.log('已删除所有现有节点');
-        } catch (error) {
-          console.error('删除现有节点失败:', error);
-        }
-        
-        // 创建新节点
-        try {
-          const nodesWithWorkflowId = formattedNodes.map(node => ({
-            ...node,
-            workflow_id: parseInt(id)
-          }));
-          
-          console.log(`准备创建 ${nodesWithWorkflowId.length} 个新节点`);
-          await Promise.all(
-            nodesWithWorkflowId.map(node => WorkflowService.createWorkflowNode(parseInt(id), node))
-          );
-          console.log('所有节点创建成功');
-          message.success('工作流节点更新成功');
-        } catch (error) {
-          console.error('创建节点失败:', error);
-          message.error('创建节点失败，请检查节点配置');
-        }
+        message.success('工作流更新成功');
       } else {
-        console.log('创建新工作流');
-        // 创建新工作流
-        const workflowCreateData = {
-          ...values,
-          nodes: formattedNodes
-        };
-        
-        await WorkflowService.createWorkflow(workflowCreateData);
+        // 创建工作流
+        savedWorkflow = await WorkflowService.createWorkflow(workflowData);
         message.success('工作流创建成功');
       }
       
-      // 返回工作流列表页面
-      console.log('操作完成，返回工作流列表页面');
+      // 保存节点审批人
+      if (savedWorkflow && savedWorkflow.nodes) {
+        console.log('保存节点审批人...');
+        
+        // 对于每个审批节点，保存审批人
+        const approvalNodes = savedWorkflow.nodes.filter(node => node.node_type === 'approval');
+        
+        for (let i = 0; i < approvalNodes.length; i++) {
+          const node = approvalNodes[i];
+          const nodeIndex = nodes.findIndex(n => n.name === node.name && n.node_type === node.node_type);
+          
+          if (nodeIndex !== -1 && nodes[nodeIndex].approver_ids && nodes[nodeIndex].approver_ids.length > 0) {
+            console.log(`保存节点 ${node.id} 的审批人:`, nodes[nodeIndex].approver_ids);
+            try {
+              await WorkflowService.saveNodeApprovers(node.id, nodes[nodeIndex].approver_ids);
+            } catch (error) {
+              console.error(`保存节点 ${node.id} 审批人失败:`, error);
+              message.warning(`节点 "${node.name}" 的审批人保存失败，请在详情页中重新设置`);
+            }
+          }
+        }
+      }
+      
+      // 跳转到工作流列表页
       navigate('/dashboard/workflow');
     } catch (error) {
-      console.error('提交工作流失败:', error);
-      message.error('提交工作流失败，请检查输入并重试');
+      console.error('保存工作流失败:', error);
+      message.error('保存工作流失败，请重试');
     } finally {
       setLoading(false);
     }
@@ -302,7 +290,7 @@ const WorkflowForm: React.FC = () => {
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleSubmit}
+          onFinish={saveWorkflow}
           initialValues={{
             is_active: true,
           }}

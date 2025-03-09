@@ -83,11 +83,22 @@ export interface Template {
   description: string;
   department: string;
   is_system: boolean;
-  type: string;
-  require_approval: boolean;
-  default_workflow_id: number | null;
+  created_by_id: number;
+  updated_by_id?: number;
   created_at: string;
   updated_at: string | null;
+  created_by_name?: string;
+  updated_by_name?: string;
+  fields_count?: number;
+  ledgers_count?: number;
+  
+  // 台账元字段（默认值）
+  default_ledger_name?: string;
+  default_description?: string;
+  default_status?: string;
+  default_team_id?: number;
+  default_team_name?: string;
+  default_metadata?: Record<string, unknown>;
 }
 
 export interface TemplateDetail extends Template {
@@ -98,18 +109,24 @@ export interface TemplateCreate {
   name: string;
   description: string;
   department: string;
-  type?: string;
-  require_approval?: boolean;
-  default_workflow_id?: number | null;
+  default_ledger_name?: string;
+  default_description?: string;
+  default_status?: string;
+  default_team_id?: number;
+  default_metadata?: Record<string, unknown>;
+  fields?: FieldCreate[];
 }
 
 export interface TemplateUpdate {
   name?: string;
   description?: string;
   department?: string;
-  type?: string;
-  require_approval?: boolean;
-  default_workflow_id?: number | null;
+  default_ledger_name?: string;
+  default_description?: string;
+  default_status?: string;
+  default_team_id?: number;
+  default_metadata?: Record<string, unknown>;
+  fields?: FieldCreate[];
 }
 
 // 字段类型
@@ -129,7 +146,7 @@ export interface Field {
 }
 
 export interface FieldCreate {
-  template_id: number;
+  template_id?: number;
   name: string;
   label: string;
   type: string;
@@ -221,8 +238,13 @@ export interface WorkflowNode {
   order_index: number;
   is_final: boolean;
   reject_to_node_id: number | null;
+  multi_approve_type: string;  // 'any' - 任一审批, 'all' - 所有人审批
+  need_select_next_approver: boolean;  // 是否需要选择下一审批人
   created_at: string;
   updated_at: string | null;
+  approvers?: User[];  // 包含id, name的审批人列表
+  approver_role_name?: string;
+  approver_user_name?: string;
 }
 
 export interface WorkflowNodeCreate {
@@ -235,6 +257,9 @@ export interface WorkflowNodeCreate {
   order_index: number;
   is_final?: boolean;
   reject_to_node_id?: number | null;
+  multi_approve_type?: string;  // 'any' - 任一审批, 'all' - 所有人审批
+  need_select_next_approver?: boolean;  // 是否需要选择下一审批人
+  approver_ids?: number[];  // 多个审批人ID
 }
 
 export interface WorkflowNodeUpdate {

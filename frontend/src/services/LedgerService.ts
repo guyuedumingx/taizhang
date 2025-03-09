@@ -1,5 +1,5 @@
 import api from '../api';
-import { Ledger, LedgerCreate, LedgerUpdate } from '../types';
+import { Ledger, LedgerCreate, LedgerUpdate, LedgerSubmit, AuditLog } from '../types';
 
 // 定义查询参数类型
 type QueryParams = Record<string, string | number | boolean | undefined>;
@@ -21,6 +21,16 @@ export class LedgerService {
       return await api.ledgers.getLedger(id);
     } catch (error) {
       console.error(`获取台账 ${id} 详情失败:`, error);
+      throw error;
+    }
+  }
+
+  // 获取台账审计日志
+  static async getLedgerAuditLogs(id: number): Promise<AuditLog[]> {
+    try {
+      return await api.ledgers.getLedgerAuditLogs(id);
+    } catch (error) {
+      console.error(`获取台账 ${id} 审计日志失败:`, error);
       throw error;
     }
   }

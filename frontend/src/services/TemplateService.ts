@@ -16,11 +16,21 @@ export class TemplateService {
   }
 
   // 获取模板详情
-  static async getTemplate(id: number): Promise<TemplateDetail> {
+  static async getTemplate(id: number): Promise<Template> {
     try {
       return await api.templates.getTemplate(id);
     } catch (error) {
       console.error(`获取模板 ${id} 详情失败:`, error);
+      throw error;
+    }
+  }
+
+  // 获取模板详情（包含字段）
+  static async getTemplateDetail(id: number): Promise<TemplateDetail> {
+    try {
+      return await api.templates.getTemplateDetail(id);
+    } catch (error) {
+      console.error(`获取模板 ${id} 详情（包含字段）失败:`, error);
       throw error;
     }
   }

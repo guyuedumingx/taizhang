@@ -25,6 +25,7 @@ import WorkflowDetail from './pages/workflow/WorkflowDetail';
 import TaskList from './pages/approval/TaskList';
 import LogList from './pages/log/LogList';
 import HelpPage from './pages/HelpPage';
+import UserProfile from './pages/UserProfile';
 import PasswordExpiredModal from './components/PasswordExpiredModal';
 import './App.css';
 
@@ -35,7 +36,48 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <ConfigProvider locale={zhCN}>
+    <ConfigProvider
+      locale={zhCN}
+      theme={{
+        token: {
+          colorPrimary: '#D05A6E',
+          colorLink: '#D05A6E',
+          colorLinkHover: '#BA4A5B',
+          colorLinkActive: '#BA4A5B',
+        },
+        components: {
+          Button: {
+            colorPrimary: '#D05A6E',
+            colorPrimaryHover: '#BA4A5B',
+            colorPrimaryActive: '#BA4A5B',
+          },
+          Checkbox: {
+            colorPrimary: '#D05A6E',
+          },
+          Radio: {
+            colorPrimary: '#D05A6E',
+          },
+          Switch: {
+            colorPrimary: '#D05A6E',
+          },
+          Slider: {
+            colorPrimary: '#D05A6E',
+          },
+          Pagination: {
+            colorPrimary: '#D05A6E',
+          },
+          Tabs: {
+            colorPrimary: '#D05A6E',
+          },
+          Menu: {
+            colorPrimary: '#D05A6E',
+          },
+          Form: {
+            colorPrimary: '#D05A6E',
+          },
+        }
+      }}
+    >
       <Router>
         <NavigationProvider>
           <Routes>
@@ -74,6 +116,7 @@ function App() {
               <Route path="admin/teams" element={<TeamManagement />} />
               <Route path="admin/teams/:id/members" element={<TeamMembers />} />
               <Route path="help" element={<HelpPage />} />
+              <Route path="user-profile" element={<UserProfile />} />
             </Route>
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>

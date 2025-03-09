@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Statistic, Table, Button, Typography, Divider, message } from 'antd';
-import { FileTextOutlined, FormOutlined, TeamOutlined, UserOutlined, EyeOutlined } from '@ant-design/icons';
+import { Row, Col, Card, Statistic, Table, Button, Typography, Divider, message, Tooltip, Empty } from 'antd';
+import { FileTextOutlined, FormOutlined, TeamOutlined, UserOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { PERMISSIONS } from '../config';
@@ -8,9 +8,9 @@ import { LedgerService } from '../services/LedgerService';
 import { TemplateService } from '../services/TemplateService';
 import { TeamService } from '../services/TeamService';
 import { UserService } from '../services/UserService';
-import { Ledger } from '../types';
+import { Ledger, Template } from '../types';
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +23,7 @@ const Dashboard: React.FC = () => {
     totalTeams: 0,
   });
   const [recentLedgers, setRecentLedgers] = useState<Ledger[]>([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -33,6 +34,7 @@ const Dashboard: React.FC = () => {
         
         // 获取模板总数
         const templates = await TemplateService.getTemplates();
+        setTemplates(templates);
         
         // 获取用户总数
         const users = await UserService.getUsers();
@@ -64,6 +66,11 @@ const Dashboard: React.FC = () => {
 
     fetchDashboardData();
   }, []);
+
+  // 直接导航到创建台账页面并使用选定的模板
+  const navigateToCreateLedger = (templateId: number) => {
+    navigate(`/dashboard/ledgers/new?template_id=${templateId}`);
+  };
 
   const columns = [
     {
@@ -119,7 +126,12 @@ const Dashboard: React.FC = () => {
       <div className="page-header">
         <Title level={3} className="page-title">系统概览</Title>
         <div>
-          <Button type="primary" onClick={() => navigate('/dashboard/ledgers/new')} disabled={!hasPermission(PERMISSIONS.LEDGER_CREATE)}>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />}
+            onClick={() => navigate('/dashboard/ledgers/new')} 
+            disabled={!hasPermission(PERMISSIONS.LEDGER_CREATE)}
+          >
             创建台账
           </Button>
         </div>
@@ -171,6 +183,79 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {hasPermission(PERMISSIONS.LEDGER_CREATE) && (
+        <>
+          <Divider />
+          
+          <div className="page-header">
+            <Title level={4} className="page-title">
+              快速登记台账
+            </Title>
+            <Button 
+              type="link" 
+              onClick={() => navigate('/dashboard/templates')}
+            >
+              管理模板
+            </Button>
+          </div>
+          
+          <Paragraph style={{ marginBottom: 16 }}>
+            选择模板类型，快速创建对应台账
+          </Paragraph>
+          
+          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+            {loading ? (
+              <Col span={24}>
+                <Card loading={true} />
+              </Col>
+            ) : templates.length > 0 ? (
+              templates.slice(0, 8).map(template => (
+                <Col xs={24} sm={12} md={8} lg={6} key={template.id}>
+                  <Card 
+                    hoverable 
+                    className="template-card"
+                    onClick={() => navigateToCreateLedger(template.id)}
+                    style={{ height: '100%' }}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                      <div style={{ flex: '1 0 auto' }}>
+                        <div style={{ fontSize: 36, color: '#1890ff', textAlign: 'center', marginBottom: 12 }}>
+                          <FormOutlined />
+                        </div>
+                        <Tooltip title={template.name}>
+                          <Title level={5} ellipsis={{ rows: 1 }} style={{ textAlign: 'center' }}>
+                            {template.name}
+                          </Title>
+                        </Tooltip>
+                      </div>
+                      <Paragraph type="secondary" ellipsis={{ rows: 2 }} style={{ marginBottom: 0, fontSize: 12 }}>
+                        {template.description || '无描述'}
+                      </Paragraph>
+                      <div style={{ marginTop: 12, textAlign: 'center' }}>
+                        <Button type="primary" size="small">
+                          创建台账
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </Col>
+              ))
+            ) : (
+              <Col span={24}>
+                <Empty description="暂无模板，请先创建模板" />
+              </Col>
+            )}
+            {templates.length > 8 && (
+              <Col span={24} style={{ textAlign: 'center', marginTop: 8 }}>
+                <Button type="link" onClick={() => navigate('/dashboard/templates')}>
+                  查看更多模板
+                </Button>
+              </Col>
+            )}
+          </Row>
+        </>
+      )}
 
       <Divider />
 
