@@ -25,7 +25,7 @@ class RoleUpdate(RoleBase):
 # 数据库中的角色
 class RoleInDBBase(RoleBase):
     id: int
-    created_at: datetime
+    created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
     class Config:

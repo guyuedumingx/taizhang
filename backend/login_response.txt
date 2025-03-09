@@ -1,0 +1,1 @@
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicm9sZXMiOlsiYWRtaW4iXSwiZXhwIjoxNzQyMjA0MDkzfQ.-a0RwTW_FX2vEKoIVoerYitZoPUO7TTmw1DEYQzwutY","token_type":"bearer","user_id":1,"username":"admin","name":"Updated User Name","roles":["admin"],"permissions":["*:*"],"teamId":2,"password_expired":false}

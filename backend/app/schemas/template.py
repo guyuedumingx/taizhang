@@ -30,7 +30,7 @@ class TemplateUpdate(TemplateBase):
 class TemplateInDBBase(TemplateBase):
     id: int
     created_by_id: int
-    created_at: datetime
+    created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
     class Config:

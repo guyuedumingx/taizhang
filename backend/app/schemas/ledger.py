@@ -48,7 +48,7 @@ class LedgerInDBBase(LedgerBase):
     created_by_id: int
     updated_by_id: int
     current_approver_id: Optional[int] = None
-    created_at: datetime
+    created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     submitted_at: Optional[datetime] = None
     approved_at: Optional[datetime] = None

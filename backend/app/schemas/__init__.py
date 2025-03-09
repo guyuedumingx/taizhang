@@ -10,6 +10,6 @@ from app.schemas.workflow import (
     WorkflowNode, WorkflowNodeCreate, WorkflowNodeCreateWithId, WorkflowNodeUpdate,
     WorkflowInstance, WorkflowInstanceCreate, WorkflowInstanceUpdate,
     WorkflowInstanceNode, WorkflowInstanceNodeCreate, WorkflowInstanceNodeUpdate,
-    ApprovalAction
+    ApprovalAction, WorkflowNodeApproval, WorkflowNodeRejection
 )
 from app.schemas.log import SystemLog, SystemLogCreate, AuditLog, AuditLogCreate, LogQueryParams 

@@ -22,7 +22,7 @@ class SystemLogCreate(SystemLogBase):
 # 系统日志响应模型
 class SystemLog(SystemLogBase):
     id: int
-    created_at: datetime
+    created_at: Optional[datetime] = None
     
     class Config:
         orm_mode = True
@@ -44,7 +44,7 @@ class AuditLogCreate(AuditLogBase):
 # 审计日志响应模型
 class AuditLog(AuditLogBase):
     id: int
-    created_at: datetime
+    created_at: Optional[datetime] = None
     
     class Config:
         orm_mode = True
