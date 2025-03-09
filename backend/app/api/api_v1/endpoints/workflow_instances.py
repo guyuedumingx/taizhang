@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from datetime import datetime
+from fastapi.encoders import jsonable_encoder
 
 from app.api import deps
 from app import crud, models, schemas
@@ -66,14 +67,13 @@ def get_workflow_instance(
             raise HTTPException(status_code=403, detail="无权查看此工作流实例")
     
     # 获取当前节点
+    current_node = None
     if instance.current_node_id:
         current_node = db.query(models.WorkflowInstanceNode).filter(
             models.WorkflowInstanceNode.id == instance.current_node_id
         ).first()
         
         if current_node:
-            instance.current_node = current_node
-            
             # 获取节点定义
             workflow_node = db.query(models.WorkflowNode).filter(
                 models.WorkflowNode.id == current_node.workflow_node_id
@@ -85,10 +85,28 @@ def get_workflow_instance(
     
     # 获取所有节点
     instance_nodes = crud.workflow_instance_node.get_by_instance(db, instance_id=instance_id)
-    instance.nodes = instance_nodes
+    
+    # 将实例转换为schema
+    instance_data = jsonable_encoder(instance)
+    result = schemas.WorkflowInstance(**instance_data)
+    result.nodes = instance_nodes
+    result.current_node = current_node
+    
+    # 添加额外信息
+    workflow = crud.workflow.get(db, id=instance.workflow_id)
+    if workflow:
+        result.workflow_name = workflow.name
+    
+    ledger = crud.ledger.get(db, id=instance.ledger_id)
+    if ledger:
+        result.ledger_name = ledger.name
+    
+    creator = crud.user.get(db, id=instance.created_by)
+    if creator:
+        result.creator_name = creator.name
     
     # 为每个节点添加节点定义信息
-    for node in instance.nodes:
+    for node in result.nodes:
         workflow_node = db.query(models.WorkflowNode).filter(
             models.WorkflowNode.id == node.workflow_node_id
         ).first()
@@ -103,7 +121,7 @@ def get_workflow_instance(
             if approver:
                 node.approver_name = approver.name
     
-    return instance
+    return result
 
 
 @router.get("/ledger/{ledger_id}", response_model=schemas.WorkflowInstance)
@@ -141,14 +159,13 @@ def get_workflow_instance_by_ledger(
         raise HTTPException(status_code=404, detail="台账没有活动的工作流实例")
     
     # 获取当前节点
+    current_node = None
     if instance.current_node_id:
         current_node = db.query(models.WorkflowInstanceNode).filter(
             models.WorkflowInstanceNode.id == instance.current_node_id
         ).first()
         
         if current_node:
-            instance.current_node = current_node
-            
             # 获取节点定义
             workflow_node = db.query(models.WorkflowNode).filter(
                 models.WorkflowNode.id == current_node.workflow_node_id
@@ -160,10 +177,28 @@ def get_workflow_instance_by_ledger(
     
     # 获取所有节点
     instance_nodes = crud.workflow_instance_node.get_by_instance(db, instance_id=instance.id)
-    instance.nodes = instance_nodes
+    
+    # 将实例转换为schema
+    instance_data = jsonable_encoder(instance)
+    result = schemas.WorkflowInstance(**instance_data)
+    result.nodes = instance_nodes
+    result.current_node = current_node
+    
+    # 添加额外信息
+    workflow = crud.workflow.get(db, id=instance.workflow_id)
+    if workflow:
+        result.workflow_name = workflow.name
+    
+    ledger = crud.ledger.get(db, id=instance.ledger_id)
+    if ledger:
+        result.ledger_name = ledger.name
+    
+    creator = crud.user.get(db, id=instance.created_by)
+    if creator:
+        result.creator_name = creator.name
     
     # 为每个节点添加节点定义信息
-    for node in instance.nodes:
+    for node in result.nodes:
         workflow_node = db.query(models.WorkflowNode).filter(
             models.WorkflowNode.id == node.workflow_node_id
         ).first()
@@ -178,7 +213,7 @@ def get_workflow_instance_by_ledger(
             if approver:
                 node.approver_name = approver.name
     
-    return instance
+    return result
 
 
 @router.get("/{instance_id}/nodes", response_model=List[schemas.WorkflowInstanceNode])
