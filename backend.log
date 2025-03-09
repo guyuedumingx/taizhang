@@ -1,0 +1,320 @@
+2025-03-09 15:00:04 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 15:00:05 - root - INFO - 启动服务器...
+2025-03-09 15:00:06 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 15:00:06 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 15:00:06 - root - INFO - 服务启动
+2025-03-09 15:00:22 - root - INFO - 服务关闭
+2025-03-09 15:00:33 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 15:00:33 - root - INFO - 启动服务器...
+2025-03-09 15:00:34 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 15:00:34 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-09 15:00:34 - root - INFO - 服务启动
+2025-03-09 15:00:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:00:46 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:08 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:01:08 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:01:09 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:17 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:01:17 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:18 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:01:18 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:01:21 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:23 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:01:23 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:39 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:01:39 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:01:41 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:42 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:01:42 - taizhang - INFO - [INFO] approval.view_audit_logs: 查看台账 测试台账 的审计日志 - ledger:1 - User:1
+2025-03-09 15:01:42 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:01:44 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:46 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:01:46 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:01:48 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:01:52 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:01:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:01:58 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:02 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:12 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:15 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:02:15 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:17 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:30 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:41 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:44 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:46 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:47 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:02:49 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:02:49 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:03:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:03:30 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:03:36 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:2 - User:1
+2025-03-09 15:03:36 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:03:39 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:03:39 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:03:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:03:42 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:03:43 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:03:43 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:03:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:03:47 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:10:59 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:10:59 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:11:01 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:11:05 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:11:06 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:09 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:11:09 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:11:11 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:11:14 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:16 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:11:16 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:24 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:11:25 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:11:32 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:11:32 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:12:22 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:12:22 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:12:25 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:12:25 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:12:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:12:26 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:12:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:12:28 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:04 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:13:04 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:13:04 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:11 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:13:12 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:13 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:13:13 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:13:16 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:13:18 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:21 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:13:21 - taizhang - INFO - [INFO] approval.view_audit_logs: 查看台账 测试台账 的审计日志 - ledger:1 - User:1
+2025-03-09 15:13:21 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:13:23 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:25 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:13:25 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:13:26 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:13:42 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:13:45 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:13:45 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:14:05 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:14:05 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:14:07 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:14:07 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:14:10 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:14:10 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:14:10 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:14:14 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:14:14 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:17:17 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:17:18 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:18:36 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:18:36 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:19:58 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:19:58 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:20:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:20:58 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:21:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:21:00 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:21:02 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:21:02 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:21:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:21:05 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:21:09 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:2 - User:1
+2025-03-09 15:21:09 - taizhang - INFO - [INFO] approval.view_audit_logs: 查看台账 测试台账 的审计日志 - ledger:2 - User:1
+2025-03-09 15:21:09 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:21:39 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:21:39 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:22:17 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:22:17 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:22:17 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:22:34 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:22:34 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:22:36 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:22:36 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:22:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:22:41 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:22:42 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:22:42 - taizhang - INFO - [INFO] approval.view_audit_logs: 查看台账 测试台账 的审计日志 - ledger:1 - User:1
+2025-03-09 15:22:42 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:22:49 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:22:49 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:23:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:23:23 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:23:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:23:27 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:23:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:23:28 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:23:29 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:23:29 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:24:54 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:24:54 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:25:10 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:25:10 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:26:53 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:26:53 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:27:19 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:27:19 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:27:27 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:27:27 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:27:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:27:28 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:27:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:27:29 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:27:31 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:27:31 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:27:32 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:27:32 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:27:33 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:27:33 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:27:33 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:30:21 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:22 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:30:22 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:25 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:30:25 - taizhang - INFO - [INFO] approval.view_audit_logs: 查看台账 测试台账 的审计日志 - ledger:1 - User:1
+2025-03-09 15:30:25 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:30:27 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:30 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:30:30 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:30:31 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:33 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:30:33 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:36 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:30:36 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:37 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:30:37 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:30:37 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:39 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:30:39 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:40 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:30:40 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:30:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:30:47 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:31:01 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:31:01 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:31:01 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:31:05 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:31:05 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:31:07 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:31:07 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:31:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:31:12 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:31:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:31:14 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:06 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:33:06 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:33:06 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:07 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:33:07 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:09 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:33:09 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:33:12 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:33:14 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:16 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:33:16 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:19 - taizhang - INFO - [INFO] workflow.read: 查看工作流 测试工作流-更新 - workflow:1 - User:1
+2025-03-09 15:33:19 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:21 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:33:21 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:24 - taizhang - INFO - [INFO] workflow.read: 查看工作流 测试工作流 - workflow:2 - User:1
+2025-03-09 15:33:24 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:28 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:33:28 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:32 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:33:33 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:33:34 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:36 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:33:36 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:39 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:33:39 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:33:40 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:41 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:33:42 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:43 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:33:43 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:33:44 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:33:44 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:33:44 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:34:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:34:01 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:00 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:35:00 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:35:00 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:02 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:35:02 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:04 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:35:04 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:09 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:35:09 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:35:11 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:35:14 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:35:27 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:35:34 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:35:37 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:35:37 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:36:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:36:04 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:36:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:36:05 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:36:07 - taizhang - INFO - [INFO] workflow.list: 获取工作流列表 - User:1
+2025-03-09 15:36:07 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:36:11 - taizhang - INFO - [INFO] approval.list_tasks: 获取待办任务列表 - User:1
+2025-03-09 15:36:11 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:36:13 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-03-09 15:36:13 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-03-09 15:36:13 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:36:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:36:30 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:36:32 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:36:32 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:37:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:37:08 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:37:11 - taizhang - INFO - [INFO] ledger.read: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-09 15:37:11 - taizhang - INFO - [INFO] approval.view_audit_logs: 查看台账 测试台账 的审计日志 - ledger:1 - User:1
+2025-03-09 15:37:11 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:37:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:37:14 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:38:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:38:02 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:38:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:38:18 - watchfiles.main - INFO - 2 changes detected
+2025-03-09 15:38:49 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-03-09 15:38:49 - watchfiles.main - INFO - 2 changes detected

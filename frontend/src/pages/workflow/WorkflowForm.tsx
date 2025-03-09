@@ -6,6 +6,7 @@ import { PERMISSIONS } from '../../config';
 import { WorkflowNodeCreate, Template, User, Role } from '../../types';
 import WorkflowNodeList from '../../components/workflow/WorkflowNodeList';
 import { WorkflowService } from '../../services/WorkflowService';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -32,15 +33,18 @@ const WorkflowForm: React.FC = () => {
 
   // 检查权限并加载数据
   useEffect(() => {
+    console.log('WorkflowForm useEffect triggered, id:', id);
+    
     const requiredPermission = isEdit ? PERMISSIONS.WORKFLOW_EDIT : PERMISSIONS.WORKFLOW_CREATE;
     if (!hasPermission(requiredPermission)) {
       message.error('您没有权限访问此页面');
-      navigate('/workflow');
+      navigate('/dashboard/workflow');
       return;
     }
 
     const fetchData = async () => {
       try {
+        console.log('Fetching data for workflow, isEdit:', isEdit);
         const [templatesData, rolesData, usersData] = await Promise.all([
           WorkflowService.getTemplates(),
           WorkflowService.getRoles(),
@@ -53,9 +57,17 @@ const WorkflowForm: React.FC = () => {
         
         // 如果是编辑模式，获取工作流详情
         if (isEdit && id) {
-          await fetchWorkflow(parseInt(id));
+          console.log('Fetching workflow details for id:', id);
+          try {
+            await fetchWorkflow(parseInt(id, 10));
+          } catch (error) {
+            console.error('获取工作流详情失败:', error);
+            message.error('获取工作流详情失败，请返回列表页重试');
+            navigate('/workflow');
+          }
         } else {
           // 创建模式，初始化节点
+          console.log('Initializing nodes for new workflow');
           setNodes(WorkflowService.initializeNodes());
         }
       } catch (error) {
@@ -69,9 +81,15 @@ const WorkflowForm: React.FC = () => {
 
   // 获取工作流详情
   const fetchWorkflow = async (workflowId: number) => {
+    console.log('fetchWorkflow called with id:', workflowId);
     setLoading(true);
     try {
       const response = await WorkflowService.getWorkflow(workflowId);
+      console.log('Workflow data received:', response);
+      
+      if (!response || !response.id) {
+        throw new Error('无效的工作流数据');
+      }
       
       // 设置表单初始值
       form.setFieldsValue({
@@ -83,6 +101,7 @@ const WorkflowForm: React.FC = () => {
       
       // 设置节点
       if (response.nodes && response.nodes.length > 0) {
+        console.log('Setting nodes from response:', response.nodes);
         const formattedNodes = response.nodes.map(node => ({
           workflow_id: node.workflow_id,
           name: node.name,
@@ -96,11 +115,13 @@ const WorkflowForm: React.FC = () => {
         }));
         setNodes(formattedNodes);
       } else {
+        console.log('No nodes in response, initializing default nodes');
         setNodes(WorkflowService.initializeNodes());
       }
     } catch (error) {
       console.error('获取工作流详情失败:', error);
       message.error('获取工作流详情失败');
+      throw error; // 重新抛出错误，让调用者处理
     } finally {
       setLoading(false);
     }
@@ -162,30 +183,73 @@ const WorkflowForm: React.FC = () => {
   const handleSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
+      console.log('提交表单数据:', values);
+      console.log('节点数据:', nodes);
+      
       // 准备节点数据
       const formattedNodes = nodes.map((node, index) => ({
         ...node,
         order_index: index,
       }));
       
-      // 准备工作流数据
-      const workflowData = {
-        ...values,
-        nodes: formattedNodes,
-      };
-      
       if (isEdit && id) {
-        // 更新工作流
-        await WorkflowService.updateWorkflow(parseInt(id), workflowData);
-        message.success('工作流更新成功');
+        console.log(`更新工作流 ID: ${id}`);
+        // 更新工作流基本信息
+        const workflowUpdateData = {
+          name: values.name,
+          description: values.description,
+          is_active: values.is_active
+        };
+        
+        await WorkflowService.updateWorkflow(parseInt(id), workflowUpdateData);
+        message.success('工作流基本信息更新成功');
+        
+        // 获取已有节点
+        try {
+          const existingNodes = await WorkflowService.getWorkflowNodes(parseInt(id));
+          console.log(`获取到 ${existingNodes.length} 个现有节点`);
+          
+          // 删除所有已有节点
+          await Promise.all(
+            existingNodes.map(node => WorkflowService.deleteWorkflowNode(parseInt(id), node.id))
+          );
+          console.log('已删除所有现有节点');
+        } catch (error) {
+          console.error('删除现有节点失败:', error);
+        }
+        
+        // 创建新节点
+        try {
+          const nodesWithWorkflowId = formattedNodes.map(node => ({
+            ...node,
+            workflow_id: parseInt(id)
+          }));
+          
+          console.log(`准备创建 ${nodesWithWorkflowId.length} 个新节点`);
+          await Promise.all(
+            nodesWithWorkflowId.map(node => WorkflowService.createWorkflowNode(parseInt(id), node))
+          );
+          console.log('所有节点创建成功');
+          message.success('工作流节点更新成功');
+        } catch (error) {
+          console.error('创建节点失败:', error);
+          message.error('创建节点失败，请检查节点配置');
+        }
       } else {
-        // 创建工作流
-        await WorkflowService.createWorkflow(workflowData);
+        console.log('创建新工作流');
+        // 创建新工作流
+        const workflowCreateData = {
+          ...values,
+          nodes: formattedNodes
+        };
+        
+        await WorkflowService.createWorkflow(workflowCreateData);
         message.success('工作流创建成功');
       }
       
       // 返回工作流列表页面
-      navigate('/workflow');
+      console.log('操作完成，返回工作流列表页面');
+      navigate('/dashboard/workflow');
     } catch (error) {
       console.error('提交工作流失败:', error);
       message.error('提交工作流失败，请检查输入并重试');
@@ -196,97 +260,108 @@ const WorkflowForm: React.FC = () => {
 
   // 取消编辑
   const handleCancel = () => {
-    navigate('/workflow');
+    navigate('/dashboard/workflow');
   };
 
   return (
-    <Card 
-      title={
-        <Title level={3}>
-          {isEdit ? '编辑工作流' : '创建工作流'}
-        </Title>
-      }
-      bordered={false}
-    >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={{
-          is_active: true,
-        }}
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '工作流管理', path: '/dashboard/workflow' },
+          { title: isEdit ? '编辑工作流' : '创建工作流' }
+        ]}
+        backButtonText="取消"
+        onBack={handleCancel}
+      />
+      
+      <Card 
+        title={
+          <Title level={3}>
+            {isEdit ? '编辑工作流' : '创建工作流'}
+          </Title>
+        }
+        bordered={false}
       >
-        <Form.Item
-          name="name"
-          label="工作流名称"
-          rules={[
-            { required: true, message: '请输入工作流名称' },
-            { max: 50, message: '工作流名称不能超过50个字符' },
-          ]}
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          initialValues={{
+            is_active: true,
+          }}
         >
-          <Input placeholder="请输入工作流名称" />
-        </Form.Item>
-        
-        <Form.Item
-          name="description"
-          label="工作流描述"
-          rules={[
-            { max: 200, message: '工作流描述不能超过200个字符' },
-          ]}
-        >
-          <TextArea 
-            placeholder="请输入工作流描述" 
-            rows={3}
-            maxLength={200}
-            showCount
+          <Form.Item
+            name="name"
+            label="工作流名称"
+            rules={[
+              { required: true, message: '请输入工作流名称' },
+              { max: 50, message: '工作流名称不能超过50个字符' },
+            ]}
+          >
+            <Input placeholder="请输入工作流名称" />
+          </Form.Item>
+          
+          <Form.Item
+            name="description"
+            label="工作流描述"
+            rules={[
+              { max: 200, message: '工作流描述不能超过200个字符' },
+            ]}
+          >
+            <TextArea 
+              placeholder="请输入工作流描述" 
+              rows={3}
+              maxLength={200}
+              showCount
+            />
+          </Form.Item>
+          
+          <Form.Item
+            name="template_id"
+            label="关联模板"
+            rules={[
+              { required: true, message: '请选择关联的模板' },
+            ]}
+          >
+            <Select placeholder="请选择模板">
+              {templates.map(template => (
+                <Option key={template.id} value={template.id}>
+                  {template.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          
+          <Form.Item
+            name="is_active"
+            label="是否启用"
+            valuePropName="checked"
+          >
+            <Switch checkedChildren="启用" unCheckedChildren="禁用" />
+          </Form.Item>
+          
+          {/* 工作流节点列表 */}
+          <WorkflowNodeList
+            nodes={nodes}
+            roles={roles}
+            users={users}
+            onAddNode={handleAddNode}
+            onDeleteNode={handleDeleteNode}
+            onMoveNode={handleMoveNode}
+            onUpdateNode={handleUpdateNode}
           />
-        </Form.Item>
-        
-        <Form.Item
-          name="template_id"
-          label="关联模板"
-          rules={[
-            { required: true, message: '请选择关联的模板' },
-          ]}
-        >
-          <Select placeholder="请选择模板">
-            {templates.map(template => (
-              <Option key={template.id} value={template.id}>
-                {template.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        
-        <Form.Item
-          name="is_active"
-          label="是否启用"
-          valuePropName="checked"
-        >
-          <Switch checkedChildren="启用" unCheckedChildren="禁用" />
-        </Form.Item>
-        
-        {/* 工作流节点列表 */}
-        <WorkflowNodeList
-          nodes={nodes}
-          roles={roles}
-          users={users}
-          onAddNode={handleAddNode}
-          onDeleteNode={handleDeleteNode}
-          onMoveNode={handleMoveNode}
-          onUpdateNode={handleUpdateNode}
-        />
-        
-        <Form.Item style={{ marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" loading={loading} style={{ marginRight: 16 }}>
-            {isEdit ? '更新工作流' : '创建工作流'}
-          </Button>
-          <Button onClick={handleCancel}>
-            取消
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          
+          <Form.Item style={{ marginTop: 24 }}>
+            <Button type="primary" htmlType="submit" loading={loading} style={{ marginRight: 16 }}>
+              {isEdit ? '更新工作流' : '创建工作流'}
+            </Button>
+            <Button onClick={handleCancel}>
+              取消
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </>
   );
 };
 

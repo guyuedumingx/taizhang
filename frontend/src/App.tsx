@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/lib/locale/zh_CN';
 import { useAuthStore } from './stores/authStore';
+import { NavigationProvider } from './contexts/NavigationContext';
 import LoginPage from './pages/LoginPage';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
@@ -34,44 +35,46 @@ function App() {
   return (
     <ConfigProvider locale={zhCN}>
       <Router>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <>
-                  <Layout />
-                  <PasswordExpiredModal />
-                </>
-              </PrivateRoute>
-            }
-          >
-            <Route index element={<Dashboard />} />
-            <Route path="ledgers" element={<LedgerList />} />
-            <Route path="ledgers/new" element={<LedgerForm />} />
-            <Route path="ledgers/edit/:id" element={<LedgerForm />} />
-            <Route path="ledgers/:id" element={<LedgerDetail />} />
-            <Route path="templates" element={<TemplateList />} />
-            <Route path="templates/new" element={<TemplateForm />} />
-            <Route path="templates/edit/:id" element={<TemplateForm />} />
-            <Route path="templates/:templateId/ledgers" element={<TemplateLedgerSummary />} />
-            <Route path="workflow" element={<WorkflowList />} />
-            <Route path="workflow/create" element={<WorkflowForm />} />
-            <Route path="workflow/edit/:id" element={<WorkflowForm />} />
-            <Route path="workflow/:id" element={<WorkflowDetail />} />
-            <Route path="approval/tasks" element={<TaskList />} />
-            <Route path="logs" element={<LogList />} />
-            <Route path="admin/users" element={<UserManagementFixed />} />
-            <Route path="admin/roles" element={<RoleManagement />} />
-            <Route path="admin/permissions" element={<PermissionManagement />} />
-            <Route path="admin/teams" element={<TeamManagement />} />
-            <Route path="admin/teams/:id/members" element={<TeamMembers />} />
-            <Route path="help" element={<HelpPage />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
+        <NavigationProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <>
+                    <Layout />
+                    <PasswordExpiredModal />
+                  </>
+                </PrivateRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="ledgers" element={<LedgerList />} />
+              <Route path="ledgers/new" element={<LedgerForm />} />
+              <Route path="ledgers/edit/:id" element={<LedgerForm />} />
+              <Route path="ledgers/:id" element={<LedgerDetail />} />
+              <Route path="templates" element={<TemplateList />} />
+              <Route path="templates/new" element={<TemplateForm />} />
+              <Route path="templates/edit/:id" element={<TemplateForm />} />
+              <Route path="templates/:templateId/ledgers" element={<TemplateLedgerSummary />} />
+              <Route path="workflow" element={<WorkflowList />} />
+              <Route path="workflow/create" element={<WorkflowForm />} />
+              <Route path="workflow/edit/:id" element={<WorkflowForm />} />
+              <Route path="workflow/:id" element={<WorkflowDetail />} />
+              <Route path="approval/tasks" element={<TaskList />} />
+              <Route path="logs" element={<LogList />} />
+              <Route path="admin/users" element={<UserManagementFixed />} />
+              <Route path="admin/roles" element={<RoleManagement />} />
+              <Route path="admin/permissions" element={<PermissionManagement />} />
+              <Route path="admin/teams" element={<TeamManagement />} />
+              <Route path="admin/teams/:id/members" element={<TeamMembers />} />
+              <Route path="help" element={<HelpPage />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Routes>
+        </NavigationProvider>
       </Router>
     </ConfigProvider>
   );

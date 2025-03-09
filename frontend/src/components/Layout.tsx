@@ -231,6 +231,9 @@ const AppLayout: React.FC = () => {
         </Header>
         
         <Content style={{ margin: '24px 16px', padding: 24, background: token.colorBgContainer, borderRadius: token.borderRadius, minHeight: 280 }}>
+          <div id="breadcrumb-container" style={{ marginBottom: 16 }}>
+            {/* 面包屑导航将由各页面组件填充 */}
+          </div>
           <Outlet />
         </Content>
       </Layout>

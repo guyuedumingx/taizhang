@@ -8,6 +8,7 @@ import { TeamService } from '../../services/TeamService';
 import { RoleService } from '../../services/RoleService';
 import { User, Team, Role, UserCreate, UserUpdate } from '../../types';
 import type { ColumnsType } from 'antd/es/table';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -367,263 +368,273 @@ const UserManagement: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Typography.Title level={3}>用户管理</Typography.Title>
-        <Space>
-          <Button
-            type="primary"
-            icon={<UploadOutlined />}
-            onClick={() => setImportModalVisible(true)}
-            disabled={!hasPermission(PERMISSIONS.USER_CREATE)}
-          >
-            批量导入
-          </Button>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={showAddModal}
-            disabled={!hasPermission(PERMISSIONS.USER_CREATE)}
-          >
-            创建用户
-          </Button>
-        </Space>
-      </div>
-      <Card>
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '系统管理', path: '/dashboard/admin' },
+          { title: '用户管理', path: '/dashboard/admin/users' }
+        ]}
+        showBackButton={false}
+      />
+      
+      <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <Title level={4}>用户列表</Title>
+          <Typography.Title level={3}>用户管理</Typography.Title>
           <Space>
-            <Search
-              placeholder="搜索用户"
-              allowClear
-              onSearch={handleSearch}
-              style={{ width: 250 }}
-            />
+            <Button
+              type="primary"
+              icon={<UploadOutlined />}
+              onClick={() => setImportModalVisible(true)}
+              disabled={!hasPermission(PERMISSIONS.USER_CREATE)}
+            >
+              批量导入
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={showAddModal}
+              disabled={!hasPermission(PERMISSIONS.USER_CREATE)}
+            >
+              创建用户
+            </Button>
           </Space>
         </div>
-        <Table
-          columns={columns}
-          dataSource={filteredUsers}
-          rowKey="id"
-          loading={loading}
-          pagination={{
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 条记录`,
-          }}
-        />
-      </Card>
+        <Card>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+            <Title level={4}>用户列表</Title>
+            <Space>
+              <Search
+                placeholder="搜索用户"
+                allowClear
+                onSearch={handleSearch}
+                style={{ width: 250 }}
+              />
+            </Space>
+          </div>
+          <Table
+            columns={columns}
+            dataSource={filteredUsers}
+            rowKey="id"
+            loading={loading}
+            pagination={{
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total) => `共 ${total} 条记录`,
+            }}
+          />
+        </Card>
 
-      <Modal
-        title={modalTitle}
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={() => setIsModalVisible(false)}
-        destroyOnClose
-      >
-        <Form
-          form={form}
-          layout="vertical"
+        <Modal
+          title={modalTitle}
+          open={isModalVisible}
+          onOk={handleModalOk}
+          onCancel={() => setIsModalVisible(false)}
+          destroyOnClose
         >
-          <Form.Item
-            label="用户名"
-            name="username"
-            rules={[
-              { required: true, message: '请输入用户名' },
-              { min: 3, message: '用户名至少3个字符' },
-            ]}
+          <Form
+            form={form}
+            layout="vertical"
           >
-            <Input disabled={!!editingUserId} />
-          </Form.Item>
-          
-          {!editingUserId && (
             <Form.Item
-              label="密码"
-              name="password"
+              label="用户名"
+              name="username"
               rules={[
-                { required: !editingUserId, message: '请输入密码' },
-                { min: 6, message: '密码至少6个字符' },
+                { required: true, message: '请输入用户名' },
+                { min: 3, message: '用户名至少3个字符' },
               ]}
             >
-              <Input.Password />
+              <Input disabled={!!editingUserId} />
             </Form.Item>
-          )}
-          
-          {editingUserId && (
-            <Form.Item
-              label="密码"
-              name="password"
-              extra="如不修改密码，请留空"
-            >
-              <Input.Password />
-            </Form.Item>
-          )}
-          
-          <Form.Item
-            label="姓名"
-            name="name"
-            rules={[{ required: true, message: '请输入姓名' }]}
-          >
-            <Input />
-          </Form.Item>
-          
-          <Form.Item
-            label="EHR号"
-            name="ehr_id"
-            rules={[
-              { required: true, message: '请输入EHR号' },
-              { min: 7, max: 7, message: 'EHR号必须是7位数字' },
-              { pattern: /^\d{7}$/, message: 'EHR号必须是7位数字' }
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          
-          <Form.Item
-            label="角色"
-            name="roles"
-            rules={[{ required: true, message: '请选择角色' }]}
-          >
-            <Select mode="multiple">
-              {roles.map(role => (
-                <Option key={role.name} value={role.name}>{role.name} - {role.description}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            label="部门"
-            name="department"
-            rules={[{ required: true, message: '请选择部门' }]}
-          >
-            <Select>
-              <Option value="财务部">财务部</Option>
-              <Option value="生产部">生产部</Option>
-              <Option value="客服部">客服部</Option>
-              <Option value="设备部">设备部</Option>
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            label="团队"
-            name="team_id"
-          >
-            <Select allowClear placeholder="选择团队">
-              {teams.map(team => (
-                <Option key={team.id} value={team.id}>{team.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            label="状态"
-            name="is_active"
-            initialValue={true}
-            rules={[{ required: true, message: '请选择状态' }]}
-          >
-            <Select>
-              <Option value={true}>启用</Option>
-              <Option value={false}>禁用</Option>
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* 导入用户模态框 */}
-      <Modal
-        title="批量导入用户"
-        open={importModalVisible}
-        onCancel={() => {
-          setImportModalVisible(false);
-          setImportResult(null);
-        }}
-        footer={[
-          <Button 
-            key="download" 
-            icon={<DownloadOutlined />}
-            onClick={handleDownloadTemplate}
-          >
-            下载模板
-          </Button>,
-          <Button 
-            key="close" 
-            onClick={() => {
-              setImportModalVisible(false);
-              setImportResult(null);
-            }}
-          >
-            关闭
-          </Button>
-        ]}
-        width={700}
-      >
-        <Typography.Paragraph>
-          请上传用户数据文件，支持Excel和CSV格式。文件必须包含以下列：username、ehr_id、password、name。
-          其他可选列：department、roles、team_id。
-        </Typography.Paragraph>
-        
-        <Upload.Dragger
-          name="file"
-          accept=".xlsx,.xls,.csv"
-          customRequest={handleImportUsers}
-          showUploadList={false}
-          disabled={importLoading}
-        >
-          <p className="ant-upload-drag-icon">
-            <UploadOutlined />
-          </p>
-          <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
-          <p className="ant-upload-hint">支持Excel和CSV格式</p>
-        </Upload.Dragger>
-        
-        {importLoading && (
-          <div style={{ textAlign: 'center', marginTop: 16 }}>
-            <Typography.Text>正在导入，请稍候...</Typography.Text>
-          </div>
-        )}
-        
-        {importResult && (
-          <Card style={{ marginTop: 16 }}>
-            <Typography.Title level={4}>导入结果</Typography.Title>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Card title="成功" bordered={false}>
-                  <Typography.Text style={{ fontSize: 24, color: '#52c41a' }}>
-                    {importResult.success_count}
-                  </Typography.Text>
-                  <Typography.Text> 个用户</Typography.Text>
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card title="失败" bordered={false}>
-                  <Typography.Text style={{ fontSize: 24, color: '#f5222d' }}>
-                    {importResult.failed_count}
-                  </Typography.Text>
-                  <Typography.Text> 个用户</Typography.Text>
-                </Card>
-              </Col>
-            </Row>
             
-            {importResult.failed_count > 0 && (
-              <>
-                <Typography.Title level={5} style={{ marginTop: 16 }}>失败详情</Typography.Title>
-                <Table
-                  dataSource={importResult.failed_users}
-                  columns={[
-                    { title: '行号', dataIndex: 'row', key: 'row' },
-                    { title: '用户名', dataIndex: 'username', key: 'username' },
-                    { title: '失败原因', dataIndex: 'reason', key: 'reason' }
-                  ]}
-                  size="small"
-                  pagination={false}
-                  rowKey={(record) => `${record.row}-${record.username}`}
-                />
-              </>
+            {!editingUserId && (
+              <Form.Item
+                label="密码"
+                name="password"
+                rules={[
+                  { required: !editingUserId, message: '请输入密码' },
+                  { min: 6, message: '密码至少6个字符' },
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
             )}
-          </Card>
-        )}
-      </Modal>
-    </div>
+            
+            {editingUserId && (
+              <Form.Item
+                label="密码"
+                name="password"
+                extra="如不修改密码，请留空"
+              >
+                <Input.Password />
+              </Form.Item>
+            )}
+            
+            <Form.Item
+              label="姓名"
+              name="name"
+              rules={[{ required: true, message: '请输入姓名' }]}
+            >
+              <Input />
+            </Form.Item>
+            
+            <Form.Item
+              label="EHR号"
+              name="ehr_id"
+              rules={[
+                { required: true, message: '请输入EHR号' },
+                { min: 7, max: 7, message: 'EHR号必须是7位数字' },
+                { pattern: /^\d{7}$/, message: 'EHR号必须是7位数字' }
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            
+            <Form.Item
+              label="角色"
+              name="roles"
+              rules={[{ required: true, message: '请选择角色' }]}
+            >
+              <Select mode="multiple">
+                {roles.map(role => (
+                  <Option key={role.name} value={role.name}>{role.name} - {role.description}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+            
+            <Form.Item
+              label="部门"
+              name="department"
+              rules={[{ required: true, message: '请选择部门' }]}
+            >
+              <Select>
+                <Option value="财务部">财务部</Option>
+                <Option value="生产部">生产部</Option>
+                <Option value="客服部">客服部</Option>
+                <Option value="设备部">设备部</Option>
+              </Select>
+            </Form.Item>
+            
+            <Form.Item
+              label="团队"
+              name="team_id"
+            >
+              <Select allowClear placeholder="选择团队">
+                {teams.map(team => (
+                  <Option key={team.id} value={team.id}>{team.name}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+            
+            <Form.Item
+              label="状态"
+              name="is_active"
+              initialValue={true}
+              rules={[{ required: true, message: '请选择状态' }]}
+            >
+              <Select>
+                <Option value={true}>启用</Option>
+                <Option value={false}>禁用</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        {/* 导入用户模态框 */}
+        <Modal
+          title="批量导入用户"
+          open={importModalVisible}
+          onCancel={() => {
+            setImportModalVisible(false);
+            setImportResult(null);
+          }}
+          footer={[
+            <Button 
+              key="download" 
+              icon={<DownloadOutlined />}
+              onClick={handleDownloadTemplate}
+            >
+              下载模板
+            </Button>,
+            <Button 
+              key="close" 
+              onClick={() => {
+                setImportModalVisible(false);
+                setImportResult(null);
+              }}
+            >
+              关闭
+            </Button>
+          ]}
+          width={700}
+        >
+          <Typography.Paragraph>
+            请上传用户数据文件，支持Excel和CSV格式。文件必须包含以下列：username、ehr_id、password、name。
+            其他可选列：department、roles、team_id。
+          </Typography.Paragraph>
+          
+          <Upload.Dragger
+            name="file"
+            accept=".xlsx,.xls,.csv"
+            customRequest={handleImportUsers}
+            showUploadList={false}
+            disabled={importLoading}
+          >
+            <p className="ant-upload-drag-icon">
+              <UploadOutlined />
+            </p>
+            <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+            <p className="ant-upload-hint">支持Excel和CSV格式</p>
+          </Upload.Dragger>
+          
+          {importLoading && (
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <Typography.Text>正在导入，请稍候...</Typography.Text>
+            </div>
+          )}
+          
+          {importResult && (
+            <Card style={{ marginTop: 16 }}>
+              <Typography.Title level={4}>导入结果</Typography.Title>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Card title="成功" bordered={false}>
+                    <Typography.Text style={{ fontSize: 24, color: '#52c41a' }}>
+                      {importResult.success_count}
+                    </Typography.Text>
+                    <Typography.Text> 个用户</Typography.Text>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card title="失败" bordered={false}>
+                    <Typography.Text style={{ fontSize: 24, color: '#f5222d' }}>
+                      {importResult.failed_count}
+                    </Typography.Text>
+                    <Typography.Text> 个用户</Typography.Text>
+                  </Card>
+                </Col>
+              </Row>
+              
+              {importResult.failed_count > 0 && (
+                <>
+                  <Typography.Title level={5} style={{ marginTop: 16 }}>失败详情</Typography.Title>
+                  <Table
+                    dataSource={importResult.failed_users}
+                    columns={[
+                      { title: '行号', dataIndex: 'row', key: 'row' },
+                      { title: '用户名', dataIndex: 'username', key: 'username' },
+                      { title: '失败原因', dataIndex: 'reason', key: 'reason' }
+                    ]}
+                    size="small"
+                    pagination={false}
+                    rowKey={(record) => `${record.row}-${record.username}`}
+                  />
+                </>
+              )}
+            </Card>
+          )}
+        </Modal>
+      </div>
+    </>
   );
 };
 

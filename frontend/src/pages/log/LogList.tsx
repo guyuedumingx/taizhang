@@ -7,6 +7,7 @@ import { LogService } from '../../services/LogService';
 import SystemLogTable from '../../components/log/SystemLogTable';
 import AuditLogTable from '../../components/log/AuditLogTable';
 import LogSearchForm from '../../components/log/LogSearchForm';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { TabPane } = Tabs;
 
@@ -174,52 +175,61 @@ const LogList: React.FC = () => {
   };
 
   return (
-    <Card title="系统日志" bordered={false}>
-      <Tabs activeKey={activeTab} onChange={handleTabChange}>
-        <TabPane tab="系统日志" key="system">
-          <LogSearchForm
-            type="system"
-            onSearch={handleSystemSearch}
-            onReset={handleSystemReset}
-            loading={systemLoading}
-          />
-          <SystemLogTable
-            logs={systemLogs}
-            loading={systemLoading}
-            pagination={{
-              current: systemParams.page || 1,
-              pageSize: systemParams.page_size || 10,
-              total: systemTotal,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total: number) => `共 ${total} 条记录`,
-            }}
-            onChange={handleSystemTableChange}
-          />
-        </TabPane>
-        <TabPane tab="审计日志" key="audit">
-          <LogSearchForm
-            type="audit"
-            onSearch={handleAuditSearch}
-            onReset={handleAuditReset}
-            loading={auditLoading}
-          />
-          <AuditLogTable
-            logs={auditLogs}
-            loading={auditLoading}
-            pagination={{
-              current: auditParams.page || 1,
-              pageSize: auditParams.page_size || 10,
-              total: auditTotal,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total: number) => `共 ${total} 条记录`,
-            }}
-            onChange={handleAuditTableChange}
-          />
-        </TabPane>
-      </Tabs>
-    </Card>
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '日志管理', path: '/dashboard/logs' }
+        ]}
+        showBackButton={false}
+      />
+      
+      <Card title="系统日志" bordered={false}>
+        <Tabs activeKey={activeTab} onChange={handleTabChange}>
+          <TabPane tab="系统日志" key="system">
+            <LogSearchForm
+              type="system"
+              onSearch={handleSystemSearch}
+              onReset={handleSystemReset}
+              loading={systemLoading}
+            />
+            <SystemLogTable
+              logs={systemLogs}
+              loading={systemLoading}
+              pagination={{
+                current: systemParams.page || 1,
+                pageSize: systemParams.page_size || 10,
+                total: systemTotal,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total: number) => `共 ${total} 条记录`,
+              }}
+              onChange={handleSystemTableChange}
+            />
+          </TabPane>
+          <TabPane tab="审计日志" key="audit">
+            <LogSearchForm
+              type="audit"
+              onSearch={handleAuditSearch}
+              onReset={handleAuditReset}
+              loading={auditLoading}
+            />
+            <AuditLogTable
+              logs={auditLogs}
+              loading={auditLoading}
+              pagination={{
+                current: auditParams.page || 1,
+                pageSize: auditParams.page_size || 10,
+                total: auditTotal,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total: number) => `共 ${total} 条记录`,
+              }}
+              onChange={handleAuditTableChange}
+            />
+          </TabPane>
+        </Tabs>
+      </Card>
+    </>
   );
 };
 

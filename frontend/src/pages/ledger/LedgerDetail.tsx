@@ -8,6 +8,7 @@ import { LedgerService } from '../../services/LedgerService';
 import { ApprovalService } from '../../services/ApprovalService';
 import { TemplateService } from '../../services/TemplateService';
 import { Ledger, AuditLog, Field } from '../../types';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title, Text } = Typography;
 

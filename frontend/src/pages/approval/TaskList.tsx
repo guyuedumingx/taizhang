@@ -6,6 +6,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import api from '../../api';
 import type { ColumnsType } from 'antd/es/table';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 
@@ -155,19 +156,28 @@ const TaskList: React.FC = () => {
   ];
 
   return (
-    <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Title level={4}>待办任务</Title>
-        <Button type="primary" onClick={fetchTasks}>刷新</Button>
-      </div>
-      <Table
-        columns={columns}
-        dataSource={tasks}
-        rowKey="task_id"
-        loading={loading}
-        pagination={{ pageSize: 10 }}
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '审批任务', path: '/dashboard/approval/tasks' }
+        ]}
+        showBackButton={false}
       />
-    </Card>
+      
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+          <Title level={4}>待办任务</Title>
+          <Button type="primary" onClick={fetchTasks}>刷新</Button>
+        </div>
+        <Table
+          columns={columns}
+          dataSource={tasks}
+          rowKey="task_id"
+          loading={loading}
+          pagination={{ pageSize: 10 }}
+        />
+      </Card>
+    </>
   );
 };
 

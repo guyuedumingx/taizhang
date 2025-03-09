@@ -10,7 +10,9 @@ import {
   message, 
   Breadcrumb, 
   Dropdown,
-  MenuProps
+  MenuProps,
+  Statistic,
+  Tag
 } from 'antd';
 import { 
   FileExcelOutlined, 
@@ -26,9 +28,9 @@ import { Ledger, Template } from '../../types';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import type { ColumnsType } from 'antd/es/table';
-import dayjs from 'dayjs';
-import type { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 // 初始化dayjs插件
 dayjs.extend(isBetween);
@@ -218,11 +220,12 @@ const TemplateLedgerSummary: React.FC = () => {
 
   return (
     <Card>
-      <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item><a href="/dashboard">仪表盘</a></Breadcrumb.Item>
-        <Breadcrumb.Item><a href="/dashboard/templates">模板管理</a></Breadcrumb.Item>
-        <Breadcrumb.Item>{template?.name || '模板'} - 台账汇总</Breadcrumb.Item>
-      </Breadcrumb>
+      <BreadcrumbNav
+        items={[
+          { title: '模板管理', path: '/dashboard/templates' },
+          { title: `${template?.name || '模板'} - 台账汇总` }
+        ]}
+      />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <Title level={4}>{template?.name || '模板'} - 台账汇总</Title>

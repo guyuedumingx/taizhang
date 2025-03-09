@@ -7,6 +7,7 @@ import { PERMISSIONS } from '../../config';
 import api from '../../api';
 import type { ColumnsType } from 'antd/es/table';
 import { Workflow } from '../../types';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 
@@ -100,7 +101,10 @@ const WorkflowList: React.FC = () => {
               <Button
                 type="link"
                 icon={<EditOutlined />}
-                onClick={() => navigate(`/workflow/edit/${record.id}`)}
+                onClick={() => {
+                  console.log(`导航到工作流编辑页面，ID: ${record.id}`);
+                  navigate(`/dashboard/workflow/edit/${record.id}`);
+                }}
               />
             </Tooltip>
           )}
@@ -121,27 +125,36 @@ const WorkflowList: React.FC = () => {
   ];
 
   return (
-    <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Title level={4}>工作流程管理</Title>
-        {hasPermission(PERMISSIONS.WORKFLOW_CREATE) && (
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate('/workflow/create')}
-          >
-            新建工作流程
-          </Button>
-        )}
-      </div>
-      <Table
-        columns={columns}
-        dataSource={workflows}
-        rowKey="id"
-        loading={loading}
-        pagination={{ pageSize: 10 }}
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '工作流管理', path: '/dashboard/workflow' }
+        ]}
+        showBackButton={false}
       />
-    </Card>
+      
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+          <Title level={4}>工作流程管理</Title>
+          {hasPermission(PERMISSIONS.WORKFLOW_CREATE) && (
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate('/dashboard/workflow/create')}
+            >
+              新建工作流程
+            </Button>
+          )}
+        </div>
+        <Table
+          columns={columns}
+          dataSource={workflows}
+          rowKey="id"
+          loading={loading}
+          pagination={{ pageSize: 10 }}
+        />
+      </Card>
+    </>
   );
 };
 

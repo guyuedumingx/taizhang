@@ -4,6 +4,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import type { ColumnsType } from 'antd/es/table';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -295,113 +296,123 @@ const RoleManagement: React.FC = () => {
   ];
 
   return (
-    <div>
-      <Card>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <Title level={4}>角色管理</Title>
-          <Space>
-            <Search
-              placeholder="搜索角色"
-              allowClear
-              onSearch={handleSearch}
-              style={{ width: 250 }}
-            />
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={showAddModal}
-              disabled={!hasPermission(PERMISSIONS.ROLE_CREATE)}
-            >
-              添加角色
-            </Button>
-          </Space>
-        </div>
-        <Table
-          columns={columns}
-          dataSource={filteredRoles}
-          rowKey="id"
-          loading={loading}
-          pagination={{
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 条记录`,
-          }}
-          expandable={{
-            expandedRowRender: (record) => (
-              <div style={{ margin: 0 }}>
-                <div style={{ fontWeight: 'bold', marginBottom: 8 }}>权限列表：</div>
-                <div>
-                  {permissionGroups.map(group => {
-                    const groupPermissions = group.permissions.filter(p => 
-                      record.permissions.includes(p.key)
-                    );
-                    
-                    if (groupPermissions.length === 0) return null;
-                    
-                    return (
-                      <div key={group.groupName} style={{ marginBottom: 8 }}>
-                        <span style={{ fontWeight: 'bold' }}>{group.groupName}：</span>
-                        {groupPermissions.map(p => p.label).join('、')}
-                      </div>
-                    );
-                  })}
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '系统管理', path: '/dashboard/admin' },
+          { title: '角色管理', path: '/dashboard/admin/roles' }
+        ]}
+        showBackButton={false}
+      />
+      
+      <div>
+        <Card>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+            <Title level={4}>角色管理</Title>
+            <Space>
+              <Search
+                placeholder="搜索角色"
+                allowClear
+                onSearch={handleSearch}
+                style={{ width: 250 }}
+              />
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={showAddModal}
+                disabled={!hasPermission(PERMISSIONS.ROLE_CREATE)}
+              >
+                添加角色
+              </Button>
+            </Space>
+          </div>
+          <Table
+            columns={columns}
+            dataSource={filteredRoles}
+            rowKey="id"
+            loading={loading}
+            pagination={{
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total) => `共 ${total} 条记录`,
+            }}
+            expandable={{
+              expandedRowRender: (record) => (
+                <div style={{ margin: 0 }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: 8 }}>权限列表：</div>
+                  <div>
+                    {permissionGroups.map(group => {
+                      const groupPermissions = group.permissions.filter(p => 
+                        record.permissions.includes(p.key)
+                      );
+                      
+                      if (groupPermissions.length === 0) return null;
+                      
+                      return (
+                        <div key={group.groupName} style={{ marginBottom: 8 }}>
+                          <span style={{ fontWeight: 'bold' }}>{group.groupName}：</span>
+                          {groupPermissions.map(p => p.label).join('、')}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ),
-          }}
-        />
-      </Card>
+              ),
+            }}
+          />
+        </Card>
 
-      <Modal
-        title={modalTitle}
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={() => setIsModalVisible(false)}
-        width={700}
-        destroyOnClose
-      >
-        <Form
-          form={form}
-          layout="vertical"
+        <Modal
+          title={modalTitle}
+          open={isModalVisible}
+          onOk={handleModalOk}
+          onCancel={() => setIsModalVisible(false)}
+          width={700}
+          destroyOnClose
         >
-          <Form.Item
-            label="角色名称"
-            name="name"
-            rules={[
-              { required: true, message: '请输入角色名称' },
-              { min: 2, message: '角色名称至少2个字符' },
-            ]}
+          <Form
+            form={form}
+            layout="vertical"
           >
-            <Input disabled={!!editingRoleId} />
-          </Form.Item>
-          
-          <Form.Item
-            label="描述"
-            name="description"
-            rules={[{ required: true, message: '请输入描述' }]}
-          >
-            <Input />
-          </Form.Item>
-          
-          <Divider>权限设置</Divider>
-          
-          <Form.Item
-            name="permissions"
-          >
-            <div>
-              {permissionGroups.map(group => (
-                <div key={group.groupName} style={{ marginBottom: 16 }}>
-                  <div style={{ fontWeight: 'bold', marginBottom: 8 }}>{group.groupName}</div>
-                  <CheckboxGroup
-                    options={group.permissions.map(p => ({ label: p.label, value: p.key }))}
-                  />
-                </div>
-              ))}
-            </div>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+            <Form.Item
+              label="角色名称"
+              name="name"
+              rules={[
+                { required: true, message: '请输入角色名称' },
+                { min: 2, message: '角色名称至少2个字符' },
+              ]}
+            >
+              <Input disabled={!!editingRoleId} />
+            </Form.Item>
+            
+            <Form.Item
+              label="描述"
+              name="description"
+              rules={[{ required: true, message: '请输入描述' }]}
+            >
+              <Input />
+            </Form.Item>
+            
+            <Divider>权限设置</Divider>
+            
+            <Form.Item
+              name="permissions"
+            >
+              <div>
+                {permissionGroups.map(group => (
+                  <div key={group.groupName} style={{ marginBottom: 16 }}>
+                    <div style={{ fontWeight: 'bold', marginBottom: 8 }}>{group.groupName}</div>
+                    <CheckboxGroup
+                      options={group.permissions.map(p => ({ label: p.label, value: p.key }))}
+                    />
+                  </div>
+                ))}
+              </div>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    </>
   );
 };
 

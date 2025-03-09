@@ -7,6 +7,7 @@ import { PERMISSIONS } from '../../config';
 import { LedgerService } from '../../services/LedgerService';
 import { Ledger } from '../../types';
 import type { ColumnsType } from 'antd/es/table';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -120,27 +121,32 @@ const LedgerList: React.FC = () => {
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
+      width: 180,
     },
     {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
+      width: 200,
     },
     {
       title: '团队',
       dataIndex: 'team_name',
       key: 'team_name',
+      width: 120,
     },
     {
       title: '模板',
       dataIndex: 'template_name',
       key: 'template_name',
+      width: 120,
     },
     {
       title: '创建人',
       dataIndex: 'created_by_name',
       key: 'created_by_name',
+      width: 120,
     },
     {
       title: '创建时间',
@@ -148,11 +154,13 @@ const LedgerList: React.FC = () => {
       key: 'created_at',
       sorter: (a, b) => a.created_at.localeCompare(b.created_at),
       render: (text) => text ? new Date(text).toLocaleString() : '-',
+      width: 180,
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      width: 100,
       render: (text: string) => (
         <Tag color={text === 'completed' ? 'success' : text === 'active' ? 'processing' : 'default'}>
           {text === 'completed' ? '已完成' : text === 'active' ? '处理中' : '草稿'}
@@ -168,6 +176,8 @@ const LedgerList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
+      fixed: 'right',
+      width: 150,
       render: (_, record) => (
         <Space size="middle">
           <Button
@@ -230,72 +240,82 @@ const LedgerList: React.FC = () => {
   ];
 
   return (
-    <div>
-      <Card>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <Title level={4}>台账列表</Title>
-          <Space>
-            <Search
-              placeholder="搜索台账"
-              allowClear
-              onSearch={handleSearch}
-              style={{ width: 250 }}
-            />
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: 'excel',
-                    label: '导出为Excel',
-                    onClick: () => handleExportAll('excel')
-                  },
-                  {
-                    key: 'csv',
-                    label: '导出为CSV',
-                    onClick: () => handleExportAll('csv')
-                  },
-                  {
-                    key: 'txt',
-                    label: '导出为TXT',
-                    onClick: () => handleExportAll('txt')
-                  }
-                ]
-              }}
-              disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT) || ledgers.length === 0}
-            >
-              <Button 
-                type="default" 
-                icon={<DownloadOutlined />}
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '台账管理', path: '/dashboard/ledgers' }
+        ]}
+        showBackButton={false}
+      />
+      
+      <div>
+        <Card>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+            <Title level={4}>台账列表</Title>
+            <Space>
+              <Search
+                placeholder="搜索台账"
+                allowClear
+                onSearch={handleSearch}
+                style={{ width: 250 }}
+              />
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'excel',
+                      label: '导出为Excel',
+                      onClick: () => handleExportAll('excel')
+                    },
+                    {
+                      key: 'csv',
+                      label: '导出为CSV',
+                      onClick: () => handleExportAll('csv')
+                    },
+                    {
+                      key: 'txt',
+                      label: '导出为TXT',
+                      onClick: () => handleExportAll('txt')
+                    }
+                  ]
+                }}
                 disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT) || ledgers.length === 0}
               >
-                导出
-              </Button>
-            </Dropdown>
-            {hasPermission(PERMISSIONS.LEDGER_CREATE) && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => navigate('/dashboard/ledgers/new')}
-              >
-                新建台账
-              </Button>
-            )}
-          </Space>
-        </div>
-        <Table
-          columns={columns}
-          dataSource={filteredLedgers}
-          rowKey="id"
-          loading={loading}
-          pagination={{
-            pageSize: 10,
-            showQuickJumper: true,
-            showSizeChanger: true,
-            showTotal: (total) => `共 ${total} 条记录`
-          }}
-        />
-      </Card>
-    </div>
+                <Button 
+                  type="default" 
+                  icon={<DownloadOutlined />}
+                  disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT) || ledgers.length === 0}
+                >
+                  导出
+                </Button>
+              </Dropdown>
+              {hasPermission(PERMISSIONS.LEDGER_CREATE) && (
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate('/dashboard/ledgers/new')}
+                >
+                  新建台账
+                </Button>
+              )}
+            </Space>
+          </div>
+          <Table
+            columns={columns}
+            dataSource={filteredLedgers}
+            rowKey="id"
+            loading={loading}
+            pagination={{
+              pageSize: 10,
+              showQuickJumper: true,
+              showSizeChanger: true,
+              showTotal: (total) => `共 ${total} 条记录`
+            }}
+            scroll={{ x: 1300 }}
+          />
+        </Card>
+      </div>
+    </>
   );
 };
 

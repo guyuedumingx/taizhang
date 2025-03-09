@@ -1,5 +1,5 @@
 import api from '../api';
-import { Workflow, WorkflowCreate, WorkflowUpdate, WorkflowNodeCreate, Template, User, Role } from '../types';
+import { Workflow, WorkflowCreate, WorkflowUpdate, WorkflowNodeCreate, WorkflowNode, Template, User, Role } from '../types';
 
 export class WorkflowService {
   // 获取工作流列表
@@ -15,7 +15,27 @@ export class WorkflowService {
   // 获取工作流详情
   static async getWorkflow(id: number): Promise<Workflow> {
     try {
-      return await api.workflows.getWorkflow(id);
+      console.log(`开始获取工作流 ${id} 详情`);
+      const workflow = await api.workflows.getWorkflow(id);
+      
+      // 确保工作流对象有效
+      if (!workflow || !workflow.id) {
+        throw new Error(`无效的工作流数据: ${JSON.stringify(workflow)}`);
+      }
+      
+      // 获取工作流节点
+      try {
+        console.log(`获取工作流 ${id} 的节点`);
+        const nodes = await api.workflows.getWorkflowNodes(id);
+        workflow.nodes = nodes; // 将节点添加到工作流对象
+        console.log(`工作流 ${id} 的节点数量: ${nodes.length}`);
+      } catch (nodeError) {
+        console.error(`获取工作流 ${id} 节点失败:`, nodeError);
+        workflow.nodes = []; // 设置为空数组，避免undefined错误
+      }
+      
+      console.log(`成功获取工作流 ${id} 详情:`, workflow);
+      return workflow;
     } catch (error) {
       console.error(`获取工作流 ${id} 详情失败:`, error);
       throw error;
@@ -219,5 +239,35 @@ export class WorkflowService {
     }
     
     return updatedNodes;
+  }
+
+  // 获取工作流节点
+  static async getWorkflowNodes(workflowId: number): Promise<WorkflowNode[]> {
+    try {
+      return await api.workflows.getWorkflowNodes(workflowId);
+    } catch (error) {
+      console.error(`获取工作流 ${workflowId} 节点失败:`, error);
+      throw error;
+    }
+  }
+  
+  // 创建工作流节点
+  static async createWorkflowNode(workflowId: number, node: WorkflowNodeCreate): Promise<WorkflowNode> {
+    try {
+      return await api.workflows.createWorkflowNode(workflowId, node);
+    } catch (error) {
+      console.error(`创建工作流 ${workflowId} 节点失败:`, error);
+      throw error;
+    }
+  }
+  
+  // 删除工作流节点
+  static async deleteWorkflowNode(workflowId: number, nodeId: number): Promise<void> {
+    try {
+      await api.workflows.deleteWorkflowNode(workflowId, nodeId);
+    } catch (error) {
+      console.error(`删除工作流节点 ${nodeId} 失败:`, error);
+      throw error;
+    }
   }
 } 

@@ -7,6 +7,7 @@ import { PERMISSIONS } from '../../config';
 import { TemplateService } from '../../services/TemplateService';
 import { Template } from '../../types';
 import type { ColumnsType } from 'antd/es/table';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -154,38 +155,47 @@ const TemplateList: React.FC = () => {
   ];
 
   return (
-    <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Title level={4}>模板管理</Title>
-        <Space>
-          <Search
-            placeholder="搜索模板"
-            allowClear
-            onSearch={handleSearch}
-            style={{ width: 250 }}
-          />
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate('/dashboard/templates/new')}
-            disabled={!hasPermission(PERMISSIONS.TEMPLATE_CREATE)}
-          >
-            添加模板
-          </Button>
-        </Space>
-      </div>
-      <Table
-        columns={columns}
-        dataSource={filteredTemplates}
-        rowKey="id"
-        loading={loading}
-        pagination={{
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total) => `共 ${total} 条记录`,
-        }}
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '模板管理', path: '/dashboard/templates' }
+        ]}
+        showBackButton={false}
       />
-    </Card>
+      
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+          <Title level={4}>模板管理</Title>
+          <Space>
+            <Search
+              placeholder="搜索模板"
+              allowClear
+              onSearch={handleSearch}
+              style={{ width: 250 }}
+            />
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate('/dashboard/templates/new')}
+              disabled={!hasPermission(PERMISSIONS.TEMPLATE_CREATE)}
+            >
+              添加模板
+            </Button>
+          </Space>
+        </div>
+        <Table
+          columns={columns}
+          dataSource={filteredTemplates}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `共 ${total} 条记录`,
+          }}
+        />
+      </Card>
+    </>
   );
 };
 
