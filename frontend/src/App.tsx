@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/lib/locale/zh_CN';
@@ -11,6 +12,7 @@ import LedgerForm from './pages/ledger/LedgerForm';
 import LedgerDetail from './pages/ledger/LedgerDetail';
 import TemplateList from './pages/template/TemplateList';
 import TemplateForm from './pages/template/TemplateForm';
+import TemplateDetail from './pages/template/TemplateDetail';
 import TemplateLedgerSummary from './pages/template/TemplateLedgerSummary';
 import UserManagementFixed from './pages/admin/UserManagementFixed';
 import RoleManagement from './pages/admin/RoleManagement';
@@ -58,6 +60,7 @@ function App() {
               <Route path="templates" element={<TemplateList />} />
               <Route path="templates/new" element={<TemplateForm />} />
               <Route path="templates/edit/:id" element={<TemplateForm />} />
+              <Route path="templates/:id" element={<TemplateDetail />} />
               <Route path="templates/:templateId/ledgers" element={<TemplateLedgerSummary />} />
               <Route path="workflow" element={<WorkflowList />} />
               <Route path="workflow/create" element={<WorkflowForm />} />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Card, Typography, Select, Switch, message } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import { WorkflowNodeCreate, Template, User, Role } from '../../types';
@@ -22,6 +22,7 @@ interface FormValues {
 const WorkflowForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const { hasPermission } = useAuthStore();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -30,6 +31,10 @@ const WorkflowForm: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [nodes, setNodes] = useState<WorkflowNodeCreate[]>([]);
   const isEdit = !!id;
+  
+  // 从URL查询参数中获取模板ID
+  const queryParams = new URLSearchParams(location.search);
+  const templateId = queryParams.get('template_id');
 
   // 检查权限并加载数据
   useEffect(() => {
@@ -63,12 +68,20 @@ const WorkflowForm: React.FC = () => {
           } catch (error) {
             console.error('获取工作流详情失败:', error);
             message.error('获取工作流详情失败，请返回列表页重试');
-            navigate('/workflow');
+            navigate('/dashboard/workflow');
           }
         } else {
           // 创建模式，初始化节点
           console.log('Initializing nodes for new workflow');
           setNodes(WorkflowService.initializeNodes());
+          
+          // 如果有模板ID参数，预先选择该模板
+          if (templateId) {
+            console.log('Setting template ID from URL parameter:', templateId);
+            form.setFieldsValue({
+              template_id: parseInt(templateId, 10)
+            });
+          }
         }
       } catch (error) {
         console.error('加载数据失败:', error);
@@ -77,7 +90,7 @@ const WorkflowForm: React.FC = () => {
     };
 
     fetchData();
-  }, [isEdit, id, hasPermission, navigate]);
+  }, [isEdit, id, templateId, hasPermission, navigate, form]);
 
   // 获取工作流详情
   const fetchWorkflow = async (workflowId: number) => {
@@ -267,11 +280,15 @@ const WorkflowForm: React.FC = () => {
     <>
       <BreadcrumbNav 
         items={[
+          ...(templateId ? [{ title: '模板管理', path: '/dashboard/templates' }] : []),
           { title: '工作流管理', path: '/dashboard/workflow' },
           { title: isEdit ? '编辑工作流' : '创建工作流' }
         ]}
-        backButtonText="取消"
-        onBack={handleCancel}
+        backButtonText="返回"
+        onBack={() => templateId 
+          ? navigate(`/dashboard/workflow?template_id=${templateId}`) 
+          : navigate('/dashboard/workflow')
+        }
       />
       
       <Card 

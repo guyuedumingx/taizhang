@@ -199,12 +199,14 @@ export interface LedgerUpdate {
 
 export interface LedgerSubmit {
   workflow_id?: number;
+  comment?: string;
 }
 
 export interface LedgerApproval {
   action: string;
   comment?: string;
   next_approver_id?: number;
+  approved?: boolean;
 }
 
 // 工作流类型
@@ -335,7 +337,7 @@ export interface LogQueryParams {
   end_date?: string;
   page?: number;
   page_size?: number;
-  date_range?: [any, any];
+  date_range?: [string, string] | null;
   keyword?: string;
   ledger_id?: number;
   ip_address?: string;

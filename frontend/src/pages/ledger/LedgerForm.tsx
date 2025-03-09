@@ -8,6 +8,7 @@ import { TemplateService } from '../../services/TemplateService';
 import { TeamService } from '../../services/TeamService';
 import { Ledger, LedgerCreate, LedgerUpdate, Template, Team, Field } from '../../types';
 import dayjs from 'dayjs';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -269,86 +270,97 @@ const LedgerForm: React.FC = () => {
   };
 
   return (
-    <Card loading={loading}>
-      <Title level={4}>{isEdit ? '编辑台账' : '创建台账'}</Title>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={{
-          status: 'draft',
-          data: {}
-        }}
-      >
-        <Form.Item
-          label="模板"
-          name="template_id"
-          rules={[{ required: true, message: '请选择模板' }]}
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '台账管理', path: '/dashboard/ledgers' },
+          { title: isEdit ? '编辑台账' : '创建台账' }
+        ]}
+        backButtonText="返回列表"
+        onBack={() => navigate('/dashboard/ledgers')}
+      />
+      
+      <Card loading={loading}>
+        <Title level={4}>{isEdit ? '编辑台账' : '创建台账'}</Title>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          initialValues={{
+            status: 'draft',
+            data: {}
+          }}
         >
-          <Select
-            placeholder="选择模板"
-            onChange={handleTemplateChange}
-            disabled={isEdit}
+          <Form.Item
+            label="模板"
+            name="template_id"
+            rules={[{ required: true, message: '请选择模板' }]}
           >
-            {templates.map(template => (
-              <Option key={template.id} value={template.id}>{template.name}</Option>
-            ))}
-          </Select>
-        </Form.Item>
-        
-        <Form.Item
-          label="台账名称"
-          name="name"
-          rules={[{ required: true, message: '请输入台账名称' }]}
-        >
-          <Input />
-        </Form.Item>
-        
-        <Form.Item
-          label="所属团队"
-          name="team_id"
-          rules={[{ required: true, message: '请选择所属团队' }]}
-        >
-          <Select placeholder="选择团队">
-            {teams.map(team => (
-              <Option key={team.id} value={team.id}>{team.name}</Option>
-            ))}
-          </Select>
-        </Form.Item>
-        
-        <Form.Item
-          label="台账描述"
-          name="description"
-        >
-          <TextArea rows={4} />
-        </Form.Item>
-        
-        <Form.Item
-          label="状态"
-          name="status"
-          rules={[{ required: true, message: '请选择状态' }]}
-        >
-          <Select>
-            <Option value="draft">草稿</Option>
-            <Option value="active">处理中</Option>
-            <Option value="completed">已完成</Option>
-          </Select>
-        </Form.Item>
-        
-        {renderTemplateFields()}
-        
-        <Divider />
-        
-        <Form.Item>
-          <Space>
-            <Button type="primary" htmlType="submit" loading={submitting}>
-              {isEdit ? '更新台账' : '创建台账'}
-            </Button>
-            <Button onClick={() => navigate('/dashboard/ledgers')}>取消</Button>
-          </Space>
-        </Form.Item>
-      </Form>
-    </Card>
+            <Select
+              placeholder="选择模板"
+              onChange={handleTemplateChange}
+              disabled={isEdit}
+            >
+              {templates.map(template => (
+                <Option key={template.id} value={template.id}>{template.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          
+          <Form.Item
+            label="台账名称"
+            name="name"
+            rules={[{ required: true, message: '请输入台账名称' }]}
+          >
+            <Input />
+          </Form.Item>
+          
+          <Form.Item
+            label="所属团队"
+            name="team_id"
+            rules={[{ required: true, message: '请选择所属团队' }]}
+          >
+            <Select placeholder="选择团队">
+              {teams.map(team => (
+                <Option key={team.id} value={team.id}>{team.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          
+          <Form.Item
+            label="台账描述"
+            name="description"
+          >
+            <TextArea rows={4} />
+          </Form.Item>
+          
+          <Form.Item
+            label="状态"
+            name="status"
+            rules={[{ required: true, message: '请选择状态' }]}
+          >
+            <Select>
+              <Option value="draft">草稿</Option>
+              <Option value="active">处理中</Option>
+              <Option value="completed">已完成</Option>
+            </Select>
+          </Form.Item>
+          
+          {renderTemplateFields()}
+          
+          <Divider />
+          
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit" loading={submitting}>
+                {isEdit ? '更新台账' : '创建台账'}
+              </Button>
+              <Button onClick={() => navigate('/dashboard/ledgers')}>取消</Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Card>
+    </>
   );
 };
 

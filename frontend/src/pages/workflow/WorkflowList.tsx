@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Card, Typography, Tag, Space, message, Tooltip, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Table, Button, Card, Typography, Tag, Space, message, Tooltip, Popconfirm, Input } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import api from '../../api';
@@ -10,12 +10,19 @@ import { Workflow } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
+const { Search } = Input;
 
 const WorkflowList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const [searchText, setSearchText] = useState<string>('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { hasPermission } = useAuthStore();
+  
+  // 从URL查询参数中获取模板ID
+  const queryParams = new URLSearchParams(location.search);
+  const templateId = queryParams.get('template_id');
 
   useEffect(() => {
     // 检查权限
@@ -33,6 +40,11 @@ const WorkflowList: React.FC = () => {
     try {
       const response = await api.workflows.getWorkflows();
       setWorkflows(response);
+      
+      // 如果URL中有模板ID参数，显示提示信息
+      if (templateId) {
+        message.info(`正在显示与模板ID ${templateId} 相关的工作流`);
+      }
     } catch (error) {
       console.error('获取工作流程失败:', error);
       message.error('获取工作流程失败');
@@ -51,6 +63,29 @@ const WorkflowList: React.FC = () => {
       message.error('删除工作流程失败');
     }
   };
+
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+  };
+
+  // 过滤工作流数据
+  const filteredWorkflows = workflows.filter(workflow => {
+    // 如果有模板ID参数，只显示匹配的工作流
+    if (templateId && workflow.template_id.toString() !== templateId) {
+      return false;
+    }
+    
+    // 处理搜索过滤
+    if (searchText) {
+      return (
+        workflow.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        (workflow.description && workflow.description.toLowerCase().includes(searchText.toLowerCase())) ||
+        (workflow.template_name && workflow.template_name.toLowerCase().includes(searchText.toLowerCase()))
+      );
+    }
+    
+    return true;
+  });
 
   const columns: ColumnsType<Workflow> = [
     {
@@ -128,27 +163,40 @@ const WorkflowList: React.FC = () => {
     <>
       <BreadcrumbNav 
         items={[
+          ...(templateId ? [{ title: '模板管理', path: '/dashboard/templates' }] : []),
           { title: '工作流管理', path: '/dashboard/workflow' }
         ]}
-        showBackButton={false}
+        showBackButton={templateId ? true : false}
+        onBack={templateId ? () => navigate(`/dashboard/templates`) : undefined}
       />
       
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <Title level={4}>工作流程管理</Title>
-          {hasPermission(PERMISSIONS.WORKFLOW_CREATE) && (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate('/dashboard/workflow/create')}
-            >
-              新建工作流程
-            </Button>
-          )}
+          <Title level={4}>
+            工作流程管理
+            {templateId && <Tag color="blue" style={{ marginLeft: 8 }}>模板筛选</Tag>}
+          </Title>
+          <Space>
+            <Search
+              placeholder="搜索工作流"
+              allowClear
+              onSearch={handleSearch}
+              style={{ width: 250 }}
+            />
+            {hasPermission(PERMISSIONS.WORKFLOW_CREATE) && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate(`/dashboard/workflow/create${templateId ? `?template_id=${templateId}` : ''}`)}
+              >
+                新建工作流程
+              </Button>
+            )}
+          </Space>
         </div>
         <Table
           columns={columns}
-          dataSource={workflows}
+          dataSource={filteredWorkflows}
           rowKey="id"
           loading={loading}
           pagination={{ pageSize: 10 }}

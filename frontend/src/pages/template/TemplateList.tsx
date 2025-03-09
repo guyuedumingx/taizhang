@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Input, Space, Card, Typography, Popconfirm, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, FieldBinaryOutlined, FileTextOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, FieldBinaryOutlined, FileTextOutlined, BranchesOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
@@ -126,6 +126,13 @@ const TemplateList: React.FC = () => {
             onClick={() => navigate(`/dashboard/templates/${record.id}/ledgers`)}
             disabled={!hasPermission(PERMISSIONS.TEMPLATE_VIEW) || !hasPermission(PERMISSIONS.LEDGER_VIEW)}
             title="查看台账汇总"
+          />
+          <Button
+            type="text"
+            icon={<BranchesOutlined />}
+            onClick={() => navigate(`/dashboard/workflow?template_id=${record.id}`)}
+            disabled={!hasPermission(PERMISSIONS.WORKFLOW_VIEW)}
+            title="关联工作流"
           />
           <Button
             type="text"

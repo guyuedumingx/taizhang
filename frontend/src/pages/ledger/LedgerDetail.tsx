@@ -93,7 +93,7 @@ const LedgerDetail: React.FC = () => {
     if (!id || !ledger) return;
     
     try {
-      await ApprovalService.submitLedger(parseInt(id), { comments: '提交审批' });
+      await ApprovalService.submitLedger(parseInt(id), { comment: '提交审批' });
       message.success('提交审批成功');
       fetchLedgerDetails(parseInt(id));
     } catch (error) {
@@ -107,7 +107,7 @@ const LedgerDetail: React.FC = () => {
     if (!id || !ledger) return;
     
     try {
-      await ApprovalService.approveLedger(parseInt(id), { approved: true, comments: '审批通过' });
+      await ApprovalService.approveLedger(parseInt(id), { action: 'approve', comment: '审批通过' });
       message.success('审批通过');
       fetchLedgerDetails(parseInt(id));
     } catch (error) {
@@ -118,22 +118,21 @@ const LedgerDetail: React.FC = () => {
 
   // 渲染审计日志
   const renderAuditLogs = () => {
-    if (auditLogs.length === 0) {
+    if (!auditLogs || auditLogs.length === 0) {
       return <Text>暂无审计日志</Text>;
     }
-
+    
     return (
       <Timeline mode="left">
         {auditLogs.map(log => (
-          <Timeline.Item
+          <Timeline.Item 
             key={log.id}
-            color={log.action.includes('approved') ? 'green' : log.action.includes('rejected') ? 'red' : 'blue'}
-            label={new Date(log.created_at).toLocaleString()}
+            color={log.action === 'create' ? 'green' : log.action === 'approve' ? 'blue' : 'orange'}
           >
             <Space>
-              <Text strong>{log.user_name}</Text>
+              <Text strong>{log.user_id}</Text>
               <Text>{log.action}</Text>
-              {log.comments && <Text type="secondary">{log.comments}</Text>}
+              {log.comment && <Text type="secondary">{log.comment}</Text>}
             </Space>
           </Timeline.Item>
         ))}
@@ -142,12 +141,12 @@ const LedgerDetail: React.FC = () => {
   };
 
   // 渲染字段值
-  const renderFieldValue = (key: string, value: any) => {
+  const renderFieldValue = (key: string, value: unknown) => {
     const field = fields.find(f => f.name === key);
     if (!field) return String(value);
     
-    if (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox') {
-      return <Tag color="blue">{value}</Tag>;
+    if (field.type === 'boolean') {
+      return <Tag color="blue">{value ? '是' : '否'}</Tag>;
     }
     
     return String(value);
@@ -169,91 +168,100 @@ const LedgerDetail: React.FC = () => {
   }
 
   return (
-    <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Title level={4}>{ledger.name}</Title>
-        <Space>
-          {hasPermission(PERMISSIONS.LEDGER_EXPORT) && (
-            <Button 
-              icon={<DownloadOutlined />} 
-              onClick={() => handleExport('excel')}
-            >
-              导出
-            </Button>
-          )}
-          {hasPermission(PERMISSIONS.LEDGER_EDIT) && (
-            <Button 
-              type="primary" 
-              icon={<EditOutlined />} 
-              onClick={() => navigate(`/dashboard/ledgers/edit/${id}`)}
-            >
-              编辑
-            </Button>
-          )}
-          {ledger.status === 'draft' && hasPermission(PERMISSIONS.APPROVAL_SUBMIT) && (
-            <Button 
-              type="primary" 
-              icon={<SendOutlined />}
-              onClick={handleSubmitApproval}
-            >
-              提交审批
-            </Button>
-          )}
-          {ledger.status === 'active' && hasPermission(PERMISSIONS.APPROVAL_APPROVE) && (
-            <Button 
-              type="primary" 
-              icon={<CheckCircleOutlined />}
-              onClick={handleApprove}
-            >
-              审批通过
-            </Button>
-          )}
-        </Space>
-      </div>
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '台账管理', path: '/dashboard/ledgers' },
+          { title: ledger.name || `台账 #${ledger.id}` }
+        ]}
+      />
+      
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+          <Title level={4}>{ledger.name}</Title>
+          <Space>
+            {hasPermission(PERMISSIONS.LEDGER_EXPORT) && (
+              <Button 
+                icon={<DownloadOutlined />} 
+                onClick={() => handleExport('excel')}
+              >
+                导出
+              </Button>
+            )}
+            {hasPermission(PERMISSIONS.LEDGER_EDIT) && (
+              <Button 
+                type="primary" 
+                icon={<EditOutlined />} 
+                onClick={() => navigate(`/dashboard/ledgers/edit/${id}`)}
+              >
+                编辑
+              </Button>
+            )}
+            {ledger.status === 'draft' && hasPermission(PERMISSIONS.APPROVAL_SUBMIT) && (
+              <Button 
+                type="primary" 
+                icon={<SendOutlined />}
+                onClick={handleSubmitApproval}
+              >
+                提交审批
+              </Button>
+            )}
+            {ledger.status === 'active' && hasPermission(PERMISSIONS.APPROVAL_APPROVE) && (
+              <Button 
+                type="primary" 
+                icon={<CheckCircleOutlined />}
+                onClick={handleApprove}
+              >
+                审批通过
+              </Button>
+            )}
+          </Space>
+        </div>
 
-      <Descriptions bordered column={2}>
-        <Descriptions.Item label="台账编号">{ledger.id}</Descriptions.Item>
-        <Descriptions.Item label="状态">
-          <Tag color={ledger.status === 'completed' ? 'success' : ledger.status === 'active' ? 'processing' : 'default'}>
-            {ledger.status === 'completed' ? '已完成' : ledger.status === 'active' ? '处理中' : '草稿'}
-          </Tag>
-        </Descriptions.Item>
-        <Descriptions.Item label="模板">{ledger.template_name || '-'}</Descriptions.Item>
-        <Descriptions.Item label="所属团队">{ledger.team_name || '-'}</Descriptions.Item>
-        <Descriptions.Item label="创建人">{ledger.created_by_name || '-'}</Descriptions.Item>
-        <Descriptions.Item label="创建时间">{ledger.created_at ? new Date(ledger.created_at).toLocaleString() : '-'}</Descriptions.Item>
-        <Descriptions.Item label="最后更新" span={2}>
-          {ledger.updated_at ? (
-            <Space>
-              <ClockCircleOutlined />
-              <span>{new Date(ledger.updated_at).toLocaleString()}</span>
-              {ledger.updated_by_name && <span>- {ledger.updated_by_name}</span>}
-            </Space>
-          ) : '-'}
-        </Descriptions.Item>
-        <Descriptions.Item label="描述" span={2}>
-          {ledger.description || '-'}
-        </Descriptions.Item>
-      </Descriptions>
+        <Descriptions bordered column={2}>
+          <Descriptions.Item label="台账编号">{ledger.id}</Descriptions.Item>
+          <Descriptions.Item label="状态">
+            <Tag color={ledger.status === 'completed' ? 'success' : ledger.status === 'active' ? 'processing' : 'default'}>
+              {ledger.status === 'completed' ? '已完成' : ledger.status === 'active' ? '处理中' : '草稿'}
+            </Tag>
+          </Descriptions.Item>
+          <Descriptions.Item label="模板">{ledger.template_name || '-'}</Descriptions.Item>
+          <Descriptions.Item label="所属团队">{ledger.team_name || '-'}</Descriptions.Item>
+          <Descriptions.Item label="创建人">{ledger.created_by_name || '-'}</Descriptions.Item>
+          <Descriptions.Item label="创建时间">{ledger.created_at ? new Date(ledger.created_at).toLocaleString() : '-'}</Descriptions.Item>
+          <Descriptions.Item label="最后更新" span={2}>
+            {ledger.updated_at ? (
+              <Space>
+                <ClockCircleOutlined />
+                <span>{new Date(ledger.updated_at).toLocaleString()}</span>
+                {ledger.updated_by_name && <span>- {ledger.updated_by_name}</span>}
+              </Space>
+            ) : '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="描述" span={2}>
+            {ledger.description || '-'}
+          </Descriptions.Item>
+        </Descriptions>
 
-      {ledger.data && Object.keys(ledger.data).length > 0 && (
-        <>
-          <Divider orientation="left">台账数据</Divider>
-          <Descriptions bordered column={2}>
-            {Object.entries(ledger.data).map(([key, value]) => (
-              <Descriptions.Item key={key} label={
-                fields.find(f => f.name === key)?.label || key
-              }>
-                {renderFieldValue(key, value)}
-              </Descriptions.Item>
-            ))}
-          </Descriptions>
-        </>
-      )}
+        {ledger.data && Object.keys(ledger.data).length > 0 && (
+          <>
+            <Divider orientation="left">台账数据</Divider>
+            <Descriptions bordered column={2}>
+              {Object.entries(ledger.data).map(([key, value]) => (
+                <Descriptions.Item key={key} label={
+                  fields.find(f => f.name === key)?.label || key
+                }>
+                  {renderFieldValue(key, value)}
+                </Descriptions.Item>
+              ))}
+            </Descriptions>
+          </>
+        )}
 
-      <Divider orientation="left">审计日志</Divider>
-      {renderAuditLogs()}
-    </Card>
+        <Divider orientation="left">审计日志</Divider>
+        {renderAuditLogs()}
+      </Card>
+    </>
   );
 };
 
