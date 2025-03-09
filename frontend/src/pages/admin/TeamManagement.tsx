@@ -1,33 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Input, Space, Card, Typography, Modal, Form, Select, message, Popconfirm, Tag } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
+import { Team, TeamCreate, TeamUpdate, User } from '../../types';
+import { TeamService } from '../../services/TeamService';
 import type { ColumnsType } from 'antd/es/table';
 
 const { Title } = Typography;
 const { Search } = Input;
 const { Option } = Select;
 
-interface Team {
-  id: number;
-  name: string;
-  department: string;
-  description: string;
-  leaderId: number | null;
-  leaderName: string | null;
-  memberCount: number;
-  createdAt: string;
-}
-
-interface User {
-  id: number;
-  name: string;
-  department: string;
-}
-
 const TeamManagement: React.FC = () => {
   const { hasPermission } = useAuthStore();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [teams, setTeams] = useState<Team[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -37,54 +24,33 @@ const TeamManagement: React.FC = () => {
   const [editingTeamId, setEditingTeamId] = useState<number | null>(null);
   const [form] = Form.useForm();
 
-  // 检查权限
-  useEffect(() => {
+  // 获取团队和用户数据
+  const fetchData = async () => {
     if (!hasPermission(PERMISSIONS.TEAM_VIEW)) {
       message.error('您没有权限访问此页面');
       return;
     }
 
-    // 获取团队列表和用户列表
     setLoading(true);
-    Promise.all([
-      // 模拟获取团队列表
-      new Promise<Team[]>(resolve => {
-        setTimeout(() => {
-          const mockTeams: Team[] = [];
-          for (let i = 1; i <= 10; i++) {
-            mockTeams.push({
-              id: i,
-              name: `团队${i}`,
-              department: i % 4 === 0 ? '财务部' : i % 4 === 1 ? '生产部' : i % 4 === 2 ? '客服部' : '设备部',
-              description: `这是团队${i}的描述`,
-              leaderId: i % 5 === 0 ? null : i,
-              leaderName: i % 5 === 0 ? null : `用户${i}`,
-              memberCount: 5 + (i % 10),
-              createdAt: `2023-${Math.floor(i / 3) + 1}-${(i % 28) + 1}`,
-            });
-          }
-          resolve(mockTeams);
-        }, 1000);
-      }),
-      // 模拟获取用户列表
-      new Promise<User[]>(resolve => {
-        setTimeout(() => {
-          const mockUsers: User[] = [];
-          for (let i = 1; i <= 20; i++) {
-            mockUsers.push({
-              id: i,
-              name: `用户${i}`,
-              department: i % 4 === 0 ? '财务部' : i % 4 === 1 ? '生产部' : i % 4 === 2 ? '客服部' : '设备部',
-            });
-          }
-          resolve(mockUsers);
-        }, 500);
-      }),
-    ]).then(([teamsData, usersData]) => {
+    try {
+      const [teamsData, usersData] = await Promise.all([
+        TeamService.getTeams(),
+        TeamService.getUsers()
+      ]);
+      
       setTeams(teamsData);
       setUsers(usersData);
+    } catch (error) {
+      console.error('获取数据失败:', error);
+      message.error('获取数据失败，请刷新页面重试');
+    } finally {
       setLoading(false);
-    });
+    }
+  };
+
+  // 初始加载数据
+  useEffect(() => {
+    fetchData();
   }, [hasPermission]);
 
   const handleSearch = (value: string) => {
@@ -103,60 +69,57 @@ const TeamManagement: React.FC = () => {
       name: team.name,
       department: team.department,
       description: team.description,
-      leaderId: team.leaderId,
+      leader_id: team.leader_id,
     });
     setModalTitle('编辑团队');
     setEditingTeamId(team.id);
     setIsModalVisible(true);
   };
 
-  const handleModalOk = () => {
-    form.validateFields().then(values => {
-      const leader = users.find(user => user.id === values.leaderId);
+  const handleModalOk = async () => {
+    try {
+      const values = await form.validateFields();
+      setLoading(true);
       
       if (editingTeamId) {
         // 编辑团队
-        const updatedTeams = teams.map(team => {
-          if (team.id === editingTeamId) {
-            return {
-              ...team,
-              ...values,
-              leaderName: leader ? leader.name : null,
-            };
-          }
-          return team;
-        });
-        setTeams(updatedTeams);
+        await TeamService.updateTeam(editingTeamId, values as TeamUpdate);
         message.success('团队更新成功');
       } else {
         // 添加团队
-        const newTeam: Team = {
-          id: Math.max(...teams.map(t => t.id)) + 1,
-          name: values.name,
-          department: values.department,
-          description: values.description,
-          leaderId: values.leaderId,
-          leaderName: leader ? leader.name : null,
-          memberCount: 0,
-          createdAt: new Date().toISOString().split('T')[0],
-        };
-        setTeams([...teams, newTeam]);
+        await TeamService.createTeam(values as TeamCreate);
         message.success('团队添加成功');
       }
+      
       setIsModalVisible(false);
-    });
+      fetchData(); // 重新获取数据以刷新列表
+    } catch (error) {
+      console.error('操作失败:', error);
+      message.error('操作失败，请重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    setTeams(teams.filter(team => team.id !== id));
-    message.success('团队删除成功');
+  const handleDelete = async (id: number) => {
+    try {
+      setLoading(true);
+      await TeamService.deleteTeam(id);
+      message.success('团队删除成功');
+      fetchData(); // 重新获取数据以刷新列表
+    } catch (error) {
+      console.error('删除失败:', error);
+      message.error('删除失败，请重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredTeams = teams.filter(team => 
     team.name.toLowerCase().includes(searchText.toLowerCase()) ||
     team.department.toLowerCase().includes(searchText.toLowerCase()) ||
-    team.description.toLowerCase().includes(searchText.toLowerCase()) ||
-    (team.leaderName && team.leaderName.toLowerCase().includes(searchText.toLowerCase()))
+    (team.description && team.description.toLowerCase().includes(searchText.toLowerCase())) ||
+    (team.leader_name && team.leader_name.toLowerCase().includes(searchText.toLowerCase()))
   );
 
   const columns: ColumnsType<Team> = [
@@ -186,21 +149,22 @@ const TeamManagement: React.FC = () => {
     },
     {
       title: '团队负责人',
-      dataIndex: 'leaderName',
-      key: 'leaderName',
-      render: (leaderName: string | null) => leaderName || <Tag color="warning">未指定</Tag>,
+      dataIndex: 'leader_name',
+      key: 'leader_name',
+      render: (leader_name: string | null | undefined) => leader_name || <Tag color="warning">未指定</Tag>,
     },
     {
       title: '成员数量',
-      dataIndex: 'memberCount',
-      key: 'memberCount',
-      sorter: (a, b) => a.memberCount - b.memberCount,
+      dataIndex: 'member_count',
+      key: 'member_count',
+      sorter: (a, b) => a.member_count - b.member_count,
     },
     {
       title: '创建时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
+      dataIndex: 'created_at',
+      key: 'created_at',
+      sorter: (a, b) => ((a.created_at || '') as string).localeCompare((b.created_at || '') as string),
+      render: (created_at: string | undefined) => created_at ? new Date(created_at).toLocaleDateString() : '-',
     },
     {
       title: '操作',
@@ -210,7 +174,7 @@ const TeamManagement: React.FC = () => {
           <Button
             type="text"
             icon={<UserOutlined />}
-            onClick={() => navigate(`/admin/teams/${record.id}/members`)}
+            onClick={() => navigate(`/dashboard/admin/teams/${record.id}/members`)}
             disabled={!hasPermission(PERMISSIONS.TEAM_VIEW)}
             title="查看成员"
           />
@@ -238,12 +202,6 @@ const TeamManagement: React.FC = () => {
       ),
     },
   ];
-
-  // 模拟导航函数
-  const navigate = (path: string) => {
-    console.log('导航到:', path);
-    message.info(`功能开发中: ${path}`);
-  };
 
   return (
     <div>
@@ -286,6 +244,7 @@ const TeamManagement: React.FC = () => {
         onOk={handleModalOk}
         onCancel={() => setIsModalVisible(false)}
         destroyOnClose
+        confirmLoading={loading}
       >
         <Form
           form={form}
@@ -322,7 +281,7 @@ const TeamManagement: React.FC = () => {
           
           <Form.Item
             label="团队负责人"
-            name="leaderId"
+            name="leader_id"
           >
             <Select allowClear placeholder="选择负责人">
               {users

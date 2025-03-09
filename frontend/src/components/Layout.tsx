@@ -1,60 +1,82 @@
-import React, { useState } from 'react';
-import { Layout as AntLayout, Menu, Button, Dropdown, Avatar, theme, Typography } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Avatar, Dropdown, Button, theme } from 'antd';
 import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
+  UserOutlined,
   DashboardOutlined,
-  FileTextOutlined,
+  FileOutlined,
   FormOutlined,
   TeamOutlined,
-  UserOutlined,
   SettingOutlined,
-  LogoutOutlined,
-  QuestionCircleOutlined,
+  SafetyOutlined,
   AuditOutlined,
-  CheckCircleOutlined,
-  HistoryOutlined,
+  LogoutOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  QuestionCircleOutlined,
+  FileSearchOutlined,
+  FieldBinaryOutlined,
+  SolutionOutlined,
 } from '@ant-design/icons';
-import { useNavigate, Outlet, Link } from 'react-router-dom';
+import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { PERMISSIONS } from '../config';
 
-const { Header, Sider, Content, Footer } = AntLayout;
-const { Title } = Typography;
+const { Header, Sider, Content } = Layout;
 
-const Layout: React.FC = () => {
+const AppLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { token: { colorBgContainer, borderRadiusLG } } = theme.useToken();
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [openKeys, setOpenKeys] = useState<string[]>(['admin']);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout, hasPermission } = useAuthStore();
+  const { token } = theme.useToken();
+
+  // 当路由变化时，更新选中的菜单项
+  useEffect(() => {
+    const pathSegments = location.pathname.split('/').filter(Boolean);
+    
+    // 默认选中仪表盘
+    if (pathSegments.length === 0 || (pathSegments[0] === 'dashboard' && pathSegments.length === 1)) {
+      setSelectedKeys(['dashboard']);
+      return;
+    }
+    
+    // 从路径中提取菜单key
+    if (pathSegments.length >= 1) {
+      if (pathSegments[0] === 'dashboard' && pathSegments.length >= 2) {
+        // 处理子菜单的情况
+        if (pathSegments[1] === 'admin' && pathSegments.length >= 3) {
+          // 系统管理子菜单
+          setSelectedKeys([pathSegments[2]]);
+          setOpenKeys(['admin']);
+        } else {
+          // 普通菜单
+          setSelectedKeys([pathSegments[1]]);
+        }
+      } else {
+        // 非dashboard开头的路径
+        setSelectedKeys([pathSegments[0]]);
+      }
+    }
+  }, [location]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const userMenuItems = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: '个人信息',
-      onClick: () => navigate('/profile'),
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-      onClick: handleLogout,
-    },
-  ];
+  // 处理子菜单展开状态
+  const onOpenChange = (keys: string[]) => {
+    setOpenKeys(keys);
+  };
 
   return (
-    <AntLayout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh' }}>
       <Sider 
-        trigger={null} 
         collapsible 
         collapsed={collapsed} 
-        width={240}
+        onCollapse={setCollapsed}
         style={{
           overflow: 'auto',
           height: '100vh',
@@ -62,151 +84,158 @@ const Layout: React.FC = () => {
           left: 0,
           top: 0,
           bottom: 0,
+          backgroundColor: token.colorBgContainer,
+          boxShadow: '2px 0 8px rgba(0,0,0,0.06)'
         }}
       >
-        <div className="logo" style={{ 
-          height: 64, 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          color: 'white', 
-          fontSize: collapsed ? 16 : 20, 
-          fontWeight: 'bold',
-          margin: '16px 0'
-        }}>
-          {collapsed ? 'TZ' : '台账管理系统'}
+        <div 
+          style={{ 
+            height: 64, 
+            margin: 16, 
+            textAlign: 'center', 
+            lineHeight: '32px',
+            fontSize: collapsed ? 14 : 18,
+            fontWeight: 'bold',
+            color: token.colorPrimary
+          }}
+        >
+          {collapsed ? '台账' : '台账管理系统'}
         </div>
+        
         <Menu
-          theme="dark"
+          theme="light"
           mode="inline"
-          defaultSelectedKeys={['dashboard']}
+          selectedKeys={selectedKeys}
+          openKeys={!collapsed ? openKeys : []}
+          onOpenChange={onOpenChange}
           items={[
+            // 仪表盘
             {
               key: 'dashboard',
               icon: <DashboardOutlined />,
-              label: <Link to="/">首页</Link>,
+              label: <Link to="/dashboard">仪表盘</Link>,
             },
-            {
+            
+            // 台账管理
+            hasPermission(PERMISSIONS.LEDGER_VIEW) ? {
               key: 'ledgers',
-              icon: <FileTextOutlined />,
-              label: <Link to="/ledgers">台账管理</Link>,
-              disabled: !hasPermission(PERMISSIONS.LEDGER_VIEW),
-            },
-            {
+              icon: <FileOutlined />,
+              label: <Link to="/dashboard/ledgers">台账管理</Link>,
+            } : null,
+            
+            // 模板管理
+            hasPermission(PERMISSIONS.TEMPLATE_VIEW) ? {
               key: 'templates',
               icon: <FormOutlined />,
-              label: <Link to="/templates">模板管理</Link>,
-              disabled: !hasPermission(PERMISSIONS.TEMPLATE_VIEW),
-            },
-            {
+              label: <Link to="/dashboard/templates">模板管理</Link>,
+            } : null,
+            
+            // 工作流管理
+            hasPermission(PERMISSIONS.WORKFLOW_VIEW) ? {
               key: 'workflow',
-              icon: <AuditOutlined />,
-              label: <Link to="/workflow">工作流程</Link>,
-              disabled: !hasPermission(PERMISSIONS.WORKFLOW_VIEW),
-            },
-            {
+              icon: <FieldBinaryOutlined />,
+              label: <Link to="/dashboard/workflow">工作流管理</Link>,
+            } : null,
+            
+            // 审批任务
+            hasPermission(PERMISSIONS.APPROVAL_VIEW) ? {
               key: 'approval',
-              icon: <CheckCircleOutlined />,
-              label: <Link to="/approval/tasks">审批任务</Link>,
-              disabled: !hasPermission(PERMISSIONS.WORKFLOW_VIEW),
-            },
-            {
+              icon: <SolutionOutlined />,
+              label: <Link to="/dashboard/approval/tasks">审批任务</Link>,
+            } : null,
+            
+            // 日志管理
+            hasPermission(PERMISSIONS.LOG_VIEW) ? {
               key: 'logs',
-              icon: <HistoryOutlined />,
-              label: <Link to="/logs">系统日志</Link>,
-              disabled: !hasPermission(PERMISSIONS.ROLE_VIEW),
-            },
-            {
+              icon: <FileSearchOutlined />,
+              label: <Link to="/dashboard/logs">日志管理</Link>,
+            } : null,
+            
+            // 系统管理
+            (hasPermission(PERMISSIONS.USER_VIEW) || 
+             hasPermission(PERMISSIONS.ROLE_VIEW) ||
+             hasPermission(PERMISSIONS.TEAM_VIEW) ||
+             hasPermission(PERMISSIONS.PERMISSION_VIEW)) ? {
               key: 'admin',
               icon: <SettingOutlined />,
               label: '系统管理',
-              disabled: !(
-                hasPermission(PERMISSIONS.USER_VIEW) ||
-                hasPermission(PERMISSIONS.ROLE_VIEW) ||
-                hasPermission(PERMISSIONS.TEAM_VIEW)
-              ),
               children: [
-                {
+                hasPermission(PERMISSIONS.USER_VIEW) ? {
                   key: 'users',
                   icon: <UserOutlined />,
-                  label: <Link to="/admin/users">用户管理</Link>,
-                  disabled: !hasPermission(PERMISSIONS.USER_VIEW),
-                },
-                {
+                  label: <Link to="/dashboard/admin/users">用户管理</Link>,
+                } : null,
+                hasPermission(PERMISSIONS.ROLE_VIEW) ? {
                   key: 'roles',
-                  icon: <SettingOutlined />,
-                  label: <Link to="/admin/roles">角色管理</Link>,
-                  disabled: !hasPermission(PERMISSIONS.ROLE_VIEW),
-                },
-                {
-                  key: 'permissions',
-                  icon: <SettingOutlined />,
-                  label: <Link to="/admin/permissions">权限管理</Link>,
-                  disabled: !hasPermission(PERMISSIONS.ROLE_VIEW),
-                },
-                {
+                  icon: <SafetyOutlined />,
+                  label: <Link to="/dashboard/admin/roles">角色管理</Link>,
+                } : null,
+                hasPermission(PERMISSIONS.TEAM_VIEW) ? {
                   key: 'teams',
                   icon: <TeamOutlined />,
-                  label: <Link to="/admin/teams">团队管理</Link>,
-                  disabled: !hasPermission(PERMISSIONS.TEAM_VIEW),
-                },
-              ],
-            },
+                  label: <Link to="/dashboard/admin/teams">团队管理</Link>,
+                } : null,
+                hasPermission(PERMISSIONS.PERMISSION_VIEW) ? {
+                  key: 'permissions',
+                  icon: <AuditOutlined />,
+                  label: <Link to="/dashboard/admin/permissions">权限管理</Link>,
+                } : null,
+              ].filter(Boolean),
+            } : null,
+            
+            // 帮助
             {
               key: 'help',
               icon: <QuestionCircleOutlined />,
-              label: <Link to="/help">使用帮助</Link>,
+              label: <Link to="/dashboard/help">帮助</Link>,
             },
-          ]}
+          ].filter(Boolean)}
         />
       </Sider>
-      <AntLayout style={{ marginLeft: collapsed ? 80 : 240, transition: 'all 0.2s' }}>
-        <Header style={{ 
-          padding: 0, 
-          background: colorBgContainer, 
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          width: '100%',
-          boxShadow: '0 1px 4px rgba(0, 21, 41, 0.08)'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24 }}>
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{ fontSize: '16px', width: 64, height: 64 }}
-            />
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Title level={4} style={{ margin: 0, marginRight: 24 }}>台账管理系统</Title>
-              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-                <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                  <Avatar icon={<UserOutlined />} />
-                  <span style={{ marginLeft: 8 }}>{user?.name || '用户'}</span>
-                </div>
-              </Dropdown>
-            </div>
-          </div>
-        </Header>
-        <Content
-          style={{
-            margin: '24px 16px',
-            padding: 24,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-            minHeight: 280,
-            overflow: 'initial',
-            position: 'relative'
+      
+      <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'margin-left 0.3s' }}>
+        <Header 
+          style={{ 
+            padding: 0, 
+            background: token.colorBgContainer, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.05)'
           }}
         >
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{ fontSize: '16px', width: 64, height: 64 }}
+          />
+          
+          <div style={{ paddingRight: 24 }}>
+            <Dropdown menu={{ 
+              items: [
+                {
+                  key: '1',
+                  icon: <LogoutOutlined />,
+                  label: '退出登录',
+                  onClick: handleLogout
+                }
+              ]
+            }}>
+              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Avatar icon={<UserOutlined />} />
+                <span>{user?.name || user?.username}</span>
+              </div>
+            </Dropdown>
+          </div>
+        </Header>
+        
+        <Content style={{ margin: '24px 16px', padding: 24, background: token.colorBgContainer, borderRadius: token.borderRadius, minHeight: 280 }}>
           <Outlet />
         </Content>
-        <Footer style={{ textAlign: 'center' }}>
-          台账管理系统 ©{new Date().getFullYear()} 版权所有
-        </Footer>
-      </AntLayout>
-    </AntLayout>
+      </Layout>
+    </Layout>
   );
 };
 
-export default Layout; 
+export default AppLayout; 

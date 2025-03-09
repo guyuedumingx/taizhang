@@ -3,24 +3,24 @@ import { Form, Input, Select, Button, Card, Typography, DatePicker, message, Spa
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
+import { LedgerService } from '../../services/LedgerService';
+import { TemplateService } from '../../services/TemplateService';
+import { TeamService } from '../../services/TeamService';
+import { Ledger, LedgerCreate, LedgerUpdate, Template, Team, Field } from '../../types';
 import dayjs from 'dayjs';
 
 const { Title } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-interface LedgerFormData {
-  title: string;
-  department: string;
-  teamId: number;
-  description: string;
-  date: string;
+interface FormValues {
+  name: string;
+  team_id: number;
+  description?: string;
+  date: dayjs.Dayjs;
   status: string;
-  fields: Array<{
-    id: string;
-    name: string;
-    value: string;
-  }>;
+  template_id: number;
+  data: Record<string, string>;
 }
 
 const LedgerForm: React.FC = () => {
@@ -30,10 +30,10 @@ const LedgerForm: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [templates, setTemplates] = useState<Array<{ id: number; name: string }>>([]);
-  const [teams, setTeams] = useState<Array<{ id: number; name: string }>>([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
-  const [templateFields, setTemplateFields] = useState<Array<{ id: string; name: string; type: string }>>([]);
+  const [templateFields, setTemplateFields] = useState<Field[]>([]);
   
   const isEdit = !!id;
   
@@ -42,95 +42,96 @@ const LedgerForm: React.FC = () => {
     const requiredPermission = isEdit ? PERMISSIONS.LEDGER_EDIT : PERMISSIONS.LEDGER_CREATE;
     if (!hasPermission(requiredPermission)) {
       message.error('您没有权限执行此操作');
-      navigate('/ledgers');
+      navigate('/dashboard/ledgers');
+      return;
     }
-  }, [hasPermission, isEdit, navigate]);
+    
+    // 获取模板和团队列表
+    fetchTemplatesAndTeams();
+    
+    // 如果是编辑模式，获取台账数据
+    if (isEdit) {
+      fetchLedger(parseInt(id));
+    }
+  }, [hasPermission, isEdit, id, navigate]);
 
-  // 获取模板列表
-  useEffect(() => {
-    // 模拟获取模板列表
-    setTimeout(() => {
-      setTemplates([
-        { id: 1, name: '财务差错模板' },
-        { id: 2, name: '生产质量问题模板' },
-        { id: 3, name: '客户投诉模板' },
-        { id: 4, name: '设备故障模板' },
+  // 获取模板和团队数据
+  const fetchTemplatesAndTeams = async () => {
+    setLoading(true);
+    try {
+      const [templatesData, teamsData] = await Promise.all([
+        TemplateService.getTemplates(),
+        TeamService.getTeams()
       ]);
       
-      setTeams([
-        { id: 1, name: '财务团队' },
-        { id: 2, name: '生产团队' },
-        { id: 3, name: '客服团队' },
-        { id: 4, name: '设备团队' },
-      ]);
-    }, 500);
-  }, []);
-
-  // 如果是编辑模式，获取台账数据
-  useEffect(() => {
-    if (isEdit) {
-      setLoading(true);
-      // 模拟获取台账数据
-      setTimeout(() => {
-        const mockData: LedgerFormData = {
-          title: `台账示例 ${id}`,
-          department: '财务部',
-          teamId: 1,
-          description: '这是一个示例台账描述',
-          date: '2023-05-15',
-          status: '处理中',
-          fields: [
-            { id: 'field1', name: '问题类型', value: '数据错误' },
-            { id: 'field2', name: '严重程度', value: '中等' },
-            { id: 'field3', name: '责任人', value: '张三' },
-            { id: 'field4', name: '解决方案', value: '重新核对数据并更正' },
-          ],
-        };
-        
-        form.setFieldsValue({
-          ...mockData,
-          date: dayjs(mockData.date),
-          templateId: 1, // 假设使用了模板1
-        });
-        
-        setSelectedTemplate(1);
-        setTemplateFields([
-          { id: 'field1', name: '问题类型', type: 'input' },
-          { id: 'field2', name: '严重程度', type: 'select' },
-          { id: 'field3', name: '责任人', type: 'input' },
-          { id: 'field4', name: '解决方案', type: 'textarea' },
-        ]);
-        
-        setLoading(false);
-      }, 1000);
+      setTemplates(templatesData);
+      setTeams(teamsData);
+    } catch (error) {
+      console.error('获取数据失败:', error);
+      message.error('获取模板和团队数据失败');
+    } finally {
+      setLoading(false);
     }
-  }, [form, id, isEdit]);
+  };
+
+  // 获取台账详情
+  const fetchLedger = async (ledgerId: number) => {
+    setLoading(true);
+    try {
+      const ledger = await LedgerService.getLedger(ledgerId);
+      
+      // 设置表单初始值
+      form.setFieldsValue({
+        name: ledger.name,
+        description: ledger.description,
+        team_id: ledger.team_id,
+        template_id: ledger.template_id,
+        status: ledger.status,
+        data: ledger.data || {},
+      });
+      
+      // 如果有模板ID，获取模板字段
+      if (ledger.template_id) {
+        setSelectedTemplate(ledger.template_id);
+        await fetchTemplateFields(ledger.template_id);
+      }
+    } catch (error) {
+      console.error('获取台账详情失败:', error);
+      message.error('获取台账详情失败');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 处理模板选择
-  const handleTemplateChange = (templateId: number) => {
+  const handleTemplateChange = async (templateId: number) => {
     setSelectedTemplate(templateId);
-    
-    // 模拟获取模板字段
-    setTimeout(() => {
-      const fields = [
-        { id: 'field1', name: '问题类型', type: 'input' },
-        { id: 'field2', name: '严重程度', type: 'select' },
-        { id: 'field3', name: '责任人', type: 'input' },
-        { id: 'field4', name: '解决方案', type: 'textarea' },
-      ];
+    await fetchTemplateFields(templateId);
+  };
+
+  // 获取模板字段
+  const fetchTemplateFields = async (templateId: number) => {
+    try {
+      const templateDetail = await TemplateService.getTemplate(templateId);
       
-      setTemplateFields(fields);
-      
-      // 清除之前的字段值
-      const currentValues = form.getFieldsValue();
-      const newValues = { ...currentValues };
-      newValues.fields = {};
-      form.setFieldsValue(newValues);
-    }, 500);
+      if (templateDetail.fields) {
+        setTemplateFields(templateDetail.fields);
+        
+        // 重置表单中的数据字段
+        const currentValues = form.getFieldsValue();
+        form.setFieldsValue({
+          ...currentValues,
+          data: {}
+        });
+      }
+    } catch (error) {
+      console.error('获取模板字段失败:', error);
+      message.error('获取模板字段失败');
+    }
   };
 
   // 提交表单
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: FormValues) => {
     if (!selectedTemplate) {
       message.error('请选择模板');
       return;
@@ -139,12 +140,30 @@ const LedgerForm: React.FC = () => {
     setSubmitting(true);
     
     try {
-      // 模拟提交数据
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 准备提交数据
+      const submitData = {
+        name: values.name,
+        description: values.description,
+        team_id: values.team_id,
+        template_id: values.template_id,
+        status: values.status,
+        data: values.data
+      };
       
-      message.success(isEdit ? '台账更新成功' : '台账创建成功');
-      navigate('/ledgers');
+      if (isEdit) {
+        // 更新台账
+        await LedgerService.updateLedger(parseInt(id), submitData as LedgerUpdate);
+        message.success('台账更新成功');
+      } else {
+        // 创建台账
+        await LedgerService.createLedger(submitData as LedgerCreate);
+        message.success('台账创建成功');
+      }
+      
+      // 返回台账列表页面
+      navigate('/dashboard/ledgers');
     } catch (error) {
+      console.error('台账操作失败:', error);
       message.error('操作失败，请重试');
     } finally {
       setSubmitting(false);
@@ -161,15 +180,16 @@ const LedgerForm: React.FC = () => {
       <>
         <Divider orientation="left">模板字段</Divider>
         {templateFields.map(field => {
-          const fieldName = `fields[${field.id}]`;
+          const fieldName = ['data', field.name];
           
+          // 根据字段类型渲染不同的表单控件
           if (field.type === 'input') {
             return (
               <Form.Item
                 key={field.id}
-                label={field.name}
+                label={field.label || field.name}
                 name={fieldName}
-                rules={[{ required: true, message: `请输入${field.name}` }]}
+                rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
               >
                 <Input />
               </Form.Item>
@@ -180,34 +200,69 @@ const LedgerForm: React.FC = () => {
             return (
               <Form.Item
                 key={field.id}
-                label={field.name}
+                label={field.label || field.name}
                 name={fieldName}
-                rules={[{ required: true, message: `请输入${field.name}` }]}
+                rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
               >
                 <TextArea rows={4} />
               </Form.Item>
             );
           }
           
-          if (field.type === 'select') {
+          if (field.type === 'select' && field.options) {
             return (
               <Form.Item
                 key={field.id}
-                label={field.name}
+                label={field.label || field.name}
                 name={fieldName}
-                rules={[{ required: true, message: `请选择${field.name}` }]}
+                rules={[{ required: field.required, message: `请选择${field.label || field.name}` }]}
               >
                 <Select>
-                  <Option value="低">低</Option>
-                  <Option value="中等">中等</Option>
-                  <Option value="高">高</Option>
-                  <Option value="严重">严重</Option>
+                  {field.options.map(option => (
+                    <Option key={option} value={option}>{option}</Option>
+                  ))}
                 </Select>
               </Form.Item>
             );
           }
           
-          return null;
+          if (field.type === 'number') {
+            return (
+              <Form.Item
+                key={field.id}
+                label={field.label || field.name}
+                name={fieldName}
+                rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
+              >
+                <Input type="number" />
+              </Form.Item>
+            );
+          }
+          
+          if (field.type === 'date') {
+            return (
+              <Form.Item
+                key={field.id}
+                label={field.label || field.name}
+                name={fieldName}
+                rules={[{ required: field.required, message: `请选择${field.label || field.name}` }]}
+              >
+                <DatePicker style={{ width: '100%' }} />
+              </Form.Item>
+            );
+          }
+          
+          // 默认使用文本输入框
+          return (
+            <Form.Item
+              key={field.id}
+              label={field.label || field.name}
+              name={fieldName}
+              rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
+            >
+              <Input />
+            </Form.Item>
+          );
         })}
       </>
     );
@@ -215,19 +270,19 @@ const LedgerForm: React.FC = () => {
 
   return (
     <Card loading={loading}>
-      <Title level={4}>{isEdit ? '编辑台账' : '新建台账'}</Title>
+      <Title level={4}>{isEdit ? '编辑台账' : '创建台账'}</Title>
       <Form
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
         initialValues={{
-          status: '处理中',
-          date: dayjs(),
+          status: 'draft',
+          data: {}
         }}
       >
         <Form.Item
           label="模板"
-          name="templateId"
+          name="template_id"
           rules={[{ required: true, message: '请选择模板' }]}
         >
           <Select
@@ -242,30 +297,17 @@ const LedgerForm: React.FC = () => {
         </Form.Item>
         
         <Form.Item
-          label="台账标题"
-          name="title"
-          rules={[{ required: true, message: '请输入台账标题' }]}
+          label="台账名称"
+          name="name"
+          rules={[{ required: true, message: '请输入台账名称' }]}
         >
           <Input />
         </Form.Item>
         
         <Form.Item
-          label="部门"
-          name="department"
-          rules={[{ required: true, message: '请选择部门' }]}
-        >
-          <Select placeholder="选择部门">
-            <Option value="财务部">财务部</Option>
-            <Option value="生产部">生产部</Option>
-            <Option value="客服部">客服部</Option>
-            <Option value="设备部">设备部</Option>
-          </Select>
-        </Form.Item>
-        
-        <Form.Item
-          label="团队"
-          name="teamId"
-          rules={[{ required: true, message: '请选择团队' }]}
+          label="所属团队"
+          name="team_id"
+          rules={[{ required: true, message: '请选择所属团队' }]}
         >
           <Select placeholder="选择团队">
             {teams.map(team => (
@@ -275,11 +317,10 @@ const LedgerForm: React.FC = () => {
         </Form.Item>
         
         <Form.Item
-          label="日期"
-          name="date"
-          rules={[{ required: true, message: '请选择日期' }]}
+          label="台账描述"
+          name="description"
         >
-          <DatePicker style={{ width: '100%' }} />
+          <TextArea rows={4} />
         </Form.Item>
         
         <Form.Item
@@ -288,27 +329,22 @@ const LedgerForm: React.FC = () => {
           rules={[{ required: true, message: '请选择状态' }]}
         >
           <Select>
-            <Option value="处理中">处理中</Option>
-            <Option value="已完成">已完成</Option>
+            <Option value="draft">草稿</Option>
+            <Option value="active">处理中</Option>
+            <Option value="completed">已完成</Option>
           </Select>
-        </Form.Item>
-        
-        <Form.Item
-          label="描述"
-          name="description"
-          rules={[{ required: true, message: '请输入描述' }]}
-        >
-          <TextArea rows={4} />
         </Form.Item>
         
         {renderTemplateFields()}
         
+        <Divider />
+        
         <Form.Item>
           <Space>
             <Button type="primary" htmlType="submit" loading={submitting}>
-              {isEdit ? '更新' : '创建'}
+              {isEdit ? '更新台账' : '创建台账'}
             </Button>
-            <Button onClick={() => navigate('/ledgers')}>取消</Button>
+            <Button onClick={() => navigate('/dashboard/ledgers')}>取消</Button>
           </Space>
         </Form.Item>
       </Form>

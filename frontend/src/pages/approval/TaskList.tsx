@@ -29,7 +29,7 @@ const TaskList: React.FC = () => {
   useEffect(() => {
     if (!hasPermission(PERMISSIONS.LEDGER_APPROVE)) {
       message.error('您没有权限访问此页面');
-      navigate('/');
+      navigate('/dashboard');
       return;
     }
 
@@ -41,7 +41,17 @@ const TaskList: React.FC = () => {
     setLoading(true);
     try {
       const response = await api.approvals.getPendingTasks();
-      setTasks(response as Task[]);
+      // 转换响应数据以符合Task接口
+      const taskList = response.map((item: Record<string, unknown>) => ({
+        task_id: Number(item.id || 0),
+        ledger_id: Number(item.ledger_id || 0),
+        ledger_name: String(item.ledger_name || '未命名台账'),
+        workflow_instance_id: Number(item.workflow_instance_id || 0),
+        workflow_node_name: String(item.workflow_node_name || '未知节点'),
+        created_by: String(item.created_by || '未知用户'),
+        created_at: String(item.created_at || new Date().toISOString())
+      }));
+      setTasks(taskList);
     } catch (error) {
       console.error('获取待办任务失败:', error);
       message.error('获取待办任务失败');
@@ -93,7 +103,7 @@ const TaskList: React.FC = () => {
       dataIndex: 'ledger_name',
       key: 'ledger_name',
       render: (text, record) => (
-        <a onClick={() => navigate(`/ledgers/${record.ledger_id}`)}>{text}</a>
+        <a onClick={() => navigate(`/dashboard/ledgers/${record.ledger_id}`)}>{text}</a>
       ),
     },
     {
@@ -121,7 +131,7 @@ const TaskList: React.FC = () => {
             <Button
               type="text"
               icon={<EyeOutlined />}
-              onClick={() => navigate(`/ledgers/${record.ledger_id}`)}
+              onClick={() => navigate(`/dashboard/ledgers/${record.ledger_id}`)}
             />
           </Tooltip>
           <Tooltip title="同意">

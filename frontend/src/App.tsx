@@ -10,10 +10,12 @@ import LedgerForm from './pages/ledger/LedgerForm';
 import LedgerDetail from './pages/ledger/LedgerDetail';
 import TemplateList from './pages/template/TemplateList';
 import TemplateForm from './pages/template/TemplateForm';
-import UserManagement from './pages/admin/UserManagement';
+import TemplateLedgerSummary from './pages/template/TemplateLedgerSummary';
+import UserManagementFixed from './pages/admin/UserManagementFixed';
 import RoleManagement from './pages/admin/RoleManagement';
 import PermissionManagement from './pages/admin/PermissionManagement';
 import TeamManagement from './pages/admin/TeamManagement';
+import TeamMembers from './pages/admin/TeamMembers';
 import WorkflowList from './pages/workflow/WorkflowList';
 import WorkflowForm from './pages/workflow/WorkflowForm';
 import WorkflowDetail from './pages/workflow/WorkflowDetail';
@@ -34,8 +36,9 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <PrivateRoute>
                 <>
@@ -53,18 +56,21 @@ function App() {
             <Route path="templates" element={<TemplateList />} />
             <Route path="templates/new" element={<TemplateForm />} />
             <Route path="templates/edit/:id" element={<TemplateForm />} />
+            <Route path="templates/:templateId/ledgers" element={<TemplateLedgerSummary />} />
             <Route path="workflow" element={<WorkflowList />} />
             <Route path="workflow/create" element={<WorkflowForm />} />
             <Route path="workflow/edit/:id" element={<WorkflowForm />} />
             <Route path="workflow/:id" element={<WorkflowDetail />} />
             <Route path="approval/tasks" element={<TaskList />} />
             <Route path="logs" element={<LogList />} />
-            <Route path="admin/users" element={<UserManagement />} />
+            <Route path="admin/users" element={<UserManagementFixed />} />
             <Route path="admin/roles" element={<RoleManagement />} />
             <Route path="admin/permissions" element={<PermissionManagement />} />
             <Route path="admin/teams" element={<TeamManagement />} />
+            <Route path="admin/teams/:id/members" element={<TeamMembers />} />
             <Route path="help" element={<HelpPage />} />
           </Route>
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
     </ConfigProvider>

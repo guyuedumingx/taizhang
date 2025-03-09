@@ -4,7 +4,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, DownloadOutlin
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
-import api from '../../api';
+import { LedgerService } from '../../services/LedgerService';
 import { Ledger } from '../../types';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -27,7 +27,7 @@ const LedgerList: React.FC = () => {
     
     setLoading(true);
     try {
-      const data = await api.ledgers.getLedgers();
+      const data = await LedgerService.getLedgers();
       setLedgers(data);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -50,7 +50,7 @@ const LedgerList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await api.ledgers.deleteLedger(id);
+      await LedgerService.deleteLedger(id);
       message.success('删除成功');
       fetchLedgers();
     } catch (error: unknown) {
@@ -65,7 +65,7 @@ const LedgerList: React.FC = () => {
   // 处理导出单个台账
   const handleExport = async (id: number, format: string) => {
     try {
-      const blob = await api.ledgers.exportLedger(id, format);
+      const blob = await LedgerService.exportLedger(id, format);
       // 创建下载链接
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -87,7 +87,7 @@ const LedgerList: React.FC = () => {
   // 处理导出所有台账
   const handleExportAll = async (format: string) => {
     try {
-      const blob = await api.ledgers.exportAllLedgers(format);
+      const blob = await LedgerService.exportAllLedgers(format);
       // 创建下载链接
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -108,10 +108,10 @@ const LedgerList: React.FC = () => {
 
   const filteredLedgers = ledgers.filter(item => 
     item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.description?.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.created_by_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.team_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.template_name?.toLowerCase().includes(searchText.toLowerCase())
+    (item.description && item.description.toLowerCase().includes(searchText.toLowerCase())) ||
+    (item.created_by_name && item.created_by_name.toLowerCase().includes(searchText.toLowerCase())) ||
+    (item.team_name && item.team_name.toLowerCase().includes(searchText.toLowerCase())) ||
+    (item.template_name && item.template_name.toLowerCase().includes(searchText.toLowerCase()))
   );
 
   const columns: ColumnsType<Ledger> = [
@@ -173,13 +173,13 @@ const LedgerList: React.FC = () => {
           <Button
             type="text"
             icon={<EyeOutlined />}
-            onClick={() => navigate(`/ledgers/${record.id}`)}
+            onClick={() => navigate(`/dashboard/ledgers/${record.id}`)}
             disabled={!hasPermission(PERMISSIONS.LEDGER_VIEW)}
           />
           <Button
             type="text"
             icon={<EditOutlined />}
-            onClick={() => navigate(`/ledgers/edit/${record.id}`)}
+            onClick={() => navigate(`/dashboard/ledgers/edit/${record.id}`)}
             disabled={!hasPermission(PERMISSIONS.LEDGER_EDIT)}
           />
           <Dropdown
@@ -261,23 +261,25 @@ const LedgerList: React.FC = () => {
                   }
                 ]
               }}
-              disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT)}
+              disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT) || ledgers.length === 0}
             >
-              <Button
+              <Button 
+                type="default" 
                 icon={<DownloadOutlined />}
-                disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT)}
+                disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT) || ledgers.length === 0}
               >
-                批量导出
+                导出
               </Button>
             </Dropdown>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate('/ledgers/new')}
-              disabled={!hasPermission(PERMISSIONS.LEDGER_CREATE)}
-            >
-              新建台账
-            </Button>
+            {hasPermission(PERMISSIONS.LEDGER_CREATE) && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate('/dashboard/ledgers/new')}
+              >
+                新建台账
+              </Button>
+            )}
           </Space>
         </div>
         <Table
@@ -286,9 +288,10 @@ const LedgerList: React.FC = () => {
           rowKey="id"
           loading={loading}
           pagination={{
-            showSizeChanger: true,
+            pageSize: 10,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 条记录`,
+            showSizeChanger: true,
+            showTotal: (total) => `共 ${total} 条记录`
           }}
         />
       </Card>

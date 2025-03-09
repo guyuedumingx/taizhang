@@ -339,7 +339,7 @@ export default {
     
     // 导出所有台账
     exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
-      let url = `/ledgersexport-all?format=${format}`;
+      let url = `/ledgers/export-all?format=${format}`;
       if (templateId) {
         url += `&template_id=${templateId}`;
       }

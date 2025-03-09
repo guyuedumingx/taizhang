@@ -1,265 +1,259 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Descriptions, Button, Space, Tag, Divider, Table, message, Popconfirm, Dropdown } from 'antd';
-import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, DownloadOutlined } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Card, Typography, Descriptions, Button, Space, Tag, Divider, message, Spin, Timeline } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
+import { EditOutlined, DownloadOutlined, ClockCircleOutlined, CheckCircleOutlined, SendOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
-import api from '../../api';
+import { LedgerService } from '../../services/LedgerService';
+import { ApprovalService } from '../../services/ApprovalService';
+import { TemplateService } from '../../services/TemplateService';
+import { Ledger, AuditLog, Field } from '../../types';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
-interface LedgerField {
-  id: string;
-  name: string;
-  value: string;
-}
-
-interface LedgerDetail {
-  id: number;
-  title: string;
-  department: string;
-  teamName: string;
-  description: string;
-  date: string;
-  status: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  fields: LedgerField[];
-}
-
-const LedgerDetailPage: React.FC = () => {
-  const navigate = useNavigate();
+const LedgerDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { hasPermission, token } = useAuthStore();
+  const navigate = useNavigate();
+  const { hasPermission } = useAuthStore();
   const [loading, setLoading] = useState(true);
-  const [ledger, setLedger] = useState<LedgerDetail | null>(null);
+  const [ledger, setLedger] = useState<Ledger | null>(null);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [fields, setFields] = useState<Field[]>([]);
 
-  const fetchLedger = async () => {
-    if (id) {
-      setLoading(true);
-      try {
-        const data = await api.ledgers.getLedger(Number(id));
-        
-        // 将 API 返回的数据转换为 LedgerDetail 类型
-        const ledgerDetail: LedgerDetail = {
-          id: data.id,
-          title: data.name || '',
-          department: data.team_id ? '财务部' : '', // 假设的部门
-          teamName: data.team_name || '',
-          description: data.description || '',
-          date: data.created_at ? new Date(data.created_at).toLocaleDateString() : '',
-          status: data.status || '',
-          createdBy: data.created_by_name || '',
-          createdAt: data.created_at || '',
-          updatedBy: data.updated_by_name || '',
-          updatedAt: data.updated_at || '',
-          fields: [] // 假设的字段列表
-        };
-        
-        setLedger(ledgerDetail);
-      } catch (error: unknown) {
-        console.error('获取台账详情失败:', error);
-        message.error('获取台账详情失败');
-        // 如果是认证错误，不要重复尝试获取数据
-        if (error && typeof error === 'object' && 'response' in error && 
-            error.response && typeof error.response === 'object' && 
-            'status' in error.response && error.response.status === 401) {
-          return;
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
+  // 获取台账详情和审计日志
   useEffect(() => {
-    // 检查权限
-    if (!hasPermission(PERMISSIONS.LEDGER_VIEW)) {
-      message.error('您没有权限查看此台账');
-      navigate('/ledgers');
+    if (!id) {
+      message.error('台账ID无效');
+      navigate('/dashboard/ledgers');
       return;
     }
 
-    fetchLedger();
+    if (!hasPermission(PERMISSIONS.LEDGER_VIEW)) {
+      message.error('您没有查看台账的权限');
+      navigate('/dashboard');
+      return;
+    }
+
+    const ledgerId = parseInt(id);
+    fetchLedgerDetails(ledgerId);
   }, [id, hasPermission, navigate]);
 
-  const handleEdit = () => {
-    navigate(`/ledgers/edit/${id}`);
-  };
-
-  const handleDelete = () => {
-    // 模拟删除操作
+  // 获取台账详情、模板字段和审计日志
+  const fetchLedgerDetails = async (ledgerId: number) => {
     setLoading(true);
-    setTimeout(() => {
-      message.success('台账删除成功');
-      navigate('/ledgers');
-    }, 1000);
-  };
-
-  const handleBack = () => {
-    navigate('/ledgers');
-  };
-
-  // 导出台账
-  const handleExport = async (format: string) => {
     try {
-      // 使用fetch API直接下载文件
-      const response = await fetch(`/api/v1/ledgers/${id}/export?format=${format}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || '导出失败');
-      }
-      
-      // 获取文件名
-      const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = `台账_${id}.${format}`;
-      
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename=(.+)/);
-        if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1].replace(/["']/g, '');
+      const [ledgerData, logsData] = await Promise.all([
+        LedgerService.getLedger(ledgerId),
+        ApprovalService.getLedgerAuditLogs(ledgerId)
+      ]);
+
+      setLedger(ledgerData);
+      setAuditLogs(logsData);
+
+      // 如果有模板ID，获取模板字段
+      if (ledgerData.template_id) {
+        try {
+          const templateData = await TemplateService.getTemplate(ledgerData.template_id);
+          setFields(templateData.fields);
+        } catch (error) {
+          console.error('获取模板字段失败:', error);
         }
       }
-      
-      // 创建Blob对象
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      
-      // 创建下载链接
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      
-      // 清理
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      message.success(`台账已导出为${format.toUpperCase()}格式`);
     } catch (error) {
-      console.error('导出台账失败:', error);
-      message.error('导出台账失败: ' + (error as Error).message);
+      console.error('获取台账详情失败:', error);
+      message.error('获取台账详情失败');
+    } finally {
+      setLoading(false);
     }
   };
-  
-  // 导出菜单
-  const exportMenu = [
-    {
-      key: 'excel',
-      label: 'Excel格式',
-      onClick: () => handleExport('excel')
-    },
-    {
-      key: 'csv',
-      label: 'CSV格式',
-      onClick: () => handleExport('csv')
-    },
-    {
-      key: 'txt',
-      label: 'TXT格式',
-      onClick: () => handleExport('txt')
+
+  // 处理导出
+  const handleExport = async (format: string) => {
+    if (!id) return;
+    
+    try {
+      const blob = await LedgerService.exportLedger(parseInt(id), format);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `台账_${id}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('导出失败:', error);
+      message.error('导出失败');
     }
-  ];
+  };
+
+  // 处理审批提交
+  const handleSubmitApproval = async () => {
+    if (!id || !ledger) return;
+    
+    try {
+      await ApprovalService.submitLedger(parseInt(id), { comments: '提交审批' });
+      message.success('提交审批成功');
+      fetchLedgerDetails(parseInt(id));
+    } catch (error) {
+      console.error('提交审批失败:', error);
+      message.error('提交审批失败');
+    }
+  };
+
+  // 处理审批通过
+  const handleApprove = async () => {
+    if (!id || !ledger) return;
+    
+    try {
+      await ApprovalService.approveLedger(parseInt(id), { approved: true, comments: '审批通过' });
+      message.success('审批通过');
+      fetchLedgerDetails(parseInt(id));
+    } catch (error) {
+      console.error('审批失败:', error);
+      message.error('审批失败');
+    }
+  };
+
+  // 渲染审计日志
+  const renderAuditLogs = () => {
+    if (auditLogs.length === 0) {
+      return <Text>暂无审计日志</Text>;
+    }
+
+    return (
+      <Timeline mode="left">
+        {auditLogs.map(log => (
+          <Timeline.Item
+            key={log.id}
+            color={log.action.includes('approved') ? 'green' : log.action.includes('rejected') ? 'red' : 'blue'}
+            label={new Date(log.created_at).toLocaleString()}
+          >
+            <Space>
+              <Text strong>{log.user_name}</Text>
+              <Text>{log.action}</Text>
+              {log.comments && <Text type="secondary">{log.comments}</Text>}
+            </Space>
+          </Timeline.Item>
+        ))}
+      </Timeline>
+    );
+  };
+
+  // 渲染字段值
+  const renderFieldValue = (key: string, value: any) => {
+    const field = fields.find(f => f.name === key);
+    if (!field) return String(value);
+    
+    if (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox') {
+      return <Tag color="blue">{value}</Tag>;
+    }
+    
+    return String(value);
+  };
 
   if (loading) {
-    return <Card loading={true} />;
-  }
-
-  if (!ledger) {
     return (
       <Card>
-        <Title level={4}>台账不存在</Title>
-        <Button type="primary" onClick={handleBack}>返回列表</Button>
+        <div style={{ textAlign: 'center', padding: '50px 0' }}>
+          <Spin size="large" />
+          <div style={{ marginTop: 16 }}>加载中...</div>
+        </div>
       </Card>
     );
   }
 
-  // 将字段转换为表格数据
-  const fieldColumns = [
-    {
-      title: '字段名称',
-      dataIndex: 'name',
-      key: 'name',
-      width: '30%',
-    },
-    {
-      title: '字段值',
-      dataIndex: 'value',
-      key: 'value',
-    },
-  ];
+  if (!ledger) {
+    return <Card><Text>台账不存在或已被删除</Text></Card>;
+  }
 
   return (
     <Card>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <Title level={4}>{ledger.name}</Title>
         <Space>
-          <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
-            返回
-          </Button>
-          <Title level={4} style={{ margin: 0 }}>{ledger.title}</Title>
-        </Space>
-        <Space>
-          <Dropdown menu={{ items: exportMenu }} placement="bottomRight">
-            <Button icon={<DownloadOutlined />}>导出</Button>
-          </Dropdown>
+          {hasPermission(PERMISSIONS.LEDGER_EXPORT) && (
+            <Button 
+              icon={<DownloadOutlined />} 
+              onClick={() => handleExport('excel')}
+            >
+              导出
+            </Button>
+          )}
           {hasPermission(PERMISSIONS.LEDGER_EDIT) && (
             <Button 
               type="primary" 
               icon={<EditOutlined />} 
-              onClick={handleEdit}
+              onClick={() => navigate(`/dashboard/ledgers/edit/${id}`)}
             >
               编辑
             </Button>
           )}
-          {hasPermission(PERMISSIONS.LEDGER_DELETE) && (
-            <Popconfirm
-              title="确定要删除这个台账吗？"
-              onConfirm={handleDelete}
-              okText="确定"
-              cancelText="取消"
+          {ledger.status === 'draft' && hasPermission(PERMISSIONS.APPROVAL_SUBMIT) && (
+            <Button 
+              type="primary" 
+              icon={<SendOutlined />}
+              onClick={handleSubmitApproval}
             >
-              <Button danger icon={<DeleteOutlined />}>删除</Button>
-            </Popconfirm>
+              提交审批
+            </Button>
+          )}
+          {ledger.status === 'active' && hasPermission(PERMISSIONS.APPROVAL_APPROVE) && (
+            <Button 
+              type="primary" 
+              icon={<CheckCircleOutlined />}
+              onClick={handleApprove}
+            >
+              审批通过
+            </Button>
           )}
         </Space>
       </div>
 
       <Descriptions bordered column={2}>
-        <Descriptions.Item label="部门">{ledger.department}</Descriptions.Item>
-        <Descriptions.Item label="团队">{ledger.teamName}</Descriptions.Item>
-        <Descriptions.Item label="日期">{ledger.date}</Descriptions.Item>
+        <Descriptions.Item label="台账编号">{ledger.id}</Descriptions.Item>
         <Descriptions.Item label="状态">
-          <Tag color={ledger.status === '已完成' ? 'success' : 'warning'}>
-            {ledger.status}
+          <Tag color={ledger.status === 'completed' ? 'success' : ledger.status === 'active' ? 'processing' : 'default'}>
+            {ledger.status === 'completed' ? '已完成' : ledger.status === 'active' ? '处理中' : '草稿'}
           </Tag>
         </Descriptions.Item>
-        <Descriptions.Item label="创建人">{ledger.createdBy}</Descriptions.Item>
-        <Descriptions.Item label="创建时间">{ledger.createdAt}</Descriptions.Item>
-        <Descriptions.Item label="更新人">{ledger.updatedBy}</Descriptions.Item>
-        <Descriptions.Item label="更新时间">{ledger.updatedAt}</Descriptions.Item>
+        <Descriptions.Item label="模板">{ledger.template_name || '-'}</Descriptions.Item>
+        <Descriptions.Item label="所属团队">{ledger.team_name || '-'}</Descriptions.Item>
+        <Descriptions.Item label="创建人">{ledger.created_by_name || '-'}</Descriptions.Item>
+        <Descriptions.Item label="创建时间">{ledger.created_at ? new Date(ledger.created_at).toLocaleString() : '-'}</Descriptions.Item>
+        <Descriptions.Item label="最后更新" span={2}>
+          {ledger.updated_at ? (
+            <Space>
+              <ClockCircleOutlined />
+              <span>{new Date(ledger.updated_at).toLocaleString()}</span>
+              {ledger.updated_by_name && <span>- {ledger.updated_by_name}</span>}
+            </Space>
+          ) : '-'}
+        </Descriptions.Item>
         <Descriptions.Item label="描述" span={2}>
-          {ledger.description}
+          {ledger.description || '-'}
         </Descriptions.Item>
       </Descriptions>
 
-      <Divider orientation="left">台账字段</Divider>
-      <Table
-        columns={fieldColumns}
-        dataSource={ledger.fields}
-        rowKey="id"
-        pagination={false}
-        bordered
-      />
+      {ledger.data && Object.keys(ledger.data).length > 0 && (
+        <>
+          <Divider orientation="left">台账数据</Divider>
+          <Descriptions bordered column={2}>
+            {Object.entries(ledger.data).map(([key, value]) => (
+              <Descriptions.Item key={key} label={
+                fields.find(f => f.name === key)?.label || key
+              }>
+                {renderFieldValue(key, value)}
+              </Descriptions.Item>
+            ))}
+          </Descriptions>
+        </>
+      )}
+
+      <Divider orientation="left">审计日志</Divider>
+      {renderAuditLogs()}
     </Card>
   );
 };
 
-export default LedgerDetailPage; 
+export default LedgerDetail; 

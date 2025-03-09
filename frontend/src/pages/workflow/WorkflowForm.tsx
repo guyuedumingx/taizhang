@@ -194,6 +194,11 @@ const WorkflowForm: React.FC = () => {
     }
   };
 
+  // 取消编辑
+  const handleCancel = () => {
+    navigate('/workflow');
+  };
+
   return (
     <Card 
       title={
@@ -273,15 +278,10 @@ const WorkflowForm: React.FC = () => {
         />
         
         <Form.Item style={{ marginTop: 24 }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            style={{ marginRight: 16 }}
-          >
+          <Button type="primary" htmlType="submit" loading={loading} style={{ marginRight: 16 }}>
             {isEdit ? '更新工作流' : '创建工作流'}
           </Button>
-          <Button onClick={() => navigate('/workflow')}>
+          <Button onClick={handleCancel}>
             取消
           </Button>
         </Form.Item>

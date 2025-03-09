@@ -33,17 +33,17 @@ const LoginPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('login');
   const [registerLoading, setRegisterLoading] = useState(false);
   
-  // 如果已经登录，重定向到首页
+  // 如果已经登录，重定向到仪表盘
   React.useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
   const onLoginFinish = async (values: LoginFormValues) => {
     const success = await login(values.username, values.password);
     if (success) {
-      navigate('/');
+      navigate('/dashboard');
     }
   };
 

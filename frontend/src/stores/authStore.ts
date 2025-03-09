@@ -78,11 +78,14 @@ export const useAuthStore = create<AuthState>()(
       },
       
       logout: () => {
+        // 清除本地存储
+        localStorage.removeItem('auth-storage');
         
+        // 重置状态
         set({
           user: null,
-          token: localStorage.getItem('auth-storage') ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token : null,
-          isAuthenticated: !!localStorage.getItem('auth-storage') && !!JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token,
+          token: null,
+          isAuthenticated: false,
           passwordExpired: false,
         });
       },

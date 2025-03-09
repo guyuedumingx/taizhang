@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Statistic, Table, Button, Typography, Divider } from 'antd';
+import { Row, Col, Card, Statistic, Table, Button, Typography, Divider, message } from 'antd';
 import { FileTextOutlined, FormOutlined, TeamOutlined, UserOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { PERMISSIONS } from '../config';
+import { LedgerService } from '../services/LedgerService';
+import { TemplateService } from '../services/TemplateService';
+import { TeamService } from '../services/TeamService';
+import { UserService } from '../services/UserService';
+import { Ledger } from '../types';
 
 const { Title } = Typography;
-
-interface LedgerItem {
-  id: number;
-  title: string;
-  department: string;
-  createdBy: string;
-  createdAt: string;
-  status: string;
-}
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -26,78 +22,55 @@ const Dashboard: React.FC = () => {
     totalUsers: 0,
     totalTeams: 0,
   });
-  const [recentLedgers, setRecentLedgers] = useState<LedgerItem[]>([]);
+  const [recentLedgers, setRecentLedgers] = useState<Ledger[]>([]);
 
   useEffect(() => {
-    // 模拟获取数据
-    setTimeout(() => {
-      setStats({
-        totalLedgers: 156,
-        totalTemplates: 12,
-        totalUsers: 45,
-        totalTeams: 8,
-      });
-      
-      setRecentLedgers([
-        {
-          id: 1,
-          title: '2023年第一季度财务差错',
-          department: '财务部',
-          createdBy: '张三',
-          createdAt: '2023-04-01',
-          status: '已完成',
-        },
-        {
-          id: 2,
-          title: '2023年5月生产质量问题',
-          department: '生产部',
-          createdBy: '李四',
-          createdAt: '2023-06-02',
-          status: '处理中',
-        },
-        {
-          id: 3,
-          title: '2023年上半年客户投诉',
-          department: '客服部',
-          createdBy: '王五',
-          createdAt: '2023-07-15',
-          status: '已完成',
-        },
-        {
-          id: 4,
-          title: '2023年7月设备故障记录',
-          department: '设备部',
-          createdBy: '赵六',
-          createdAt: '2023-08-01',
-          status: '处理中',
-        },
-      ]);
-      
-      setLoading(false);
-    }, 1000);
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      try {
+        // 获取台账总数
+        const ledgers = await LedgerService.getLedgers();
+        
+        // 获取模板总数
+        const templates = await TemplateService.getTemplates();
+        
+        // 获取用户总数
+        const users = await UserService.getUsers();
+        
+        // 获取团队总数
+        const teams = await TeamService.getTeams();
+        
+        // 更新统计数据
+        setStats({
+          totalLedgers: ledgers.length,
+          totalTemplates: templates.length,
+          totalUsers: users.length,
+          totalTeams: teams.length,
+        });
+        
+        // 更新最近台账数据（取最新的4个）
+        const sortedLedgers = [...ledgers].sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ).slice(0, 4);
+        
+        setRecentLedgers(sortedLedgers);
+      } catch (error) {
+        console.error('获取仪表盘数据失败:', error);
+        message.error('获取仪表盘数据失败');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
   const columns = [
     {
-      title: '台账标题',
-      dataIndex: 'title',
-      key: 'title',
+      title: '台账名称',
+      dataIndex: 'name',
+      key: 'name',
       width: '30%',
-    },
-    {
-      title: '部门',
-      dataIndex: 'department',
-      key: 'department',
-    },
-    {
-      title: '创建人',
-      dataIndex: 'createdBy',
-      key: 'createdBy',
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
     },
     {
       title: '状态',
@@ -110,13 +83,29 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
+      title: '团队',
+      dataIndex: 'team_name',
+      key: 'team_name',
+    },
+    {
+      title: '创建人',
+      dataIndex: 'created_by_name',
+      key: 'created_by_name',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      render: (text: string) => text ? new Date(text).toLocaleString() : '-',
+    },
+    {
       title: '操作',
       key: 'action',
-      render: (_: unknown, record: LedgerItem) => (
+      render: (_: unknown, record: Ledger) => (
         <Button 
           type="link" 
           icon={<EyeOutlined />}
-          onClick={() => navigate(`/ledgers/${record.id}`)}
+          onClick={() => navigate(`/dashboard/ledgers/${record.id}`)}
           disabled={!hasPermission(PERMISSIONS.LEDGER_VIEW)}
         >
           查看
@@ -130,7 +119,7 @@ const Dashboard: React.FC = () => {
       <div className="page-header">
         <Title level={3} className="page-title">系统概览</Title>
         <div>
-          <Button type="primary" onClick={() => navigate('/ledgers/new')} disabled={!hasPermission(PERMISSIONS.LEDGER_CREATE)}>
+          <Button type="primary" onClick={() => navigate('/dashboard/ledgers/new')} disabled={!hasPermission(PERMISSIONS.LEDGER_CREATE)}>
             创建台账
           </Button>
         </div>
@@ -187,7 +176,7 @@ const Dashboard: React.FC = () => {
 
       <div className="page-header">
         <Title level={4} className="page-title">最近台账</Title>
-        <Button type="link" onClick={() => navigate('/ledgers')}>
+        <Button type="link" onClick={() => navigate('/dashboard/ledgers')}>
           查看全部
         </Button>
       </div>

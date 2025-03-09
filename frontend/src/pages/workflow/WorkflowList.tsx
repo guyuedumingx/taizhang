@@ -20,7 +20,7 @@ const WorkflowList: React.FC = () => {
     // 检查权限
     if (!hasPermission(PERMISSIONS.WORKFLOW_VIEW)) {
       message.error('您没有查看工作流程的权限');
-      navigate('/');
+      navigate('/dashboard');
       return;
     }
 
@@ -122,27 +122,25 @@ const WorkflowList: React.FC = () => {
 
   return (
     <Card>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Title level={4}>工作流程管理</Title>
-          {hasPermission(PERMISSIONS.WORKFLOW_CREATE) && (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate('/workflow/create')}
-            >
-              创建工作流程
-            </Button>
-          )}
-        </Space>
-        <Table
-          columns={columns}
-          dataSource={workflows}
-          rowKey="id"
-          loading={loading}
-          pagination={{ pageSize: 10 }}
-        />
-      </Space>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <Title level={4}>工作流程管理</Title>
+        {hasPermission(PERMISSIONS.WORKFLOW_CREATE) && (
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate('/workflow/create')}
+          >
+            新建工作流程
+          </Button>
+        )}
+      </div>
+      <Table
+        columns={columns}
+        dataSource={workflows}
+        rowKey="id"
+        loading={loading}
+        pagination={{ pageSize: 10 }}
+      />
     </Card>
   );
 };
