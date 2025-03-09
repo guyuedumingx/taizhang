@@ -16,6 +16,7 @@ interface TemplateField {
   type: string;
   required: boolean;
   options?: string[];
+  is_key_field: boolean;
 }
 
 interface TemplateFormData {
@@ -59,10 +60,10 @@ const TemplateForm: React.FC = () => {
           description: '这是一个示例模板描述',
           department: '财务部',
           fields: [
-            { id: '1', name: '问题类型', type: 'input', required: true },
-            { id: '2', name: '严重程度', type: 'select', required: true, options: ['低', '中等', '高', '严重'] },
-            { id: '3', name: '责任人', type: 'input', required: true },
-            { id: '4', name: '解决方案', type: 'textarea', required: false },
+            { id: '1', name: '问题类型', type: 'input', required: true, is_key_field: true },
+            { id: '2', name: '严重程度', type: 'select', required: true, options: ['低', '中等', '高', '严重'], is_key_field: true },
+            { id: '3', name: '责任人', type: 'input', required: true, is_key_field: true },
+            { id: '4', name: '解决方案', type: 'textarea', required: false, is_key_field: false },
           ],
         };
         
@@ -117,6 +118,7 @@ const TemplateForm: React.FC = () => {
         type: field.type,
         required: field.required,
         options: field.options ? field.options.join('\n') : '',
+        is_key_field: field.is_key_field,
       });
       setEditingFieldIndex(index);
     } else {
@@ -136,6 +138,7 @@ const TemplateForm: React.FC = () => {
         type: values.type,
         required: values.required,
         options: values.type === 'select' && values.options ? values.options.split('\n').filter(Boolean) : undefined,
+        is_key_field: values.is_key_field,
       };
       
       if (editingFieldIndex !== null) {
@@ -203,6 +206,12 @@ const TemplateForm: React.FC = () => {
       dataIndex: 'required',
       key: 'required',
       render: (required: boolean) => required ? '是' : '否',
+    },
+    {
+      title: '是否关键字段',
+      dataIndex: 'is_key_field',
+      key: 'is_key_field',
+      render: (is_key_field: boolean) => is_key_field ? '是' : '否',
     },
     {
       title: '操作',
@@ -344,6 +353,18 @@ const TemplateForm: React.FC = () => {
           <Form.Item
             label="是否必填"
             name="required"
+            valuePropName="checked"
+            initialValue={false}
+          >
+            <Select>
+              <Option value={true}>是</Option>
+              <Option value={false}>否</Option>
+            </Select>
+          </Form.Item>
+          
+          <Form.Item
+            label="是否关键字段"
+            name="is_key_field"
             valuePropName="checked"
             initialValue={false}
           >

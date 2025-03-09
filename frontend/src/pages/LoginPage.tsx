@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Tabs, message } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { authApi } from '../api';
+import api from '../api';
 
 interface LoginFormValues {
   username: string;
@@ -14,8 +14,9 @@ interface RegisterFormValues {
   username: string;
   password: string;
   confirmPassword: string;
-  email: string;
+  ehr_id: string;
   name: string;
+  department: string;
 }
 
 interface ApiError {
@@ -55,11 +56,12 @@ const LoginPage: React.FC = () => {
     setRegisterLoading(true);
     try {
       // 调用注册API
-      await authApi.register({
+      await api.auth.register({
         username: values.username,
         password: values.password,
-        email: values.email,
-        name: values.name
+        ehr_id: values.ehr_id,
+        name: values.name,
+        department: values.department
       });
       
       message.success('注册成功，请登录');
@@ -156,15 +158,25 @@ const LoginPage: React.FC = () => {
                     />
                   </Form.Item>
                   <Form.Item
-                    name="email"
+                    name="ehr_id"
                     rules={[
-                      { required: true, message: '请输入邮箱!' },
-                      { type: 'email', message: '请输入有效的邮箱地址!' }
+                      { required: true, message: '请输入EHR号!' },
+                      { min: 7, max: 7, message: 'EHR号必须是7位数字' },
+                      { pattern: /^\d{7}$/, message: 'EHR号必须是7位数字' }
                     ]}
                   >
                     <Input 
-                      prefix={<MailOutlined />} 
-                      placeholder="邮箱" 
+                      prefix={<UserOutlined />} 
+                      placeholder="EHR号" 
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="department"
+                    rules={[{ required: true, message: '请输入部门!' }]}
+                  >
+                    <Input 
+                      prefix={<UserOutlined />} 
+                      placeholder="部门" 
                     />
                   </Form.Item>
                   <Form.Item

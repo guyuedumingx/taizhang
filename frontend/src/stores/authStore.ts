@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { message } from 'antd';
-import { authApi } from '../api';
+import api from '../api';
 
 interface User {
   id: number;
@@ -69,8 +69,9 @@ export const useAuthStore = create<AuthState>()(
           
           message.success('登录成功');
           return true;
-        } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */error) {
-          // 忽略错误对象，只显示错误消息
+        } catch (error) {
+          // 显示错误消息
+          console.error('登录失败:', error);
           message.error('登录失败，请检查用户名和密码');
           return false;
         }
@@ -101,10 +102,9 @@ export const useAuthStore = create<AuthState>()(
         if (!get().token) return false;
         
         try {
-          // 使用 authApi 来发送请求
-          const response = await authApi.checkPasswordExpired();
-          set({ passwordExpired: response.password_expired });
-          return response.password_expired;
+          const data = await api.auth.checkPasswordExpired();
+          set({ passwordExpired: data.password_expired });
+          return data.password_expired;
         } catch (error) {
           console.error('检查密码过期失败:', error);
           return false;
@@ -115,8 +115,7 @@ export const useAuthStore = create<AuthState>()(
         if (!get().token) return false;
         
         try {
-          // 使用 authApi 来发送请求
-          await authApi.changePassword(currentPassword, newPassword);
+          await api.auth.changePassword(currentPassword, newPassword);
           set({ passwordExpired: false });
           message.success('密码修改成功');
           return true;

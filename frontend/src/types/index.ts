@@ -2,7 +2,7 @@
 export interface User {
   id: number;
   username: string;
-  email: string;
+  ehr_id: string;
   name: string;
   department?: string;
   is_active: boolean;
@@ -13,7 +13,7 @@ export interface User {
 
 export interface UserCreate {
   username: string;
-  email: string;
+  ehr_id: string;
   password: string;
   name: string;
   department?: string;
@@ -25,7 +25,7 @@ export interface UserCreate {
 
 export interface UserUpdate {
   username?: string;
-  email?: string;
+  ehr_id?: string;
   password?: string;
   name?: string;
   department?: string;
@@ -128,6 +128,7 @@ export interface Field {
   default_value?: string;
   order: number;
   template_id: number;
+  is_key_field?: boolean;
 }
 
 export interface FieldCreate {
@@ -138,6 +139,7 @@ export interface FieldCreate {
   options?: string[];
   default_value?: string;
   order?: number;
+  is_key_field?: boolean;
 }
 
 export interface FieldUpdate {
@@ -148,6 +150,7 @@ export interface FieldUpdate {
   options?: string[];
   default_value?: string;
   order?: number;
+  is_key_field?: boolean;
 }
 
 // 台账相关类型
@@ -204,6 +207,6 @@ export interface LoginResponse {
 export interface RegisterRequest {
   username: string;
   password: string;
-  email: string;
+  ehr_id: string;
   name: string;
 } 

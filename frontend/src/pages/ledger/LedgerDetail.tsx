@@ -4,8 +4,7 @@ import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, DownloadOutlined } fro
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
-import { ledgerApi } from '../../api';
-import { Ledger } from '../../types';
+import api from '../../api';
 
 const { Title } = Typography;
 
@@ -38,44 +37,40 @@ const LedgerDetailPage: React.FC = () => {
   const [ledger, setLedger] = useState<LedgerDetail | null>(null);
 
   const fetchLedger = async () => {
-    // 检查是否已登录
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      const data = await ledgerApi.getLedger(Number(id));
-      
-      // 将 API 返回的数据转换为 LedgerDetail 类型
-      const ledgerDetail: LedgerDetail = {
-        id: data.id,
-        title: data.name || '',
-        department: data.team_id ? '财务部' : '', // 假设的部门
-        teamName: data.team_name || '',
-        description: data.description || '',
-        date: data.created_at ? new Date(data.created_at).toLocaleDateString() : '',
-        status: data.status || '',
-        createdBy: data.created_by_name || '',
-        createdAt: data.created_at || '',
-        updatedBy: data.updated_by_name || '',
-        updatedAt: data.updated_at || '',
-        fields: [] // 假设的字段列表
-      };
-      
-      setLedger(ledgerDetail);
-    } catch (error: unknown) {
-      console.error('获取台账详情失败:', error);
-      message.error('获取台账详情失败');
-      // 如果是认证错误，不要重复尝试获取数据
-      if (error && typeof error === 'object' && 'response' in error && 
-          error.response && typeof error.response === 'object' && 
-          'status' in error.response && error.response.status === 401) {
-        return;
+    if (id) {
+      setLoading(true);
+      try {
+        const data = await api.ledgers.getLedger(Number(id));
+        
+        // 将 API 返回的数据转换为 LedgerDetail 类型
+        const ledgerDetail: LedgerDetail = {
+          id: data.id,
+          title: data.name || '',
+          department: data.team_id ? '财务部' : '', // 假设的部门
+          teamName: data.team_name || '',
+          description: data.description || '',
+          date: data.created_at ? new Date(data.created_at).toLocaleDateString() : '',
+          status: data.status || '',
+          createdBy: data.created_by_name || '',
+          createdAt: data.created_at || '',
+          updatedBy: data.updated_by_name || '',
+          updatedAt: data.updated_at || '',
+          fields: [] // 假设的字段列表
+        };
+        
+        setLedger(ledgerDetail);
+      } catch (error: unknown) {
+        console.error('获取台账详情失败:', error);
+        message.error('获取台账详情失败');
+        // 如果是认证错误，不要重复尝试获取数据
+        if (error && typeof error === 'object' && 'response' in error && 
+            error.response && typeof error.response === 'object' && 
+            'status' in error.response && error.response.status === 401) {
+          return;
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
     }
   };
 

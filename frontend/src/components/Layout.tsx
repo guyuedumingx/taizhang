@@ -11,6 +11,9 @@ import {
   SettingOutlined,
   LogoutOutlined,
   QuestionCircleOutlined,
+  AuditOutlined,
+  CheckCircleOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -94,6 +97,24 @@ const Layout: React.FC = () => {
               icon: <FormOutlined />,
               label: <Link to="/templates">模板管理</Link>,
               disabled: !hasPermission(PERMISSIONS.TEMPLATE_VIEW),
+            },
+            {
+              key: 'workflow',
+              icon: <AuditOutlined />,
+              label: <Link to="/workflow">工作流程</Link>,
+              disabled: !hasPermission(PERMISSIONS.WORKFLOW_VIEW),
+            },
+            {
+              key: 'approval',
+              icon: <CheckCircleOutlined />,
+              label: <Link to="/approval/tasks">审批任务</Link>,
+              disabled: !hasPermission(PERMISSIONS.WORKFLOW_VIEW),
+            },
+            {
+              key: 'logs',
+              icon: <HistoryOutlined />,
+              label: <Link to="/logs">系统日志</Link>,
+              disabled: !hasPermission(PERMISSIONS.ROLE_VIEW),
             },
             {
               key: 'admin',

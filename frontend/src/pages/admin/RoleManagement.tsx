@@ -114,6 +114,7 @@ const RoleManagement: React.FC = () => {
                 { key: PERMISSIONS.LEDGER_CREATE, label: '创建台账' },
                 { key: PERMISSIONS.LEDGER_EDIT, label: '编辑台账' },
                 { key: PERMISSIONS.LEDGER_DELETE, label: '删除台账' },
+                { key: PERMISSIONS.LEDGER_EXPORT, label: '导出台账' },
               ],
             },
             {

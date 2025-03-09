@@ -14,6 +14,11 @@ import UserManagement from './pages/admin/UserManagement';
 import RoleManagement from './pages/admin/RoleManagement';
 import PermissionManagement from './pages/admin/PermissionManagement';
 import TeamManagement from './pages/admin/TeamManagement';
+import WorkflowList from './pages/workflow/WorkflowList';
+import WorkflowForm from './pages/workflow/WorkflowForm';
+import WorkflowDetail from './pages/workflow/WorkflowDetail';
+import TaskList from './pages/approval/TaskList';
+import LogList from './pages/log/LogList';
 import HelpPage from './pages/HelpPage';
 import PasswordExpiredModal from './components/PasswordExpiredModal';
 import './App.css';
@@ -48,6 +53,12 @@ function App() {
             <Route path="templates" element={<TemplateList />} />
             <Route path="templates/new" element={<TemplateForm />} />
             <Route path="templates/edit/:id" element={<TemplateForm />} />
+            <Route path="workflow" element={<WorkflowList />} />
+            <Route path="workflow/create" element={<WorkflowForm />} />
+            <Route path="workflow/edit/:id" element={<WorkflowForm />} />
+            <Route path="workflow/:id" element={<WorkflowDetail />} />
+            <Route path="approval/tasks" element={<TaskList />} />
+            <Route path="logs" element={<LogList />} />
             <Route path="admin/users" element={<UserManagement />} />
             <Route path="admin/roles" element={<RoleManagement />} />
             <Route path="admin/permissions" element={<PermissionManagement />} />

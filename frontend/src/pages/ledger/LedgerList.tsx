@@ -4,7 +4,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, DownloadOutlin
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
-import { ledgerApi } from '../../api';
+import api from '../../api';
 import { Ledger } from '../../types';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -27,16 +27,13 @@ const LedgerList: React.FC = () => {
     
     setLoading(true);
     try {
-      const data = await ledgerApi.getLedgers();
+      const data = await api.ledgers.getLedgers();
       setLedgers(data);
     } catch (error: unknown) {
-      console.error('获取台账列表失败:', error);
-      message.error('获取台账列表失败');
-      // 如果是认证错误，不要重复尝试获取数据
-      if (error && typeof error === 'object' && 'response' in error && 
-          error.response && typeof error.response === 'object' && 
-          'status' in error.response && error.response.status === 401) {
-        return;
+      if (error instanceof Error) {
+        message.error(`获取台账列表失败: ${error.message}`);
+      } else {
+        message.error('获取台账列表失败');
       }
     } finally {
       setLoading(false);
@@ -53,12 +50,59 @@ const LedgerList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await ledgerApi.deleteLedger(id);
+      await api.ledgers.deleteLedger(id);
       message.success('删除成功');
       fetchLedgers();
-    } catch (error) {
-      console.error('删除台账失败:', error);
-      message.error('删除台账失败');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(`删除失败: ${error.message}`);
+      } else {
+        message.error('删除失败');
+      }
+    }
+  };
+
+  // 处理导出单个台账
+  const handleExport = async (id: number, format: string) => {
+    try {
+      const blob = await api.ledgers.exportLedger(id, format);
+      // 创建下载链接
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `台账_${id}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(`导出失败: ${error.message}`);
+      } else {
+        message.error('导出失败');
+      }
+    }
+  };
+
+  // 处理导出所有台账
+  const handleExportAll = async (format: string) => {
+    try {
+      const blob = await api.ledgers.exportAllLedgers(format);
+      // 创建下载链接
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `台账_全部.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(`导出失败: ${error.message}`);
+      } else {
+        message.error('导出失败');
+      }
     }
   };
 
@@ -138,6 +182,34 @@ const LedgerList: React.FC = () => {
             onClick={() => navigate(`/ledgers/edit/${record.id}`)}
             disabled={!hasPermission(PERMISSIONS.LEDGER_EDIT)}
           />
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: 'excel',
+                  label: 'Excel格式',
+                  onClick: () => handleExport(record.id, 'excel')
+                },
+                {
+                  key: 'csv',
+                  label: 'CSV格式',
+                  onClick: () => handleExport(record.id, 'csv')
+                },
+                {
+                  key: 'txt',
+                  label: 'TXT格式',
+                  onClick: () => handleExport(record.id, 'txt')
+                }
+              ]
+            }}
+            disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT)}
+          >
+            <Button
+              type="text"
+              icon={<DownloadOutlined />}
+              disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT)}
+            />
+          </Dropdown>
           <Popconfirm
             title="确定要删除这个台账吗?"
             onConfirm={() => handleDelete(record.id)}
@@ -169,6 +241,35 @@ const LedgerList: React.FC = () => {
               onSearch={handleSearch}
               style={{ width: 250 }}
             />
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: 'excel',
+                    label: '导出为Excel',
+                    onClick: () => handleExportAll('excel')
+                  },
+                  {
+                    key: 'csv',
+                    label: '导出为CSV',
+                    onClick: () => handleExportAll('csv')
+                  },
+                  {
+                    key: 'txt',
+                    label: '导出为TXT',
+                    onClick: () => handleExportAll('txt')
+                  }
+                ]
+              }}
+              disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT)}
+            >
+              <Button
+                icon={<DownloadOutlined />}
+                disabled={!hasPermission(PERMISSIONS.LEDGER_EXPORT)}
+              >
+                批量导出
+              </Button>
+            </Dropdown>
             <Button
               type="primary"
               icon={<PlusOutlined />}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Space, Card, Typography, Tag, Modal, Form, Select, message, Popconfirm, Row, Col, Upload, Tooltip } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, UnlockOutlined, ExclamationCircleOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Table, Button, Input, Space, Card, Typography, Tag, Modal, Form, Select, message, Popconfirm, Row, Col, Upload } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, UnlockOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import type { ColumnsType } from 'antd/es/table';
@@ -13,12 +13,12 @@ interface User {
   id: number;
   username: string;
   name: string;
-  email: string;
+  ehr_id: string;
   role: string;
   department: string;
   teamId: number | null;
   teamName: string | null;
-  status: 'active' | 'inactive';
+  status: string;
   createdAt: string;
 }
 
@@ -77,7 +77,7 @@ const UserManagement: React.FC = () => {
               id: i,
               username: `user${i}`,
               name: `用户${i}`,
-              email: `user${i}@example.com`,
+              ehr_id: i < 10 ? `000000${i}` : `00000${i}`,
               role: i === 1 ? 'admin' : i % 3 === 0 ? 'manager' : 'user',
               department: i % 4 === 0 ? '财务部' : i % 4 === 1 ? '生产部' : i % 4 === 2 ? '客服部' : '设备部',
               teamId: i === 1 ? null : (i % 4) + 1,
@@ -133,7 +133,7 @@ const UserManagement: React.FC = () => {
     form.setFieldsValue({
       username: user.username,
       name: user.name,
-      email: user.email,
+      ehr_id: user.ehr_id,
       role: user.role,
       department: user.department,
       teamId: user.teamId,
@@ -167,12 +167,12 @@ const UserManagement: React.FC = () => {
           id: Math.max(...users.map(u => u.id)) + 1,
           username: values.username,
           name: values.name,
-          email: values.email,
+          ehr_id: values.ehr_id,
           role: values.role,
           department: values.department,
           teamId: values.teamId,
           teamName: values.teamId ? teams.find(team => team.id === values.teamId)?.name || null : null,
-          status: values.status as 'active' | 'inactive',
+          status: values.status as string,
           createdAt: new Date().toISOString().split('T')[0],
         };
         setUsers([...users, newUser]);
@@ -202,7 +202,7 @@ const UserManagement: React.FC = () => {
   const filteredUsers = users.filter(user => 
     user.username.toLowerCase().includes(searchText.toLowerCase()) ||
     user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchText.toLowerCase()) ||
+    user.ehr_id.toLowerCase().includes(searchText.toLowerCase()) ||
     (user.teamName && user.teamName.toLowerCase().includes(searchText.toLowerCase()))
   );
 
@@ -219,9 +219,9 @@ const UserManagement: React.FC = () => {
       key: 'name',
     },
     {
-      title: '邮箱',
-      dataIndex: 'email',
-      key: 'email',
+      title: 'EHR号',
+      dataIndex: 'ehr_id',
+      key: 'ehr_id',
     },
     {
       title: '角色',
@@ -262,7 +262,7 @@ const UserManagement: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status: 'active' | 'inactive') => (
+      render: (status: string) => (
         <Tag color={status === 'active' ? 'success' : 'error'}>
           {status === 'active' ? '启用' : '禁用'}
         </Tag>
@@ -317,7 +317,7 @@ const UserManagement: React.FC = () => {
   ];
 
   // 添加导入用户的方法
-  const handleImportUsers = async (options: any) => {
+  const handleImportUsers = async (options: { file: File }) => {
     const { file, onSuccess, onError } = options;
     
     setImportLoading(true);
@@ -350,7 +350,11 @@ const UserManagement: React.FC = () => {
       }
       
       // 刷新用户列表
-      fetchUsers();
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        message.success('导入成功');
+      }, 1000);
     } catch (error) {
       console.error('导入用户失败:', error);
       message.error('导入用户失败: ' + (error as Error).message);
@@ -476,11 +480,12 @@ const UserManagement: React.FC = () => {
           </Form.Item>
           
           <Form.Item
-            label="邮箱"
-            name="email"
+            label="EHR号"
+            name="ehr_id"
             rules={[
-              { required: true, message: '请输入邮箱' },
-              { type: 'email', message: '请输入有效的邮箱地址' },
+              { required: true, message: '请输入EHR号' },
+              { min: 7, max: 7, message: 'EHR号必须是7位数字' },
+              { pattern: /^\d{7}$/, message: 'EHR号必须是7位数字' }
             ]}
           >
             <Input />

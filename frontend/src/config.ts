@@ -13,6 +13,9 @@ export const PERMISSIONS = {
   LEDGER_CREATE: 'ledger:create',
   LEDGER_EDIT: 'ledger:edit',
   LEDGER_DELETE: 'ledger:delete',
+  LEDGER_EXPORT: 'ledger:export',
+  LEDGER_APPROVE: 'ledger:approve',
+  LEDGER_ADMIN_APPROVE: 'ledger:admin_approve',
   
   // 模板权限
   TEMPLATE_VIEW: 'template:view',
@@ -37,4 +40,13 @@ export const PERMISSIONS = {
   TEAM_CREATE: 'team:create',
   TEAM_EDIT: 'team:edit',
   TEAM_DELETE: 'team:delete',
+  
+  // 工作流管理权限
+  WORKFLOW_VIEW: 'workflow:view',
+  WORKFLOW_CREATE: 'workflow:create',
+  WORKFLOW_EDIT: 'workflow:edit',
+  WORKFLOW_DELETE: 'workflow:delete',
+  
+  // 日志查看权限
+  LOG_VIEW: 'log:view',
 }; 
