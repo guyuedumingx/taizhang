@@ -100,7 +100,21 @@ class LogService:
                 detail="工作流不存在"
             )
         
-        return crud.audit_log.get_by_workflow(db, workflow_id=workflow_id, limit=limit)
+        # 获取工作流关联的所有工作流实例
+        workflow_instances = db.query(models.WorkflowInstance).filter(
+            models.WorkflowInstance.workflow_id == workflow_id
+        ).all()
+        
+        if not workflow_instances:
+            return []
+        
+        # 获取这些工作流实例的审计日志
+        instance_ids = [instance.id for instance in workflow_instances]
+        return db.query(models.AuditLog).filter(
+            models.AuditLog.workflow_instance_id.in_(instance_ids)
+        ).order_by(
+            models.AuditLog.created_at.desc()
+        ).limit(limit).all()
 
     @staticmethod
     def get_user_audit_logs(db: Session, user_id: int, limit: int) -> List[models.AuditLog]:

@@ -59,8 +59,9 @@ class UserService:
         db.refresh(user)
         
         # 为用户分配角色
-        if user_in.role:
-            add_role_for_user(str(user.id), user_in.role)
+        if hasattr(user_in, 'roles') and user_in.roles:
+            for role in user_in.roles:
+                add_role_for_user(str(user.id), role)
         else:
             # 默认角色为普通用户
             add_role_for_user(str(user.id), "user")

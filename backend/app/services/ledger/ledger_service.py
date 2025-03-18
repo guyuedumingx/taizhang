@@ -516,13 +516,13 @@ class LedgerService:
             template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
             if template:
                 # 获取模板字段
-                fields = db.query(models.TemplateField).filter(
-                    models.TemplateField.template_id == template.id
+                fields = db.query(models.Field).filter(
+                    models.Field.template_id == template.id
                 ).all()
                 
                 for field in fields:
                     key = field.name
-                    value = ledger.data.get(field.key, "")
+                    value = ledger.data.get(field.name, "")
                     data[key] = [value]
         
         # 创建DataFrame
@@ -609,8 +609,8 @@ class LedgerService:
             template = db.query(models.Template).filter(models.Template.id == template_id).first()
             if template:
                 # 获取模板字段
-                fields = db.query(models.TemplateField).filter(
-                    models.TemplateField.template_id == template.id
+                fields = db.query(models.Field).filter(
+                    models.Field.template_id == template.id
                 ).all()
                 
                 for field in fields:
@@ -618,8 +618,8 @@ class LedgerService:
                     data[key] = []
                     
                     for ledger in ledgers:
-                        if ledger.data and field.key in ledger.data:
-                            data[key].append(ledger.data[field.key])
+                        if ledger.data and field.name in ledger.data:
+                            data[key].append(ledger.data[field.name])
                         else:
                             data[key].append("")
         

@@ -112,7 +112,7 @@ class AuthService:
             raise HTTPException(status_code=404, detail="用户不存在")
         
         # 验证旧密码
-        if not verify_password(password_data.old_password, user.hashed_password):
+        if not verify_password(password_data.current_password, user.hashed_password):
             raise HTTPException(status_code=400, detail="旧密码不正确")
         
         # 设置新密码

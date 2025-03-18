@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Dict
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import models, schemas
 from app.utils.logger import LoggerService
 
 class WorkflowService:
@@ -12,309 +12,274 @@ class WorkflowService:
         db: Session, 
         skip: int = 0, 
         limit: int = 100,
-        template_id: Optional[int] = None,
-        is_active: Optional[bool] = None
+        search: Optional[str] = None,
+        template_id: Optional[int] = None
     ) -> List[models.Workflow]:
         """
         获取工作流列表
         """
-        # 构建查询条件
-        filters = {}
-        if template_id is not None:
-            filters["template_id"] = template_id
-        if is_active is not None:
-            filters["is_active"] = is_active
-            
-        workflows = crud.workflow.get_multi_with_filter(db, skip=skip, limit=limit, **filters)
+        # 构建查询
+        query = db.query(models.Workflow)
         
-        # 为每个工作流添加相关信息并处理序列化
-        result = []
+        # 按模板筛选
+        if template_id:
+            query = query.filter(models.Workflow.template_id == template_id)
+        
+        # 搜索
+        if search:
+            query = query.filter(models.Workflow.name.ilike(f"%{search}%"))
+        
+        # 分页
+        workflows = query.offset(skip).limit(limit).all()
+        
+        # 获取关联信息
         for workflow in workflows:
-            # 添加模板名称
-            template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-            if template:
-                workflow.template_name = template.name
+            # 获取关联的模板
+            if workflow.template_id:
+                template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
+                workflow.template_name = template.name if template else None
             
-            # 创建工作流字典
-            workflow_dict = {
-                "id": workflow.id,
-                "name": workflow.name,
-                "description": workflow.description,
-                "template_id": workflow.template_id,
-                "template_name": getattr(workflow, "template_name", None),
-                "is_active": workflow.is_active,
-                "created_by": workflow.created_by,
-                "created_at": workflow.created_at,
-                "updated_at": workflow.updated_at,
-                "nodes": []
-            }
+            # 获取创建者和更新者信息
+            if workflow.created_by:
+                creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
+                workflow.creator_name = creator.name if creator else None
             
-            # 处理节点
-            for node in workflow.nodes:
-                node_dict = {
-                    "id": node.id,
-                    "name": node.name,
-                    "description": node.description,
-                    "node_type": node.node_type,
-                    "workflow_id": node.workflow_id,
-                    "approver_role_id": node.approver_role_id,
-                    "approver_user_id": node.approver_user_id,
-                    "order_index": node.order_index,
-                    "is_final": node.is_final,
-                    "reject_to_node_id": node.reject_to_node_id,
-                    "multi_approve_type": node.multi_approve_type,
-                    "need_select_next_approver": node.need_select_next_approver,
-                    "created_at": node.created_at,
-                    "updated_at": node.updated_at,
-                    "approver_role_name": getattr(node, "approver_role_name", None),
-                    "approver_user_name": getattr(node, "approver_user_name", None),
-                    "approvers": []
-                }
-                
-                # 处理审批人
-                for approver in node.approvers:
-                    node_dict["approvers"].append({
-                        "id": approver.id,
-                        "name": approver.name,
-                        "username": approver.username
-                    })
-                
-                workflow_dict["nodes"].append(node_dict)
-            
-            result.append(workflow_dict)
+            # 获取节点数量
+            workflow.node_count = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).count()
         
-        return result
-
+        return workflows
+    
     @staticmethod
     def create_workflow(
         db: Session,
         workflow_in: schemas.WorkflowCreate,
-        created_by: int
+        current_user_id: int
     ) -> models.Workflow:
         """
         创建新工作流
         """
-        # 验证工作流名称不能为空
-        if not workflow_in.name or workflow_in.name.strip() == "":
-            raise HTTPException(status_code=422, detail="工作流名称不能为空")
-        
         # 检查模板是否存在
-        template = crud.template.get(db, id=workflow_in.template_id)
-        if not template:
-            raise HTTPException(status_code=404, detail="模板不存在")
+        if workflow_in.template_id:
+            template = db.query(models.Template).filter(models.Template.id == workflow_in.template_id).first()
+            if not template:
+                raise HTTPException(status_code=404, detail="模板不存在")
+        
+        # 检查工作流名称是否已存在
+        workflow = db.query(models.Workflow).filter(models.Workflow.name == workflow_in.name).first()
+        if workflow:
+            raise HTTPException(
+                status_code=400,
+                detail="工作流名称已存在",
+            )
         
         # 创建工作流
-        workflow = crud.workflow.create_with_nodes(db, obj_in=workflow_in, created_by=created_by)
-        
-        # 添加模板名称
-        workflow.template_name = template.name
-        
-        return workflow
-
-    @staticmethod
-    def get_workflow(db: Session, workflow_id: int) -> models.Workflow:
-        """
-        获取指定工作流
-        """
-        workflow = crud.workflow.get(db, id=workflow_id)
-        if not workflow:
-            raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        # 添加模板名称
-        template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-        if template:
-            workflow.template_name = template.name
-        
-        return workflow
-
-    @staticmethod
-    def update_workflow(
-        db: Session, 
-        workflow_id: int, 
-        workflow_in: schemas.WorkflowUpdate
-    ) -> models.Workflow:
-        """
-        更新工作流
-        """
-        workflow = crud.workflow.get(db, id=workflow_id)
-        if not workflow:
-            raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        # 更新工作流
-        workflow = crud.workflow.update_with_nodes(db, db_obj=workflow, obj_in=workflow_in)
-        
-        # 添加模板名称
-        template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-        if template:
-            workflow.template_name = template.name
-        
-        return workflow
-
-    @staticmethod
-    def delete_workflow(db: Session, workflow_id: int) -> models.Workflow:
-        """
-        删除工作流
-        """
-        workflow = crud.workflow.get(db, id=workflow_id)
-        if not workflow:
-            raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        # 检查是否有关联的工作流实例
-        workflow_instances = db.query(models.WorkflowInstance).filter(
-            models.WorkflowInstance.workflow_id == workflow_id
-        ).count()
-        
-        if workflow_instances > 0:
-            raise HTTPException(status_code=400, detail="该工作流已被使用，无法删除")
-        
-        return crud.workflow.remove(db, id=workflow_id)
-
-    @staticmethod
-    def get_workflow_nodes(db: Session, workflow_id: int) -> List[models.WorkflowNode]:
-        """
-        获取工作流的所有节点
-        """
-        workflow = crud.workflow.get(db, id=workflow_id)
-        if not workflow:
-            raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        nodes = db.query(models.WorkflowNode).filter(
-            models.WorkflowNode.workflow_id == workflow_id
-        ).order_by(models.WorkflowNode.order_index).all()
-        
-        for node in nodes:
-            # 获取审批人信息
-            approvers = crud.workflow_node.get_node_approvers(db, node_id=node.id)
-            node.approvers = approvers
-            
-            if node.approver_role_id:
-                role = db.query(models.Role).filter(models.Role.id == node.approver_role_id).first()
-                if role:
-                    node.approver_role_name = role.name
-            
-            if node.approver_user_id:
-                user = db.query(models.User).filter(models.User.id == node.approver_user_id).first()
-                if user:
-                    node.approver_user_name = user.name
-        
-        return nodes
-
-    @staticmethod
-    def create_workflow_node(
-        db: Session, 
-        workflow_id: int, 
-        node_in: schemas.WorkflowNodeCreateWithId
-    ) -> models.WorkflowNode:
-        """
-        添加工作流节点
-        """
-        workflow = crud.workflow.get(db, id=workflow_id)
-        if not workflow:
-            raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        # 检查节点类型
-        if node_in.node_type not in ["start", "approval", "end"]:
-            raise HTTPException(status_code=422, detail="节点类型必须是start, approval或end")
-        
-        # 创建工作流节点
-        node = crud.workflow_node.create_with_id(db, obj_in=node_in, workflow_id=workflow_id)
-        
-        # 获取审批人信息
-        if node.approver_role_id:
-            role = db.query(models.Role).filter(models.Role.id == node.approver_role_id).first()
-            if role:
-                node.approver_role_name = role.name
-        
-        if node.approver_user_id:
-            user = db.query(models.User).filter(models.User.id == node.approver_user_id).first()
-            if user:
-                node.approver_user_name = user.name
-        
-        return node
-
-    @staticmethod
-    def update_workflow_node(
-        db: Session, 
-        workflow_id: int, 
-        node_id: int, 
-        node_in: schemas.WorkflowNodeUpdate
-    ) -> models.WorkflowNode:
-        """
-        更新工作流节点
-        """
-        workflow = crud.workflow.get(db, id=workflow_id)
-        if not workflow:
-            raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        node = crud.workflow_node.get(db, id=node_id)
-        if not node:
-            raise HTTPException(status_code=404, detail="工作流节点不存在")
-        
-        if node.workflow_id != workflow_id:
-            raise HTTPException(status_code=400, detail="节点不属于该工作流")
-        
-        # 更新节点
-        node = crud.workflow_node.update(db, db_obj=node, obj_in=node_in)
-        
-        # 获取审批人信息
-        approvers = crud.workflow_node.get_node_approvers(db, node_id=node.id)
-        node.approvers = approvers
-        
-        if node.approver_role_id:
-            role = db.query(models.Role).filter(models.Role.id == node.approver_role_id).first()
-            if role:
-                node.approver_role_name = role.name
-        
-        if node.approver_user_id:
-            user = db.query(models.User).filter(models.User.id == node.approver_user_id).first()
-            if user:
-                node.approver_user_name = user.name
-        
-        return node
-
-    @staticmethod
-    def delete_workflow_node(db: Session, workflow_id: int, node_id: int) -> models.WorkflowNode:
-        """
-        删除工作流节点
-        """
-        workflow = crud.workflow.get(db, id=workflow_id)
-        if not workflow:
-            raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        node = crud.workflow_node.get(db, id=node_id)
-        if not node:
-            raise HTTPException(status_code=404, detail="工作流节点不存在")
-        
-        if node.workflow_id != workflow_id:
-            raise HTTPException(status_code=400, detail="节点不属于该工作流")
-        
-        # 删除节点
-        return crud.workflow_node.remove(db, id=node_id)
-
-    @staticmethod
-    def deactivate_workflow(db: Session, workflow_id: int) -> models.Workflow:
-        """
-        停用工作流
-        """
-        workflow = crud.workflow.get(db, id=workflow_id)
-        if not workflow:
-            raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        if not workflow.is_active:
-            raise HTTPException(status_code=400, detail="工作流已经是停用状态")
-        
-        # 停用工作流
-        workflow.is_active = False
+        workflow = models.Workflow(
+            name=workflow_in.name,
+            description=workflow_in.description,
+            template_id=workflow_in.template_id,
+            created_by=current_user_id,
+        )
         db.add(workflow)
         db.commit()
         db.refresh(workflow)
         
-        # 添加模板名称
-        template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-        if template:
-            workflow.template_name = template.name
+        # 创建节点
+        if workflow_in.nodes:
+            for node_data in workflow_in.nodes:
+                node = models.WorkflowNode(
+                    name=node_data.name,
+                    description=node_data.description,
+                    workflow_id=workflow.id,
+                    node_type=node_data.node_type,
+                    order_index=node_data.order_index,
+                    reject_to_node_id=node_data.reject_to_node_id,
+                )
+                db.add(node)
+            db.commit()
+        
+        # 记录日志
+        LoggerService.log_info(
+            db=db,
+            user_id=current_user_id,
+            module="workflow",
+            action="create_workflow",
+            resource_id=str(workflow.id),
+            resource_type="workflow",
+            message=f"创建工作流: {workflow.name}"
+        )
+        
+        # 获取关联信息
+        if workflow.template_id:
+            template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
+            workflow.template_name = template.name if template else None
+        
+        if workflow.created_by:
+            creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
+            workflow.creator_name = creator.name if creator else None
+        
+        # 获取节点数量
+        workflow.node_count = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).count()
         
         return workflow
-
+    
+    @staticmethod
+    def get_workflow(db: Session, workflow_id: int) -> models.Workflow:
+        """
+        获取工作流详情
+        """
+        workflow = db.query(models.Workflow).filter(models.Workflow.id == workflow_id).first()
+        if not workflow:
+            raise HTTPException(status_code=404, detail="工作流不存在")
+        
+        # 获取关联信息
+        if workflow.template_id:
+            template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
+            workflow.template_name = template.name if template else None
+        
+        # 获取创建者信息
+        if workflow.created_by:
+            creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
+            workflow.creator_name = creator.name if creator else None
+        
+        # 获取节点
+        nodes = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).order_by(models.WorkflowNode.order_index).all()
+        workflow.nodes = nodes
+        
+        return workflow
+    
+    @staticmethod
+    def update_workflow(
+        db: Session,
+        workflow_id: int,
+        workflow_in: schemas.WorkflowUpdate,
+        current_user_id: int
+    ) -> models.Workflow:
+        """
+        更新工作流信息
+        """
+        workflow = db.query(models.Workflow).filter(models.Workflow.id == workflow_id).first()
+        if not workflow:
+            raise HTTPException(status_code=404, detail="工作流不存在")
+        
+        # 如果更新工作流名称，检查是否已存在
+        if workflow_in.name and workflow_in.name != workflow.name:
+            existing_workflow = db.query(models.Workflow).filter(models.Workflow.name == workflow_in.name).first()
+            if existing_workflow:
+                raise HTTPException(
+                    status_code=400,
+                    detail="工作流名称已存在",
+                )
+        
+        # 如果更新模板ID，检查模板是否存在
+        if hasattr(workflow_in, 'template_id') and workflow_in.template_id and workflow_in.template_id != workflow.template_id:
+            template = db.query(models.Template).filter(models.Template.id == workflow_in.template_id).first()
+            if not template:
+                raise HTTPException(status_code=404, detail="模板不存在")
+        
+        # 更新工作流信息
+        update_data = workflow_in.dict(exclude_unset=True, exclude={"nodes"})
+        
+        # 更新其他字段
+        for field, value in update_data.items():
+            setattr(workflow, field, value)
+        
+        db.add(workflow)
+        db.commit()
+        db.refresh(workflow)
+        
+        # 处理节点更新
+        if hasattr(workflow_in, "nodes") and workflow_in.nodes is not None:
+            # 删除现有节点
+            db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).delete()
+            db.commit()
+            
+            # 创建新节点
+            for node_data in workflow_in.nodes:
+                node = models.WorkflowNode(
+                    name=node_data.name,
+                    description=node_data.description,
+                    workflow_id=workflow.id,
+                    node_type=node_data.node_type,
+                    order_index=node_data.order_index,
+                    reject_to_node_id=node_data.reject_to_node_id,
+                )
+                db.add(node)
+            db.commit()
+        
+        # 记录日志
+        LoggerService.log_info(
+            db=db,
+            user_id=current_user_id,
+            module="workflow",
+            action="update_workflow",
+            resource_id=str(workflow.id),
+            resource_type="workflow",
+            message=f"更新工作流: {workflow.name}"
+        )
+        
+        # 获取关联信息
+        if workflow.template_id:
+            template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
+            workflow.template_name = template.name if template else None
+        
+        if workflow.created_by:
+            creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
+            workflow.creator_name = creator.name if creator else None
+        
+        # 获取节点
+        nodes = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).order_by(models.WorkflowNode.order_index).all()
+        workflow.nodes = nodes
+        
+        return workflow
+    
+    @staticmethod
+    def delete_workflow(
+        db: Session, 
+        workflow_id: int,
+        current_user_id: int
+    ) -> models.Workflow:
+        """
+        删除工作流
+        """
+        workflow = db.query(models.Workflow).filter(models.Workflow.id == workflow_id).first()
+        if not workflow:
+            raise HTTPException(status_code=404, detail="工作流不存在")
+        
+        # 检查是否有关联的台账
+        ledgers = db.query(models.Ledger).filter(models.Ledger.workflow_id == workflow_id).count()
+        if ledgers > 0:
+            raise HTTPException(status_code=400, detail="该工作流已被台账使用，无法删除")
+        
+        # 删除节点
+        db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).delete()
+        
+        # 记录日志
+        LoggerService.log_info(
+            db=db,
+            user_id=current_user_id,
+            module="workflow",
+            action="delete_workflow",
+            resource_id=str(workflow.id),
+            resource_type="workflow",
+            message=f"删除工作流: {workflow.name}"
+        )
+        
+        # 删除工作流
+        db.delete(workflow)
+        db.commit()
+        
+        return workflow
+    
+    @staticmethod
+    def get_workflow_nodes(db: Session, workflow_id: int) -> List[models.WorkflowNode]:
+        """
+        获取工作流节点列表
+        """
+        workflow = db.query(models.Workflow).filter(models.Workflow.id == workflow_id).first()
+        if not workflow:
+            raise HTTPException(status_code=404, detail="工作流不存在")
+        
+        nodes = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow_id).order_by(models.WorkflowNode.order_index).all()
+        return nodes
 
 workflow_service = WorkflowService() 
