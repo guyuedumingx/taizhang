@@ -127,6 +127,12 @@ export default {
       return response.data;
     },
     
+    // 获取当前用户权限
+    getUserPermissions: async (): Promise<string[]> => {
+      const response = await api.get('/users/me/permissions');
+      return response.data;
+    },
+    
     // 创建用户
     createUser: async (data: UserCreate): Promise<User> => {
       const response = await api.post('/users/', data);
@@ -203,6 +209,7 @@ export default {
     
     // 创建角色
     createRole: async (data: RoleCreate): Promise<Role> => {
+      console.log(data);
       const response = await api.post('/roles/', data);
       return response.data;
     },
@@ -357,37 +364,50 @@ export default {
     
     // 导出所有台账
     exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
-      // 记录请求参数
-      console.log('导出所有台账请求参数:', { format, templateId });
-      
       // 确保format参数是正确的值
       const safeFormat = format.toLowerCase();
       if (!['excel', 'csv', 'txt'].includes(safeFormat)) {
         throw new Error(`不支持的导出格式: ${format}，支持的格式：excel、csv、txt`);
       }
       
-      // 构建查询参数
-      const params = new URLSearchParams();
-      params.append('format', safeFormat);
-      
-      // 只有当templateId有效时才添加到请求
-      if (templateId !== undefined && templateId !== null && !isNaN(templateId)) {
-        params.append('template_id', templateId.toString());
-      }
-      
-      const url = `/ledgers/export-all?${params.toString()}`;
-      console.log('导出所有台账请求URL:', url);
-      
       try {
-        const response = await api.get(url, {
-          responseType: 'blob',
-          headers: {
-            'Accept': safeFormat === 'excel' ? 
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
-              safeFormat === 'csv' ? 
-                'text/csv' : 'text/plain'
+        // 构建基本URL
+        let url = `${API_BASE_URL}/ledgers/export-all?format=${encodeURIComponent(safeFormat)}`;
+        
+        // 只在有效的情况下添加模板ID
+        if (templateId !== undefined && templateId !== null) {
+          // 确保是数字
+          const numericTemplateId = Number(templateId);
+          if (!isNaN(numericTemplateId)) {
+            url += `&template_id=${numericTemplateId}`;
           }
+        }
+        
+        // 获取身份验证令牌
+        const token = localStorage.getItem('auth-storage')
+          ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
+          : null;
+        
+        // 设置请求头
+        const headers: Record<string, string> = {
+          'Accept': safeFormat === 'excel' ? 
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
+            safeFormat === 'csv' ? 'text/csv' : 'text/plain'
+        };
+        
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        // 直接使用axios发起请求
+        console.log('导出请求URL:', url);
+        console.log('导出请求头:', headers);
+        
+        const response = await axios.get(url, {
+          responseType: 'blob',
+          headers
         });
+        
         return response.data;
       } catch (error) {
         console.error('API调用失败:', error);
@@ -447,7 +467,7 @@ export default {
     
     // 处理审批
     processApproval: async (ledgerId: number, data: LedgerApproval): Promise<void> => {
-      await api.post(`/ledgers/${ledgerId}/approve`, data);
+      await api.post(`/approvals/ledgers/${ledgerId}/approve`, data);
     },
   },
   

@@ -20,7 +20,7 @@ class UserCreate(UserBase):
     username: str
     ehr_id: constr(min_length=7, max_length=7, pattern=r'^\d{7}$')
     password: str
-    role: Optional[str] = None
+    roles: Optional[List[str]] = None
     
     @validator('ehr_id')
     def ehr_id_must_be_7_digits(cls, v):

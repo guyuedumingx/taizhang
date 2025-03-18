@@ -1,48 +1,32 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from sqlalchemy.orm import Session
 
-from app import models, schemas
+from app import crud, models, schemas
 from app.api import deps
-from app.services.casbin_service import (
-    get_roles_for_user, 
-    get_permissions_for_role, 
-    add_role_for_user, 
-    remove_role_for_user,
-    add_permission_for_role,
-    remove_permission_for_role
-)
+from app.core.config import settings
+from app.models.role import Role
+from app.services.role.role_service import role_service
 
 router = APIRouter()
 
-
 @router.get("/", response_model=List[schemas.Role])
 def read_roles(
+    *,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
+    skip: int = 0,
+    limit: int = 100,
 ) -> Any:
     """
-    获取角色列表
+    检索角色列表
     """
-    # 检查权限
-    if not deps.check_permissions("role", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # 检查是否有权限
+    if not crud.user.has_permission(current_user, "role:view"):
+        raise HTTPException(status_code=403, detail="没有权限")
     
-    # 获取所有角色
-    roles = db.query(models.Role).all()
-    
-    # 获取每个角色的权限
-    for role in roles:
-        permissions = get_permissions_for_role(role.name)
-        # 转换权限格式
-        role.permissions = []
-        for p in permissions:
-            if len(p) >= 3:
-                role.permissions.append(f"{p[1]}:{p[2]}")
-    
-    return roles
-
+    return role_service.get_roles(db, skip=skip, limit=limit)
 
 @router.post("/", response_model=schemas.Role)
 def create_role(
@@ -54,290 +38,107 @@ def create_role(
     """
     创建新角色
     """
-    # 检查权限
-    if not deps.check_permissions("role", "create", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # 检查是否有权限
+    if not crud.user.has_permission(current_user, "role:create"):
+        raise HTTPException(status_code=403, detail="没有权限")
     
-    # 检查角色名称是否已存在
-    role = db.query(models.Role).filter(models.Role.name == role_in.name).first()
-    if role:
-        raise HTTPException(
-            status_code=400,
-            detail="角色名称已存在",
-        )
-    
-    # 创建角色
-    role = models.Role(
-        name=role_in.name,
-        description=role_in.description,
-    )
-    db.add(role)
-    db.commit()
-    db.refresh(role)
-    
-    # 添加权限
-    if role_in.permissions:
-        for permission in role_in.permissions:
-            resource, action = permission.split(":")
-            add_permission_for_role(role.name, resource, action)
-    
-    # 获取角色权限
-    permissions = get_permissions_for_role(role.name)
-    # 转换权限格式
-    role.permissions = []
-    for p in permissions:
-        if len(p) >= 3:
-            role.permissions.append(f"{p[1]}:{p[2]}")
-    
-    return role
-
+    return role_service.create_role(db, role_in=role_in)
 
 @router.get("/{role_id}", response_model=schemas.Role)
 def read_role(
-    role_id: int,
+    *,
     db: Session = Depends(deps.get_db),
+    role_id: int = Path(..., title="角色ID"),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     获取角色详情
     """
-    # 检查权限
-    if not deps.check_permissions("role", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # 检查是否有权限
+    if not crud.user.has_permission(current_user, "role:view"):
+        raise HTTPException(status_code=403, detail="没有权限")
     
-    role = db.query(models.Role).filter(models.Role.id == role_id).first()
-    if not role:
-        raise HTTPException(status_code=404, detail="角色不存在")
-    
-    # 获取角色权限
-    permissions = get_permissions_for_role(role.name)
-    # 转换权限格式
-    role.permissions = []
-    for p in permissions:
-        if len(p) >= 3:
-            role.permissions.append(f"{p[1]}:{p[2]}")
-    
-    return role
-
+    return role_service.get_role(db, role_id=role_id)
 
 @router.put("/{role_id}", response_model=schemas.Role)
 def update_role(
     *,
     db: Session = Depends(deps.get_db),
-    role_id: int,
+    role_id: int = Path(..., title="角色ID"),
     role_in: schemas.RoleUpdate,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    更新角色信息
+    更新角色
     """
-    # 检查权限
-    if not deps.check_permissions("role", "edit", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # 检查是否有权限
+    if not crud.user.has_permission(current_user, "role:edit"):
+        raise HTTPException(status_code=403, detail="没有权限")
     
-    role = db.query(models.Role).filter(models.Role.id == role_id).first()
-    if not role:
-        raise HTTPException(status_code=404, detail="角色不存在")
-    
-    # 如果更新角色名称，检查是否已存在
-    if role_in.name and role_in.name != role.name:
-        existing_role = db.query(models.Role).filter(models.Role.name == role_in.name).first()
-        if existing_role:
-            raise HTTPException(
-                status_code=400,
-                detail="角色名称已存在",
-            )
-    
-    # 保存原始角色名称，以防更新
-    original_role_name = role.name
-    
-    # 更新角色信息
-    update_data = role_in.dict(exclude_unset=True)
-    
-    # 处理权限更新
-    permissions_to_set = []
-    if "permissions" in update_data:
-        permissions_to_set = update_data.pop("permissions")
-        
-        # 获取当前权限
-        current_permissions = get_permissions_for_role(role.name)
-        current_permission_strs = []
-        
-        for p in current_permissions:
-            if len(p) >= 3:
-                current_permission_strs.append(f"{p[1]}:{p[2]}")
-        
-        # 添加新权限
-        for permission in permissions_to_set:
-            if permission not in current_permission_strs:
-                resource, action = permission.split(":")
-                add_permission_for_role(role.name, resource, action)
-        
-        # 删除移除的权限
-        for permission in current_permission_strs:
-            if permission not in permissions_to_set:
-                resource, action = permission.split(":")
-                remove_permission_for_role(role.name, resource, action)
-    
-    # 更新其他字段
-    for field, value in update_data.items():
-        setattr(role, field, value)
-    
-    db.add(role)
-    db.commit()
-    db.refresh(role)
-    
-    # 如果角色名称已更改，需要更新Casbin中的权限
-    if original_role_name != role.name and permissions_to_set:
-        # 为新角色名称添加权限
-        for permission in permissions_to_set:
-            resource, action = permission.split(":")
-            add_permission_for_role(role.name, resource, action)
-        
-        # 删除旧角色名称的权限
-        old_permissions = get_permissions_for_role(original_role_name)
-        for p in old_permissions:
-            if len(p) >= 3:
-                remove_permission_for_role(original_role_name, p[1], p[2])
-    
-    # 创建一个新的响应对象，包含角色信息和权限
-    response = {
-        "id": role.id,
-        "name": role.name,
-        "description": role.description,
-        "is_system": role.is_system,
-        "created_at": role.created_at,
-        "updated_at": role.updated_at,
-        "permissions": permissions_to_set if permissions_to_set else []
-    }
-    
-    return response
-
+    return role_service.update_role(db, role_id=role_id, role_in=role_in)
 
 @router.delete("/{role_id}", response_model=schemas.Role)
 def delete_role(
     *,
     db: Session = Depends(deps.get_db),
-    role_id: int,
+    role_id: int = Path(..., title="角色ID"),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     删除角色
     """
-    # 检查权限
-    if not deps.check_permissions("role", "delete", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # 检查是否有权限
+    if not crud.user.has_permission(current_user, "role:delete"):
+        raise HTTPException(status_code=403, detail="没有权限")
     
-    role = db.query(models.Role).filter(models.Role.id == role_id).first()
-    if not role:
-        raise HTTPException(status_code=404, detail="角色不存在")
-    
-    # 检查是否为系统角色
-    if role.name in ["admin", "user"]:
-        raise HTTPException(status_code=400, detail="不能删除系统角色")
-    
-    # 删除角色
-    db.delete(role)
-    db.commit()
-    
-    return role
+    return role_service.delete_role(db, role_id=role_id)
 
-
-@router.get("/user/{user_id}", response_model=List[str])
+@router.get("/user/{user_id}/roles", response_model=List[str])
 def read_user_roles(
-    user_id: int,
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    获取用户的角色
-    """
-    # 检查权限
-    if not deps.check_permissions("role", "view", current_user) and current_user.id != user_id:
-        raise HTTPException(status_code=403, detail="没有足够的权限")
-    
-    # 获取用户角色
-    roles = get_roles_for_user(str(user_id))
-    
-    return roles
-
-
-@router.post("/user/{user_id}/roles", response_model=List[str])
-def assign_role_to_user(
     *,
-    user_id: int,
-    role_name: str,
     db: Session = Depends(deps.get_db),
+    user_id: int = Path(..., title="用户ID"),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    为用户分配角色
+    获取用户的所有角色
     """
-    # 检查权限
-    if not deps.check_permissions("role", "assign", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # 检查是否有权限
+    if not (crud.user.has_permission(current_user, "user:view") or current_user.id == user_id):
+        raise HTTPException(status_code=403, detail="没有权限")
     
-    # 检查用户是否存在
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="用户不存在")
-    
-    # 检查角色是否存在
-    role = db.query(models.Role).filter(models.Role.name == role_name).first()
-    if not role:
-        raise HTTPException(status_code=404, detail="角色不存在")
-    
-    # 检查用户是否已有该角色
-    user_roles = get_roles_for_user(str(user_id))
-    if role_name in user_roles:
-        raise HTTPException(status_code=400, detail="用户已有该角色")
-    
-    # 分配角色
-    add_role_for_user(str(user_id), role_name)
-    
-    # 获取更新后的角色
-    updated_roles = get_roles_for_user(str(user_id))
-    
-    return updated_roles
+    return role_service.get_user_roles(db, user_id=user_id)
 
-
-@router.delete("/user/{user_id}/roles/{role_name}", response_model=List[str])
-def remove_role_from_user(
+@router.post("/user/{user_id}/roles/{role_name}", response_model=dict)
+def add_user_role(
     *,
-    user_id: int,
-    role_name: str,
     db: Session = Depends(deps.get_db),
+    user_id: int = Path(..., title="用户ID"),
+    role_name: str = Path(..., title="角色名称"),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    移除用户的角色
+    为用户添加角色
     """
-    # 检查权限
-    if not deps.check_permissions("role", "assign", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # 检查是否有权限
+    if not crud.user.has_permission(current_user, "user:edit"):
+        raise HTTPException(status_code=403, detail="没有权限")
     
-    # 检查用户是否存在
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="用户不存在")
+    return role_service.add_user_role(db, user_id=user_id, role_name=role_name)
+
+@router.delete("/user/{user_id}/roles/{role_name}", response_model=dict)
+def remove_user_role(
+    *,
+    db: Session = Depends(deps.get_db),
+    user_id: int = Path(..., title="用户ID"),
+    role_name: str = Path(..., title="角色名称"),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    删除用户的角色
+    """
+    # 检查是否有权限
+    if not crud.user.has_permission(current_user, "user:edit"):
+        raise HTTPException(status_code=403, detail="没有权限")
     
-    # 检查角色是否存在
-    role = db.query(models.Role).filter(models.Role.name == role_name).first()
-    if not role:
-        raise HTTPException(status_code=404, detail="角色不存在")
-    
-    # 检查是否为系统角色
-    if role_name == "user" and not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="不能移除基本用户角色")
-    
-    # 检查用户是否有该角色
-    user_roles = get_roles_for_user(str(user_id))
-    if role_name not in user_roles:
-        raise HTTPException(status_code=400, detail="用户没有该角色")
-    
-    # 移除角色
-    remove_role_for_user(str(user_id), role_name)
-    
-    # 获取更新后的角色
-    updated_roles = get_roles_for_user(str(user_id))
-    
-    return updated_roles 
+    return role_service.remove_user_role(db, user_id=user_id, role_name=role_name) 

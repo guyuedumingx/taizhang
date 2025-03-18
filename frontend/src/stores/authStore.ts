@@ -7,8 +7,9 @@ interface User {
   id: number;
   username: string;
   name: string;
-  role: string;
-  permissions: string[];
+  // role: string;
+  roles: string[] | null;
+  permissions: string[] | null;
   teamId?: number;
 }
 
@@ -22,6 +23,7 @@ interface AuthState {
   hasPermission: (permission: string) => boolean;
   checkPasswordExpired: () => Promise<boolean>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
+  updatePermissions: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -58,9 +60,10 @@ export const useAuthStore = create<AuthState>()(
               id: data.user_id,
               username: data.username,
               name: data.name,
-              role: data.roles[0] || 'user',
+              // role: data.roles[0] || 'user',
+              roles: data.roles,
               permissions: data.permissions || [],
-              teamId: data.teamId,
+              teamId: data.team_id,
             },
             token: data.access_token,
             isAuthenticated: true,
@@ -95,10 +98,10 @@ export const useAuthStore = create<AuthState>()(
         if (!user) return false;
         
         // 超级管理员拥有所有权限
-        if (user.role === 'admin') return true;
+        if (user.roles?.includes('admin')) return true;
         
         // 检查用户权限列表
-        return user.permissions.includes(permission) || user.permissions.includes('*:*');
+        return user.permissions?.includes(permission) || user.permissions?.includes('*:*') || false;
       },
       
       checkPasswordExpired: async () => {
@@ -126,6 +129,22 @@ export const useAuthStore = create<AuthState>()(
           console.error('修改密码失败:', error);
           message.error('修改密码失败: ' + (error as Error).message);
           return false;
+        }
+      },
+      
+      updatePermissions: async () => {
+        if (!get().token) return;
+        
+        try {
+          const permissions = await api.users.getUserPermissions();
+          set(state => ({
+            user: state.user ? {
+              ...state.user,
+              permissions: permissions
+            } : null
+          }));
+        } catch (error) {
+          console.error('获取权限失败:', error);
         }
       },
     }),

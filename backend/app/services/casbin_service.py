@@ -1,74 +1,65 @@
-import casbin
 import os
+import casbin
 from app.core.config import settings
 
-# 创建Casbin执行器，使用文件适配器代替SQLAlchemy适配器
-# 使用绝对路径
-base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-model_path = os.path.join(base_dir, settings.CASBIN_MODEL_PATH)
-policy_path = os.path.join(os.path.dirname(model_path), "policy.csv")
+def get_enforcer():
+    """获取Casbin enforcer实例"""
+    model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "core", "rbac_model.conf")
+    
+    # 使用SQLite适配器
+    from casbin_sqlalchemy_adapter import Adapter
+    from sqlalchemy import create_engine
+    
+    # 获取数据库URL
+    database_url = settings.SQLALCHEMY_DATABASE_URI
+    
+    # 创建SQLAlchemy适配器
+    adapter = Adapter(create_engine(database_url))
+    
+    # 创建并返回enforcer
+    return casbin.Enforcer(model_path, adapter)
 
-# 确保策略文件存在
-if not os.path.exists(policy_path):
-    with open(policy_path, "w") as f:
-        f.write("")  # 创建空文件
+# 获取enforcer单例
+_enforcer = None
 
-# 创建Casbin执行器
-enforcer = casbin.Enforcer(model_path, policy_path)
+def get_enforcer_instance():
+    """获取enforcer单例"""
+    global _enforcer
+    if _enforcer is None:
+        _enforcer = get_enforcer()
+    return _enforcer
 
-# 添加角色和权限
 def add_permission_for_role(role: str, resource: str, action: str) -> bool:
-    """
-    为角色添加权限
-    """
-    result = enforcer.add_policy(role, resource, action)
-    enforcer.save_policy()
-    return result
+    """为角色添加权限"""
+    e = get_enforcer_instance()
+    return e.add_policy(role, resource, action)
 
-# 删除角色的权限
 def remove_permission_for_role(role: str, resource: str, action: str) -> bool:
-    """
-    删除角色的权限
-    """
-    result = enforcer.remove_policy(role, resource, action)
-    enforcer.save_policy()
-    return result
+    """移除角色的权限"""
+    e = get_enforcer_instance()
+    return e.remove_policy(role, resource, action)
 
-# 为用户分配角色
 def add_role_for_user(user_id: str, role: str) -> bool:
-    """
-    为用户分配角色
-    """
-    result = enforcer.add_grouping_policy(user_id, role)
-    enforcer.save_policy()
-    return result
+    """为用户添加角色"""
+    e = get_enforcer_instance()
+    return e.add_grouping_policy(str(user_id), role)
 
-# 删除用户的角色
 def remove_role_for_user(user_id: str, role: str) -> bool:
-    """
-    删除用户的角色
-    """
-    result = enforcer.remove_grouping_policy(user_id, role)
-    enforcer.save_policy()
-    return result
+    """移除用户的角色"""
+    e = get_enforcer_instance()
+    return e.remove_grouping_policy(str(user_id), role)
 
-# 获取用户的所有角色
 def get_roles_for_user(user_id: str) -> list:
-    """
-    获取用户的所有角色
-    """
-    return enforcer.get_roles_for_user(user_id)
+    """获取用户的所有角色"""
+    e = get_enforcer_instance()
+    return e.get_roles_for_user(str(user_id))
 
-# 获取角色的所有权限
 def get_permissions_for_role(role: str) -> list:
-    """
-    获取角色的所有权限
-    """
-    return enforcer.get_permissions_for_user(role)
+    """获取角色的所有权限"""
+    e = get_enforcer_instance()
+    return e.get_permissions_for_user(role)
 
-# 检查用户是否有权限
 def check_permission(user_id: str, resource: str, action: str) -> bool:
-    """
-    检查用户是否有权限
-    """
-    return enforcer.enforce(user_id, resource, action) 
+    """检查用户是否有特定权限"""
+    e = get_enforcer_instance()
+    return e.enforce(str(user_id), resource, action) 

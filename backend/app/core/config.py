@@ -23,12 +23,14 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str = "台账管理系统"
-    
+    BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    print(BASE_DIR)
     # 数据库配置
     DATABASE_TYPE: str = os.getenv("DATABASE_TYPE", "sqlite")  # sqlite 或 oracle
     
     # SQLite配置
-    SQLITE_DATABASE_URI: str = "sqlite:///./taizhang.db"
+    SQLITE_DATABASE_URI: str = f"sqlite:///{BASE_DIR}/../taizhang.db?check_same_thread=False"
+    print(SQLITE_DATABASE_URI)
     
     # Oracle配置
     ORACLE_USER: Optional[str] = os.getenv("ORACLE_USER")

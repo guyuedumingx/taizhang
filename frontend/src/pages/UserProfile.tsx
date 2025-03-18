@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Typography, Descriptions, Avatar, Button, Form, Input, Select, message, Divider, Spin } from 'antd';
-import { UserOutlined, EditOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
+import { UserOutlined, EditOutlined, SaveOutlined, CloseOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { UserService } from '../services/UserService';
@@ -14,10 +14,11 @@ const UserProfile: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [editing, setEditing] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
+  const [refreshingPermissions, setRefreshingPermissions] = useState<boolean>(false);
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { user, updatePermissions } = useAuthStore();
 
   useEffect(() => {
     fetchUserDetails();
@@ -86,6 +87,19 @@ const UserProfile: React.FC = () => {
   const handlePasswordChange = () => {
     // 可以在此添加修改密码的弹窗或跳转到修改密码页面
     message.info('密码修改功能即将推出');
+  };
+
+  const handleRefreshPermissions = async () => {
+    setRefreshingPermissions(true);
+    try {
+      await updatePermissions();
+      message.success('权限刷新成功');
+    } catch (error) {
+      console.error('刷新权限失败:', error);
+      message.error('刷新权限失败');
+    } finally {
+      setRefreshingPermissions(false);
+    }
   };
 
   if (loading) {
@@ -243,6 +257,25 @@ const UserProfile: React.FC = () => {
             )}
             
             <Divider />
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Title level={4}>权限管理</Title>
+              <Button 
+                icon={<ReloadOutlined />} 
+                loading={refreshingPermissions}
+                onClick={handleRefreshPermissions}
+              >
+                刷新权限
+              </Button>
+            </div>
+            
+            {user?.permissions && (
+              <Descriptions column={1} bordered style={{ marginTop: 16 }}>
+                <Descriptions.Item label="当前拥有权限">
+                  {user.permissions.join(', ')}
+                </Descriptions.Item>
+              </Descriptions>
+            )}
             
             <div>
               <Button onClick={handlePasswordChange}>修改密码</Button>

@@ -26,13 +26,14 @@ import {
   EyeOutlined,
   FilterOutlined,
   ClearOutlined,
+  DownOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TemplateService } from '../../services/TemplateService';
 import { LedgerService } from '../../services/LedgerService';
 import { Ledger, Template, Field } from '../../types';
 import { useAuthStore } from '../../stores/authStore';
-import { PERMISSIONS } from '../../config';
+import { PERMISSIONS, API_BASE_URL } from '../../config';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -153,93 +154,118 @@ const TemplateLedgerSummary: React.FC = () => {
 
   // 处理导出
   const handleExport = async (format: string) => {
-    if (!templateId) return;
+    if (!templateId) {
+      message.error('模板ID不能为空');
+      return;
+    }
     
     setExportLoading(true);
+    message.loading({ content: '正在准备导出...', key: 'export' });
+    
     try {
-      message.loading({ content: '正在导出...', key: 'export' });
-      
-      // 确保templateId是数字类型
-      const templateIdNum = parseInt(templateId, 10);
-      if (isNaN(templateIdNum)) {
-        message.error({ content: '模板ID无效', key: 'export' });
+      // 确保模板ID是有效整数
+      const templateIdNumber = parseInt(templateId, 10);
+      if (isNaN(templateIdNumber)) {
+        message.error('模板ID必须是有效整数');
+        setExportLoading(false);
         return;
       }
       
-      // 打印请求参数以便调试
-      console.log('导出请求参数:', {
-        format,
-        templateId: templateIdNum
+      // 构建下载URL（确保使用正确的API路径和整数模板ID）
+      const exportFormat = format.toLowerCase();
+      const downloadUrl = `${API_BASE_URL}/ledgers/export-all?format=${encodeURIComponent(exportFormat)}&template_id=${templateIdNumber}`;
+      console.log('导出URL:', downloadUrl);
+      
+      // 获取认证token
+      const token = localStorage.getItem('auth-storage')
+        ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
+        : null;
+      
+      if (!token) {
+        message.error({ content: '未登录或会话已过期，请重新登录', key: 'export' });
+        return;
+      }
+      
+      // 输出调试信息
+      console.log('开始导出请求，URL:', downloadUrl);
+      console.log('模板ID (原始):', templateId);
+      console.log('模板ID (转换后):', templateIdNumber, '类型:', typeof templateIdNumber);
+      console.log('导出格式:', exportFormat);
+      
+      // 使用fetch API手动下载
+      const response = await fetch(downloadUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': exportFormat === 'excel' ? 
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
+            exportFormat === 'csv' ? 'text/csv' : 'text/plain'
+        }
       });
       
-      const blob = await LedgerService.exportAllLedgers(format, templateIdNum);
+      // 增加更多调试信息
+      console.log('服务器响应状态:', response.status, response.statusText);
+      console.log('响应头:', [...response.headers.entries()].reduce((obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+      }, {} as Record<string, string>));
       
-      // 检查服务器返回的内容类型
-      if (blob.type.includes('json')) {
-        // 如果返回的是JSON（可能是错误信息），转换成文本并显示
-        const text = await blob.text();
-        console.log('服务器返回JSON:', text);
-        try {
-          const response = JSON.parse(text);
-          message.error({ content: response.detail || '导出失败', key: 'export' });
-        } catch (parseError) {
-          console.error('解析错误响应失败:', parseError);
-          message.error({ content: '导出失败: ' + text, key: 'export' });
-        }
-        return;
-      }
-      
-      // 根据格式确定文件扩展名
-      let fileExtension = format;
-      if (format.toLowerCase() === 'excel') {
-        fileExtension = 'xlsx';
-      }
-      
-      // 创建下载链接
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const filename = `${template?.name || '模板'}_台账汇总.${fileExtension}`;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      message.success({ content: '导出成功', key: 'export' });
-    } catch (error: unknown) {
-      console.error('导出台账失败:', error);
-      
-      // 尝试提取并显示更详细的错误信息
-      let errorMessage = '导出台账失败，请重试';
-      
-      // 检查是否为Axios错误
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { 
-          response?: { 
-            status?: number; 
-            data?: unknown 
-          } 
-        };
+      if (!response.ok) {
+        console.error('导出失败，服务器响应:', response.status, response.statusText);
         
-        if (axiosError.response) {
-          console.log('错误响应状态:', axiosError.response.status);
-          console.log('错误响应数据:', axiosError.response.data);
-          
-          if (axiosError.response.data) {
-            if (typeof axiosError.response.data === 'string') {
-              errorMessage = axiosError.response.data;
-            } else if (typeof axiosError.response.data === 'object' && 
-                       axiosError.response.data !== null &&
-                       'detail' in axiosError.response.data &&
-                       typeof axiosError.response.data.detail === 'string') {
-              errorMessage = axiosError.response.data.detail;
-            }
-          }
+        if (response.status === 422) {
+          throw new Error('参数错误，请检查模板ID是否有效');
+        } else if (response.status === 404) {
+          throw new Error('导出接口不存在，请检查API路径配置是否正确');
+        } else if (response.status === 403) {
+          throw new Error('没有导出权限，请联系管理员');
+        }
+        
+        const text = await response.text();
+        console.log('错误响应内容:', text);
+        
+        try {
+          const data = JSON.parse(text);
+          throw new Error(data.detail || `导出失败: ${response.statusText}`);
+        } catch {
+          throw new Error(`导出失败: ${response.statusText || '未知错误'}`);
         }
       }
       
-      message.error({ content: errorMessage, key: 'export' });
+      const contentType = response.headers.get('content-type');
+      console.log('响应内容类型:', contentType);
+      
+      // 判断是否为二进制文件
+      if (contentType && (
+        contentType.includes('spreadsheet') || 
+        contentType.includes('csv') || 
+        contentType.includes('text/plain') ||
+        contentType.includes('octet-stream')
+      )) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const extension = exportFormat === 'excel' ? 'xlsx' : exportFormat;
+        const filename = `${template?.name || '模板'}_台账汇总.${extension}`;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        message.success({ content: '导出成功', key: 'export' });
+      } else {
+        // 如果不是预期的内容类型，可能是错误响应
+        const text = await response.text();
+        console.error('非预期响应内容:', text);
+        throw new Error('导出失败: 服务器返回了非预期的内容类型');
+      }
+    } catch (error) {
+      console.error('导出失败:', error);
+      message.error({ 
+        content: error instanceof Error ? error.message : '导出失败，请稍后再试', 
+        key: 'export' 
+      });
     } finally {
       setExportLoading(false);
     }
@@ -672,9 +698,9 @@ const TemplateLedgerSummary: React.FC = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <Title level={4}>{template?.name || '模板'} - 台账汇总</Title>
-        <Dropdown menu={{ items }} disabled={loading || ledgers.length === 0}>
+        <Dropdown menu={{ items }} trigger={['click']} disabled={loading || ledgers.length === 0}>
           <Button type="primary" icon={<DownloadOutlined />} loading={exportLoading}>
-            导出台账
+            导出台账 <DownOutlined />
           </Button>
         </Dropdown>
       </div>

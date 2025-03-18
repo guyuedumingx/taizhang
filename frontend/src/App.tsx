@@ -14,7 +14,7 @@ import TemplateList from './pages/template/TemplateList';
 import TemplateForm from './pages/template/TemplateForm';
 import TemplateDetail from './pages/template/TemplateDetail';
 import TemplateLedgerSummary from './pages/template/TemplateLedgerSummary';
-import UserManagementFixed from './pages/admin/UserManagementFixed';
+import UserManagement from './pages/admin/UserManagement';
 import RoleManagement from './pages/admin/RoleManagement';
 import PermissionManagement from './pages/admin/PermissionManagement';
 import TeamManagement from './pages/admin/TeamManagement';
@@ -110,7 +110,7 @@ function App() {
               <Route path="workflow/:id" element={<WorkflowDetail />} />
               <Route path="approval/tasks" element={<TaskList />} />
               <Route path="logs" element={<LogList />} />
-              <Route path="admin/users" element={<UserManagementFixed />} />
+              <Route path="admin/users" element={<UserManagement />} />
               <Route path="admin/roles" element={<RoleManagement />} />
               <Route path="admin/permissions" element={<PermissionManagement />} />
               <Route path="admin/teams" element={<TeamManagement />} />

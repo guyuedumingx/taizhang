@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app import crud, models, schemas
 from app.utils.logger import LoggerService
+from app.services.workflow.workflow_node_service import workflow_node_service
 
 # 工作流节点路由器 - 只保留审批人相关API
 router = APIRouter()
@@ -23,20 +24,7 @@ def get_workflow_node(
     if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
         raise HTTPException(status_code=403, detail="权限不足")
     
-    node = crud.workflow_node.get(db, id=node_id)
-    if not node:
-        raise HTTPException(status_code=404, detail="工作流节点不存在")
-    
-    # 获取审批人信息
-    approvers = crud.workflow_node.get_node_approvers(db, node_id=node.id)
-    node.approvers = approvers
-    
-    if node.approver_user_id:
-        user = db.query(models.User).filter(models.User.id == node.approver_user_id).first()
-        if user:
-            node.approver_user_name = user.name
-    
-    return node
+    return workflow_node_service.get_workflow_node(db, node_id=node_id)
 
 @router.get("/{node_id}/approvers", response_model=List[schemas.User])
 def get_node_approvers(
@@ -52,13 +40,7 @@ def get_node_approvers(
     if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
         raise HTTPException(status_code=403, detail="权限不足")
     
-    # 检查节点是否存在
-    node = crud.workflow_node.get(db, id=node_id)
-    if not node:
-        raise HTTPException(status_code=404, detail="工作流节点不存在")
-    
-    approvers = crud.workflow_node.get_node_approvers(db, node_id=node_id)
-    return approvers
+    return workflow_node_service.get_node_approvers(db, node_id=node_id)
 
 @router.post("/{node_id}/approvers", response_model=schemas.WorkflowNode)
 def add_node_approvers(
@@ -75,29 +57,7 @@ def add_node_approvers(
     if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
         raise HTTPException(status_code=403, detail="权限不足")
     
-    # 检查节点是否存在
-    node = crud.workflow_node.get(db, id=node_id)
-    if not node:
-        raise HTTPException(status_code=404, detail="工作流节点不存在")
-    
-    # 检查用户是否存在
-    user = crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="用户不存在")
-    
-    # 检查用户是否已经是审批人
-    current_approvers = node.approvers
-    current_approver_ids = [user.id for user in current_approvers]
-    
-    if user_id in current_approver_ids:
-        raise HTTPException(status_code=400, detail="该用户已经是审批人")
-    
-    # 添加审批人
-    node.approvers.append(user)
-    db.commit()
-    db.refresh(node)
-    
-    return node
+    return workflow_node_service.add_node_approver(db, node_id=node_id, user_id=user_id)
 
 @router.delete("/{node_id}/approvers", response_model=schemas.WorkflowNode)
 def remove_node_approvers(
@@ -114,21 +74,7 @@ def remove_node_approvers(
     if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
         raise HTTPException(status_code=403, detail="权限不足")
     
-    # 检查节点是否存在
-    node = crud.workflow_node.get(db, id=node_id)
-    if not node:
-        raise HTTPException(status_code=404, detail="工作流节点不存在")
-    
-    # 检查用户是否存在
-    user = crud.user.get(db, id=user_id)
-    if user and user in node.approvers:
-        node.approvers.remove(user)
-        db.commit()
-        db.refresh(node)
-    else:
-        raise HTTPException(status_code=404, detail="该用户不是审批人")
-    
-    return node
+    return workflow_node_service.remove_node_approver(db, node_id=node_id, user_id=user_id)
 
 @router.put("/{node_id}/approvers", response_model=schemas.WorkflowNode)
 def update_node_approvers(
@@ -145,21 +91,4 @@ def update_node_approvers(
     if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
         raise HTTPException(status_code=403, detail="权限不足")
     
-    # 检查节点是否存在
-    node = crud.workflow_node.get(db, id=node_id)
-    if not node:
-        raise HTTPException(status_code=404, detail="工作流节点不存在")
-    
-    # 清空现有审批人
-    node.approvers = []
-    
-    # 添加新的审批人
-    for user_id in user_ids:
-        user = crud.user.get(db, id=user_id)
-        if user:
-            node.approvers.append(user)
-    
-    db.commit()
-    db.refresh(node)
-    
-    return node 
+    return workflow_node_service.update_node_approvers(db, node_id=node_id, user_ids=user_ids) 

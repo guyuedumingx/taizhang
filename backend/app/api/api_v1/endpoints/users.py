@@ -9,7 +9,7 @@ from datetime import datetime
 from app import models, schemas
 from app.api import deps
 from app.core.security import get_password_hash
-from app.services.casbin_service import add_role_for_user, remove_role_for_user, get_roles_for_user
+from app.services.casbin_service import add_role_for_user, remove_role_for_user, get_roles_for_user, get_permissions_for_role
 
 router = APIRouter()
 
@@ -322,4 +322,32 @@ def import_users(
             status_code=500, detail=f"导入用户时发生错误: {str(e)}"
         )
     finally:
-        file.file.close() 
+        file.file.close()
+
+
+@router.get("/me/permissions", response_model=List[str])
+def read_user_permissions(
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    获取当前用户的权限列表
+    """
+    # 如果是超级管理员，拥有所有权限
+    if current_user.is_superuser:
+        return ["*:*"]
+    
+    # 获取用户角色
+    roles = get_roles_for_user(str(current_user.id))
+    
+    # 获取所有角色的权限
+    permissions = []
+    for role in roles:
+        role_permissions = get_permissions_for_role(role)
+        for p in role_permissions:
+            # p格式为 [role, resource, action]
+            if len(p) >= 3:
+                permission = f"{p[1]}:{p[2]}"
+                if permission not in permissions:
+                    permissions.append(permission)
+    
+    return permissions 

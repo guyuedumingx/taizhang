@@ -74,7 +74,6 @@ const AppLayout: React.FC = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider 
-        collapsible 
         collapsed={collapsed} 
         onCollapse={setCollapsed}
         style={{

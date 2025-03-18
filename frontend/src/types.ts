@@ -1,46 +1,49 @@
 // 用户类型
 export interface User {
   id: number;
-  username: string;
-  ehr_id: string;
-  name: string;
-  department: string;
-  is_active: boolean;
+  username: string | null;
+  ehr_id: string | null;
+  name: string | null;
+  department: string | null;
+  is_active: boolean | null;
   is_superuser: boolean;
   team_id: number | null;
-  team_name?: string;
-  roles: string[];
+  roles: string[] | null;
+  password_expired?: boolean | null;
 }
 
 export interface UserCreate {
   username: string;
   ehr_id: string;
   password: string;
-  name: string;
-  department: string;
-  is_active?: boolean;
+  name: string | null;
+  department: string | null;
+  is_active?: boolean | null;
   is_superuser?: boolean;
   team_id?: number | null;
+  role?: string | null;
 }
 
 export interface UserUpdate {
-  username?: string;
-  ehr_id?: string;
-  password?: string;
-  name?: string;
-  department?: string;
-  is_active?: boolean;
+  username?: string | null;
+  ehr_id?: string | null;
+  password?: string | null;
+  name?: string | null;
+  department?: string | null;
+  is_active?: boolean | null;
   is_superuser?: boolean;
   team_id?: number | null;
+  role?: string | null;
 }
 
 // 团队类型
 export interface Team {
   id: number;
-  name: string;
-  description: string;
-  created_at: string;
-  updated_at: string | null;
+  name: string | null;
+  description: string | null;
+  leader_id: number | null;
+  leader_name: string | null;
+  member_count: number;
 }
 
 export interface TeamCreate {
@@ -198,8 +201,8 @@ export interface Ledger {
 export interface LedgerCreate {
   name: string;
   description?: string;
+  template_id: number;
   team_id?: number | null;
-  template_id?: number | null;
   workflow_id?: number | null;
   data?: Record<string, unknown>;
 }
@@ -217,13 +220,13 @@ export interface LedgerUpdate {
 export interface LedgerSubmit {
   workflow_id?: number;
   comment?: string;
+  next_approver_id?: number;
 }
 
 export interface LedgerApproval {
   action: string;
   comment?: string;
   next_approver_id?: number;
-  approved?: boolean;
 }
 
 // 工作流类型
@@ -238,11 +241,11 @@ export interface WorkflowNode {
   order_index: number;
   is_final: boolean;
   reject_to_node_id: number | null;
-  multi_approve_type: string;  // 'any' - 任一审批, 'all' - 所有人审批
-  need_select_next_approver: boolean;  // 是否需要选择下一审批人
+  multi_approve_type: string;
+  need_select_next_approver: boolean;
   created_at: string;
   updated_at: string | null;
-  approvers?: User[];  // 包含id, name的审批人列表
+  approvers?: Array<{id: number; name: string}>;
   approver_role_name?: string;
   approver_user_name?: string;
 }
@@ -257,19 +260,23 @@ export interface WorkflowNodeCreate {
   order_index: number;
   is_final?: boolean;
   reject_to_node_id?: number | null;
-  multi_approve_type?: string;  // 'any' - 任一审批, 'all' - 所有人审批
-  need_select_next_approver?: boolean;  // 是否需要选择下一审批人
-  approver_ids?: number[];  // 多个审批人ID
+  multi_approve_type?: string;
+  need_select_next_approver?: boolean;
+  approver_ids?: number[];
 }
 
 export interface WorkflowNodeUpdate {
   name?: string;
   description?: string;
+  node_type?: string;
   approver_role_id?: number | null;
   approver_user_id?: number | null;
   order_index?: number;
   is_final?: boolean;
   reject_to_node_id?: number | null;
+  multi_approve_type?: string;
+  need_select_next_approver?: boolean;
+  approver_ids?: number[];
 }
 
 export interface Workflow {
@@ -278,10 +285,12 @@ export interface Workflow {
   description: string;
   template_id: number;
   is_active: boolean;
+  created_by: number;
   created_at: string;
   updated_at: string | null;
   nodes: WorkflowNode[];
   template_name?: string;
+  creator_name?: string;
 }
 
 export interface WorkflowCreate {
@@ -296,6 +305,7 @@ export interface WorkflowUpdate {
   name?: string;
   description?: string;
   is_active?: boolean;
+  nodes?: WorkflowNodeCreate[];
 }
 
 export interface WorkflowInstanceNode {
@@ -308,6 +318,16 @@ export interface WorkflowInstanceNode {
   created_at: string;
   updated_at: string | null;
   completed_at: string | null;
+  approver_name?: string;
+  node_name?: string;
+  node_type?: string;
+  approver_actions?: Array<{
+    user_id: number;
+    user_name?: string;
+    action: string;
+    comment?: string;
+    timestamp?: string;
+  }>;
 }
 
 export interface WorkflowInstance {
@@ -321,6 +341,11 @@ export interface WorkflowInstance {
   updated_at: string | null;
   completed_at: string | null;
   nodes: WorkflowInstanceNode[];
+  workflow_name?: string;
+  ledger_name?: string;
+  creator_name?: string;
+  current_node_name?: string;
+  current_node?: WorkflowInstanceNode;
 }
 
 // 日志类型

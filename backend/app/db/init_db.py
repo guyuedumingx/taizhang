@@ -1,10 +1,11 @@
 import logging
 from sqlalchemy.orm import Session
 
-from app import models
+from app import models, crud, schemas
 from app.core.config import settings
 from app.core.security import get_password_hash
-from app.services.casbin_service import add_role_for_user, add_permission_for_role
+from app.services.casbin_service import add_role_for_user, add_permission_for_role, get_enforcer_instance
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -107,11 +108,65 @@ def init_admin_user(db: Session):
 
 # 初始化数据库
 def init_db(db: Session) -> None:
-    # 初始化角色
-    init_roles(db)
+    """
+    初始化数据库
+    创建第一个超级用户
+    """
+    # Casbin 规则表初始化
+    init_casbin_rules(db)
     
-    # 初始化权限
-    init_permissions()
+    # 超级管理员角色
+    create_admin_role(db)
     
-    # 初始化管理员用户
-    init_admin_user(db) 
+    # 创建超级用户
+    if settings.FIRST_SUPERUSER:
+        user = crud.user.get_by_username(db, username=settings.FIRST_SUPERUSER)
+        if not user:
+            user_in = schemas.UserCreate(
+                username=settings.FIRST_SUPERUSER,
+                password=settings.FIRST_SUPERUSER_PASSWORD,
+                is_superuser=True,
+                ehr_id="admin",
+                name="超级管理员",
+                department="系统",
+            )
+            user = crud.user.create(db, obj_in=user_in)
+            logger.info(f"已创建超级用户: {settings.FIRST_SUPERUSER}")
+            
+            # 添加超级管理员角色
+            admin_role = crud.role.get_by_name(db, name="admin")
+            if admin_role:
+                # 为超级用户添加超级管理员角色
+                e = get_enforcer_instance()
+                e.add_grouping_policy(str(user.id), "admin")
+                logger.info(f"已为超级用户 {user.username} 分配超级管理员角色")
+        else:
+            logger.info(f"超级用户已存在: {settings.FIRST_SUPERUSER}")
+    else:
+        logger.warning("未设置超级用户，跳过初始化超级用户")
+
+def create_admin_role(db: Session) -> None:
+    """创建超级管理员角色"""
+    # 检查是否已存在
+    admin_role = crud.role.get_by_name(db, name="admin")
+    if not admin_role:
+        # 创建超级管理员角色
+        role_in = schemas.RoleCreate(
+            name="admin",
+            description="超级管理员",
+        )
+        admin_role = crud.role.create(db, obj_in=role_in)
+        logger.info("已创建超级管理员角色")
+        
+        # 将所有系统权限添加到超级管理员角色
+        e = get_enforcer_instance()
+        e.add_policy("admin", "*", "*")
+        logger.info("已为超级管理员角色添加所有权限")
+    else:
+        logger.info("超级管理员角色已存在")
+
+def init_casbin_rules(db: Session) -> None:
+    """初始化 Casbin 规则表"""
+    # 获取 enforcer 实例来触发表创建
+    e = get_enforcer_instance()
+    logger.info("已初始化 Casbin 规则表") 
