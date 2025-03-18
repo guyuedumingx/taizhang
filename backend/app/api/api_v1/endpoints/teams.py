@@ -37,7 +37,7 @@ def create_team(
     if not deps.check_permissions("team", "create", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    return team_service.create_team(db, team_in=team_in)
+    return team_service.create_team(db, team_in=team_in, current_user_id=current_user.id)
 
 
 @router.get("/{team_id}", response_model=schemas.Team)
@@ -67,7 +67,7 @@ def update_team(
     if not deps.check_permissions("team", "edit", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    return team_service.update_team(db, team_id=team_id, team_in=team_in)
+    return team_service.update_team(db, team_id=team_id, team_in=team_in, current_user_id=current_user.id)
 
 
 @router.delete("/{team_id}", response_model=schemas.Team)
@@ -82,7 +82,7 @@ def delete_team(
     if not deps.check_permissions("team", "delete", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    return team_service.delete_team(db, team_id=team_id)
+    return team_service.delete_team(db, team_id=team_id, current_user_id=current_user.id)
 
 
 @router.get("/{team_id}/members")
@@ -96,4 +96,36 @@ def read_team_members(
     if not deps.check_permissions("team", "view", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    return team_service.get_team_members(db, team_id=team_id) 
+    return team_service.get_team_members(db, team_id=team_id)
+
+
+@router.post("/{team_id}/members/{user_id}", response_model=schemas.Team)
+def add_user_to_team(
+    *,
+    db: Session = Depends(deps.get_db),
+    team_id: int,
+    user_id: int,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """添加用户到团队"""
+    # 检查权限
+    if not deps.check_permissions("team", "edit", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    return team_service.add_user_to_team(db, team_id=team_id, user_id=user_id, current_user_id=current_user.id)
+
+
+@router.delete("/{team_id}/members/{user_id}", response_model=schemas.Team)
+def remove_user_from_team(
+    *,
+    db: Session = Depends(deps.get_db),
+    team_id: int,
+    user_id: int,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """从团队中移除用户"""
+    # 检查权限
+    if not deps.check_permissions("team", "edit", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    return team_service.remove_user_from_team(db, team_id=team_id, user_id=user_id, current_user_id=current_user.id) 
