@@ -402,14 +402,30 @@ export interface LoginResponse {
   name: string;
   roles: string[];
   permissions: string[];
-  teamId: number | null;
+  team_id: number | null;
   password_expired: boolean;
 }
 
 export interface RegisterRequest {
   username: string;
-  ehr_id: string;
   password: string;
+  ehr_id: string;
   name: string;
   department: string;
+}
+
+// 分页相关类型
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
+}
+
+// API响应类型
+export interface ApiResponse<T> {
+  code: number;
+  message: string;
+  data: T;
 } 

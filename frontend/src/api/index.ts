@@ -17,6 +17,34 @@ import {
 // 定义查询参数类型
 type QueryParams = Record<string, string | number | boolean | undefined>;
 
+// 创建一个内存存储，用于测试环境
+const tokenStorage = {
+  token: null as string | null,
+  setToken(token: string | null) {
+    this.token = token;
+    if (typeof localStorage !== 'undefined') {
+      if (token) {
+        localStorage.setItem('auth-storage', JSON.stringify({ state: { token } }));
+      } else {
+        localStorage.removeItem('auth-storage');
+      }
+    }
+  },
+  getToken() {
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem('auth-storage');
+      return stored ? JSON.parse(stored).state?.token : null;
+    }
+    return this.token;
+  },
+  clear() {
+    this.token = null;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('auth-storage');
+    }
+  }
+};
+
 const api = axios.create({
   baseURL: API_BASE_URL,
 });
@@ -24,10 +52,7 @@ const api = axios.create({
 // 请求拦截器，添加token到请求头
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth-storage')
-      ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
-      : null;
-    
+    const token = tokenStorage.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -46,8 +71,10 @@ api.interceptors.response.use(
   (error) => {
     // 处理401错误，清除token并跳转到登录页
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('auth-storage');
-      window.location.href = '/login';
+      tokenStorage.clear();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -71,16 +98,27 @@ export default {
   auth: {
     // 登录
     login: async (username: string, password: string): Promise<LoginResponse> => {
-      const response = await api.post('/auth/login', new URLSearchParams({
-        username,
-        password
-      }));
+      const formData = new URLSearchParams();
+      formData.append('username', username);
+      formData.append('password', password);
+      
+      const response = await api.post<LoginResponse>('/auth/login', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+      
+      // 保存token
+      if (response.data.access_token) {
+        tokenStorage.setToken(response.data.access_token);
+      }
+      
       return response.data;
     },
     
     // 注册
     register: async (data: RegisterRequest): Promise<User> => {
-      const response = await api.post('/auth/register', data);
+      const response = await api.post<User>('/auth/register', data);
       return response.data;
     },
     
@@ -106,9 +144,11 @@ export default {
     },
     
     // 登出
-    logout: async (): Promise<{ message: string }> => {
-      const response = await api.post('/auth/logout');
-      return response.data;
+    logout: () => {
+      tokenStorage.clear();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
   },
   
