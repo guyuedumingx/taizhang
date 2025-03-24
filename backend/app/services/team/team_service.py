@@ -17,28 +17,37 @@ class TeamService:
         search: Optional[str] = None
     ) -> List[models.Team]:
         """获取团队列表"""
-        # 构建查询
-        query = db.query(models.Team)
-        
-        # 搜索
-        if search:
-            query = query.filter(models.Team.name.ilike(f"%{search}%"))
-        
-        # 分页
-        teams = query.offset(skip).limit(limit).all()
-        
-        # 计算每个团队的成员数量
-        for team in teams:
-            team.member_count = db.query(models.User).filter(models.User.team_id == team.id).count()
+        try:
+            # 构建查询
+            query = db.query(models.Team)
             
-            # 获取团队负责人姓名
-            if team.leader_id:
-                leader = db.query(models.User).filter(models.User.id == team.leader_id).first()
-                team.leader_name = leader.name if leader else None
-            else:
-                team.leader_name = None
-        
-        return teams
+            # 搜索
+            if search:
+                query = query.filter(models.Team.name.ilike(f"%{search}%"))
+            
+            # 分页
+            teams = query.offset(skip).limit(limit).all()
+            
+            # 计算每个团队的成员数量
+            for team in teams:
+                try:
+                    team.member_count = db.query(models.User).filter(models.User.team_id == team.id).count()
+                    
+                    # 获取团队负责人姓名
+                    if team.leader_id:
+                        leader = db.query(models.User).filter(models.User.id == team.leader_id).first()
+                        team.leader_name = leader.name if leader else None
+                    else:
+                        team.leader_name = None
+                except Exception as e:
+                    print(f"处理团队 {team.id} 的信息时出错: {e}")
+                    team.member_count = 0
+                    team.leader_name = None
+            
+            return teams
+        except Exception as e:
+            print(f"获取团队列表时出错: {e}")
+            return []
 
     @staticmethod
     def create_team(
@@ -128,7 +137,7 @@ class TeamService:
         db: Session, 
         team_id: int,
         current_user_id: int
-    ) -> models.Team:
+    ) -> None:
         """删除团队"""
         team = db.query(models.Team).filter(models.Team.id == team_id).first()
         if not team:
@@ -147,11 +156,9 @@ class TeamService:
         # 删除团队
         db.delete(team)
         db.commit()
-        
-        return team
 
     @staticmethod
-    def get_team_members(db: Session, team_id: int) -> List[Dict[str, Any]]:
+    def get_team_members(db: Session, team_id: int) -> List[models.User]:
         """获取团队成员列表"""
         try:
             team = db.query(models.Team).filter(models.Team.id == team_id).first()
@@ -159,19 +166,7 @@ class TeamService:
                 raise HTTPException(status_code=404, detail="团队不存在")
             
             members = db.query(models.User).filter(models.User.team_id == team.id).all()
-            
-            # 简化返回，只返回基本信息
-            result = []
-            for member in members:
-                member_data = {
-                    "id": member.id,
-                    "username": member.username,
-                    "name": member.name or "",
-                    "department": member.department or "",
-                }
-                result.append(member_data)
-            
-            return result
+            return members
         except Exception as e:
             print(f"获取团队成员失败: {str(e)}")
             # 返回空列表，而不是抛出错误
@@ -183,7 +178,7 @@ class TeamService:
         team_id: int, 
         user_id: int,
         current_user_id: int
-    ) -> models.Team:
+    ) -> None:
         """
         将用户添加到团队
         """
@@ -203,8 +198,6 @@ class TeamService:
         user.team_id = team_id
         db.add(user)
         db.commit()
-        
-        return team
 
     @staticmethod
     def remove_user_from_team(
@@ -212,7 +205,7 @@ class TeamService:
         team_id: int, 
         user_id: int,
         current_user_id: int
-    ) -> models.Team:
+    ) -> None:
         """
         从团队中移除用户
         """
@@ -232,8 +225,6 @@ class TeamService:
         user.team_id = None
         db.add(user)
         db.commit()
-        
-        return team
 
 
 team_service = TeamService() 

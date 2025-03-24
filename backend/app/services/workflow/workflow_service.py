@@ -18,36 +18,46 @@ class WorkflowService:
         """
         获取工作流列表
         """
-        # 构建查询
-        query = db.query(models.Workflow)
-        
-        # 按模板筛选
-        if template_id:
-            query = query.filter(models.Workflow.template_id == template_id)
-        
-        # 搜索
-        if search:
-            query = query.filter(models.Workflow.name.ilike(f"%{search}%"))
-        
-        # 分页
-        workflows = query.offset(skip).limit(limit).all()
-        
-        # 获取关联信息
-        for workflow in workflows:
-            # 获取关联的模板
-            if workflow.template_id:
-                template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-                workflow.template_name = template.name if template else None
+        try:
+            # 构建查询
+            query = db.query(models.Workflow)
             
-            # 获取创建者和更新者信息
-            if workflow.created_by:
-                creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
-                workflow.creator_name = creator.name if creator else None
+            # 按模板筛选
+            if template_id:
+                query = query.filter(models.Workflow.template_id == template_id)
             
-            # 获取节点数量
-            workflow.node_count = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).count()
-        
-        return workflows
+            # 搜索
+            if search:
+                query = query.filter(models.Workflow.name.ilike(f"%{search}%"))
+            
+            # 分页
+            workflows = query.offset(skip).limit(limit).all()
+            
+            # 获取关联信息
+            for workflow in workflows:
+                try:
+                    # 获取关联的模板
+                    if workflow.template_id:
+                        template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
+                        workflow.template_name = template.name if template else None
+                    
+                    # 获取创建者和更新者信息
+                    if workflow.created_by:
+                        creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
+                        workflow.creator_name = creator.name if creator else None
+                    
+                    # 获取节点数量
+                    workflow.node_count = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).count()
+                except Exception as e:
+                    print(f"处理工作流 {workflow.id} 的信息时出错: {e}")
+                    workflow.template_name = None
+                    workflow.creator_name = None
+                    workflow.node_count = 0
+            
+            return workflows
+        except Exception as e:
+            print(f"获取工作流列表时出错: {e}")
+            return []
     
     @staticmethod
     def create_workflow(

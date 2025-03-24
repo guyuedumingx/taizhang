@@ -37,6 +37,15 @@ def insert_test_users(db: Session):
     # 检查用户是否已存在
     users = [
         {
+            "username": "admin",
+            "ehr_id": "1234567",
+            "name": "超级管理员",
+            "department": "管理部",
+            "hashed_password": get_password_hash("password123"),
+            "is_active": True,
+            "is_superuser": True,
+        },
+        {
             "username": "manager",
             "ehr_id": "0000002",
             "name": "部门经理",

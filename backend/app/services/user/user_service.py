@@ -53,6 +53,7 @@ class UserService:
             is_active=True,
             is_superuser=False,
             team_id=user_in.team_id,
+            last_password_change=datetime.now()
         )
         db.add(user)
         db.commit()

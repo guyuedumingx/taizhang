@@ -1,11 +1,12 @@
 from typing import Any, List, Optional, Dict
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body
+from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body, status
 from sqlalchemy.orm import Session
 from app.api import deps
 from app import crud, models, schemas
 from app.utils.logger import LoggerService
 from fastapi.encoders import jsonable_encoder
+from app.services.workflow.workflow_service import workflow_service
 
 # 主工作流路由器
 router = APIRouter()
@@ -13,91 +14,29 @@ router = APIRouter()
 # 节点路由器 - 将其移至专门的文件中
 node_router = APIRouter()
 
-@router.get("/", response_model=List[schemas.Workflow])
+@router.get("/", response_model=schemas.PaginatedResponse[schemas.Workflow])
 def read_workflows(
-    *,
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    template_id: Optional[int] = None,
-    is_active: Optional[bool] = None,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
-    """
-    获取工作流列表
-    """
-    # 检查用户权限
-    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
-        raise HTTPException(status_code=403, detail="权限不足")
+    """获取工作流列表"""
+    # 检查权限
+    if not deps.check_permissions("workflow", "view", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    # 构建查询条件
-    filters = {}
-    if template_id is not None:
-        filters["template_id"] = template_id
-    if is_active is not None:
-        filters["is_active"] = is_active
-        
-    workflows = crud.workflow.get_multi_with_filter(db, skip=skip, limit=limit, **filters)
+    workflows = workflow_service.get_workflows(db, skip=skip, limit=limit)
+    total = db.query(models.Workflow).count()
     
-    # 为每个工作流添加相关信息并处理序列化
-    result = []
-    for workflow in workflows:
-        # 添加模板名称
-        template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-        if template:
-            workflow.template_name = template.name
-        
-        # 创建工作流字典
-        workflow_dict = {
-            "id": workflow.id,
-            "name": workflow.name,
-            "description": workflow.description,
-            "template_id": workflow.template_id,
-            "template_name": getattr(workflow, "template_name", None),
-            "is_active": workflow.is_active,
-            "created_by": workflow.created_by,
-            "created_at": workflow.created_at,
-            "updated_at": workflow.updated_at,
-            "nodes": []
-        }
-        
-        # 处理节点
-        for node in workflow.nodes:
-            node_dict = {
-                "id": node.id,
-                "name": node.name,
-                "description": node.description,
-                "node_type": node.node_type,
-                "workflow_id": node.workflow_id,
-                "approver_role_id": node.approver_role_id,
-                "approver_user_id": node.approver_user_id,
-                "order_index": node.order_index,
-                "is_final": node.is_final,
-                "reject_to_node_id": node.reject_to_node_id,
-                "multi_approve_type": node.multi_approve_type,
-                "need_select_next_approver": node.need_select_next_approver,
-                "created_at": node.created_at,
-                "updated_at": node.updated_at,
-                "approver_role_name": getattr(node, "approver_role_name", None),
-                "approver_user_name": getattr(node, "approver_user_name", None),
-                "approvers": []
-            }
-            
-            # 处理审批人
-            for approver in node.approvers:
-                node_dict["approvers"].append({
-                    "id": approver.id,
-                    "name": approver.name,
-                    "username": approver.username
-                })
-            
-            workflow_dict["nodes"].append(node_dict)
-        
-        result.append(workflow_dict)
-    
-    return result
+    return {
+        "items": workflows,
+        "total": total,
+        "page": skip // limit + 1,
+        "size": limit
+    }
 
-@router.post("/", response_model=schemas.Workflow)
+@router.post("/", response_model=schemas.Workflow, status_code=status.HTTP_201_CREATED)
 def create_workflow(
     *,
     db: Session = Depends(deps.get_db),
@@ -182,13 +121,13 @@ def update_workflow(
     
     return workflow
 
-@router.delete("/{workflow_id}", response_model=schemas.Workflow)
+@router.delete("/{workflow_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_workflow(
     *,
     db: Session = Depends(deps.get_db),
     workflow_id: int = Path(...),
     current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
+) -> None:
     """
     删除工作流
     """
@@ -206,9 +145,9 @@ def delete_workflow(
         raise HTTPException(status_code=400, detail="该工作流已被台账使用，不能删除")
     
     # 删除工作流
-    workflow = crud.workflow.remove(db, id=workflow_id)
+    crud.workflow.remove(db, id=workflow_id)
     
-    return workflow
+    return None
 
 @router.get("/{workflow_id}/nodes", response_model=List[schemas.WorkflowNode])
 def read_workflow_nodes(
@@ -241,7 +180,7 @@ def read_workflow_nodes(
     
     return nodes
 
-@router.post("/{workflow_id}/nodes", response_model=schemas.WorkflowNode)
+@router.post("/{workflow_id}/nodes", response_model=schemas.WorkflowNode, status_code=status.HTTP_201_CREATED)
 def create_workflow_node(
     *,
     db: Session = Depends(deps.get_db),
@@ -261,9 +200,8 @@ def create_workflow_node(
     if not workflow:
         raise HTTPException(status_code=404, detail="工作流不存在")
     
-    # 确保workflow_id匹配
-    if node_in.workflow_id != workflow_id:
-        node_in.workflow_id = workflow_id
+    # 设置workflow_id
+    node_in.workflow_id = workflow_id
     
     # 创建节点
     node = crud.workflow_node.create_with_approvers(db, obj_in=node_in)
@@ -300,19 +238,19 @@ def update_workflow_node(
     
     return node
 
-@router.delete("/{workflow_id}/nodes/{node_id}", response_model=schemas.WorkflowNode)
+@router.delete("/{workflow_id}/nodes/{node_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_workflow_node(
     *,
     db: Session = Depends(deps.get_db),
     workflow_id: int = Path(...),
     node_id: int = Path(...),
     current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
+) -> None:
     """
     删除工作流节点
     """
     # 检查用户权限
-    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "delete"):
+    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
         raise HTTPException(status_code=403, detail="权限不足")
     
     # 检查节点是否存在
@@ -324,21 +262,10 @@ def delete_workflow_node(
     if node.workflow_id != workflow_id:
         raise HTTPException(status_code=400, detail="节点不属于指定的工作流")
     
-    # 检查是否有工作流实例正在使用此节点
-    instance_nodes = db.query(models.WorkflowInstanceNode).filter(
-        models.WorkflowInstanceNode.workflow_node_id == node_id
-    ).count()
-    
-    if instance_nodes > 0:
-        raise HTTPException(
-            status_code=400,
-            detail=f"此节点正在被 {instance_nodes} 个工作流实例节点使用，无法删除"
-        )
-    
     # 删除节点
-    node = crud.workflow_node.remove(db, id=node_id)
+    crud.workflow_node.remove(db, id=node_id)
     
-    return node
+    return None
 
 @router.post("/{workflow_id}/deactivate", response_model=schemas.Workflow)
 def deactivate_workflow(
@@ -581,6 +508,105 @@ def update_node_approvers(
     )
     
     return node
+
+@router.post("/{workflow_id}/nodes/{node_id}/approvers", response_model=schemas.WorkflowNode)
+def add_node_approver(
+    *,
+    db: Session = Depends(deps.get_db),
+    workflow_id: int = Path(...),
+    node_id: int = Path(...),
+    user_id: int = Body(..., embed=True),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    添加节点审批人
+    """
+    # 检查用户权限
+    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
+        raise HTTPException(status_code=403, detail="权限不足")
+    
+    # 检查节点是否存在
+    node = crud.workflow_node.get(db, id=node_id)
+    if not node:
+        raise HTTPException(status_code=404, detail="工作流节点不存在")
+    
+    # 确保节点属于指定的工作流
+    if node.workflow_id != workflow_id:
+        raise HTTPException(status_code=400, detail="节点不属于指定的工作流")
+    
+    # 检查用户是否存在
+    user = crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="用户不存在")
+    
+    # 添加审批人
+    crud.workflow_node.add_approver(db, node_id=node_id, user_id=user_id)
+    
+    return node
+
+@router.get("/{workflow_id}/nodes/{node_id}/approvers", response_model=List[schemas.User])
+def get_node_approvers(
+    *,
+    db: Session = Depends(deps.get_db),
+    workflow_id: int = Path(...),
+    node_id: int = Path(...),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    获取节点审批人列表
+    """
+    # 检查用户权限
+    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
+        raise HTTPException(status_code=403, detail="权限不足")
+    
+    # 检查节点是否存在
+    node = crud.workflow_node.get(db, id=node_id)
+    if not node:
+        raise HTTPException(status_code=404, detail="工作流节点不存在")
+    
+    # 确保节点属于指定的工作流
+    if node.workflow_id != workflow_id:
+        raise HTTPException(status_code=400, detail="节点不属于指定的工作流")
+    
+    # 获取审批人列表
+    approvers = crud.workflow_node.get_node_approvers(db, node_id=node_id)
+    
+    return approvers
+
+@router.delete("/{workflow_id}/nodes/{node_id}/approvers", status_code=status.HTTP_204_NO_CONTENT)
+def remove_node_approver(
+    *,
+    db: Session = Depends(deps.get_db),
+    workflow_id: int = Path(...),
+    node_id: int = Path(...),
+    user_id: int = Query(...),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> None:
+    """
+    移除节点审批人
+    """
+    # 检查用户权限
+    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
+        raise HTTPException(status_code=403, detail="权限不足")
+    
+    # 检查节点是否存在
+    node = crud.workflow_node.get(db, id=node_id)
+    if not node:
+        raise HTTPException(status_code=404, detail="工作流节点不存在")
+    
+    # 确保节点属于指定的工作流
+    if node.workflow_id != workflow_id:
+        raise HTTPException(status_code=400, detail="节点不属于指定的工作流")
+    
+    # 检查用户是否存在
+    user = crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="用户不存在")
+    
+    # 移除审批人
+    crud.workflow_node.remove_approver(db, node_id=node_id, user_id=user_id)
+    
+    return None
 
 # 将节点路由器注册到主路由器
 router.include_router(node_router, prefix="/nodes", tags=["工作流节点管理"]) 

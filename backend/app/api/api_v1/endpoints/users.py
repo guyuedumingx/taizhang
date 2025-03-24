@@ -15,7 +15,7 @@ from app.services.user.user_service import UserService as user_service
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.User])
+@router.get("/", response_model=schemas.PaginatedResponse[schemas.User])
 def read_users(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -30,15 +30,21 @@ def read_users(
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
     users = db.query(models.User).offset(skip).limit(limit).all()
+    total = db.query(models.User).count()
     
     # 获取每个用户的角色
     for user in users:
         user.roles = get_roles_for_user(str(user.id))
     
-    return users
+    return {
+        "items": users,
+        "total": total,
+        "page": skip // limit + 1,
+        "size": limit
+    }
 
 
-@router.post("/", response_model=schemas.User)
+@router.post("/", response_model=schemas.User, status_code=201)
 def create_user(
     *,
     db: Session = Depends(deps.get_db),
@@ -100,13 +106,13 @@ def update_user(
     return user_service.update_user(db, user_id=user_id, user_in=user_in)
 
 
-@router.delete("/{user_id}", response_model=schemas.User)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
     *,
     db: Session = Depends(deps.get_db),
     user_id: int,
     current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
+) -> None:
     """
     删除用户
     """
@@ -119,7 +125,7 @@ def delete_user(
         raise HTTPException(status_code=400, detail="不能删除自己的账户")
     
     # 使用用户服务删除用户
-    return user_service.delete_user(db, user_id=user_id)
+    user_service.delete_user(db, user_id=user_id)
 
 
 @router.post("/import", response_model=Dict[str, Any])

@@ -111,10 +111,6 @@ def test_delete_team(db: Session, normal_user: models.User):
     # 删除团队
     deleted_team = team_service.delete_team(db, team.id, normal_user.id)
     
-    # 验证删除结果
-    assert deleted_team.id == team.id
-    assert deleted_team.name == "待删除团队"
-    
     # 确认团队已被删除
     with pytest.raises(Exception):
         team_service.get_team(db, team.id)
@@ -131,7 +127,7 @@ def test_get_team_members(db: Session, team: models.Team, normal_user: models.Us
     
     # 验证结果
     assert len(members) >= 1
-    assert any(member["id"] == normal_user.id for member in members)
+    assert any(member.id == normal_user.id for member in members)
     
     # 测试不存在的团队
     members_of_nonexistent_team = team_service.get_team_members(db, 999)

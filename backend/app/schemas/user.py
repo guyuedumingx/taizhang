@@ -20,6 +20,7 @@ class UserCreate(UserBase):
     username: str
     ehr_id: constr(min_length=7, max_length=7, pattern=r'^\d{7}$')
     password: str
+    name: str
     roles: Optional[List[str]] = None
     
     @validator('ehr_id')
@@ -42,6 +43,7 @@ class UserInDBBase(UserBase):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 # 返回给API的用户

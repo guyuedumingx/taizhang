@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -10,7 +10,7 @@ from app.services.team.team_service import team_service
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Team])
+@router.get("/", response_model=schemas.PaginatedResponse[schemas.Team])
 def read_teams(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -22,7 +22,15 @@ def read_teams(
     if not deps.check_permissions("team", "view", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    return team_service.get_teams(db, skip=skip, limit=limit)
+    teams = team_service.get_teams(db, skip=skip, limit=limit)
+    total = db.query(models.Team).count()
+    
+    return {
+        "items": teams,
+        "total": total,
+        "page": skip // limit + 1,
+        "size": limit
+    }
 
 
 @router.post("/", response_model=schemas.Team)
@@ -70,7 +78,7 @@ def update_team(
     return team_service.update_team(db, team_id=team_id, team_in=team_in, current_user_id=current_user.id)
 
 
-@router.delete("/{team_id}", response_model=schemas.Team)
+@router.delete("/{team_id}", status_code=204, response_model=None)
 def delete_team(
     *,
     db: Session = Depends(deps.get_db),
@@ -82,10 +90,10 @@ def delete_team(
     if not deps.check_permissions("team", "delete", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    return team_service.delete_team(db, team_id=team_id, current_user_id=current_user.id)
+    team_service.delete_team(db, team_id=team_id, current_user_id=current_user.id)
 
 
-@router.get("/{team_id}/members")
+@router.get("/{team_id}/members", response_model=List[schemas.User])
 def read_team_members(
     team_id: int,
     db: Session = Depends(deps.get_db),
@@ -99,7 +107,7 @@ def read_team_members(
     return team_service.get_team_members(db, team_id=team_id)
 
 
-@router.post("/{team_id}/members/{user_id}", response_model=schemas.Team)
+@router.post("/{team_id}/members/{user_id}", status_code=204, response_model=None)
 def add_user_to_team(
     *,
     db: Session = Depends(deps.get_db),
@@ -112,10 +120,10 @@ def add_user_to_team(
     if not deps.check_permissions("team", "edit", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    return team_service.add_user_to_team(db, team_id=team_id, user_id=user_id, current_user_id=current_user.id)
+    team_service.add_user_to_team(db, team_id=team_id, user_id=user_id, current_user_id=current_user.id)
 
 
-@router.delete("/{team_id}/members/{user_id}", response_model=schemas.Team)
+@router.delete("/{team_id}/members/{user_id}", status_code=204, response_model=None)
 def remove_user_from_team(
     *,
     db: Session = Depends(deps.get_db),
@@ -128,4 +136,4 @@ def remove_user_from_team(
     if not deps.check_permissions("team", "edit", current_user):
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
-    return team_service.remove_user_from_team(db, team_id=team_id, user_id=user_id, current_user_id=current_user.id) 
+    team_service.remove_user_from_team(db, team_id=team_id, user_id=user_id, current_user_id=current_user.id) 
