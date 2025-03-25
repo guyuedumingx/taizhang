@@ -2089,3 +2089,9 @@
 2025-03-19 12:31:32 - watchfiles.main - INFO - 3 changes detected
 2025-03-19 12:31:32 - watchfiles.main - INFO - 3 changes detected
 2025-03-19 12:31:33 - watchfiles.main - INFO - 5 changes detected
+2025-03-25 19:01:46 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend\backend.log
+2025-03-25 19:01:46 - root - INFO - 正在从根目录启动服务器...
+2025-03-25 19:24:15 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend\backend.log
+2025-03-25 19:24:15 - root - INFO - 正在从根目录启动服务器...
+2025-03-25 19:35:49 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend\backend.log
+2025-03-25 19:35:49 - root - INFO - 正在从根目录启动服务器...

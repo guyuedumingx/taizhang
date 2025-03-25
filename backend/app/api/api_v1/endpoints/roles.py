@@ -23,7 +23,7 @@ def read_roles(
     检索角色列表
     """
     # 检查是否有权限
-    if not crud.user.has_permission(current_user, "role:view"):
+    if not crud.user.has_permission(db,current_user.id, "role:view"):
         raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.get_roles(db, skip=skip, limit=limit)
@@ -39,7 +39,7 @@ def create_role(
     创建新角色
     """
     # 检查是否有权限
-    if not crud.user.has_permission(current_user, "role:create"):
+    if not crud.user.has_permission(db,current_user.id, "role:create"):
         raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.create_role(db, role_in=role_in)
@@ -55,7 +55,7 @@ def read_role(
     获取角色详情
     """
     # 检查是否有权限
-    if not crud.user.has_permission(current_user, "role:view"):
+    if not crud.user.has_permission(db,current_user.id, "role:view"):
         raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.get_role(db, role_id=role_id)
@@ -72,7 +72,7 @@ def update_role(
     更新角色
     """
     # 检查是否有权限
-    if not crud.user.has_permission(current_user, "role:edit"):
+    if not crud.user.has_permission(db,current_user.id, "role:edit"):
         raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.update_role(db, role_id=role_id, role_in=role_in)
@@ -88,7 +88,7 @@ def delete_role(
     删除角色
     """
     # 检查是否有权限
-    if not crud.user.has_permission(current_user, "role:delete"):
+    if not crud.user.has_permission(db,current_user.id, "role:delete"):
         raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.delete_role(db, role_id=role_id)
@@ -104,7 +104,7 @@ def read_user_roles(
     获取用户的所有角色
     """
     # 检查是否有权限
-    if not (crud.user.has_permission(current_user, "user:view") or current_user.id == user_id):
+    if not (crud.user.has_permission(db,current_user.id, "user:view") or current_user.id == user_id):
         raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.get_user_roles(db, user_id=user_id)
@@ -121,7 +121,7 @@ def add_user_role(
     为用户添加角色
     """
     # 检查是否有权限
-    if not crud.user.has_permission(current_user, "user:edit"):
+    if not crud.user.has_permission(db,current_user.id, "user:edit"):
         raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.add_user_role(db, user_id=user_id, role_name=role_name)
@@ -138,7 +138,7 @@ def remove_user_role(
     删除用户的角色
     """
     # 检查是否有权限
-    if not crud.user.has_permission(current_user, "user:edit"):
+    if not crud.user.has_permission(db,current_user.id, "user:edit"):
         raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.remove_user_role(db, user_id=user_id, role_name=role_name) 

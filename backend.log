@@ -2307,3 +2307,145 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-03-19 12:31:32 - taizhang - INFO - [INFO] workflow.create_workflow: åˆ›å»ºå·¥ä½œæµ: å¾…åˆ é™¤å·¥ä½œæµ - workflow:1 - User:1
 2025-03-19 12:31:32 - taizhang - INFO - [INFO] workflow.delete_workflow: åˆ é™¤å·¥ä½œæµ: å¾…åˆ é™¤å·¥ä½œæµ - workflow:1 - User:1
 2025-03-19 12:31:33 - taizhang - INFO - [INFO] workflow.create_workflow: åˆ›å»ºå·¥ä½œæµ: æµ‹è¯•å·¥ä½œæµ - workflow:1 - User:1
+2025-03-25 19:01:49 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:01:49 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:03:14 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:03:16 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:03:16 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:03:27 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:03:29 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:03:30 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:03:30 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-25 19:03:30 - casbin.policy - INFO - Model:
+2025-03-25 19:03:30 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-25 19:03:30 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-25 19:03:30 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-25 19:03:30 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-25 19:03:30 - casbin.policy - INFO - g.g: _, _
+2025-03-25 19:03:30 - casbin.policy - INFO - Policy:
+2025-03-25 19:03:30 - casbin.policy - INFO - p : sub, obj, act : [['ĞÂ½ÇÉ«', 'user', 'create'], ['ĞÂ½ÇÉ«', 'user', 'update'], ['ĞÂ½ÇÉ«', 'user', 'delete'], ['²âÊÔ½ÇÉ«', 'user', 'create'], ['²âÊÔ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'update']]
+2025-03-25 19:03:30 - casbin.policy - INFO - g : _, _ : [['1', 'user'], ['49', 'admin']]
+2025-03-25 19:03:30 - casbin.policy - INFO - Role links for: g
+2025-03-25 19:03:30 - casbin.role - INFO - 1 < user, 49 < admin
+2025-03-25 19:24:17 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:24:17 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:24:43 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-25 19:24:53 - casbin.policy - INFO - Model:
+2025-03-25 19:24:53 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-25 19:24:53 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-25 19:24:53 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-25 19:24:53 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-25 19:24:53 - casbin.policy - INFO - g.g: _, _
+2025-03-25 19:24:53 - casbin.policy - INFO - Policy:
+2025-03-25 19:24:53 - casbin.policy - INFO - p : sub, obj, act : [['ĞÂ½ÇÉ«', 'user', 'create'], ['ĞÂ½ÇÉ«', 'user', 'update'], ['ĞÂ½ÇÉ«', 'user', 'delete'], ['²âÊÔ½ÇÉ«', 'user', 'create'], ['²âÊÔ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'update']]
+2025-03-25 19:24:53 - casbin.policy - INFO - g : _, _ : [['49', 'admin'], ['50', 'string'], ['1', 'string'], ['3', 'string'], ['12', 'string']]
+2025-03-25 19:24:53 - casbin.policy - INFO - Role links for: g
+2025-03-25 19:24:53 - casbin.role - INFO - 49 < admin, 50 < string, 1 < string, 3 < string, 12 < string
+2025-03-25 19:33:29 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:33:31 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:33:31 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:34:00 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:34:03 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:34:03 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:35:12 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:35:14 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:35:14 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:35:48 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:35:51 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:35:51 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:36:56 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:36:58 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:36:59 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:37:14 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:37:16 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:37:17 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:38:54 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-25 19:38:55 - casbin.policy - INFO - Model:
+2025-03-25 19:38:55 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-25 19:38:55 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-25 19:38:55 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-25 19:38:55 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-25 19:38:55 - casbin.policy - INFO - g.g: _, _
+2025-03-25 19:38:55 - casbin.policy - INFO - Policy:
+2025-03-25 19:38:55 - casbin.policy - INFO - p : sub, obj, act : [['ĞÂ½ÇÉ«', 'user', 'create'], ['ĞÂ½ÇÉ«', 'user', 'update'], ['ĞÂ½ÇÉ«', 'user', 'delete'], ['²âÊÔ½ÇÉ«', 'user', 'create'], ['²âÊÔ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'update']]
+2025-03-25 19:38:55 - casbin.policy - INFO - g : _, _ : [['49', 'admin'], ['50', 'string'], ['1', 'string'], ['3', 'string'], ['12', 'string']]
+2025-03-25 19:38:55 - casbin.policy - INFO - Role links for: g
+2025-03-25 19:38:55 - casbin.role - INFO - 49 < admin, 50 < string, 1 < string, 3 < string, 12 < string
+2025-03-25 19:39:54 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:39:56 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:39:57 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:40:10 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:40:12 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:40:12 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:40:20 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:40:22 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:40:22 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:40:47 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-25 19:40:47 - casbin.policy - INFO - Model:
+2025-03-25 19:40:47 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-25 19:40:47 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-25 19:40:47 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-25 19:40:47 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-25 19:40:47 - casbin.policy - INFO - g.g: _, _
+2025-03-25 19:40:47 - casbin.policy - INFO - Policy:
+2025-03-25 19:40:47 - casbin.policy - INFO - p : sub, obj, act : [['ĞÂ½ÇÉ«', 'user', 'create'], ['ĞÂ½ÇÉ«', 'user', 'update'], ['ĞÂ½ÇÉ«', 'user', 'delete'], ['²âÊÔ½ÇÉ«', 'user', 'create'], ['²âÊÔ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'update']]
+2025-03-25 19:40:47 - casbin.policy - INFO - g : _, _ : [['49', 'admin'], ['50', 'string'], ['1', 'string'], ['3', 'string'], ['12', 'string']]
+2025-03-25 19:40:47 - casbin.policy - INFO - Role links for: g
+2025-03-25 19:40:47 - casbin.role - INFO - 49 < admin, 50 < string, 1 < string, 3 < string, 12 < string
+2025-03-25 19:41:15 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:41:17 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:41:17 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:41:38 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-25 19:41:39 - casbin.policy - INFO - Model:
+2025-03-25 19:41:39 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-25 19:41:39 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-25 19:41:39 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-25 19:41:39 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-25 19:41:39 - casbin.policy - INFO - g.g: _, _
+2025-03-25 19:41:39 - casbin.policy - INFO - Policy:
+2025-03-25 19:41:39 - casbin.policy - INFO - p : sub, obj, act : [['ĞÂ½ÇÉ«', 'user', 'create'], ['ĞÂ½ÇÉ«', 'user', 'update'], ['ĞÂ½ÇÉ«', 'user', 'delete'], ['²âÊÔ½ÇÉ«', 'user', 'create'], ['²âÊÔ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'update']]
+2025-03-25 19:41:39 - casbin.policy - INFO - g : _, _ : [['49', 'admin'], ['50', 'string'], ['1', 'string'], ['3', 'string'], ['12', 'string']]
+2025-03-25 19:41:39 - casbin.policy - INFO - Role links for: g
+2025-03-25 19:41:39 - casbin.role - INFO - 49 < admin, 50 < string, 1 < string, 3 < string, 12 < string
+2025-03-25 19:43:48 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:43:50 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:43:51 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:44:14 - root - INFO - ·şÎñ¹Ø±Õ
+2025-03-25 19:44:17 - root - INFO - ÈÕÖ¾ÏµÍ³ÒÑ³õÊ¼»¯£¬ÈÕÖ¾ÎÄ¼şÂ·¾¶: D:\Programs\taizhang\backend.log
+2025-03-25 19:44:17 - root - INFO - ·şÎñÆô¶¯
+2025-03-25 19:44:35 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-25 19:44:44 - casbin.policy - INFO - Model:
+2025-03-25 19:44:44 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-25 19:44:44 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-25 19:44:44 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-25 19:44:44 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-25 19:44:44 - casbin.policy - INFO - g.g: _, _
+2025-03-25 19:44:44 - casbin.policy - INFO - Policy:
+2025-03-25 19:44:44 - casbin.policy - INFO - p : sub, obj, act : [['ĞÂ½ÇÉ«', 'user', 'create'], ['ĞÂ½ÇÉ«', 'user', 'update'], ['ĞÂ½ÇÉ«', 'user', 'delete'], ['²âÊÔ½ÇÉ«', 'user', 'create'], ['²âÊÔ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'read'], ['¸üĞÂºóµÄ½ÇÉ«', 'user', 'update']]
+2025-03-25 19:44:44 - casbin.policy - INFO - g : _, _ : [['49', 'admin'], ['50', 'string'], ['1', 'string'], ['3', 'string'], ['12', 'string']]
+2025-03-25 19:44:44 - casbin.policy - INFO - Role links for: g
+2025-03-25 19:44:44 - casbin.role - INFO - 49 < admin, 50 < string, 1 < string, 3 < string, 12 < string
