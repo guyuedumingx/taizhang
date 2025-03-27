@@ -41,19 +41,26 @@ export interface Team {
   id: number;
   name: string | null;
   description: string | null;
+  department?: string | null;
   leader_id: number | null;
   leader_name: string | null;
   member_count: number;
+  created_at?: string;
+  updated_at?: string | null;
 }
 
 export interface TeamCreate {
   name: string;
-  description: string;
+  department: string;
+  description?: string;
+  leader_id: number | null;
 }
 
 export interface TeamUpdate {
   name?: string;
+  department?: string;
   description?: string;
+  leader_id?: number | null;
 }
 
 // 角色类型

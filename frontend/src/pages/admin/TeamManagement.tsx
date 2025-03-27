@@ -66,9 +66,9 @@ const TeamManagement: React.FC = () => {
 
   const showEditModal = (team: Team) => {
     form.setFieldsValue({
-      name: team.name,
-      department: team.department,
-      description: team.description,
+      name: team.name || '',
+      department: team.department || '',
+      description: team.description || '',
       leader_id: team.leader_id,
     });
     setModalTitle('编辑团队');
@@ -116,8 +116,8 @@ const TeamManagement: React.FC = () => {
   };
 
   const filteredTeams = teams.filter(team => 
-    team.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    team.department.toLowerCase().includes(searchText.toLowerCase()) ||
+    (team.name || '').toLowerCase().includes(searchText.toLowerCase()) ||
+    (team.department || '').toLowerCase().includes(searchText.toLowerCase()) ||
     (team.description && team.description.toLowerCase().includes(searchText.toLowerCase())) ||
     (team.leader_name && team.leader_name.toLowerCase().includes(searchText.toLowerCase()))
   );
@@ -127,7 +127,7 @@ const TeamManagement: React.FC = () => {
       title: '团队名称',
       dataIndex: 'name',
       key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
     },
     {
       title: '部门',
@@ -139,7 +139,7 @@ const TeamManagement: React.FC = () => {
         { text: '客服部', value: '客服部' },
         { text: '设备部', value: '设备部' },
       ],
-      onFilter: (value, record) => record.department === value.toString(),
+      onFilter: (value, record) => (record.department || '') === value.toString(),
     },
     {
       title: '描述',
@@ -284,13 +284,27 @@ const TeamManagement: React.FC = () => {
             name="leader_id"
           >
             <Select allowClear placeholder="选择负责人">
-              {users
-                .filter(user => !editingTeamId || user.department === form.getFieldValue('department'))
-                .map(user => (
-                  <Option key={user.id} value={user.id}>
-                    {user.name} ({user.department})
-                  </Option>
-                ))}
+              {loading ? (
+                <Option value="" disabled>加载中...</Option>
+              ) : users && Array.isArray(users) ? (
+                users
+                  .filter(user => {
+                    // 如果正在编辑团队，不过滤部门
+                    if (editingTeamId) return true;
+                    
+                    // 获取当前部门值
+                    const departmentValue = form.getFieldValue('department');
+                    // 只有当部门存在且匹配时才显示相应用户
+                    return !departmentValue || !user.department || user.department === departmentValue;
+                  })
+                  .map(user => (
+                    <Option key={user.id} value={user.id}>
+                      {user.name || user.username} {user.department ? `(${user.department})` : ''}
+                    </Option>
+                  ))
+              ) : (
+                <Option value="" disabled>暂无数据</Option>
+              )}
             </Select>
           </Form.Item>
         </Form>

@@ -8,7 +8,23 @@ export class RoleService {
   // 获取角色列表
   static async getRoles(params?: QueryParams): Promise<Role[]> {
     try {
-      return await api.roles.getRoles(params);
+      const response = await api.roles.getRoles(params);
+      console.log('Roles API 返回数据:', response);
+      
+      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
+      if (response && typeof response === 'object' && 'items' in response && Array.isArray(response.items)) {
+        console.log('从分页数据中提取roles数组');
+        return response.items;
+      }
+      
+      // 如果返回的是数组，直接返回
+      if (Array.isArray(response)) {
+        return response;
+      }
+      
+      // 其他情况返回空数组
+      console.error('API返回的roles格式不正确:', response);
+      return [];
     } catch (error) {
       console.error('获取角色列表失败:', error);
       throw error;
@@ -58,7 +74,23 @@ export class RoleService {
   // 获取用户角色
   static async getUserRoles(userId: number): Promise<string[]> {
     try {
-      return await api.roles.getUserRoles(userId);
+      const response = await api.roles.getUserRoles(userId);
+      console.log(`获取用户 ${userId} 角色返回数据:`, response);
+      
+      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
+      if (response && typeof response === 'object' && 'items' in response && Array.isArray(response.items)) {
+        console.log(`从分页数据中提取用户 ${userId} 角色数组`);
+        return response.items;
+      }
+      
+      // 如果返回的是数组，直接返回
+      if (Array.isArray(response)) {
+        return response;
+      }
+      
+      // 其他情况返回空数组
+      console.error(`获取用户 ${userId} 角色返回格式不正确:`, response);
+      return [];
     } catch (error) {
       console.error(`获取用户 ${userId} 的角色失败:`, error);
       throw error;

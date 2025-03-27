@@ -146,7 +146,23 @@ const LedgerDetail: React.FC = () => {
           Authorization: `Bearer ${getToken()}`
         }
       });
-      setWorkflows(response.data);
+      
+      console.log('获取工作流列表原始返回数据:', response.data);
+      
+      // 处理分页格式数据
+      let workflows;
+      if (response.data && typeof response.data === 'object' && 'items' in response.data && Array.isArray(response.data.items)) {
+        console.log('从分页数据中提取workflows数组，共 ' + response.data.items.length + ' 条数据');
+        workflows = response.data.items;
+      } else if (Array.isArray(response.data)) {
+        console.log('Workflows数据已是数组格式，共 ' + response.data.length + ' 条数据');
+        workflows = response.data;
+      } else {
+        console.error('API返回的workflows格式不正确:', response.data);
+        workflows = [];
+      }
+      
+      setWorkflows(workflows);
     } catch (error) {
       console.error('获取工作流列表失败:', error);
       message.error('获取工作流列表失败');
@@ -161,13 +177,35 @@ const LedgerDetail: React.FC = () => {
           Authorization: `Bearer ${getToken()}`
         }
       });
-      setWorkflow(response.data);
+      
+      console.log('获取工作流详情原始返回数据:', response.data);
+      
+      // 处理可能的嵌套数据结构
+      let workflowData;
+      if (response.data && typeof response.data === 'object') {
+        if ('item' in response.data && response.data.item) {
+          console.log('从嵌套数据中提取工作流详情');
+          workflowData = response.data.item;
+        } else if ('id' in response.data) {
+          workflowData = response.data;
+        } else {
+          console.error('无法识别工作流数据格式:', response.data);
+          message.error('无法识别工作流数据格式');
+          return;
+        }
+      } else {
+        console.error('获取工作流详情返回格式不正确:', response.data);
+        message.error('获取工作流详情返回格式不正确');
+        return;
+      }
+      
+      setWorkflow(workflowData);
       
       // 获取开始节点的下一个节点
-      if (response.data.nodes && response.data.nodes.length > 0) {
-        const startNode = response.data.nodes.find((node: WorkflowNode) => node.node_type === 'start');
+      if (workflowData.nodes && workflowData.nodes.length > 0) {
+        const startNode = workflowData.nodes.find((node: WorkflowNode) => node.node_type === 'start');
         if (startNode) {
-          const nextNodes = response.data.nodes
+          const nextNodes = workflowData.nodes
             .filter((node: WorkflowNode) => node.order_index > startNode.order_index)
             .sort((a: WorkflowNode, b: WorkflowNode) => a.order_index - b.order_index);
           
@@ -271,7 +309,27 @@ const LedgerDetail: React.FC = () => {
       // 获取工作流
       axios.get(`${API_BASE_URL}/workflows/${workflowId}`)
         .then(response => {
-          const workflowData = response.data;
+          console.log('获取审批工作流原始返回数据:', response.data);
+          
+          // 处理可能的嵌套数据结构
+          let workflowData;
+          if (response.data && typeof response.data === 'object') {
+            if ('item' in response.data && response.data.item) {
+              console.log('从嵌套数据中提取工作流详情');
+              workflowData = response.data.item;
+            } else if ('id' in response.data) {
+              workflowData = response.data;
+            } else {
+              console.error('无法识别工作流数据格式:', response.data);
+              message.error('无法识别工作流数据格式');
+              return;
+            }
+          } else {
+            console.error('获取工作流详情返回格式不正确:', response.data);
+            message.error('获取工作流详情返回格式不正确');
+            return;
+          }
+          
           const currentNode = workflowData.nodes.find((node: WorkflowNode) => node.id === currentNodeId);
           
           if (currentNode) {

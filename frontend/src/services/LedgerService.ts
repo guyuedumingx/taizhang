@@ -8,7 +8,23 @@ export class LedgerService {
   // 获取台账列表
   static async getLedgers(params?: QueryParams): Promise<Ledger[]> {
     try {
-      return await api.ledgers.getLedgers(params);
+      const response = await api.ledgers.getLedgers(params);
+      console.log('Ledgers API 返回数据:', response);
+      
+      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
+      if (response && typeof response === 'object' && 'items' in response && Array.isArray(response.items)) {
+        console.log('从分页数据中提取ledgers数组');
+        return response.items;
+      }
+      
+      // 如果返回的是数组，直接返回
+      if (Array.isArray(response)) {
+        return response;
+      }
+      
+      // 其他情况返回空数组
+      console.error('API返回的ledgers格式不正确:', response);
+      return [];
     } catch (error) {
       console.error('获取台账列表失败:', error);
       throw error;
@@ -88,7 +104,23 @@ export class LedgerService {
   // 根据模板获取台账列表
   static async getLedgersByTemplate(templateId: number): Promise<Ledger[]> {
     try {
-      return await api.ledgers.getLedgers({ template_id: templateId });
+      const response = await api.ledgers.getLedgers({ template_id: templateId });
+      console.log(`获取模板 ${templateId} 的台账列表返回数据:`, response);
+      
+      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
+      if (response && typeof response === 'object' && 'items' in response && Array.isArray(response.items)) {
+        console.log('从分页数据中提取ledgers数组');
+        return response.items;
+      }
+      
+      // 如果返回的是数组，直接返回
+      if (Array.isArray(response)) {
+        return response;
+      }
+      
+      // 其他情况返回空数组
+      console.error(`获取模板 ${templateId} 的台账列表返回格式不正确:`, response);
+      return [];
     } catch (error) {
       console.error(`获取模板 ${templateId} 的台账列表失败:`, error);
       throw error;

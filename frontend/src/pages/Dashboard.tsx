@@ -39,16 +39,28 @@ const Dashboard: React.FC = () => {
     try {
       // 获取台账总数
       const ledgers = await LedgerService.getLedgers();
+      console.log('获取到台账数据:', ledgers);
       
       // 获取模板总数
       const templates = await TemplateService.getTemplates();
+      console.log('获取到模板数据:', templates);
       setTemplates(templates);
       
       // 获取用户总数
       const users = await UserService.getUsers();
+      console.log('获取到用户数据:', users);
       
       // 获取团队总数
       const teams = await TeamService.getTeams();
+      console.log('获取到团队数据:', teams);
+      
+      // 打印出统计数据用于调试
+      console.log('Dashboard统计数据:', {
+        ledgersCount: ledgers.length,
+        templatesCount: templates.length,
+        usersCount: users.length,
+        teamsCount: teams.length,
+      });
       
       // 更新统计数据
       setStats({

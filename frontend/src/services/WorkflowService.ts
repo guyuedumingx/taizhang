@@ -1,11 +1,38 @@
 import * as workflowsApi from '../api/workflows';
 import { Workflow, WorkflowCreate, WorkflowUpdate, WorkflowNode, WorkflowNodeCreate, LedgerApproval, Template, User, Role } from '../types';
 
+// 定义查询参数类型
+type QueryParams = Record<string, string | number | boolean | undefined>;
+
 export class WorkflowService {
   // 获取工作流列表
-  static async getWorkflows(): Promise<Workflow[]> {
+  static async getWorkflows(params?: QueryParams): Promise<Workflow[]> {
     try {
-      return await workflowsApi.getWorkflows();
+      let response;
+      if (params) {
+        // 如果提供了参数，尝试使用api调用
+        response = await workflowsApi.getWorkflows();
+      } else {
+        // 否则使用标准调用
+        response = await workflowsApi.getWorkflows();
+      }
+      
+      console.log('Workflows API 返回数据:', response);
+      
+      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
+      if (response && typeof response === 'object' && 'items' in response && Array.isArray(response.items)) {
+        console.log('从分页数据中提取workflows数组');
+        return response.items;
+      }
+      
+      // 如果返回的是数组，直接返回
+      if (Array.isArray(response)) {
+        return response;
+      }
+      
+      // 其他情况返回空数组
+      console.error('API返回的workflows格式不正确:', response);
+      return [];
     } catch (error) {
       console.error('获取工作流列表失败:', error);
       throw error;
@@ -328,7 +355,23 @@ export class WorkflowService {
   static async getNodeApprovers(nodeId: number): Promise<User[]> {
     try {
       console.log(`获取节点ID=${nodeId}的审批人`);
-      return await workflowsApi.getNodeApprovers(nodeId);
+      const response = await workflowsApi.getNodeApprovers(nodeId);
+      console.log(`获取节点ID=${nodeId}的审批人返回数据:`, response);
+      
+      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
+      if (response && typeof response === 'object' && 'items' in response && Array.isArray(response.items)) {
+        console.log(`从分页数据中提取节点ID=${nodeId}的审批人数组`);
+        return response.items;
+      }
+      
+      // 如果返回的是数组，直接返回
+      if (Array.isArray(response)) {
+        return response;
+      }
+      
+      // 其他情况返回空数组
+      console.error(`获取节点ID=${nodeId}的审批人返回格式不正确:`, response);
+      return [];
     } catch (error) {
       console.error(`获取节点ID=${nodeId}的审批人失败:`, error);
       return [];

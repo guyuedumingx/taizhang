@@ -164,7 +164,7 @@ export default {
     // 获取用户详情
     getUser: async (id: number): Promise<User> => {
       const response = await api.get(`/users/${id}`);
-      return response.data;
+      return response.data; 
     },
     
     // 获取当前用户权限
@@ -462,7 +462,25 @@ export default {
     getWorkflows: async (params?: QueryParams): Promise<Workflow[]> => {
       const query = buildQueryParams(params);
       const response = await api.get(`/workflows/${query}`);
-      return response.data;
+      
+      // 记录API返回的数据格式
+      console.log('Workflows API 原始返回数据:', response.data);
+      
+      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
+      if (response.data && typeof response.data === 'object' && 'items' in response.data && Array.isArray(response.data.items)) {
+        console.log('从分页数据中提取workflows数组，共 ' + response.data.items.length + ' 条数据');
+        return response.data.items;
+      }
+      
+      // 如果返回的是数组，直接返回
+      if (Array.isArray(response.data)) {
+        console.log('Workflows数据已是数组格式，共 ' + response.data.length + ' 条数据');
+        return response.data;
+      }
+      
+      // 其他情况返回空数组
+      console.error('API返回的workflows格式不正确:', response.data);
+      return [];
     },
     
     // 获取工作流详情
