@@ -159,6 +159,7 @@ const RoleManagement: React.FC = () => {
         const roleCreate: RoleCreate = {
           name: values.name,
           description: values.description,
+          is_system: false,
           permissions: values.permissions || [],
         };
         
@@ -325,23 +326,24 @@ const RoleManagement: React.FC = () => {
             name="permissions"
             label="权限设置"
             rules={[{ required: true, message: '请至少选择一个权限' }]}
+            valuePropName="value"
           >
-            <div style={{ maxHeight: '350px', overflowY: 'auto', padding: '10px', border: '1px solid #d9d9d9', borderRadius: '4px' }}>
-              {permissionGroups.map((group) => (
-                <div key={group.groupName} style={{ marginBottom: '15px' }}>
-                  <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{group.groupName}</div>
-                  <Checkbox.Group style={{ width: '100%' }}>
-                    <Row>
+            <Checkbox.Group style={{ width: '100%' }}>
+              <div style={{ maxHeight: '350px', overflowY: 'auto', padding: '10px', border: '1px solid #d9d9d9', borderRadius: '4px', width: '100%' }}>
+                {permissionGroups.map((group) => (
+                  <div key={group.groupName} style={{ marginBottom: '15px', width: '100%' }}>
+                    <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{group.groupName}</div>
+                    <Row style={{ width: '100%' }}>
                       {group.permissions.map((permission) => (
-                        <Col span={8} key={permission.key}>
+                        <Col span={8} key={permission.key} style={{ marginBottom: '8px' }}>
                           <Checkbox value={permission.key}>{permission.label}</Checkbox>
                         </Col>
                       ))}
                     </Row>
-                  </Checkbox.Group>
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            </Checkbox.Group>
           </Form.Item>
         </Form>
       </Modal>

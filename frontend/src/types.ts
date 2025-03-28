@@ -77,6 +77,7 @@ export interface Role {
 export interface RoleCreate {
   name: string;
   description: string;
+  is_system: boolean;
   permissions: string[];
 }
 

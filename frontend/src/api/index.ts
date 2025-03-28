@@ -249,7 +249,6 @@ export default {
     
     // 创建角色
     createRole: async (data: RoleCreate): Promise<Role> => {
-      console.log(data);
       const response = await api.post('/roles/', data);
       return response.data;
     },
