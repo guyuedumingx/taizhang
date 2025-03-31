@@ -57,9 +57,6 @@ def create_workflow(
     # 创建工作流
     workflow = crud.workflow.create_with_nodes(db, obj_in=workflow_in, created_by=current_user.id)
     
-    # 添加模板名称
-    workflow.template_name = template.name
-    
     return workflow
 
 @router.get("/{workflow_id}", response_model=schemas.Workflow)

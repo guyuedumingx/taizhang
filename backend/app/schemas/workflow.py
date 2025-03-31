@@ -1,6 +1,12 @@
-from typing import List, Optional, Any, Dict
+from typing import List, Optional, Any, Dict, ForwardRef, TYPE_CHECKING
 from pydantic import BaseModel, Field
 from datetime import datetime
+
+# 处理循环引用
+if TYPE_CHECKING:
+    from app.schemas.user import User
+else:
+    User = ForwardRef('User')
 
 # 工作流节点基础模型
 class WorkflowNodeBase(BaseModel):
@@ -39,7 +45,12 @@ class WorkflowNodeInDBBase(WorkflowNodeBase):
 class WorkflowNode(WorkflowNodeInDBBase):
     approver_role_name: Optional[str] = None
     approver_user_name: Optional[str] = None
-    approvers: Optional[List[Any]] = []  # 修改为接受任何类型，以便在序列化时处理
+    approvers: Optional[List[Any]] = []  # 使用Any类型避免循环引用问题
+    
+    class Config:
+        orm_mode = True
+        from_attributes = True
+        arbitrary_types_allowed = True  # 允许任意类型序列化
 
 # 更新工作流节点请求
 class WorkflowNodeUpdate(BaseModel):
@@ -81,6 +92,12 @@ class Workflow(WorkflowInDBBase):
     template_name: Optional[str] = None
     nodes: Optional[List[WorkflowNode]] = []
     creator_name: Optional[str] = None
+    node_count: Optional[int] = 0
+    
+    class Config:
+        orm_mode = True
+        from_attributes = True
+        arbitrary_types_allowed = True  # 允许任意类型序列化
 
 # 更新工作流请求
 class WorkflowUpdate(BaseModel):
@@ -195,4 +212,9 @@ class WorkflowNodeApproval(BaseModel):
 
 # 工作流节点拒绝请求
 class WorkflowNodeRejection(BaseModel):
-    comment: Optional[str] = None 
+    comment: Optional[str] = None
+
+# 解决循环引用
+from app.schemas.user import User
+Workflow.model_rebuild()
+WorkflowNode.model_rebuild() 

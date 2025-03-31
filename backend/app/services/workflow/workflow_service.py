@@ -13,21 +13,13 @@ class WorkflowService:
         skip: int = 0, 
         limit: int = 100,
         search: Optional[str] = None,
-        template_id: Optional[int] = None
-    ) -> List[models.Workflow]:
+    ) -> List[schemas.Workflow]:
         """
         获取工作流列表
         """
         try:
             # 构建查询
             query = db.query(models.Workflow)
-            
-            # 按模板筛选
-            if template_id:
-                # 通过Template表的workflow_id字段进行反向筛选
-                template = db.query(models.Template).filter(models.Template.id == template_id).first()
-                if template and template.workflow_id:
-                    query = query.filter(models.Workflow.id == template.workflow_id)
             
             # 搜索
             if search:
@@ -39,14 +31,6 @@ class WorkflowService:
             # 获取关联信息
             for workflow in workflows:
                 try:
-                    # 获取关联的模板
-                    templates = db.query(models.Template).filter(models.Template.workflow_id == workflow.id).all()
-                    if templates:
-                        # 使用第一个模板的名称作为显示
-                        workflow.template_name = templates[0].name if templates else None
-                    else:
-                        workflow.template_name = None
-                    
                     # 获取创建者和更新者信息
                     if workflow.created_by:
                         creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
@@ -56,11 +40,23 @@ class WorkflowService:
                     workflow.node_count = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).count()
                 except Exception as e:
                     print(f"处理工作流 {workflow.id} 的信息时出错: {e}")
-                    workflow.template_name = None
                     workflow.creator_name = None
                     workflow.node_count = 0
+                workflow.creator = None
             
-            return workflows
+            # 将ORM模型转换为Pydantic模型
+            from fastapi.encoders import jsonable_encoder
+            pydantic_workflows = []
+            for workflow in workflows:
+                try:
+                    # 先转为JSON，再转为Pydantic模型，避免循环引用问题
+                    workflow_dict = jsonable_encoder(workflow)
+                    pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+                    pydantic_workflows.append(pydantic_workflow)
+                except Exception as e:
+                    print(f"转换工作流 {workflow.id} 到Pydantic模型时出错: {e}")
+            
+            return pydantic_workflows
         except Exception as e:
             print(f"获取工作流列表时出错: {e}")
             return []
@@ -70,7 +66,7 @@ class WorkflowService:
         db: Session,
         workflow_in: schemas.WorkflowCreate,
         current_user_id: int
-    ) -> models.Workflow:
+    ) -> schemas.Workflow:
         """
         创建新工作流
         """
@@ -125,21 +121,25 @@ class WorkflowService:
         # 获取节点数量
         workflow.node_count = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).count()
         
-        return workflow
+        # 将ORM模型转换为Pydantic模型
+        from fastapi.encoders import jsonable_encoder
+        try:
+            # 先转为JSON，再转为Pydantic模型，避免循环引用问题
+            workflow_dict = jsonable_encoder(workflow)
+            pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+            return pydantic_workflow
+        except Exception as e:
+            print(f"转换工作流到Pydantic模型时出错: {e}")
+            raise HTTPException(status_code=500, detail="系统内部错误")
     
     @staticmethod
-    def get_workflow(db: Session, workflow_id: int) -> models.Workflow:
+    def get_workflow(db: Session, workflow_id: int) -> schemas.Workflow:
         """
         获取工作流详情
         """
         workflow = db.query(models.Workflow).filter(models.Workflow.id == workflow_id).first()
         if not workflow:
             raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        # 获取关联模板信息
-        templates = db.query(models.Template).filter(models.Template.workflow_id == workflow.id).all()
-        if templates:
-            workflow.template_name = templates[0].name if templates else None
         
         # 获取创建者信息
         if workflow.created_by:
@@ -150,7 +150,16 @@ class WorkflowService:
         nodes = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).order_by(models.WorkflowNode.order_index).all()
         workflow.nodes = nodes
         
-        return workflow
+        # 将ORM模型转换为Pydantic模型
+        from fastapi.encoders import jsonable_encoder
+        try:
+            # 先转为JSON，再转为Pydantic模型，避免循环引用问题
+            workflow_dict = jsonable_encoder(workflow)
+            pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+            return pydantic_workflow
+        except Exception as e:
+            print(f"转换工作流到Pydantic模型时出错: {e}")
+            raise HTTPException(status_code=500, detail="系统内部错误")
     
     @staticmethod
     def update_workflow(
@@ -158,7 +167,7 @@ class WorkflowService:
         workflow_id: int,
         workflow_in: schemas.WorkflowUpdate,
         current_user_id: int
-    ) -> models.Workflow:
+    ) -> schemas.Workflow:
         """
         更新工作流信息
         """
@@ -185,7 +194,6 @@ class WorkflowService:
         
         # 更新其他字段
         for field, value in update_data.items():
-            # 跳过template_id字段
             if field != 'template_id':
                 setattr(workflow, field, value)
         
@@ -223,10 +231,6 @@ class WorkflowService:
             message=f"更新工作流: {workflow.name}"
         )
         
-        # 获取关联信息
-        templates = db.query(models.Template).filter(models.Template.workflow_id == workflow.id).all()
-        if templates:
-            workflow.template_name = templates[0].name if templates else None
         
         if workflow.created_by:
             creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
@@ -236,14 +240,22 @@ class WorkflowService:
         nodes = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).order_by(models.WorkflowNode.order_index).all()
         workflow.nodes = nodes
         
-        return workflow
+        # 将ORM模型转换为Pydantic模型
+        from fastapi.encoders import jsonable_encoder
+        try:
+            workflow_dict = jsonable_encoder(workflow)
+            pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+            return pydantic_workflow
+        except Exception as e:
+            print(f"转换工作流到Pydantic模型时出错: {e}")
+            raise HTTPException(status_code=500, detail="系统内部错误")
     
     @staticmethod
     def delete_workflow(
         db: Session, 
         workflow_id: int,
         current_user_id: int
-    ) -> models.Workflow:
+    ) -> schemas.Workflow:
         """
         删除工作流
         """
@@ -275,14 +287,29 @@ class WorkflowService:
             message=f"删除工作流: {workflow.name}"
         )
         
-        # 删除工作流
-        db.delete(workflow)
-        db.commit()
-        
-        return workflow
+        # 创建用于返回的工作流副本
+        from fastapi.encoders import jsonable_encoder
+        try:
+            # 首先尝试转换为Pydantic模型
+            workflow_dict = jsonable_encoder(workflow)
+            pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+            
+            # 然后删除原工作流
+            db.delete(workflow)
+            db.commit()
+            
+            return pydantic_workflow
+        except Exception as e:
+            print(f"转换工作流到Pydantic模型时出错: {e}")
+            
+            # 如果转换失败，仍然删除工作流，但返回None
+            db.delete(workflow)
+            db.commit()
+            
+            return None
     
     @staticmethod
-    def get_workflow_nodes(db: Session, workflow_id: int) -> List[models.WorkflowNode]:
+    def get_workflow_nodes(db: Session, workflow_id: int) -> List[schemas.WorkflowNode]:
         """
         获取工作流节点列表
         """
@@ -291,6 +318,16 @@ class WorkflowService:
             raise HTTPException(status_code=404, detail="工作流不存在")
         
         nodes = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow_id).order_by(models.WorkflowNode.order_index).all()
-        return nodes
+        
+        # 将ORM模型转换为Pydantic模型
+        from fastapi.encoders import jsonable_encoder
+        try:
+            # 先转为JSON，再转为Pydantic模型，避免循环引用问题
+            node_dicts = jsonable_encoder(nodes)
+            pydantic_nodes = [schemas.WorkflowNode.parse_obj(node_dict) for node_dict in node_dicts]
+            return pydantic_nodes
+        except Exception as e:
+            print(f"转换工作流节点到Pydantic模型时出错: {e}")
+            raise HTTPException(status_code=500, detail="系统内部错误")
 
 workflow_service = WorkflowService() 
