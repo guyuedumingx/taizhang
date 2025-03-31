@@ -2661,3 +2661,430 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-03-31 10:22:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:49
 2025-03-31 10:22:50 - taizhang - INFO - [INFO] ledger.view: 查看台账 测试台账 - ledger:2 - User:49
 2025-03-31 10:22:54 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:49
+2025-03-31 10:23:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:49
+2025-03-31 10:23:29 - taizhang - INFO - [INFO] ledger.view: 查看台账 测试台账 - ledger:2 - User:49
+2025-03-31 10:24:33 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:49
+2025-03-31 10:24:33 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:49
+2025-03-31 10:26:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:49
+2025-03-31 10:26:31 - taizhang - INFO - [INFO] ledger.view: 查看台账 测试台账 - ledger:2 - User:49
+2025-03-31 10:26:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:49
+2025-03-31 10:26:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:49
+2025-03-31 10:27:07 - taizhang - INFO - [INFO] ledger.delete: 删除台账 测试台账 - ledger:2 - User:49
+2025-03-31 10:27:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:49
+2025-03-31 10:27:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:49
+2025-03-31 10:32:41 - root - INFO - 服务关闭
+2025-03-31 10:32:44 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:32:44 - root - INFO - 服务启动
+2025-03-31 10:43:01 - root - INFO - 服务关闭
+2025-03-31 10:43:05 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:43:05 - root - INFO - 服务启动
+2025-03-31 10:43:28 - root - INFO - 服务关闭
+2025-03-31 10:43:31 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:43:32 - root - INFO - 服务启动
+2025-03-31 10:44:04 - root - INFO - 服务关闭
+2025-03-31 10:44:07 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:44:08 - root - INFO - 服务启动
+2025-03-31 10:44:28 - root - INFO - 服务关闭
+2025-03-31 10:44:32 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:44:32 - root - INFO - 服务启动
+2025-03-31 10:45:11 - root - INFO - 服务关闭
+2025-03-31 10:45:15 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:45:15 - root - INFO - 服务启动
+2025-03-31 10:45:39 - root - INFO - 服务关闭
+2025-03-31 10:45:42 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:45:42 - root - INFO - 服务启动
+2025-03-31 10:45:52 - root - INFO - 服务关闭
+2025-03-31 10:45:55 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:45:55 - root - INFO - 服务启动
+2025-03-31 10:46:23 - root - INFO - 服务关闭
+2025-03-31 10:46:26 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:46:26 - root - INFO - 服务启动
+2025-03-31 10:46:35 - root - INFO - 服务关闭
+2025-03-31 10:46:39 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:46:39 - root - INFO - 服务启动
+2025-03-31 10:46:43 - root - INFO - 服务关闭
+2025-03-31 10:46:46 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:46:47 - root - INFO - 服务启动
+2025-03-31 10:46:50 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:46:50 - root - INFO - 服务启动
+2025-03-31 10:47:00 - root - INFO - 服务关闭
+2025-03-31 10:47:03 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:47:03 - root - INFO - 服务启动
+2025-03-31 10:47:06 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:47:07 - root - INFO - 服务启动
+2025-03-31 10:47:10 - root - INFO - 服务关闭
+2025-03-31 10:47:13 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:47:14 - root - INFO - 服务启动
+2025-03-31 10:47:16 - root - INFO - 服务关闭
+2025-03-31 10:47:19 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:47:20 - root - INFO - 服务启动
+2025-03-31 10:47:34 - root - INFO - 服务关闭
+2025-03-31 10:47:38 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:47:38 - root - INFO - 服务启动
+2025-03-31 10:47:41 - root - INFO - 服务关闭
+2025-03-31 10:47:45 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:47:45 - root - INFO - 服务启动
+2025-03-31 10:47:53 - root - INFO - 服务关闭
+2025-03-31 10:47:57 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:47:57 - root - INFO - 服务启动
+2025-03-31 10:47:59 - root - INFO - 服务关闭
+2025-03-31 10:48:03 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:48:03 - root - INFO - 服务启动
+2025-03-31 10:48:18 - root - INFO - 服务关闭
+2025-03-31 10:48:21 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:48:21 - root - INFO - 服务启动
+2025-03-31 10:48:25 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:48:25 - root - INFO - 服务启动
+2025-03-31 10:50:40 - root - INFO - 服务关闭
+2025-03-31 10:51:01 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:51:01 - root - INFO - 服务启动
+2025-03-31 10:54:03 - root - INFO - 服务关闭
+2025-03-31 10:54:20 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:54:20 - root - INFO - 服务启动
+2025-03-31 10:54:46 - root - INFO - 服务关闭
+2025-03-31 10:54:50 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:54:50 - root - INFO - 服务启动
+2025-03-31 10:55:54 - root - INFO - 服务关闭
+2025-03-31 10:55:57 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:55:58 - root - INFO - 服务启动
+2025-03-31 10:56:02 - root - INFO - 服务关闭
+2025-03-31 10:58:49 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:58:49 - root - INFO - 服务启动
+2025-03-31 10:58:49 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-31 10:58:50 - casbin.policy - INFO - Model:
+2025-03-31 10:58:50 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-31 10:58:50 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-31 10:58:50 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-31 10:58:50 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-31 10:58:50 - casbin.policy - INFO - g.g: _, _
+2025-03-31 10:58:50 - casbin.policy - INFO - Policy:
+2025-03-31 10:58:50 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read']]
+2025-03-31 10:58:50 - casbin.policy - INFO - g : _, _ : []
+2025-03-31 10:58:50 - casbin.policy - INFO - Role links for: g
+2025-03-31 10:58:50 - casbin.role - INFO - 
+2025-03-31 10:58:50 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2025-03-31 10:58:50 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 401 Unauthorized"
+2025-03-31 10:58:50 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 401 Unauthorized"
+2025-03-31 10:58:50 - root - INFO - 服务关闭
+2025-03-31 10:58:50 - root - INFO - 服务启动
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/register "HTTP/1.1 200 OK"
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/register "HTTP/1.1 400 Bad Request"
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/register "HTTP/1.1 422 Unprocessable Entity"
+2025-03-31 10:58:51 - root - INFO - 服务关闭
+2025-03-31 10:58:51 - root - INFO - 服务启动
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/logout "HTTP/1.1 200 OK"
+2025-03-31 10:58:51 - root - INFO - 服务关闭
+2025-03-31 10:58:51 - root - INFO - 服务启动
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/auth/me "HTTP/1.1 200 OK"
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/auth/me "HTTP/1.1 401 Unauthorized"
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/auth/me "HTTP/1.1 401 Unauthorized"
+2025-03-31 10:58:51 - root - INFO - 服务关闭
+2025-03-31 10:58:51 - root - INFO - 服务启动
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/check-password-expired "HTTP/1.1 200 OK"
+2025-03-31 10:58:51 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/check-password-expired "HTTP/1.1 200 OK"
+2025-03-31 10:58:51 - root - INFO - 服务关闭
+2025-03-31 10:58:51 - root - INFO - 服务启动
+2025-03-31 10:58:53 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/change-password "HTTP/1.1 200 OK"
+2025-03-31 10:58:53 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/change-password "HTTP/1.1 400 Bad Request"
+2025-03-31 10:58:53 - httpx - INFO - HTTP Request: POST http://testserver/api/v1/auth/change-password "HTTP/1.1 400 Bad Request"
+2025-03-31 10:58:53 - root - INFO - 服务关闭
+2025-03-31 10:59:18 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 10:59:18 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-31 10:59:19 - casbin.policy - INFO - Model:
+2025-03-31 10:59:19 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-31 10:59:19 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-31 10:59:19 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-31 10:59:19 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-31 10:59:19 - casbin.policy - INFO - g.g: _, _
+2025-03-31 10:59:19 - casbin.policy - INFO - Policy:
+2025-03-31 10:59:19 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read']]
+2025-03-31 10:59:19 - casbin.policy - INFO - g : _, _ : [['1', 'user']]
+2025-03-31 10:59:19 - casbin.policy - INFO - Role links for: g
+2025-03-31 10:59:19 - casbin.role - INFO - 1 < user
+2025-03-31 10:59:22 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:22 - taizhang - INFO - [INFO] ledger.create: 创建台账 新台账 - ledger:1 - User:1
+2025-03-31 10:59:22 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:22 - taizhang - INFO - [INFO] ledger.view: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:23 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:23 - taizhang - INFO - [INFO] ledger.update: 更新台账 更新后的台账 - ledger:1 - User:1
+2025-03-31 10:59:23 - taizhang - INFO - [INFO] ledger.create: 创建台账 待删除台账 - ledger:1 - User:1
+2025-03-31 10:59:23 - taizhang - INFO - [INFO] ledger.delete: 删除台账 待删除台账 - ledger:1 - User:1
+2025-03-31 10:59:24 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:24 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:24 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:24 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:24 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:24 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 10:59:24 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 10:59:26 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:26 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:27 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:36 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:36 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:37 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:37 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:37 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:37 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:37 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:37 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:38 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:38 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 10:59:38 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:38 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流2 - workflow:2 - User:1
+2025-03-31 10:59:39 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 新工作流 - workflow:1 - User:1
+2025-03-31 10:59:39 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:39 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 10:59:39 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 更新后的工作流 - workflow:1 - User:1
+2025-03-31 10:59:40 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 10:59:40 - taizhang - INFO - [INFO] workflow.delete_workflow: 删除工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 10:59:40 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:05:54 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 11:05:54 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-31 11:05:55 - casbin.policy - INFO - Model:
+2025-03-31 11:05:55 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-31 11:05:55 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-31 11:05:55 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-31 11:05:55 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-31 11:05:55 - casbin.policy - INFO - g.g: _, _
+2025-03-31 11:05:55 - casbin.policy - INFO - Policy:
+2025-03-31 11:05:55 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-03-31 11:05:55 - casbin.policy - INFO - g : _, _ : [['1', 'user'], ['testuser', 'test_role'], ['testuser', 'test_role_2']]
+2025-03-31 11:05:55 - casbin.policy - INFO - Role links for: g
+2025-03-31 11:05:55 - casbin.role - INFO - 1 < user, testuser < (test_role, test_role_2)
+2025-03-31 11:05:58 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:05:58 - taizhang - INFO - [INFO] ledger.create: 创建台账 新台账 - ledger:1 - User:1
+2025-03-31 11:05:59 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:05:59 - taizhang - INFO - [INFO] ledger.view: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:05:59 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:05:59 - taizhang - INFO - [INFO] ledger.update: 更新台账 更新后的台账 - ledger:1 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.create: 创建台账 待删除台账 - ledger:1 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.delete: 删除台账 待删除台账 - ledger:1 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 11:06:00 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 11:06:02 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:03 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:03 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:14 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:14 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:14 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:14 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:14 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:14 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:15 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:15 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:15 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:15 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:16 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:16 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流2 - workflow:2 - User:1
+2025-03-31 11:06:16 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 新工作流 - workflow:1 - User:1
+2025-03-31 11:06:17 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:17 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:17 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 更新后的工作流 - workflow:1 - User:1
+2025-03-31 11:06:17 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 11:06:17 - taizhang - INFO - [INFO] workflow.delete_workflow: 删除工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 11:06:18 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:06:41 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 11:06:41 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-31 11:06:42 - casbin.policy - INFO - Model:
+2025-03-31 11:06:42 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-31 11:06:42 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-31 11:06:42 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-31 11:06:42 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-31 11:06:42 - casbin.policy - INFO - g.g: _, _
+2025-03-31 11:06:42 - casbin.policy - INFO - Policy:
+2025-03-31 11:06:42 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-03-31 11:06:42 - casbin.policy - INFO - g : _, _ : [['1', 'user'], ['testuser', 'test_role'], ['testuser', 'test_role_2']]
+2025-03-31 11:06:42 - casbin.policy - INFO - Role links for: g
+2025-03-31 11:06:42 - casbin.role - INFO - 1 < user, testuser < (test_role, test_role_2)
+2025-03-31 11:06:45 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:45 - taizhang - INFO - [INFO] ledger.create: 创建台账 新台账 - ledger:1 - User:1
+2025-03-31 11:06:46 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:46 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:46 - taizhang - INFO - [INFO] ledger.update: 更新台账 更新后的台账 - ledger:1 - User:1
+2025-03-31 11:06:46 - taizhang - INFO - [INFO] ledger.create: 创建台账 待删除台账 - ledger:1 - User:1
+2025-03-31 11:06:46 - taizhang - INFO - [INFO] ledger.delete: 删除台账 待删除台账 - ledger:1 - User:1
+2025-03-31 11:06:47 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:47 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:47 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:47 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:47 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:47 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 11:06:47 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 11:06:49 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:49 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:06:50 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:00 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:00 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:07:00 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:00 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:07:01 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:01 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:07:01 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:01 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:07:02 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:02 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:07:02 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:02 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流2 - workflow:2 - User:1
+2025-03-31 11:07:03 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 新工作流 - workflow:1 - User:1
+2025-03-31 11:07:03 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:03 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:07:03 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 更新后的工作流 - workflow:1 - User:1
+2025-03-31 11:07:04 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 11:07:04 - taizhang - INFO - [INFO] workflow.delete_workflow: 删除工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 11:07:04 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:27 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 11:08:28 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-31 11:08:28 - casbin.policy - INFO - Model:
+2025-03-31 11:08:28 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-31 11:08:28 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-31 11:08:28 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-31 11:08:28 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-31 11:08:28 - casbin.policy - INFO - g.g: _, _
+2025-03-31 11:08:28 - casbin.policy - INFO - Policy:
+2025-03-31 11:08:28 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-03-31 11:08:28 - casbin.policy - INFO - g : _, _ : [['1', 'user'], ['testuser', 'test_role'], ['testuser', 'test_role_2']]
+2025-03-31 11:08:28 - casbin.policy - INFO - Role links for: g
+2025-03-31 11:08:28 - casbin.role - INFO - 1 < user, testuser < (test_role, test_role_2)
+2025-03-31 11:08:31 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:32 - taizhang - INFO - [INFO] ledger.create: 创建台账 新台账 - ledger:1 - User:1
+2025-03-31 11:08:32 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:32 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:32 - taizhang - INFO - [INFO] ledger.update: 更新台账 更新后的台账 - ledger:1 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.create: 创建台账 待删除台账 - ledger:1 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.delete: 删除台账 待删除台账 - ledger:1 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 11:08:33 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 11:08:35 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:36 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:36 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:47 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:47 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:47 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:47 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:48 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:48 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:48 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:48 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:49 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:49 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:08:49 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:49 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流2 - workflow:2 - User:1
+2025-03-31 11:08:49 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 新工作流 - workflow:1 - User:1
+2025-03-31 11:08:50 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:50 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:08:50 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 更新后的工作流 - workflow:1 - User:1
+2025-03-31 11:08:50 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 11:08:50 - taizhang - INFO - [INFO] workflow.delete_workflow: 删除工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 11:08:51 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:09:47 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 11:09:47 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-31 11:09:47 - casbin.policy - INFO - Model:
+2025-03-31 11:09:47 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-31 11:09:47 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-31 11:09:47 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-31 11:09:47 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-31 11:09:47 - casbin.policy - INFO - g.g: _, _
+2025-03-31 11:09:47 - casbin.policy - INFO - Policy:
+2025-03-31 11:09:47 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-03-31 11:09:47 - casbin.policy - INFO - g : _, _ : [['1', 'user'], ['testuser', 'test_role'], ['testuser', 'test_role_2']]
+2025-03-31 11:09:47 - casbin.policy - INFO - Role links for: g
+2025-03-31 11:09:47 - casbin.role - INFO - 1 < user, testuser < (test_role, test_role_2)
+2025-03-31 11:09:50 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:51 - taizhang - INFO - [INFO] ledger.create: 创建台账 新台账 - ledger:1 - User:1
+2025-03-31 11:09:51 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:51 - taizhang - INFO - [INFO] ledger.view: 查看台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:51 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:51 - taizhang - INFO - [INFO] ledger.update: 更新台账 更新后的台账 - ledger:1 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.create: 创建台账 待删除台账 - ledger:1 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.delete: 删除台账 待删除台账 - ledger:1 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.export: 导出台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 11:09:52 - taizhang - INFO - [INFO] ledger.export_all: 导出所有台账列表 - User:1
+2025-03-31 11:09:54 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:55 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:09:55 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:06 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:06 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:10:06 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:06 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:10:07 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:07 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:10:07 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:07 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:10:08 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:08 - taizhang - INFO - [INFO] ledger.create: 创建台账 测试台账 - ledger:1 - User:1
+2025-03-31 11:10:08 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:08 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流2 - workflow:2 - User:1
+2025-03-31 11:10:09 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 新工作流 - workflow:1 - User:1
+2025-03-31 11:10:09 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:09 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:10:09 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 更新后的工作流 - workflow:1 - User:1
+2025-03-31 11:10:10 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 11:10:10 - taizhang - INFO - [INFO] workflow.delete_workflow: 删除工作流: 待删除工作流 - workflow:1 - User:1
+2025-03-31 11:10:10 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 测试工作流 - workflow:1 - User:1
+2025-03-31 11:12:33 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-03-31 11:12:33 - root - INFO - 服务启动
+2025-03-31 11:12:40 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-03-31 11:12:40 - casbin.policy - INFO - Model:
+2025-03-31 11:12:40 - casbin.policy - INFO - r.r: sub, obj, act
+2025-03-31 11:12:40 - casbin.policy - INFO - p.p: sub, obj, act
+2025-03-31 11:12:40 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-03-31 11:12:40 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-03-31 11:12:40 - casbin.policy - INFO - g.g: _, _
+2025-03-31 11:12:40 - casbin.policy - INFO - Policy:
+2025-03-31 11:12:40 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-03-31 11:12:40 - casbin.policy - INFO - g : _, _ : [['1', 'user'], ['testuser', 'test_role'], ['testuser', 'test_role_2'], ['1', 'admin']]
+2025-03-31 11:12:40 - casbin.policy - INFO - Role links for: g
+2025-03-31 11:12:40 - casbin.role - INFO - 1 < (admin, user), testuser < (test_role, test_role_2)
+2025-03-31 11:12:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1

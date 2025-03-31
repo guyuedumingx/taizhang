@@ -93,23 +93,21 @@ export interface Template {
   name: string;
   description: string;
   department: string;
-  is_system: boolean;
   created_by_id: number;
-  updated_by_id?: number;
+  updated_by_id: number;
   created_at: string;
-  updated_at: string | null;
-  created_by_name?: string;
-  updated_by_name?: string;
-  fields_count?: number;
-  ledgers_count?: number;
-  
-  // 台账元字段（默认值）
+  updated_at: string;
   default_ledger_name?: string;
   default_description?: string;
   default_status?: string;
   default_team_id?: number;
+  default_workflow_id?: number;
   default_team_name?: string;
-  default_metadata?: Record<string, unknown>;
+  default_workflow_name?: string;
+  created_by_name?: string;
+  updated_by_name?: string;
+  fields_count?: number;
+  ledgers_count?: number;
 }
 
 export interface TemplateDetail extends Template {
@@ -118,25 +116,25 @@ export interface TemplateDetail extends Template {
 
 export interface TemplateCreate {
   name: string;
-  description: string;
   department: string;
+  description?: string;
   default_ledger_name?: string;
   default_description?: string;
   default_status?: string;
   default_team_id?: number;
-  default_metadata?: Record<string, unknown>;
-  fields?: FieldCreate[];
+  default_workflow_id?: number;
+  fields: FieldCreate[];
 }
 
 export interface TemplateUpdate {
   name?: string;
-  description?: string;
   department?: string;
+  description?: string;
   default_ledger_name?: string;
   default_description?: string;
   default_status?: string;
   default_team_id?: number;
-  default_metadata?: Record<string, unknown>;
+  default_workflow_id?: number;
   fields?: FieldCreate[];
 }
 

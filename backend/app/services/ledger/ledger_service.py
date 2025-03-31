@@ -121,6 +121,7 @@ class LedgerService:
         description = ledger_in.description
         team_id = ledger_in.team_id or current_user.team_id
         status = ledger_in.status or "draft"
+        workflow_id = ledger_in.workflow_id
         
         if template:
             # 如果未提供值，则使用模板默认值
@@ -135,6 +136,10 @@ class LedgerService:
                 
             if not ledger_in.status and template.default_status:
                 status = template.default_status
+                
+            # 如果未提供工作流ID，则使用模板默认工作流
+            if not workflow_id and template.default_workflow_id:
+                workflow_id = template.default_workflow_id
         
         # 确保必须的值存在
         if not name:
@@ -147,7 +152,6 @@ class LedgerService:
                 raise HTTPException(status_code=404, detail="团队不存在")
         
         # 检查工作流是否存在
-        workflow_id = ledger_in.workflow_id
         if workflow_id:
             workflow = db.query(models.Workflow).filter(
                 models.Workflow.id == workflow_id,
@@ -355,10 +359,17 @@ class LedgerService:
             update_data["status"] = "in_progress"
             
             # 确保有工作流
-            if not ledger.workflow_id and not update_data.get("workflow_id"):
-                raise HTTPException(status_code=400, detail="提交台账需要关联工作流")
-            
             workflow_id = update_data.get("workflow_id", ledger.workflow_id)
+            
+            # 如果还是没有工作流，尝试从模板获取默认工作流
+            if not workflow_id and ledger.template_id:
+                template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
+                if template and template.default_workflow_id:
+                    workflow_id = template.default_workflow_id
+                    update_data["workflow_id"] = workflow_id
+            
+            if not workflow_id:
+                raise HTTPException(status_code=400, detail="提交台账需要关联工作流，请设置工作流或使用具有默认工作流的模板")
             
             # 如果没有工作流实例，创建一个
             if not ledger.workflow_instance_id:

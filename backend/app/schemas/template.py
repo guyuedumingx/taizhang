@@ -19,6 +19,7 @@ class TemplateBase(BaseModel):
     default_status: Optional[str] = "draft"
     default_team_id: Optional[int] = None
     default_metadata: Optional[Dict[str, Any]] = None
+    default_workflow_id: Optional[int] = None
 
 
 # 创建模板时的属性
@@ -50,6 +51,7 @@ class Template(TemplateInDBBase):
     created_by_name: Optional[str] = None
     updated_by_name: Optional[str] = None
     default_team_name: Optional[str] = None
+    default_workflow_name: Optional[str] = None
     fields_count: Optional[int] = None
     ledgers_count: Optional[int] = None
 

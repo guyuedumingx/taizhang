@@ -226,7 +226,25 @@ const LedgerDetail: React.FC = () => {
 
   // 提交审批
   const submitForApproval = async () => {
-    if (!workflow) {
+    let workflowToUse = workflow;
+    
+    // 如果没有选择工作流，尝试使用台账模板的默认工作流
+    if (!workflowToUse && ledger && ledger.template_id) {
+      try {
+        const template = await TemplateService.getTemplateDetail(ledger.template_id);
+        if (template.default_workflow_id) {
+          const defaultWorkflow = await WorkflowService.getWorkflow(template.default_workflow_id);
+          if (defaultWorkflow) {
+            workflowToUse = defaultWorkflow;
+            message.info(`使用模板默认工作流: ${defaultWorkflow.name}`);
+          }
+        }
+      } catch (error) {
+        console.error('获取模板默认工作流失败:', error);
+      }
+    }
+    
+    if (!workflowToUse) {
       message.error('请选择工作流');
       return;
     }
@@ -241,7 +259,7 @@ const LedgerDetail: React.FC = () => {
       await axios.post(
         `${API_BASE_URL}/ledgers/${id}/submit`,
         {
-          workflow_id: workflow.id,
+          workflow_id: workflowToUse.id,
           comment: submitComment,
           next_approver_id: nextApproverId
         },

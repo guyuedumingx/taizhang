@@ -68,7 +68,6 @@ def superuser(db: Session) -> models.User:
     user_in = schemas.UserCreate(
         name="超级管理员",
         username="admin",
-        email="admin@example.com",
         password="password123",
         is_superuser=True,
         ehr_id="1234567"
@@ -86,7 +85,6 @@ def normal_user(db: Session) -> models.User:
     user_in = schemas.UserCreate(
         name="普通用户",
         username="user",
-        email="user@example.com",
         password="password123",
         is_superuser=False,
         ehr_id="7654321"

@@ -21,6 +21,9 @@ class Template(Base):
     default_team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
     default_metadata = Column(JSON, nullable=True)  # 可以存储其他默认元数据
     
+    # 默认工作流
+    default_workflow_id = Column(Integer, ForeignKey("workflows.id"), nullable=True)
+    
     # 外键
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     updated_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
@@ -35,4 +38,5 @@ class Template(Base):
     creator = relationship("User", foreign_keys=[created_by_id])
     updater = relationship("User", foreign_keys=[updated_by_id])
     default_team = relationship("Team", foreign_keys=[default_team_id])
+    default_workflow = relationship("Workflow", foreign_keys=[default_workflow_id])
     workflows = relationship("Workflow", back_populates="template", foreign_keys="Workflow.template_id") 

@@ -6,7 +6,8 @@ import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import { TemplateService } from '../../services/TemplateService';
 import { TeamService } from '../../services/TeamService';
-import { TemplateCreate, TemplateUpdate, FieldCreate, Team } from '../../types';
+import { WorkflowService } from '../../services/WorkflowService';
+import { TemplateCreate, TemplateUpdate, FieldCreate, Team, Workflow } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
@@ -21,6 +22,7 @@ const TemplateForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [workflows, setWorkflows] = useState<Workflow[]>([]);
   
   const isEdit = !!id;
 
@@ -35,6 +37,9 @@ const TemplateForm: React.FC = () => {
 
     // 获取团队列表
     fetchTeams();
+    
+    // 获取工作流列表
+    fetchWorkflows();
 
     if (isEdit) {
       fetchTemplate(parseInt(id));
@@ -49,6 +54,18 @@ const TemplateForm: React.FC = () => {
     } catch (error) {
       console.error('获取团队列表失败:', error);
       message.error('获取团队列表失败');
+    }
+  };
+  
+  // 获取工作流列表
+  const fetchWorkflows = async () => {
+    try {
+      const workflowsData = await WorkflowService.getWorkflows();
+      const activeWorkflows = workflowsData.filter(workflow => workflow.is_active);
+      setWorkflows(activeWorkflows);
+    } catch (error) {
+      console.error('获取工作流列表失败:', error);
+      message.error('获取工作流列表失败');
     }
   };
 
@@ -77,6 +94,7 @@ const TemplateForm: React.FC = () => {
         default_description: template.default_description || '',
         default_status: template.default_status || 'draft',
         default_team_id: template.default_team_id || null,
+        default_workflow_id: template.default_workflow_id || null,
         fields: fieldsData
       });
     } catch (error) {
@@ -120,6 +138,7 @@ const TemplateForm: React.FC = () => {
           default_description: values.default_description as string,
           default_status: values.default_status as string,
           default_team_id: values.default_team_id as number,
+          default_workflow_id: values.default_workflow_id as number,
           fields: fields
         };
         
@@ -135,6 +154,7 @@ const TemplateForm: React.FC = () => {
           default_description: values.default_description as string,
           default_status: values.default_status as string,
           default_team_id: values.default_team_id as number,
+          default_workflow_id: values.default_workflow_id as number,
           fields: fields
         };
         
@@ -236,6 +256,17 @@ const TemplateForm: React.FC = () => {
             <Select placeholder="选择默认团队" allowClear>
               {teams.map(team => (
                 <Option key={team.id} value={team.id}>{team.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          
+          <Form.Item
+            name="default_workflow_id"
+            label="默认工作流"
+          >
+            <Select placeholder="选择默认工作流" allowClear>
+              {workflows.map(workflow => (
+                <Option key={workflow.id} value={workflow.id}>{workflow.name}</Option>
               ))}
             </Select>
           </Form.Item>

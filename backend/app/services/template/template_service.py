@@ -42,6 +42,11 @@ class TemplateService:
             
             # 获取字段数量
             template.field_count = db.query(models.Field).filter(models.Field.template_id == template.id).count()
+            
+            # 获取默认工作流名称
+            if template.default_workflow_id:
+                workflow = db.query(models.Workflow).filter(models.Workflow.id == template.default_workflow_id).first()
+                template.default_workflow_name = workflow.name if workflow else None
         
         return templates
 
@@ -62,11 +67,21 @@ class TemplateService:
                 detail="模板名称已存在",
             )
         
+        # 检查默认工作流是否存在
+        if template_in.default_workflow_id:
+            workflow = db.query(models.Workflow).filter(models.Workflow.id == template_in.default_workflow_id).first()
+            if not workflow:
+                raise HTTPException(
+                    status_code=404,
+                    detail="指定的默认工作流不存在",
+                )
+        
         # 创建模板
         template = models.Template(
             name=template_in.name,
             description=template_in.description,
             department=template_in.department,
+            default_workflow_id=template_in.default_workflow_id,
             created_by_id=current_user_id,
             updated_by_id=current_user_id,
         )
@@ -102,6 +117,11 @@ class TemplateService:
         # 获取字段数量
         template.field_count = db.query(models.Field).filter(models.Field.template_id == template.id).count()
         
+        # 获取默认工作流名称
+        if template.default_workflow_id:
+            workflow = db.query(models.Workflow).filter(models.Workflow.id == template.default_workflow_id).first()
+            template.default_workflow_name = workflow.name if workflow else None
+        
         return template
 
     @staticmethod
@@ -125,6 +145,11 @@ class TemplateService:
         # 获取字段
         fields = db.query(models.Field).filter(models.Field.template_id == template.id).order_by(models.Field.order).all()
         template.fields = fields
+        
+        # 获取默认工作流名称
+        if template.default_workflow_id:
+            workflow = db.query(models.Workflow).filter(models.Workflow.id == template.default_workflow_id).first()
+            template.default_workflow_name = workflow.name if workflow else None
         
         return template
 

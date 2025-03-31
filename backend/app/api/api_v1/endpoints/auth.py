@@ -65,10 +65,13 @@ def check_password_expired(
         three_months_ago = datetime.now() - timedelta(days=90)
         password_expired = current_user.last_password_change < three_months_ago
 
-    days_until_expiry = 90 - (datetime.now() - current_user.last_password_change).days
+    days_until_expiry = 90
+    if current_user.last_password_change:
+        days_until_expiry = 90 - (datetime.now() - current_user.last_password_change).days
+    
     return {
         "password_expired": password_expired,
-        "days_until_expiry": days_until_expiry if not password_expired else 0,  # 如果已过期，则为0
+        "days_until_expiry": days_until_expiry if not password_expired else 0,
         "last_password_change": current_user.last_password_change
     }
 

@@ -18,11 +18,11 @@ class AuthService:
         # 使用EHR号查找用户
         user = db.query(models.User).filter(models.User.ehr_id == ehr_id).first()
         if not user:
-            raise HTTPException(status_code=400, detail="EHR号或密码错误")
+            raise HTTPException(status_code=401, detail="EHR号或密码错误")
         if not verify_password(password, user.hashed_password):
-            raise HTTPException(status_code=400, detail="EHR号或密码错误")
+            raise HTTPException(status_code=401, detail="EHR号或密码错误")
         if not user.is_active:
-            raise HTTPException(status_code=400, detail="用户已被禁用")
+            raise HTTPException(status_code=401, detail="用户已被禁用")
         
         # 获取用户角色
         roles = get_roles_for_user(str(user.id))
@@ -114,6 +114,10 @@ class AuthService:
         # 验证旧密码
         if not verify_password(password_data.current_password, user.hashed_password):
             raise HTTPException(status_code=400, detail="旧密码不正确")
+        
+        # 检查新密码是否与当前密码相同
+        if verify_password(password_data.new_password, user.hashed_password):
+            raise HTTPException(status_code=400, detail="新密码不能与当前密码相同")
         
         # 设置新密码
         user.hashed_password = get_password_hash(password_data.new_password)

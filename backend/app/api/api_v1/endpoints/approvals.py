@@ -156,20 +156,23 @@ def submit_ledger_for_approval(
     if active_instance:
         raise HTTPException(status_code=400, detail="台账已在审批流程中")
     
-    # 获取工作流
-    workflow_id = submit_data.workflow_id
-    if not workflow_id:
-        # 如果没有指定工作流，使用台账关联的工作流
-        workflow_id = ledger.workflow_id
+    # 确定要使用的工作流 ID
+    workflow_id = None
     
-    if not workflow_id:
-        # 如果台账没有关联工作流，使用模板默认工作流
+    # 1. 首先检查提交数据中是否有指定工作流
+    if submit_data.workflow_id:
+        workflow_id = submit_data.workflow_id
+    # 2. 如果没有指定，检查台账关联的模板是否有默认工作流
+    elif ledger.template_id:
         template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
         if template and template.default_workflow_id:
             workflow_id = template.default_workflow_id
+    # 3. 如果模板也没有默认工作流，检查台账是否有关联工作流
+    if not workflow_id and ledger.workflow_id:
+        workflow_id = ledger.workflow_id
     
     if not workflow_id:
-        raise HTTPException(status_code=400, detail="未指定工作流，无法提交审批")
+        raise HTTPException(status_code=400, detail="未找到可用的工作流，无法提交审批")
     
     # 检查工作流是否存在且活动
     workflow = db.query(models.Workflow).filter(
@@ -190,9 +193,8 @@ def submit_ledger_for_approval(
     ledger.approval_status = "pending"
     ledger.submitted_at = datetime.now()
     
-    # 如果提交时指定了工作流，更新台账的工作流关联
-    if submit_data.workflow_id:
-        ledger.workflow_id = submit_data.workflow_id
+    # 更新台账的工作流关联
+    ledger.workflow_id = workflow_id
     
     db.add(ledger)
     db.commit()
@@ -200,13 +202,14 @@ def submit_ledger_for_approval(
     
     # 记录审计日志
     log_audit(
-        action="submit",
+        db=db,
         user_id=current_user.id,
-        ledger_id=ledger_id,
-        workflow_instance_id=workflow_instance.id,
-        status_before="draft",
-        status_after="pending",
-        comment=f"提交台账进入审批流程，工作流实例ID: {workflow_instance.id}"
+        action="submit",
+        resource_type="ledger",
+        resource_id=ledger_id,
+        detail=f"提交台账进入审批流程，工作流实例ID: {workflow_instance.id}",
+        old_status="draft",
+        new_status="pending"
     )
     
     return ledger
