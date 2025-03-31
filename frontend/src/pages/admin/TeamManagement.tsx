@@ -7,6 +7,7 @@ import { PERMISSIONS } from '../../config';
 import { Team, TeamCreate, TeamUpdate, User } from '../../types';
 import { TeamService } from '../../services/TeamService';
 import type { ColumnsType } from 'antd/es/table';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -204,6 +205,14 @@ const TeamManagement: React.FC = () => {
   ];
 
   return (
+    <>
+    <BreadcrumbNav 
+        items={[
+          { title: '系统管理', path: '/dashboard/admin' },
+          { title: '团队管理', path: '/dashboard/admin/teams' }
+        ]}
+        showBackButton={false}
+      />
     <div>
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
@@ -310,6 +319,7 @@ const TeamManagement: React.FC = () => {
         </Form>
       </Modal>
     </div>
+    </>
   );
 };
 

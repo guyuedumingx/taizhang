@@ -590,7 +590,7 @@ const UserManagement: React.FC = () => {
               <Typography.Title level={4}>导入结果</Typography.Title>
               <Row gutter={16}>
                 <Col span={12}>
-                  <Card title="成功" bordered={false}>
+                  <Card title="成功">
                     <Typography.Text style={{ fontSize: 24, color: '#52c41a' }}>
                       {importResult.success_count}
                     </Typography.Text>

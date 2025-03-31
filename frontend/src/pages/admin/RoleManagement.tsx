@@ -6,6 +6,7 @@ import { PERMISSIONS } from '../../config';
 import { checkPermission } from '../../utils/permission';
 import { Role, RoleCreate, RoleUpdate } from '../../types';
 import api from '../../api';
+import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 // 权限分组类型
 interface PermissionGroup {
@@ -265,6 +266,14 @@ const RoleManagement: React.FC = () => {
   ];
 
   return (
+    <>
+      <BreadcrumbNav 
+        items={[
+          { title: '系统管理', path: '/dashboard/admin' },
+          { title: '角色管理', path: '/dashboard/admin/roles' }
+        ]}
+        showBackButton={false}
+      />
     <Card>
       <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
         <Col>
@@ -348,6 +357,7 @@ const RoleManagement: React.FC = () => {
         </Form>
       </Modal>
     </Card>
+    </>
   );
 };
 
