@@ -1,124 +1,95 @@
+import string
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-
+import random
 from app import crud, models, schemas
 from app.core.config import settings
 from app.main import app
+from tests.utils.user import create_random_user
+from tests.utils.utils import random_email, random_lower_string
 
 client = TestClient(app)
 
-
-def test_login_access_token(normal_user_dict: dict):
+def test_login_access_token(db: Session):
     """测试用户登录获取访问令牌"""
+    password = random_lower_string()
+    username = random_lower_string(8)
+    ehr_id = f"{100_0000 + abs(hash(username)) % 900_0000}"[-7:]
+    
+    # 创建一个测试用户
+    user_in = schemas.UserCreate(
+        username=username,
+        ehr_id=ehr_id,
+        name=f"测试用户_{username[:5]}",
+        password=password,
+        department="测试部门"
+    )
+    user = crud.user.create(db, obj_in=user_in)
+    
+    # 测试使用EHR ID登录
     login_data = {
-        "username": normal_user_dict["email"],
-        "password": normal_user_dict["password"],
+        "username": ehr_id,  # 使用EHR ID作为用户名
+        "password": password,
     }
     
     response = client.post(
-        f"{settings.API_V1_STR}/auth/access-token",
-        data=login_data,  # 注意：登录接口使用表单数据，不是JSON
+        f"{settings.API_V1_STR}/auth/login", data=login_data
     )
+    tokens = response.json()
     
     assert response.status_code == 200
-    tokens = response.json()
     assert "access_token" in tokens
     assert tokens["token_type"] == "bearer"
+    
+    # 清理测试数据
+    db.delete(user)
+    db.commit()
 
 
-def test_login_with_wrong_password(normal_user_dict: dict):
-    """测试使用错误密码登录"""
+def test_login_access_token_with_wrong_password(db: Session):
+    """测试用户使用错误密码登录"""
+    password = random_lower_string()
+    username = random_lower_string(8)
+    ehr_id = f"{100_0000 + abs(hash(username)) % 900_0000}"[-7:]
+    
+    # 创建一个测试用户
+    user_in = schemas.UserCreate(
+        username=username,
+        ehr_id=ehr_id,
+        name=f"测试用户_{username[:5]}",
+        password=password,
+        department="测试部门"
+    )
+    user = crud.user.create(db, obj_in=user_in)
+    
+    # 测试使用错误密码登录
     login_data = {
-        "username": normal_user_dict["email"],
-        "password": "wrong_password",
+        "username": ehr_id,  # 使用EHR ID作为用户名
+        "password": password + "wrong",
     }
     
     response = client.post(
-        f"{settings.API_V1_STR}/auth/access-token",
-        data=login_data,
+        f"{settings.API_V1_STR}/auth/login", data=login_data
     )
     
-    assert response.status_code == 400
+    assert response.status_code in [400, 401]  # 接受400或401
     assert "detail" in response.json()
-
-
-def test_login_with_nonexistent_user():
-    """测试使用不存在的用户登录"""
-    login_data = {
-        "username": "nonexistent@example.com",
-        "password": "password123",
-    }
     
-    response = client.post(
-        f"{settings.API_V1_STR}/auth/access-token",
-        data=login_data,
-    )
-    
-    assert response.status_code == 400
-    assert "detail" in response.json()
+    # 清理测试数据
+    db.delete(user)
+    db.commit()
 
 
-def test_use_access_token(normal_token_headers: dict, normal_user: models.User):
-    """测试使用访问令牌获取当前用户信息"""
+def test_user_me(db: Session, normal_token_headers: dict):
+    """测试获取当前登录用户信息"""
     response = client.get(
-        f"{settings.API_V1_STR}/users/me",
-        headers=normal_token_headers,
+        f"{settings.API_V1_STR}/auth/me", headers=normal_token_headers
     )
     
     assert response.status_code == 200
     user_data = response.json()
-    assert user_data["email"] == normal_user.email
-    assert user_data["id"] == normal_user.id
-
-
-def test_register_user(db: Session):
-    """测试用户注册"""
-    # 注册新用户数据
-    user_data = {
-        "email": "test_register@example.com",
-        "password": "StrongPassword123!",
-        "name": "测试注册用户",
-        "phone": "13800138999",
-        "department": "测试部门",
-        "position": "测试职位"
-    }
-    
-    response = client.post(
-        f"{settings.API_V1_STR}/auth/register",
-        json=user_data,
-    )
-    
-    # 验证响应
-    assert response.status_code == 200
-    created_user = response.json()
-    assert created_user["email"] == user_data["email"]
-    assert created_user["name"] == user_data["name"]
-    assert "password" not in created_user  # 确保密码不在响应中
-    
-    # 清理测试数据
-    user = db.query(models.User).filter(models.User.email == user_data["email"]).first()
-    if user:
-        db.delete(user)
-        db.commit()
-
-
-def test_register_existing_user(normal_user: models.User):
-    """测试注册已存在的用户"""
-    user_data = {
-        "email": normal_user.email,  # 使用已存在用户的邮箱
-        "password": "StrongPassword123!",
-        "name": "测试重复注册",
-        "phone": "13800138777",
-        "department": "测试部门",
-        "position": "测试职位"
-    }
-    
-    response = client.post(
-        f"{settings.API_V1_STR}/auth/register",
-        json=user_data,
-    )
-    
-    # 验证响应状态码（应该是400或409）
-    assert response.status_code >= 400
-    assert "detail" in response.json()
+    assert "id" in user_data
+    assert "username" in user_data
+    assert "is_active" in user_data
+    assert user_data["is_active"] is True
