@@ -354,7 +354,7 @@ const LedgerForm: React.FC = () => {
           </Form.Item>
           
           {/* 仅在编辑模式或未选择模板时显示通用字段 */}
-          {(!selectedTemplate || isEdit) && (
+          {(
             <>
               <Form.Item
                 label="台账名称"
