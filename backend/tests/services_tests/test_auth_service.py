@@ -22,12 +22,12 @@ def test_authenticate_user(db: Session, normal_user: models.User):
     # 测试错误的密码
     with pytest.raises(HTTPException) as excinfo:
         auth_service.authenticate_user(db, ehr_id=normal_user.ehr_id, password="wrong_password")
-    assert excinfo.value.status_code == 400
+    assert excinfo.value.status_code == 401
     
     # 测试不存在的用户
     with pytest.raises(HTTPException) as excinfo:
         auth_service.authenticate_user(db, ehr_id="9999999", password="password123")
-    assert excinfo.value.status_code == 400
+    assert excinfo.value.status_code == 401
 
 # 测试用户注册
 def test_register_user(db: Session):

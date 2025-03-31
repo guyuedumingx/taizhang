@@ -33,7 +33,7 @@ def test_create_ledger_item(db: Session, test_template: dict, test_user: dict, t
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
         template_id=template.id
     )
     
@@ -105,7 +105,7 @@ def test_get_ledger_item(db: Session, test_template: dict, test_user: dict, test
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
         template_id=template.id
     )
     
@@ -180,7 +180,7 @@ def test_update_ledger_item(db: Session, test_template: dict, test_user: dict, t
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
         template_id=template.id
     )
     
@@ -260,7 +260,7 @@ def test_delete_ledger_item(db: Session, test_template: dict, test_user: dict, t
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
         template_id=template.id
     )
     
@@ -336,7 +336,7 @@ def test_get_multi_ledger_items(db: Session, test_template: dict, test_user: dic
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
         template_id=template.id
     )
     
@@ -418,12 +418,12 @@ def test_get_ledger_items_by_ledger(db: Session, test_template: dict, test_user:
     
     # 创建多个台账
     ledger1_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
         template_id=template.id
     )
     
     ledger2_in = schemas.LedgerCreate(
-        name=f"{test_ledger['title']}_2",
+        name=f"{test_ledger['name']}_2",
         template_id=template.id
     )
     

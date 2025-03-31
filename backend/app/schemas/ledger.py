@@ -14,7 +14,6 @@ class LedgerBase(BaseModel):
     template_id: Optional[int] = None
     data: Optional[Dict[str, Any]] = None
     approval_status: Optional[str] = "pending"
-    workflow_id: Optional[int] = None
 
 
 # 创建台账时的属性

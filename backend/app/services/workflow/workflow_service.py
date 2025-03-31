@@ -51,7 +51,7 @@ class WorkflowService:
                 try:
                     # 先转为JSON，再转为Pydantic模型，避免循环引用问题
                     workflow_dict = jsonable_encoder(workflow)
-                    pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+                    pydantic_workflow = schemas.Workflow.model_validate(workflow_dict)
                     pydantic_workflows.append(pydantic_workflow)
                 except Exception as e:
                     print(f"转换工作流 {workflow.id} 到Pydantic模型时出错: {e}")
@@ -126,7 +126,7 @@ class WorkflowService:
         try:
             # 先转为JSON，再转为Pydantic模型，避免循环引用问题
             workflow_dict = jsonable_encoder(workflow)
-            pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+            pydantic_workflow = schemas.Workflow.model_validate(workflow_dict)
             return pydantic_workflow
         except Exception as e:
             print(f"转换工作流到Pydantic模型时出错: {e}")
@@ -155,7 +155,7 @@ class WorkflowService:
         try:
             # 先转为JSON，再转为Pydantic模型，避免循环引用问题
             workflow_dict = jsonable_encoder(workflow)
-            pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+            pydantic_workflow = schemas.Workflow.model_validate(workflow_dict)
             return pydantic_workflow
         except Exception as e:
             print(f"转换工作流到Pydantic模型时出错: {e}")
@@ -197,28 +197,53 @@ class WorkflowService:
             if field != 'template_id':
                 setattr(workflow, field, value)
         
-        db.add(workflow)
-        db.commit()
-        db.refresh(workflow)
-        
-        # 处理节点更新
-        if hasattr(workflow_in, "nodes") and workflow_in.nodes is not None:
-            # 删除现有节点
-            db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).delete()
+        # 更新节点
+        if workflow_in.nodes:
+            # 首先删除所有现有节点
+            db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow_id).delete()
             db.commit()
             
-            # 创建新节点
-            for node_data in workflow_in.nodes:
+            # 创建新节点，暂时不处理reject_to_node_id
+            created_nodes = []
+            node_id_map = {}  # 用于存储临时ID与实际数据库ID的映射
+            
+            for i, node_data in enumerate(workflow_in.nodes):
                 node = models.WorkflowNode(
                     name=node_data.name,
                     description=node_data.description,
-                    workflow_id=workflow.id,
+                    workflow_id=workflow_id,
                     node_type=node_data.node_type,
                     order_index=node_data.order_index,
-                    reject_to_node_id=node_data.reject_to_node_id,
+                    approver_role_id=node_data.approver_role_id,
+                    approver_user_id=node_data.approver_user_id,
+                    multi_approve_type=node_data.multi_approve_type,
+                    need_select_next_approver=node_data.need_select_next_approver,
+                    reject_to_node_id=None  # 先设为None，稍后更新
                 )
                 db.add(node)
-            db.commit()
+                db.flush()  # 获取数据库分配的ID
+                
+                # 记录临时ID或索引与实际数据库ID的映射
+                if hasattr(node_data, 'id') and node_data.id:
+                    node_id_map[node_data.id] = node.id
+                else:
+                    # 使用索引作为临时ID
+                    node_id_map[i] = node.id
+                
+                created_nodes.append((node, node_data))
+            
+            # 第二遍：更新reject_to_node_id
+            for node, node_data in created_nodes:
+                if node_data.reject_to_node_id is not None:
+                    # 尝试从映射中获取实际的reject_to_node_id
+                    if node_data.reject_to_node_id in node_id_map:
+                        node.reject_to_node_id = node_id_map[node_data.reject_to_node_id]
+                        db.add(node)
+        
+        # 保存更新
+        db.add(workflow)
+        db.commit()
+        db.refresh(workflow)
         
         # 记录日志
         LoggerService.log_info(
@@ -231,24 +256,40 @@ class WorkflowService:
             message=f"更新工作流: {workflow.name}"
         )
         
+        # 创建工作流副本用于返回
+        workflow_copy = {
+            "id": workflow.id,
+            "name": workflow.name,
+            "description": workflow.description,
+            "is_active": workflow.is_active,
+            "created_by": workflow.created_by,
+            "created_at": workflow.created_at,
+            "updated_at": workflow.updated_at,
+            "creator_name": None,
+            "node_count": 0,
+            "nodes": []  # 初始化空节点列表
+        }
         
+        # 获取创建者信息
         if workflow.created_by:
             creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
-            workflow.creator_name = creator.name if creator else None
+            workflow_copy["creator_name"] = creator.name if creator else None
         
         # 获取节点
-        nodes = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).order_by(models.WorkflowNode.order_index).all()
-        workflow.nodes = nodes
-        
-        # 将ORM模型转换为Pydantic模型
-        from fastapi.encoders import jsonable_encoder
+        nodes = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).all()
+        if nodes:
+            from fastapi.encoders import jsonable_encoder
+            nodes_dict = jsonable_encoder(nodes)
+            workflow_copy["nodes"] = nodes_dict
+            workflow_copy["node_count"] = len(nodes)
+            
+        # 尝试转换为Pydantic模型
         try:
-            workflow_dict = jsonable_encoder(workflow)
-            pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
+            pydantic_workflow = schemas.Workflow.model_validate(workflow_copy)
             return pydantic_workflow
         except Exception as e:
             print(f"转换工作流到Pydantic模型时出错: {e}")
-            raise HTTPException(status_code=500, detail="系统内部错误")
+            return None
     
     @staticmethod
     def delete_workflow(
@@ -262,11 +303,6 @@ class WorkflowService:
         workflow = db.query(models.Workflow).filter(models.Workflow.id == workflow_id).first()
         if not workflow:
             raise HTTPException(status_code=404, detail="工作流不存在")
-        
-        # 检查是否有关联的台账
-        ledgers = db.query(models.Ledger).filter(models.Ledger.workflow_id == workflow_id).count()
-        if ledgers > 0:
-            raise HTTPException(status_code=400, detail="该工作流已被台账使用，无法删除")
         
         # 检查是否有关联的模板 - 现在模板关联工作流，所以需要检查
         templates = db.query(models.Template).filter(models.Template.workflow_id == workflow_id).count()
@@ -287,25 +323,29 @@ class WorkflowService:
             message=f"删除工作流: {workflow.name}"
         )
         
-        # 创建用于返回的工作流副本
-        from fastapi.encoders import jsonable_encoder
+        # 创建工作流副本用于返回
+        workflow_copy = {
+            "id": workflow.id,
+            "name": workflow.name,
+            "description": workflow.description,
+            "is_active": workflow.is_active,
+            "created_by": workflow.created_by,
+            "created_at": workflow.created_at,
+            "updated_at": workflow.updated_at,
+            "creator_name": None,
+            "node_count": 0
+        }
+        
+        # 首先删除工作流
+        db.delete(workflow)
+        db.commit()
+        
+        # 然后尝试转换为Pydantic模型返回
         try:
-            # 首先尝试转换为Pydantic模型
-            workflow_dict = jsonable_encoder(workflow)
-            pydantic_workflow = schemas.Workflow.parse_obj(workflow_dict)
-            
-            # 然后删除原工作流
-            db.delete(workflow)
-            db.commit()
-            
+            pydantic_workflow = schemas.Workflow.model_validate(workflow_copy)
             return pydantic_workflow
         except Exception as e:
             print(f"转换工作流到Pydantic模型时出错: {e}")
-            
-            # 如果转换失败，仍然删除工作流，但返回None
-            db.delete(workflow)
-            db.commit()
-            
             return None
     
     @staticmethod
@@ -324,7 +364,7 @@ class WorkflowService:
         try:
             # 先转为JSON，再转为Pydantic模型，避免循环引用问题
             node_dicts = jsonable_encoder(nodes)
-            pydantic_nodes = [schemas.WorkflowNode.parse_obj(node_dict) for node_dict in node_dicts]
+            pydantic_nodes = [schemas.WorkflowNode.model_validate(node_dict) for node_dict in node_dicts]
             return pydantic_nodes
         except Exception as e:
             print(f"转换工作流节点到Pydantic模型时出错: {e}")

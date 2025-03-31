@@ -114,8 +114,9 @@ def test_workflow() -> Dict[str, Any]:
 def test_ledger() -> Dict[str, Any]:
     """返回测试台账数据"""
     return {
-        "title": "Test Ledger",
+        "name": "Test Ledger",
         "status": "draft",
+        "description": "Test Ledger Description",
         "created_at": datetime.now(),
         "modified_at": datetime.now(),
     }

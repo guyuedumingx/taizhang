@@ -353,7 +353,6 @@ const LedgerForm: React.FC = () => {
             </Select>
           </Form.Item>
           
-          {/* 仅在编辑模式或未选择模板时显示通用字段 */}
           {(
             <>
               <Form.Item

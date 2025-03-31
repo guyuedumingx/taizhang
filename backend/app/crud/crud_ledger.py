@@ -12,10 +12,6 @@ class CRUDLedger(CRUDBase[Ledger, LedgerCreate, LedgerUpdate]):
         from fastapi.encoders import jsonable_encoder
         obj_in_data = jsonable_encoder(obj_in)
         
-        # 处理 title 字段，兼容旧代码
-        if hasattr(obj_in, "title") and getattr(obj_in, "title") is not None:
-            obj_in_data["name"] = getattr(obj_in, "title")
-            
         db_obj = self.model(**obj_in_data)
         db_obj.created_by_id = created_by_id
         db_obj.updated_by_id = updated_by_id
@@ -38,9 +34,9 @@ class CRUDLedger(CRUDBase[Ledger, LedgerCreate, LedgerUpdate]):
         else:
             update_data = obj_in.dict(exclude_unset=True)
             
-        # 处理 title 字段，兼容旧代码
-        if "title" in update_data and update_data["title"] is not None:
-            update_data["name"] = update_data.pop("title")
+        # # 处理 title 字段，兼容旧代码
+        # if "title" in update_data and update_data["title"] is not None:
+        #     update_data["name"] = update_data.pop("title")
             
         # 更新 updated_by_id
         update_data["updated_by_id"] = updated_by_id

@@ -39,11 +39,11 @@ class Workflow(Base):
     nodes = relationship("WorkflowNode", back_populates="workflow", cascade="all, delete-orphan")
     instances = relationship("WorkflowInstance", back_populates="workflow")
     creator = relationship("User", foreign_keys=[created_by])
-    templates = relationship(
-        "Template",
-        back_populates="workflow",
-        primaryjoin="and_(Workflow.id==Template.workflow_id, Template.workflow_id!=None)"
-    )
+    # templates = relationship(
+    #     "Template",
+    #     back_populates="workflow",
+    #     primaryjoin="and_(Workflow.id==Template.workflow_id, Template.workflow_id!=None)"
+    # )
 
     def __repr__(self):
         return f"<Workflow {self.name}>"

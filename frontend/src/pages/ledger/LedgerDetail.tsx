@@ -31,6 +31,9 @@ const LedgerDetail: React.FC = () => {
   const [nextNodeId, setNextNodeId] = useState<number | undefined>(undefined);
   const [submitComment, setSubmitComment] = useState('');
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  
+  // 模板是否有工作流标志
+  const [templateHasWorkflow, setTemplateHasWorkflow] = useState<boolean>(false);
 
   // 审批处理相关状态
   const [approvalModalVisible, setApprovalModalVisible] = useState(false);
@@ -53,6 +56,13 @@ const LedgerDetail: React.FC = () => {
       fetchLedgerDetails(parseInt(id));
     }
   }, [id]);
+
+  // 台账详情加载完成后检查是否有关联工作流
+  useEffect(() => {
+    if (ledger && !loading) {
+      checkTemplateWorkflow();
+    }
+  }, [ledger, loading]);
 
   // 从localStorage获取token
   const getToken = () => {
@@ -92,77 +102,80 @@ const LedgerDetail: React.FC = () => {
     }
   };
 
-  // 处理导出
-  const handleExport = async (format: string) => {
-    if (!id) return;
+  // 检查模板是否关联了工作流
+  const checkTemplateWorkflow = async () => {
+    if (!ledger) return;
     
     try {
-      message.loading({ content: '正在导出...', key: 'export' });
-      const blob = await LedgerService.exportLedger(parseInt(id), format);
-      
-      // 检查服务器返回的内容类型
-      if (blob.type.includes('json')) {
-        // 如果返回的是JSON（可能是错误信息），转换成文本并显示
-        const text = await blob.text();
-        const response = JSON.parse(text);
-        message.error({ content: response.detail || '导出失败', key: 'export' });
+      // 如果台账已经关联了工作流
+      if (ledger.workflow_id) {
+        setTemplateHasWorkflow(true);
         return;
       }
       
-      // 根据格式确定文件扩展名
-      let fileExtension = format;
-      if (format.toLowerCase() === 'excel') {
-        fileExtension = 'xlsx';
+      // 查询模板是否关联了工作流
+      if (ledger.template_id) {
+        const template = await TemplateService.getTemplateDetail(ledger.template_id);
+        if (template.workflow_id) {
+          setTemplateHasWorkflow(true);
+        } else {
+          setTemplateHasWorkflow(false);
+        }
+      } else {
+        setTemplateHasWorkflow(false);
       }
-      
-      // 创建下载链接
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      
-      // 使用默认命名
-      const filename = `台账_${id}.${fileExtension}`;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      message.success({ content: '导出成功', key: 'export' });
     } catch (error) {
-      console.error('导出失败:', error);
-      message.error({ content: '导出失败，请重试', key: 'export' });
+      console.error('检查模板工作流失败:', error);
+      setTemplateHasWorkflow(false);
     }
   };
 
   // 获取可用工作流
   const fetchWorkflows = async () => {
-    if (!ledger?.template_id) return;
-    
     try {
-      // 获取模板关联的工作流
-      const response = await axios.get(`${API_BASE_URL}/workflows/?template_id=${ledger.template_id}`, {
+      // 如果台账有关联工作流，直接使用
+      if (ledger?.workflow_id) {
+        const workflowData = await WorkflowService.getWorkflow(ledger.workflow_id);
+        setWorkflow(workflowData);
+        setWorkflows([workflowData]);
+        fetchWorkflowDetail(workflowData.id);
+        return;
+      }
+      
+      // 否则获取模板关联的工作流
+      if (ledger?.template_id) {
+        try {
+          const template = await TemplateService.getTemplateDetail(ledger.template_id);
+          if (template.default_workflow_id) {
+            const defaultWorkflow = await WorkflowService.getWorkflow(template.default_workflow_id);
+            if (defaultWorkflow) {
+              setWorkflow(defaultWorkflow);
+              setWorkflows([defaultWorkflow]);
+              fetchWorkflowDetail(defaultWorkflow.id);
+              return;
+            }
+          }
+        } catch (error) {
+          console.error('获取模板默认工作流失败:', error);
+        }
+      }
+      
+      // 如果没有关联工作流，获取所有可用工作流
+      const response = await axios.get(`${API_BASE_URL}/workflows/`, {
         headers: {
           Authorization: `Bearer ${getToken()}`
         }
       });
       
-      console.log('获取工作流列表原始返回数据:', response.data);
+      const allWorkflows = response.data.items || [];
+      setWorkflows(allWorkflows);
       
-      // 处理分页格式数据
-      let workflows;
-      if (response.data && typeof response.data === 'object' && 'items' in response.data && Array.isArray(response.data.items)) {
-        console.log('从分页数据中提取workflows数组，共 ' + response.data.items.length + ' 条数据');
-        workflows = response.data.items;
-      } else if (Array.isArray(response.data)) {
-        console.log('Workflows数据已是数组格式，共 ' + response.data.length + ' 条数据');
-        workflows = response.data;
-      } else {
-        console.error('API返回的workflows格式不正确:', response.data);
-        workflows = [];
+      if (allWorkflows.length === 1) {
+        setWorkflow(allWorkflows[0]);
+        fetchWorkflowDetail(allWorkflows[0].id);
+      } else if (allWorkflows.length === 0) {
+        message.warning('没有可用的工作流');
       }
-      
-      setWorkflows(workflows);
     } catch (error) {
       console.error('获取工作流列表失败:', error);
       message.error('获取工作流列表失败');
@@ -284,32 +297,6 @@ const LedgerDetail: React.FC = () => {
     }
   };
 
-  // 处理审批
-  const processApproval = async () => {
-    if (!id) return;
-    
-    setApproving(true);
-    try {
-      const approvalData = {
-        action: approvalAction,
-        comment: approvalComment,
-        next_approver_id: currentNodeNeedSelectNextApprover ? nextApprovalApproverId : undefined
-      };
-      
-      // 使用WorkflowService代替直接的api调用
-      await WorkflowService.processApproval(parseInt(id), approvalData);
-      
-      message.success(`台账审批${approvalAction === 'approve' ? '通过' : '拒绝'}成功`);
-      setApprovalModalVisible(false);
-      fetchLedgerDetails(parseInt(id)); // 重新获取台账数据
-    } catch (error) {
-      console.error('处理审批失败:', error);
-      message.error('处理审批失败，请稍后重试');
-    } finally {
-      setApproving(false);
-    }
-  };
-
   // 打开提交审批对话框
   const showSubmitModal = () => {
     // 获取可用工作流
@@ -319,6 +306,9 @@ const LedgerDetail: React.FC = () => {
 
   // 打开处理审批对话框
   const showApprovalModal = () => {
+    // 清空状态
+    setNextApprovalApproverId(undefined);
+    
     // 获取下一个节点
     if (ledger?.active_workflow_instance?.current_node_id) {
       const currentNodeId = ledger.active_workflow_instance.current_node_id;
@@ -376,14 +366,13 @@ const LedgerDetail: React.FC = () => {
               const nextNode = nextNodes[0];
               setNextApprovalNodeId(nextNode.id);
               
-              // 如果下一节点不需要选择审批人，或只有一个审批人
-              if (
-                !nextNode.need_select_next_approver || 
-                (nextNode.approvers && nextNode.approvers.length === 1)
-              ) {
-                if (nextNode.approvers && nextNode.approvers.length === 1) {
-                  setNextApprovalApproverId(nextNode.approvers[0].id);
-                }
+              // 检查下一节点审批人选择需求
+              if (nextNode.need_select_next_approver) {
+                setCurrentNodeNeedSelectNextApprover(true);
+                // 如果需要选择，则不自动设置审批人，等待用户选择
+              } else if (nextNode.approvers && nextNode.approvers.length === 1) {
+                // 如果只有一个审批人，自动选择
+                setNextApprovalApproverId(nextNode.approvers[0].id);
               }
             }
           }
@@ -395,6 +384,38 @@ const LedgerDetail: React.FC = () => {
     }
     
     setApprovalModalVisible(true);
+  };
+
+  // 处理审批
+  const processApproval = async () => {
+    if (!id) return;
+    
+    // 验证：如果需要选择下一个审批人但没有选择
+    if (currentNodeNeedSelectNextApprover && !nextApprovalApproverId) {
+      message.error('请选择下一步审批人');
+      return;
+    }
+    
+    setApproving(true);
+    try {
+      const approvalData = {
+        action: approvalAction,
+        comment: approvalComment,
+        next_approver_id: currentNodeNeedSelectNextApprover ? nextApprovalApproverId : undefined
+      };
+      
+      // 使用WorkflowService代替直接的api调用
+      await WorkflowService.processApproval(parseInt(id), approvalData);
+      
+      message.success(`台账审批${approvalAction === 'approve' ? '通过' : '拒绝'}成功`);
+      setApprovalModalVisible(false);
+      fetchLedgerDetails(parseInt(id)); // 重新获取台账数据
+    } catch (error) {
+      console.error('处理审批失败:', error);
+      message.error('处理审批失败，请稍后重试');
+    } finally {
+      setApproving(false);
+    }
   };
 
   // 渲染审计日志
@@ -431,6 +452,49 @@ const LedgerDetail: React.FC = () => {
     }
     
     return String(value);
+  };
+
+  // 处理导出
+  const handleExport = async (format: string) => {
+    if (!id) return;
+    
+    try {
+      message.loading({ content: '正在导出...', key: 'export' });
+      const blob = await LedgerService.exportLedger(parseInt(id), format);
+      
+      // 检查服务器返回的内容类型
+      if (blob.type.includes('json')) {
+        // 如果返回的是JSON（可能是错误信息），转换成文本并显示
+        const text = await blob.text();
+        const response = JSON.parse(text);
+        message.error({ content: response.detail || '导出失败', key: 'export' });
+        return;
+      }
+      
+      // 根据格式确定文件扩展名
+      let fileExtension = format;
+      if (format.toLowerCase() === 'excel') {
+        fileExtension = 'xlsx';
+      }
+      
+      // 创建下载链接
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      
+      // 使用默认命名
+      const filename = `台账_${id}.${fileExtension}`;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      message.success({ content: '导出成功', key: 'export' });
+    } catch (error) {
+      console.error('导出失败:', error);
+      message.error({ content: '导出失败，请重试', key: 'export' });
+    }
   };
 
   if (loading) {
@@ -497,7 +561,7 @@ const LedgerDetail: React.FC = () => {
                 编辑
               </Button>
             )}
-            {ledger.status === 'draft' && hasPermission(PERMISSIONS.LEDGER_SUBMIT) && (
+            {ledger.status === 'draft' && hasPermission(PERMISSIONS.LEDGER_SUBMIT) && templateHasWorkflow && (
               <Button 
                 type="primary" 
                 icon={<UploadOutlined />} 
@@ -576,39 +640,55 @@ const LedgerDetail: React.FC = () => {
             type="primary"
             loading={submitting}
             onClick={submitForApproval}
+            disabled={!workflow}
           >
             提交
           </Button>
         ]}
       >
         <Form layout="vertical">
-          <Form.Item label="选择工作流" required>
-            <Select
-              placeholder="请选择工作流"
-              value={workflow?.id}
-              onChange={(value) => {
-                setWorkflow(workflows.find(w => w.id === value) || null);
-                fetchWorkflowDetail(value);
-              }}
-            >
-              {workflows.map(w => (
-                <Select.Option key={w.id} value={w.id}>
-                  {w.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+          {workflows.length > 1 ? (
+            <Form.Item label="选择工作流" required>
+              <Select
+                placeholder="请选择工作流"
+                value={workflow?.id}
+                onChange={(value) => {
+                  const selectedWorkflow = workflows.find(w => w.id === value) || null;
+                  setWorkflow(selectedWorkflow);
+                  if (selectedWorkflow) {
+                    fetchWorkflowDetail(selectedWorkflow.id);
+                  }
+                }}
+              >
+                {workflows.map(w => (
+                  <Select.Option key={w.id} value={w.id}>
+                    {w.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          ) : workflows.length === 1 ? (
+            <Form.Item label="工作流">
+              <Input value={workflows[0].name} disabled />
+              <div style={{ marginTop: 8 }}>
+                <Text type="secondary">使用模板关联的默认工作流</Text>
+              </div>
+            </Form.Item>
+          ) : null}
           
-          {nextNodeId && (
-            <ApproverSelector
-              nodeId={nextNodeId}
-              value={nextApproverId}
-              onChange={(approverId: number | number[]) => {
-                if (typeof approverId === 'number') {
-                  setNextApproverId(approverId);
-                }
-              }}
-            />
+          {workflow && workflow.nodes && nextNodeId && 
+           workflow.nodes.some(node => node.id === nextNodeId && node.need_select_next_approver) && (
+            <Form.Item label="选择审批人" required>
+              <ApproverSelector
+                nodeId={nextNodeId}
+                value={nextApproverId}
+                onChange={(approverId: number | number[]) => {
+                  if (typeof approverId === 'number') {
+                    setNextApproverId(approverId);
+                  }
+                }}
+              />
+            </Form.Item>
           )}
           
           <Form.Item label="审批说明">
@@ -650,6 +730,7 @@ const LedgerDetail: React.FC = () => {
               setApprovalAction('approve');
               processApproval();
             }}
+            disabled={currentNodeNeedSelectNextApprover && !nextApprovalApproverId}
           >
             通过
           </Button>
@@ -673,15 +754,18 @@ const LedgerDetail: React.FC = () => {
           )}
           
           {/* 根据需要显示审批人选择器 */}
-          {nextApprovalNodeId && currentNodeNeedSelectNextApprover && (
-            <ApproverSelector
-              nodeId={nextApprovalNodeId}
-              value={nextApprovalApproverId}
-              onChange={(value) => setNextApprovalApproverId(value as number)}
-              style={{ marginTop: 16 }}
-              required={true}
-              label="选择下一审批人"
-            />
+          {currentNodeNeedSelectNextApprover && (
+            <Form.Item label="选择下一步审批人" required style={{ marginTop: 16 }}>
+              <ApproverSelector
+                nodeId={nextApprovalNodeId || 0}
+                value={nextApprovalApproverId}
+                onChange={(value) => setNextApprovalApproverId(value as number)}
+                required={true}
+              />
+              <div style={{ marginTop: 8 }}>
+                <Text type="secondary">当前工作流节点需要选择下一步审批人</Text>
+              </div>
+            </Form.Item>
           )}
           
           <Form.Item label="审批意见" style={{ marginTop: 16 }}>

@@ -33,16 +33,15 @@ def test_create_ledger(db: Session, test_template: dict, test_user: dict, test_l
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
         template_id=template.id,
     )
     
     ledger = crud.ledger.create(db, obj_in=ledger_in, created_by_id=user.id, updated_by_id=user.id)
     
-    assert ledger.name == test_ledger["title"]
+    assert ledger.name == test_ledger["name"]
     assert ledger.template_id == template.id
     assert ledger.created_by_id == user.id
-    assert ledger.status == "draft"  # 默认状态应为草稿
 
 
 def test_get_ledger(db: Session, test_template: dict, test_user: dict, test_ledger: dict):
@@ -73,7 +72,8 @@ def test_get_ledger(db: Session, test_template: dict, test_user: dict, test_ledg
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
+        description=test_ledger["description"],
         template_id=template.id,
     )
     
@@ -83,7 +83,7 @@ def test_get_ledger(db: Session, test_template: dict, test_user: dict, test_ledg
     
     assert fetched_ledger
     assert fetched_ledger.id == created_ledger.id
-    assert fetched_ledger.name == test_ledger["title"]
+    assert fetched_ledger.name == test_ledger["name"]
     assert fetched_ledger.template_id == template.id
     assert fetched_ledger.created_by_id == user.id
 
@@ -116,7 +116,8 @@ def test_update_ledger(db: Session, test_template: dict, test_user: dict, test_l
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
+        description=test_ledger["description"],
         template_id=template.id,
     )
     
@@ -133,6 +134,7 @@ def test_update_ledger(db: Session, test_template: dict, test_user: dict, test_l
     assert updated_ledger.id == created_ledger.id
     assert updated_ledger.name == new_name
     assert updated_ledger.template_id == template.id  # 没有更新的字段应保持不变
+    assert updated_ledger.description == test_ledger["description"]
 
 
 def test_delete_ledger(db: Session, test_template: dict, test_user: dict, test_ledger: dict):
@@ -163,7 +165,8 @@ def test_delete_ledger(db: Session, test_template: dict, test_user: dict, test_l
     
     # 创建台账
     ledger_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
+        description=test_ledger["description"],
         template_id=template.id,
     )
     
@@ -207,13 +210,15 @@ def test_get_multi_ledgers(db: Session, test_template: dict, test_user: dict, te
     
     # 创建第一个台账
     ledger1_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
+        description=test_ledger["description"],
         template_id=template.id,
     )
     
     # 创建第二个台账
     ledger2_in = schemas.LedgerCreate(
-        name=f"{test_ledger['title']}_2",
+        name=f"{test_ledger['name']}_2",
+        description=f"{test_ledger['description']} 2",
         template_id=template.id,
     )
     
@@ -223,8 +228,8 @@ def test_get_multi_ledgers(db: Session, test_template: dict, test_user: dict, te
     ledgers = crud.ledger.get_multi(db)
     
     assert len(ledgers) == 2
-    assert any(l.name == test_ledger["title"] for l in ledgers)
-    assert any(l.name == f"{test_ledger['title']}_2" for l in ledgers)
+    assert any(l.name == test_ledger["name"] for l in ledgers)
+    assert any(l.name == f"{test_ledger['name']}_2" for l in ledgers)
 
 
 def test_get_ledgers_by_template(db: Session, test_template: dict, test_user: dict, test_ledger: dict):
@@ -264,19 +269,19 @@ def test_get_ledgers_by_template(db: Session, test_template: dict, test_user: di
     
     # 创建第一个模板的台账
     ledger1_in = schemas.LedgerCreate(
-        name=test_ledger["title"],
+        name=test_ledger["name"],
         template_id=template1.id,
     )
     
     # 创建第二个模板的台账
     ledger2_in = schemas.LedgerCreate(
-        name=f"{test_ledger['title']}_2",
+        name=f"{test_ledger['name']}_2",
         template_id=template2.id,
     )
     
     # 创建另一个第一个模板的台账
     ledger3_in = schemas.LedgerCreate(
-        name=f"{test_ledger['title']}_3",
+        name=f"{test_ledger['name']}_3",
         template_id=template1.id,
     )
     

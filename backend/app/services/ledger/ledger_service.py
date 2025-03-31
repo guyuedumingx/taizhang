@@ -23,7 +23,6 @@ class LedgerService:
         search: Optional[str] = None,
         status: Optional[str] = None,
         approval_status: Optional[str] = None,
-        workflow_id: Optional[int] = None,
         current_user: models.User = None,
     ) -> List[schemas.Ledger]:
         """
@@ -47,10 +46,6 @@ class LedgerService:
         # 按审批状态筛选
         if approval_status:
             query = query.filter(models.Ledger.approval_status == approval_status)
-        
-        # 按工作流筛选
-        if workflow_id:
-            query = query.filter(models.Ledger.workflow_id == workflow_id)
         
         # 搜索
         if search:
@@ -76,6 +71,13 @@ class LedgerService:
                 template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
                 if template:
                     ledger.template_name = template.name
+
+                # 获取工作流名称
+                if template.workflow_id:
+                    workflow = db.query(models.Workflow).filter(models.Workflow.id == template.workflow_id).first()
+                    if workflow:
+                        ledger.workflow_name = workflow.name
+        
             
             # 获取创建人和更新人姓名
             creator = db.query(models.User).filter(models.User.id == ledger.created_by_id).first()
@@ -92,12 +94,6 @@ class LedgerService:
                 if approver:
                     ledger.current_approver_name = approver.name
             
-            # 获取工作流名称
-            if ledger.workflow_id:
-                workflow = db.query(models.Workflow).filter(models.Workflow.id == ledger.workflow_id).first()
-                if workflow:
-                    ledger.workflow_name = workflow.name
-        
         return ledgers
 
     @staticmethod
@@ -117,37 +113,23 @@ class LedgerService:
                 raise HTTPException(status_code=404, detail="模板不存在")
         
         # 从模板获取默认值
-        name = ledger_in.name
         description = ledger_in.description
-        team_id = ledger_in.team_id or current_user.team_id
         status = ledger_in.status or "draft"
-        workflow_id = ledger_in.workflow_id
         
         if template:
-            # 如果未提供值，则使用模板默认值
-            if not name and template.default_ledger_name:
-                name = template.default_ledger_name
                 
             if not description and template.default_description:
                 description = template.default_description
                 
-            if not ledger_in.team_id and template.default_team_id:
-                team_id = template.default_team_id
-                
-            if not ledger_in.status and template.default_status:
-                status = template.default_status
-                
-            # 如果未提供工作流ID，则使用模板默认工作流
-            if not workflow_id and template.default_workflow_id:
-                workflow_id = template.default_workflow_id
+            workflow_id = template.workflow_id
         
         # 确保必须的值存在
-        if not name:
+        if not ledger_in.name:
             raise HTTPException(status_code=400, detail="台账名称不能为空")
         
         # 检查团队是否存在
-        if team_id:
-            team = db.query(models.Team).filter(models.Team.id == team_id).first()
+        if ledger_in.team_id:
+            team = db.query(models.Team).filter(models.Team.id == ledger_in.team_id).first()
             if not team:
                 raise HTTPException(status_code=404, detail="团队不存在")
         
@@ -162,11 +144,10 @@ class LedgerService:
         
         # 创建台账
         ledger = models.Ledger(
-            name=name,
+            name=ledger_in.name,
             description=description,
-            team_id=team_id,
+            team_id=ledger_in.team_id,
             template_id=ledger_in.template_id,
-            workflow_id=workflow_id,
             data=ledger_in.data or {},
             status=status,
             approval_status="pending",
@@ -272,6 +253,12 @@ class LedgerService:
             if template:
                 ledger.template_name = template.name
         
+            # 获取工作流名称
+            if template.workflow_id:
+                workflow = db.query(models.Workflow).filter(models.Workflow.id == template.workflow_id).first()
+                if workflow:
+                    ledger.workflow_name = workflow.name
+        
         # 获取创建人和更新人姓名
         creator = db.query(models.User).filter(models.User.id == ledger.created_by_id).first()
         if creator:
@@ -286,12 +273,6 @@ class LedgerService:
             approver = db.query(models.User).filter(models.User.id == ledger.current_approver_id).first()
             if approver:
                 ledger.current_approver_name = approver.name
-        
-        # 获取工作流名称
-        if ledger.workflow_id:
-            workflow = db.query(models.Workflow).filter(models.Workflow.id == ledger.workflow_id).first()
-            if workflow:
-                ledger.workflow_name = workflow.name
         
         # 记录日志
         LoggerService.log_info(
@@ -364,8 +345,8 @@ class LedgerService:
             # 如果还是没有工作流，尝试从模板获取默认工作流
             if not workflow_id and ledger.template_id:
                 template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
-                if template and template.default_workflow_id:
-                    workflow_id = template.default_workflow_id
+                if template and template.workflow_id:
+                    workflow_id = template.workflow_id
                     update_data["workflow_id"] = workflow_id
             
             if not workflow_id:

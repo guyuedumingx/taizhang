@@ -97,11 +97,7 @@ export interface Template {
   department: string;
   is_system: boolean;
   workflow_id?: number;
-  default_workflow_id?: number;
-  default_team_id?: number;
-  default_ledger_name?: string;
   default_description?: string;
-  default_status?: string;
   created_by_id: number;
   created_by_name?: string;
   updated_by_id?: number;
@@ -109,8 +105,6 @@ export interface Template {
   created_at: string;
   updated_at?: string;
   field_count: number;
-  default_workflow_name?: string;
-  default_team_name?: string;
 }
 
 export interface TemplateDetail extends Template {
@@ -122,11 +116,7 @@ export interface TemplateCreate {
   description?: string;
   department: string;
   workflow_id?: number;
-  default_workflow_id?: number;
-  default_team_id?: number;
-  default_ledger_name?: string;
   default_description?: string;
-  default_status?: string;
   fields?: FieldCreate[];
 }
 
@@ -135,11 +125,7 @@ export interface TemplateUpdate {
   description?: string;
   department?: string;
   workflow_id?: number;
-  default_workflow_id?: number;
-  default_team_id?: number;
-  default_ledger_name?: string;
   default_description?: string;
-  default_status?: string;
   fields?: FieldCreate[];
 }
 
