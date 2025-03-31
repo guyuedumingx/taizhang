@@ -41,10 +41,6 @@ const WorkflowList: React.FC = () => {
       const response = await api.workflows.getWorkflows();
       setWorkflows(response);
       
-      // 如果URL中有模板ID参数，显示提示信息
-      if (templateId) {
-        message.info(`正在显示与模板ID ${templateId} 相关的工作流`);
-      }
     } catch (error) {
       console.error('获取工作流程失败:', error);
       message.error('获取工作流程失败');
@@ -70,11 +66,6 @@ const WorkflowList: React.FC = () => {
 
   // 过滤工作流数据
   const filteredWorkflows = workflows.filter(workflow => {
-    // 如果有模板ID参数，只显示匹配的工作流
-    if (templateId && workflow.template_id.toString() !== templateId) {
-      return false;
-    }
-    
     // 处理搜索过滤
     if (searchText) {
       return (
@@ -104,11 +95,6 @@ const WorkflowList: React.FC = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
-    },
-    {
-      title: '模板',
-      dataIndex: ['template', 'name'],
-      key: 'template',
     },
     {
       title: '状态',

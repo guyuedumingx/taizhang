@@ -90,6 +90,7 @@ const TemplateForm: React.FC = () => {
         name: template.name,
         department: template.department,
         description: template.description || '',
+        workflow_id: template.workflow_id || null,
         default_ledger_name: template.default_ledger_name || '',
         default_description: template.default_description || '',
         default_status: template.default_status || 'draft',
@@ -134,6 +135,7 @@ const TemplateForm: React.FC = () => {
           name: values.name as string,
           department: values.department as string,
           description: values.description as string,
+          workflow_id: values.workflow_id as number,
           default_ledger_name: values.default_ledger_name as string,
           default_description: values.default_description as string,
           default_status: values.default_status as string,
@@ -150,6 +152,7 @@ const TemplateForm: React.FC = () => {
           name: values.name as string,
           department: values.department as string,
           description: values.description as string,
+          workflow_id: values.workflow_id as number,
           default_ledger_name: values.default_ledger_name as string,
           default_description: values.default_description as string,
           default_status: values.default_status as string,
@@ -220,6 +223,17 @@ const TemplateForm: React.FC = () => {
             label="模板描述"
           >
             <TextArea rows={4} placeholder="请输入模板描述" />
+          </Form.Item>
+          
+          <Form.Item
+            name="workflow_id"
+            label="关联工作流"
+          >
+            <Select placeholder="选择关联工作流" allowClear>
+              {workflows.map(workflow => (
+                <Option key={workflow.id} value={workflow.id}>{workflow.name}</Option>
+              ))}
+            </Select>
           </Form.Item>
           
           <Divider orientation="left">台账默认值设置</Divider>

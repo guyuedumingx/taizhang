@@ -96,6 +96,12 @@ export interface Template {
   description?: string;
   department: string;
   is_system: boolean;
+  workflow_id?: number;
+  default_workflow_id?: number;
+  default_team_id?: number;
+  default_ledger_name?: string;
+  default_description?: string;
+  default_status?: string;
   created_by_id: number;
   created_by_name?: string;
   updated_by_id?: number;
@@ -103,6 +109,8 @@ export interface Template {
   created_at: string;
   updated_at?: string;
   field_count: number;
+  default_workflow_name?: string;
+  default_team_name?: string;
 }
 
 export interface TemplateDetail extends Template {
@@ -113,6 +121,12 @@ export interface TemplateCreate {
   name: string;
   description?: string;
   department: string;
+  workflow_id?: number;
+  default_workflow_id?: number;
+  default_team_id?: number;
+  default_ledger_name?: string;
+  default_description?: string;
+  default_status?: string;
   fields?: FieldCreate[];
 }
 
@@ -120,6 +134,12 @@ export interface TemplateUpdate {
   name?: string;
   description?: string;
   department?: string;
+  workflow_id?: number;
+  default_workflow_id?: number;
+  default_team_id?: number;
+  default_ledger_name?: string;
+  default_description?: string;
+  default_status?: string;
   fields?: FieldCreate[];
 }
 
@@ -215,4 +235,66 @@ export interface RegisterRequest {
   password: string;
   ehr_id: string;
   name: string;
+}
+
+export interface Workflow {
+  id: number;
+  name: string;
+  description: string;
+  is_active: boolean;
+  created_by: number;
+  created_at: string;
+  updated_at: string | null;
+  nodes: WorkflowNode[];
+  template_name?: string;
+  creator_name?: string;
+}
+
+export interface WorkflowNode {
+  id: number;
+  workflow_id: number;
+  name: string;
+  description?: string;
+  node_type: string;
+  approver_role_id?: number | null;
+  approver_user_id?: number | null;
+  order_index: number;
+  is_final?: boolean;
+  reject_to_node_id?: number | null;
+  multi_approve_type?: string;
+  need_select_next_approver?: boolean;
+  created_at?: string;
+  updated_at?: string | null;
+  approver_role_name?: string;
+  approver_user_name?: string;
+  approvers?: Array<{id: number; name: string}>;
+}
+
+export interface WorkflowNodeCreate {
+  workflow_id: number;
+  name: string;
+  description?: string;
+  node_type: string;
+  approver_role_id?: number | null;
+  approver_user_id?: number | null;
+  order_index: number;
+  is_final?: boolean;
+  reject_to_node_id?: number | null;
+  multi_approve_type?: string;
+  need_select_next_approver?: boolean;
+  approver_ids?: number[];
+}
+
+export interface WorkflowCreate {
+  name: string;
+  description?: string;
+  is_active?: boolean;
+  nodes?: WorkflowNodeCreate[];
+}
+
+export interface WorkflowUpdate {
+  name?: string;
+  description?: string;
+  is_active?: boolean;
+  nodes?: WorkflowNodeCreate[];
 } 
