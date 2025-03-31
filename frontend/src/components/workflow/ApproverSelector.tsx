@@ -152,7 +152,7 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
         optionFilterProp="children"
         disabled={disabled}
       >
-        {userOptions.map(user => (
+        {userOptions.items.map(user => (
           <Option key={user.id} value={user.id}>
             {user.name} ({user.username})
           </Option>
