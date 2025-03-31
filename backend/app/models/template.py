@@ -13,6 +13,7 @@ class Template(Base):
     description = Column(Text, nullable=True)
     department = Column(String, nullable=False)
     is_system = Column(Boolean, default=False)
+    workflow_id = Column(Integer, ForeignKey("workflows.id"), nullable=True)
     
     # 台账元字段（默认值）
     default_ledger_name = Column(String, nullable=True)
@@ -39,4 +40,9 @@ class Template(Base):
     updater = relationship("User", foreign_keys=[updated_by_id])
     default_team = relationship("Team", foreign_keys=[default_team_id])
     default_workflow = relationship("Workflow", foreign_keys=[default_workflow_id])
-    workflows = relationship("Workflow", back_populates="template", foreign_keys="Workflow.template_id") 
+    workflow = relationship(
+        "Workflow",
+        back_populates="templates",
+        primaryjoin="and_(Template.workflow_id==Workflow.id, Template.workflow_id!=None)",
+        foreign_keys=[workflow_id]
+    ) 

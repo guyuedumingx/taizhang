@@ -12,6 +12,7 @@ class TemplateBase(BaseModel):
     description: Optional[str] = None
     department: Optional[str] = None
     is_system: Optional[bool] = False
+    workflow_id: Optional[int] = None
     
     # 台账元字段（默认值）
     default_ledger_name: Optional[str] = None

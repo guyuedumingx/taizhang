@@ -24,7 +24,10 @@ class WorkflowService:
             
             # 按模板筛选
             if template_id:
-                query = query.filter(models.Workflow.template_id == template_id)
+                # 通过Template表的workflow_id字段进行反向筛选
+                template = db.query(models.Template).filter(models.Template.id == template_id).first()
+                if template and template.workflow_id:
+                    query = query.filter(models.Workflow.id == template.workflow_id)
             
             # 搜索
             if search:
@@ -37,9 +40,12 @@ class WorkflowService:
             for workflow in workflows:
                 try:
                     # 获取关联的模板
-                    if workflow.template_id:
-                        template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-                        workflow.template_name = template.name if template else None
+                    templates = db.query(models.Template).filter(models.Template.workflow_id == workflow.id).all()
+                    if templates:
+                        # 使用第一个模板的名称作为显示
+                        workflow.template_name = templates[0].name if templates else None
+                    else:
+                        workflow.template_name = None
                     
                     # 获取创建者和更新者信息
                     if workflow.created_by:
@@ -68,12 +74,6 @@ class WorkflowService:
         """
         创建新工作流
         """
-        # 检查模板是否存在
-        if workflow_in.template_id:
-            template = db.query(models.Template).filter(models.Template.id == workflow_in.template_id).first()
-            if not template:
-                raise HTTPException(status_code=404, detail="模板不存在")
-        
         # 检查工作流名称是否已存在
         workflow = db.query(models.Workflow).filter(models.Workflow.name == workflow_in.name).first()
         if workflow:
@@ -82,11 +82,10 @@ class WorkflowService:
                 detail="工作流名称已存在",
             )
         
-        # 创建工作流
+        # 创建工作流 - 不再设置template_id
         workflow = models.Workflow(
             name=workflow_in.name,
             description=workflow_in.description,
-            template_id=workflow_in.template_id,
             created_by=current_user_id,
         )
         db.add(workflow)
@@ -118,11 +117,7 @@ class WorkflowService:
             message=f"创建工作流: {workflow.name}"
         )
         
-        # 获取关联信息
-        if workflow.template_id:
-            template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-            workflow.template_name = template.name if template else None
-        
+        # 获取创建者信息
         if workflow.created_by:
             creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
             workflow.creator_name = creator.name if creator else None
@@ -141,10 +136,10 @@ class WorkflowService:
         if not workflow:
             raise HTTPException(status_code=404, detail="工作流不存在")
         
-        # 获取关联信息
-        if workflow.template_id:
-            template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-            workflow.template_name = template.name if template else None
+        # 获取关联模板信息
+        templates = db.query(models.Template).filter(models.Template.workflow_id == workflow.id).all()
+        if templates:
+            workflow.template_name = templates[0].name if templates else None
         
         # 获取创建者信息
         if workflow.created_by:
@@ -180,18 +175,19 @@ class WorkflowService:
                     detail="工作流名称已存在",
                 )
         
-        # 如果更新模板ID，检查模板是否存在
-        if hasattr(workflow_in, 'template_id') and workflow_in.template_id and workflow_in.template_id != workflow.template_id:
-            template = db.query(models.Template).filter(models.Template.id == workflow_in.template_id).first()
-            if not template:
-                raise HTTPException(status_code=404, detail="模板不存在")
-        
         # 更新工作流信息
-        update_data = workflow_in.dict(exclude_unset=True, exclude={"nodes"})
+        try:
+            # 尝试新API
+            update_data = workflow_in.model_dump(exclude_unset=True, exclude={"nodes"})
+        except AttributeError:
+            # 老版本Pydantic
+            update_data = workflow_in.dict(exclude_unset=True, exclude={"nodes"})
         
         # 更新其他字段
         for field, value in update_data.items():
-            setattr(workflow, field, value)
+            # 跳过template_id字段
+            if field != 'template_id':
+                setattr(workflow, field, value)
         
         db.add(workflow)
         db.commit()
@@ -228,9 +224,9 @@ class WorkflowService:
         )
         
         # 获取关联信息
-        if workflow.template_id:
-            template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-            workflow.template_name = template.name if template else None
+        templates = db.query(models.Template).filter(models.Template.workflow_id == workflow.id).all()
+        if templates:
+            workflow.template_name = templates[0].name if templates else None
         
         if workflow.created_by:
             creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
@@ -259,6 +255,11 @@ class WorkflowService:
         ledgers = db.query(models.Ledger).filter(models.Ledger.workflow_id == workflow_id).count()
         if ledgers > 0:
             raise HTTPException(status_code=400, detail="该工作流已被台账使用，无法删除")
+        
+        # 检查是否有关联的模板 - 现在模板关联工作流，所以需要检查
+        templates = db.query(models.Template).filter(models.Template.workflow_id == workflow_id).count()
+        if templates > 0:
+            raise HTTPException(status_code=400, detail="该工作流已被模板使用，请先解除关联")
         
         # 删除节点
         db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).delete()

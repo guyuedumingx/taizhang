@@ -59,7 +59,6 @@ class WorkflowNodeUpdate(BaseModel):
 class WorkflowBase(BaseModel):
     name: str
     description: Optional[str] = None
-    template_id: int
     is_active: Optional[bool] = True
 
 # 创建工作流请求

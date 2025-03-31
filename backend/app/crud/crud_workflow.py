@@ -31,17 +31,6 @@ class CRUDWorkflow(CRUDBase[Workflow, WorkflowCreate, WorkflowUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def get_by_template(self, db: Session, *, template_id: int) -> List[Workflow]:
-        """获取模板的所有工作流"""
-        return db.query(Workflow).filter(Workflow.template_id == template_id).all()
-    
-    def get_active_by_template(self, db: Session, *, template_id: int) -> List[Workflow]:
-        """获取模板的活动工作流"""
-        return db.query(Workflow).filter(
-            Workflow.template_id == template_id,
-            Workflow.is_active == True
-        ).all()
-    
     def deactivate(self, db: Session, *, workflow_id: int) -> Workflow:
         """停用工作流"""
         workflow = db.query(Workflow).filter(Workflow.id == workflow_id).first()

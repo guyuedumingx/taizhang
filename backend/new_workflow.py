@@ -39,11 +39,7 @@ class Workflow(Base):
     nodes = relationship("WorkflowNode", back_populates="workflow", cascade="all, delete-orphan")
     instances = relationship("WorkflowInstance", back_populates="workflow")
     creator = relationship("User", foreign_keys=[created_by])
-    templates = relationship(
-        "Template",
-        back_populates="workflow",
-        primaryjoin="and_(Workflow.id==Template.workflow_id, Template.workflow_id!=None)"
-    )
+    template = relationship("Template", secondary="template_workflows", back_populates="workflows")
 
     def __repr__(self):
         return f"<Workflow {self.name}>"
@@ -86,7 +82,7 @@ class WorkflowInstance(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     workflow_id = Column(Integer, ForeignKey("workflows.id"), nullable=False)
-    ledger_id = Column(Integer, ForeignKey("ledgers.id"), nullable=False, unique=True)  # 确保一对一关系
+    ledger_id = Column(Integer, ForeignKey("ledgers.id"), nullable=False)
     status = Column(String, default="active")  # active, completed, cancelled
     current_node_id = Column(Integer, nullable=True)  # 移除外键约束，避免循环引用
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -96,7 +92,7 @@ class WorkflowInstance(Base):
 
     # 关系
     workflow = relationship("Workflow", back_populates="instances")
-    ledger = relationship("Ledger", back_populates="workflow_instance", uselist=False)  # 确保一对一关系
+    ledger = relationship("Ledger", back_populates="workflow_instances")
     creator = relationship("User", foreign_keys=[created_by])
     instance_nodes = relationship("WorkflowInstanceNode", back_populates="workflow_instance", cascade="all, delete-orphan")
     

@@ -54,11 +54,6 @@ def create_workflow(
     if not workflow_in.name or workflow_in.name.strip() == "":
         raise HTTPException(status_code=422, detail="工作流名称不能为空")
     
-    # 检查模板是否存在
-    template = crud.template.get(db, id=workflow_in.template_id)
-    if not template:
-        raise HTTPException(status_code=404, detail="模板不存在")
-    
     # 创建工作流
     workflow = crud.workflow.create_with_nodes(db, obj_in=workflow_in, created_by=current_user.id)
     
@@ -85,10 +80,10 @@ def read_workflow(
     if not workflow:
         raise HTTPException(status_code=404, detail="工作流不存在")
     
-    # 添加模板名称
-    template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-    if template:
-        workflow.template_name = template.name
+    # # 添加模板名称
+    # template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
+    # if template:
+    #     workflow.template_name = template.name
     
     return workflow
 
@@ -114,10 +109,10 @@ def update_workflow(
     # 更新工作流
     workflow = crud.workflow.update_with_nodes(db, db_obj=workflow, obj_in=workflow_in)
     
-    # 添加模板名称
-    template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-    if template:
-        workflow.template_name = template.name
+    # # 添加模板名称
+    # template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
+    # if template:
+    #     workflow.template_name = template.name
     
     return workflow
 
@@ -289,9 +284,9 @@ def deactivate_workflow(
     workflow = crud.workflow.deactivate(db, workflow_id=workflow_id)
     
     # 添加模板名称
-    template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
-    if template:
-        workflow.template_name = template.name
+    # template = db.query(models.Template).filter(models.Template.id == workflow.template_id).first()
+    # if template:
+    #     workflow.template_name = template.name
     
     return workflow
 

@@ -41,5 +41,5 @@ class Ledger(Base):
     current_approver = relationship("User", foreign_keys=[current_approver_id])
     field_values = relationship("FieldValue", back_populates="ledger", cascade="all, delete-orphan")
     workflow = relationship("Workflow", foreign_keys=[workflow_id])
-    workflow_instances = relationship("WorkflowInstance", back_populates="ledger", cascade="all, delete-orphan")
+    workflow_instance = relationship("WorkflowInstance", back_populates="ledger", uselist=False)
     audit_logs = relationship("AuditLog", back_populates="ledger", cascade="all, delete-orphan") 

@@ -158,14 +158,13 @@ def template(db: Session, normal_user: models.User) -> models.Template:
 
 
 @pytest.fixture(scope="function")
-def workflow(db: Session, template: models.Template, normal_user: models.User) -> models.Workflow:
+def workflow(db: Session, normal_user: models.User) -> models.Workflow:
     """
     创建测试工作流
     """
     workflow_in = schemas.WorkflowCreate(
         name="测试工作流",
         description="这是一个测试工作流",
-        template_id=template.id,
     )
     from app.services.workflow.workflow_service import workflow_service
     workflow = workflow_service.create_workflow(db, workflow_in, normal_user.id)
