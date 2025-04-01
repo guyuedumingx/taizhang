@@ -291,12 +291,12 @@ export interface Workflow {
   nodes: WorkflowNode[];
   template_name?: string;
   creator_name?: string;
+  node_count?: number;
 }
 
 export interface WorkflowCreate {
   name: string;
   description: string;
-  template_id: number;
   is_active?: boolean;
   nodes: WorkflowNodeCreate[];
 }

@@ -5398,3 +5398,18 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-04-01 16:13:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
 2025-04-01 16:13:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
 2025-04-01 16:13:08 - root - INFO - 访问根路径
+2025-04-01 16:32:40 - root - INFO - 服务关闭
+2025-04-01 16:32:42 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 16:32:42 - root - INFO - 服务启动
+2025-04-01 16:36:22 - root - INFO - 服务关闭
+2025-04-01 16:36:23 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 16:36:24 - root - INFO - 服务启动
+2025-04-01 16:36:26 - root - INFO - 服务关闭
+2025-04-01 16:36:28 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 16:36:28 - root - INFO - 服务启动
+2025-04-01 16:36:38 - root - INFO - 服务关闭
+2025-04-01 16:36:40 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 16:36:40 - root - INFO - 服务启动
+2025-04-01 16:37:07 - root - INFO - 服务关闭
+2025-04-01 16:37:10 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 16:37:10 - root - INFO - 服务启动

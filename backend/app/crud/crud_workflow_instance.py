@@ -19,7 +19,7 @@ from app.models.ledger import Ledger
 
 class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, WorkflowInstanceUpdate]):
     def create_with_nodes(
-        self, db: Session, *, workflow_id: int, ledger_id: int, created_by: int
+        self, db: Session, *, workflow_id: int, ledger_id: int, created_by: int, next_approver_id: Optional[int] = None
     ) -> WorkflowInstance:
         """创建工作流实例及其节点"""
         # 首先创建工作流实例
@@ -27,7 +27,7 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
             workflow_id=workflow_id,
             ledger_id=ledger_id,
             created_by=created_by,
-            status="active"
+            status="active",
         )
         db.add(db_obj)
         db.flush()  # 获取实例ID

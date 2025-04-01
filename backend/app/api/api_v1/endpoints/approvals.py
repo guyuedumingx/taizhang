@@ -181,8 +181,10 @@ def submit_ledger_for_approval(
         raise HTTPException(status_code=404, detail="指定的工作流不存在或未激活")
     
     # 创建工作流实例
+    # 前端提交时，如果需要指定下一审批人，则需要将next_approver_id传入
+    # 如果不需要指定下一审批人，则不传入next_approver_id
     workflow_instance = crud.workflow_instance.create_with_nodes(
-        db, workflow_id=workflow_id, ledger_id=ledger_id, created_by=current_user.id
+        db, workflow_id=workflow_id, ledger_id=ledger_id, created_by=current_user.id, next_approver_id=submit_data.next_approver_id
     )
     
     # 更新台账状态
