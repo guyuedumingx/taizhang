@@ -2,7 +2,7 @@ import pytest
 from typing import Dict, Generator
 from sqlalchemy.orm import Session
 
-from app import crud, models
+from app import crud, models, schemas
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.core.security import create_access_token
@@ -30,13 +30,14 @@ def admin_user(db: Session) -> models.User:
         return admin
     
     # 管理员数据
-    user_in = models.UserCreate(
+    user_in = schemas.UserCreate(
         username="admin",
-        email="admin@example.com",
+        ehr_id="1000001",
+        name="测试管理员",
         password="admin123",
+        department="测试部门",
         is_superuser=True,
-        is_active=True,
-        full_name="测试管理员"
+        is_active=True
     )
     user = crud.user.create(db, obj_in=user_in)
     return user
