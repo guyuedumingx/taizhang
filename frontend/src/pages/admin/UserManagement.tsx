@@ -369,11 +369,16 @@ const UserManagement: React.FC = () => {
         ]}
         showBackButton={false}
       />
-      
-      <div className="container">
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <Typography.Title level={3}>用户管理</Typography.Title>
-          <Space>
+        <Card>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+            <Title level={4}>用户列表</Title>
+            <Space>
+              <Search
+                placeholder="搜索用户"
+                allowClear
+                onSearch={handleSearch}
+                style={{ width: 250 }}
+              />
             <Button
               type="primary"
               icon={<UploadOutlined />}
@@ -390,18 +395,6 @@ const UserManagement: React.FC = () => {
             >
               创建用户
             </Button>
-          </Space>
-        </div>
-        <Card>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-            <Title level={4}>用户列表</Title>
-            <Space>
-              <Search
-                placeholder="搜索用户"
-                allowClear
-                onSearch={handleSearch}
-                style={{ width: 250 }}
-              />
             </Space>
           </div>
           <Table
@@ -626,7 +619,6 @@ const UserManagement: React.FC = () => {
             </Card>
           )}
         </Modal>
-      </div>
     </>
   );
 };
