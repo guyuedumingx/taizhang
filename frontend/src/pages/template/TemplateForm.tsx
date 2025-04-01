@@ -7,7 +7,7 @@ import { PERMISSIONS } from '../../config';
 import { TemplateService } from '../../services/TemplateService';
 import { TeamService } from '../../services/TeamService';
 import { WorkflowService } from '../../services/WorkflowService';
-import { TemplateCreate, TemplateUpdate, FieldCreate, Team, Workflow } from '../../types';
+import { TemplateCreate, TemplateUpdate, FieldCreate, Team, Workflow, FieldUpdate } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
 const { Title } = Typography;
@@ -82,7 +82,8 @@ const TemplateForm: React.FC = () => {
         type: field.type,
         required: field.required,
         options: field.options ? field.options.join(',') : '',
-        is_key_field: field.is_key_field || false
+        is_key_field: field.is_key_field || false,  
+        id: field.id
       }));
       
       // 设置表单初始值
@@ -106,19 +107,31 @@ const TemplateForm: React.FC = () => {
   const handleSubmit = async (values: Record<string, unknown>) => {
     // 转换字段数据
     const fields = (values.fields as Array<Record<string, unknown>>).map((field) => {
-      const fieldData: FieldCreate = {
-        name: field.name as string,
-        label: field.label as string,
-        type: field.type as string,
-        required: field.required as boolean || false,
-        is_key_field: field.is_key_field as boolean || false
-      };
+      let fieldData: FieldUpdate | FieldCreate | null = null;
+      if (isEdit) {
+        fieldData = {
+          id: field.id as number,
+          name: field.name as string,
+          label: field.label as string,
+          type: field.type as string,
+          required: field.required as boolean || false,
+          is_key_field: field.is_key_field as boolean || false
+        };
+      } else {
+        fieldData = {
+          name: field.name as string,
+          label: field.label as string,
+          type: field.type as string,
+          required: field.required as boolean || false,
+          is_key_field: field.is_key_field as boolean || false
+        };
+      }
       
       // 处理选项类型的字段
       if (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox') {
         fieldData.options = field.options ? (field.options as string).split(',').map((opt: string) => opt.trim()) : [];
       }
-      
+      console.log(fieldData);
       return fieldData;
     });
     

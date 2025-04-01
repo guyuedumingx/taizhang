@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from app.schemas.field import Field, FieldCreate
+from app.schemas.field import Field, FieldCreate, FieldUpdate
 
 
 # 共享属性
@@ -28,7 +28,7 @@ class TemplateCreate(TemplateBase):
 
 # 更新模板时的属性
 class TemplateUpdate(TemplateBase):
-    fields: Optional[List[FieldCreate]] = None
+    fields: Optional[List[FieldUpdate]] = None
 
 
 # 数据库中的模板

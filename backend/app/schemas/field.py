@@ -23,7 +23,7 @@ class FieldCreate(FieldBase):
 
 # 更新字段时的属性
 class FieldUpdate(FieldBase):
-    pass
+    id: Optional[int] = None
 
 
 # 数据库中的字段

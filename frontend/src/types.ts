@@ -160,6 +160,7 @@ export interface FieldCreate {
 }
 
 export interface FieldUpdate {
+  id?: number;
   name?: string;
   label?: string;
   type?: string;
