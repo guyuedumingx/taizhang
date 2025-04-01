@@ -5,9 +5,9 @@ import pandas as pd
 from io import BytesIO
 from datetime import datetime
 from urllib.parse import quote
-
 from app import models, schemas, crud
 from app.utils.logger import LoggerService
+from app.schemas.workflow import WorkflowInstanceCreate
 
 
 class LedgerService:
@@ -168,40 +168,40 @@ class LedgerService:
             resource_type="ledger",
             resource_id=str(ledger.id)
         )
-        
+
+        # 提交审批时才需要创建工作流 
         # 如果有工作流，创建工作流实例
-        if workflow_id:
-            # 创建实例
-            from app.schemas.workflow import WorkflowInstanceCreate
-            instance_create = WorkflowInstanceCreate(
-                workflow_id=workflow_id,
-                ledger_id=ledger.id,
-                creator_id=current_user.id,
-                status="active"
-            )
-            instance = crud.workflow_instance.create(db, obj_in=instance_create)
+        # if workflow_id:
+        #     # 创建实例
+        #     instance_create = WorkflowInstanceCreate(
+        #         workflow_id=workflow_id,
+        #         ledger_id=ledger.id,
+        #         creator_id=current_user.id,
+        #         status="active",
+        #     )
+        #     instance = crud.workflow_instance.create(db, obj_in=instance_create)
             
-            # 启动工作流
-            started = crud.workflow_instance.start_workflow(db, instance_id=instance.id)
+        #     # 启动工作流
+        #     started = crud.workflow_instance.start_workflow(db, instance_id=instance.id)
             
-            if started:
-                # 更新台账状态
-                ledger.workflow_instance_id = instance.id
-                ledger.status = "in_progress"
-                db.add(ledger)
-                db.commit()
-                db.refresh(ledger)
+        #     if started:
+        #         # 更新台账状态
+        #         ledger.workflow_instance_id = instance.id
+        #         ledger.status = "in_progress"
+        #         db.add(ledger)
+        #         db.commit()
+        #         db.refresh(ledger)
                 
-                # 记录日志
-                LoggerService.log_info(
-                    db=db,
-                    module="workflow",
-                    action="start",
-                    message=f"启动台账 {ledger.name} 的工作流",
-                    user_id=current_user.id,
-                    resource_type="ledger",
-                    resource_id=str(ledger.id)
-                )
+        #         # 记录日志
+        #         LoggerService.log_info(
+        #             db=db,
+        #             module="workflow",
+        #             action="start",
+        #             message=f"启动台账 {ledger.name} 的工作流",
+        #             user_id=current_user.id,
+        #             resource_type="ledger",
+        #             resource_id=str(ledger.id)
+        #         )
         
         return ledger
 

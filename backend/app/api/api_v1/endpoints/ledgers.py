@@ -25,7 +25,6 @@ def read_ledgers(
     search: Optional[str] = None,
     status: Optional[str] = None,
     approval_status: Optional[str] = None,
-    workflow_id: Optional[int] = None,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -45,7 +44,6 @@ def read_ledgers(
         search=search,
         status=status,
         approval_status=approval_status,
-        workflow_id=workflow_id,
         current_user=current_user
     )
     
