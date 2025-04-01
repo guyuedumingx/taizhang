@@ -160,16 +160,13 @@ def submit_ledger_for_approval(
     workflow_id = None
     
     # 1. 首先检查提交数据中是否有指定工作流
-    if submit_data.workflow_id:
-        workflow_id = submit_data.workflow_id
+    # if submit_data.workflow_id:
+    #     workflow_id = submit_data.workflow_id
     # 2. 如果没有指定，检查台账关联的模板是否有默认工作流
-    elif ledger.template_id:
+    if ledger.template_id:
         template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
-        if template and template.default_workflow_id:
-            workflow_id = template.default_workflow_id
-    # 3. 如果模板也没有默认工作流，检查台账是否有关联工作流
-    if not workflow_id and ledger.workflow_id:
-        workflow_id = ledger.workflow_id
+        if template and template.workflow_id:
+            workflow_id = template.workflow_id
     
     if not workflow_id:
         raise HTTPException(status_code=400, detail="未找到可用的工作流，无法提交审批")
@@ -194,7 +191,7 @@ def submit_ledger_for_approval(
     ledger.submitted_at = datetime.now()
     
     # 更新台账的工作流关联
-    ledger.workflow_id = workflow_id
+    # ledger.workflow_id = workflow_id
     
     db.add(ledger)
     db.commit()
