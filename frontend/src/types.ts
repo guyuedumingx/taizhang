@@ -10,6 +10,7 @@ export interface User {
   team_id: number | null;
   roles: string[] | null;
   password_expired?: boolean | null;
+  last_password_change?: string | null;
 }
 
 export interface UserCreate {
@@ -45,8 +46,6 @@ export interface Team {
   leader_id: number | null;
   leader_name: string | null;
   member_count: number;
-  created_at?: string;
-  updated_at?: string | null;
 }
 
 export interface TeamCreate {
@@ -85,6 +84,7 @@ export interface RoleUpdate {
   name?: string;
   description?: string;
   permissions?: string[];
+  is_system?: boolean;
 }
 
 // 模板类型
@@ -95,19 +95,16 @@ export interface Template {
   department: string;
   created_by_id: number;
   updated_by_id: number;
-  created_at: string;
-  updated_at: string;
-  default_ledger_name?: string;
+  created_at: string | null;
+  updated_at: string | null;
   default_description?: string;
-  default_status?: string;
-  default_team_id?: number;
-  default_workflow_id?: number;
-  default_team_name?: string;
-  default_workflow_name?: string;
+  default_metadata?: object | null;
   created_by_name?: string;
   updated_by_name?: string;
   fields_count?: number;
   ledgers_count?: number;
+  workflow_id: number | null;
+  is_system: boolean;
 }
 
 export interface TemplateDetail extends Template {
@@ -116,25 +113,23 @@ export interface TemplateDetail extends Template {
 
 export interface TemplateCreate {
   name: string;
+  description?: string | null;
   department: string;
-  description?: string;
-  default_ledger_name?: string;
-  default_description?: string;
-  default_status?: string;
-  default_team_id?: number;
-  default_workflow_id?: number;
+  is_system: boolean | null;
+  default_description?: string | null;
   fields: FieldCreate[];
+  workflow_id?: number | null;
+  default_metadata?: object | null;
 }
 
 export interface TemplateUpdate {
   name?: string;
   department?: string;
   description?: string;
-  default_ledger_name?: string;
+  is_system?: boolean | null;
   default_description?: string;
-  default_status?: string;
-  default_team_id?: number;
-  default_workflow_id?: number;
+  default_metadata?: object | null;
+  workflow_id?: number | null;
   fields?: FieldCreate[];
 }
 
@@ -142,22 +137,20 @@ export interface TemplateUpdate {
 export interface Field {
   id: number;
   template_id: number;
-  name: string;
-  label: string;
-  type: string;
+  name: string | null;
+  label: string | null;
+  type: string | null;
   required: boolean;
   order: number;
   options: string[] | null;
   default_value: string | null;
   is_key_field: boolean;
-  created_at: string;
-  updated_at: string | null;
 }
 
 export interface FieldCreate {
   template_id?: number;
   name: string;
-  label: string;
+  label: string | null;
   type: string;
   required?: boolean;
   order?: number;
@@ -186,7 +179,6 @@ export interface Ledger {
   approval_status: string;
   team_id: number | null;
   template_id: number | null;
-  workflow_id: number | null;
   data: Record<string, unknown>;
   created_by_id: number;
   updated_by_id: number;
@@ -211,6 +203,8 @@ export interface LedgerCreate {
   team_id?: number | null;
   workflow_id?: number | null;
   data?: Record<string, unknown>;
+  status?: string;
+  approval_status?: string;
 }
 
 export interface LedgerUpdate {
@@ -219,8 +213,8 @@ export interface LedgerUpdate {
   status?: string;
   team_id?: number | null;
   template_id?: number | null;
-  workflow_id?: number | null;
   data?: Record<string, unknown>;
+  approval_status?: string;
 }
 
 export interface LedgerSubmit {

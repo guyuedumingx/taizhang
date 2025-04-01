@@ -91,11 +91,7 @@ const TemplateForm: React.FC = () => {
         department: template.department,
         description: template.description || '',
         workflow_id: template.workflow_id || null,
-        default_ledger_name: template.default_ledger_name || '',
         default_description: template.default_description || '',
-        default_status: template.default_status || 'draft',
-        default_team_id: template.default_team_id || null,
-        default_workflow_id: template.default_workflow_id || null,
         fields: fieldsData
       });
     } catch (error) {
@@ -136,11 +132,7 @@ const TemplateForm: React.FC = () => {
           department: values.department as string,
           description: values.description as string,
           workflow_id: values.workflow_id as number,
-          default_ledger_name: values.default_ledger_name as string,
           default_description: values.default_description as string,
-          default_status: values.default_status as string,
-          default_team_id: values.default_team_id as number,
-          default_workflow_id: values.default_workflow_id as number,
           fields: fields
         };
         
@@ -153,11 +145,7 @@ const TemplateForm: React.FC = () => {
           department: values.department as string,
           description: values.description as string,
           workflow_id: values.workflow_id as number,
-          default_ledger_name: values.default_ledger_name as string,
           default_description: values.default_description as string,
-          default_status: values.default_status as string,
-          default_team_id: values.default_team_id as number,
-          default_workflow_id: values.default_workflow_id as number,
           fields: fields
         };
         
@@ -230,55 +218,6 @@ const TemplateForm: React.FC = () => {
             label="关联工作流"
           >
             <Select placeholder="选择关联工作流" allowClear>
-              {workflows.map(workflow => (
-                <Option key={workflow.id} value={workflow.id}>{workflow.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          
-          <Divider orientation="left">台账默认值设置</Divider>
-          
-          <Form.Item
-            name="default_ledger_name"
-            label="默认台账名称"
-          >
-            <Input placeholder="请输入默认台账名称" />
-          </Form.Item>
-          
-          <Form.Item
-            name="default_description"
-            label="默认台账描述"
-          >
-            <TextArea rows={2} placeholder="请输入默认台账描述" />
-          </Form.Item>
-          
-          <Form.Item
-            name="default_status"
-            label="默认台账状态"
-          >
-            <Select placeholder="选择默认状态">
-              <Option value="draft">草稿</Option>
-              <Option value="active">处理中</Option>
-              <Option value="completed">已完成</Option>
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            name="default_team_id"
-            label="默认所属团队"
-          >
-            <Select placeholder="选择默认团队" allowClear>
-              {teams.map(team => (
-                <Option key={team.id} value={team.id}>{team.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            name="default_workflow_id"
-            label="默认工作流"
-          >
-            <Select placeholder="选择默认工作流" allowClear>
               {workflows.map(workflow => (
                 <Option key={workflow.id} value={workflow.id}>{workflow.name}</Option>
               ))}

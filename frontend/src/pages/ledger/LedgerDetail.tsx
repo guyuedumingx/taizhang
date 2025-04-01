@@ -134,47 +134,30 @@ const LedgerDetail: React.FC = () => {
   const fetchWorkflows = async () => {
     try {
       // 如果台账有关联工作流，直接使用
-      if (ledger?.workflow_id) {
-        const workflowData = await WorkflowService.getWorkflow(ledger.workflow_id);
-        setWorkflow(workflowData);
-        setWorkflows([workflowData]);
-        fetchWorkflowDetail(workflowData.id);
-        return;
-      }
+      // if (ledger?.workflow_id) {
+      //   const workflowData = await WorkflowService.getWorkflow(ledger.workflow_id);
+      //   setWorkflow(workflowData);
+      //   setWorkflows([workflowData]);
+      //   fetchWorkflowDetail(workflowData.id);
+      //   return;
+      // }
       
       // 否则获取模板关联的工作流
       if (ledger?.template_id) {
         try {
           const template = await TemplateService.getTemplateDetail(ledger.template_id);
-          if (template.default_workflow_id) {
-            const defaultWorkflow = await WorkflowService.getWorkflow(template.default_workflow_id);
-            if (defaultWorkflow) {
-              setWorkflow(defaultWorkflow);
-              setWorkflows([defaultWorkflow]);
-              fetchWorkflowDetail(defaultWorkflow.id);
+          if (template.workflow_id) {
+            const bingWorkflow = await WorkflowService.getWorkflow(template.workflow_id);
+            if (bingWorkflow) {
+              setWorkflow(bingWorkflow);
+              setWorkflows([bingWorkflow]);
+              fetchWorkflowDetail(bingWorkflow.id);
               return;
             }
           }
         } catch (error) {
-          console.error('获取模板默认工作流失败:', error);
+          console.error('获取模板工作流失败:', error);
         }
-      }
-      
-      // 如果没有关联工作流，获取所有可用工作流
-      const response = await axios.get(`${API_BASE_URL}/workflows/`, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`
-        }
-      });
-      
-      const allWorkflows = response.data.items || [];
-      setWorkflows(allWorkflows);
-      
-      if (allWorkflows.length === 1) {
-        setWorkflow(allWorkflows[0]);
-        fetchWorkflowDetail(allWorkflows[0].id);
-      } else if (allWorkflows.length === 0) {
-        message.warning('没有可用的工作流');
       }
     } catch (error) {
       console.error('获取工作流列表失败:', error);
@@ -245,15 +228,15 @@ const LedgerDetail: React.FC = () => {
     if (!workflowToUse && ledger && ledger.template_id) {
       try {
         const template = await TemplateService.getTemplateDetail(ledger.template_id);
-        if (template.default_workflow_id) {
+        if (template.workflow_id) {
           const defaultWorkflow = await WorkflowService.getWorkflow(template.default_workflow_id);
           if (defaultWorkflow) {
             workflowToUse = defaultWorkflow;
-            message.info(`使用模板默认工作流: ${defaultWorkflow.name}`);
+            message.info(`使用模板工作流: ${defaultWorkflow.name}`);
           }
         }
       } catch (error) {
-        console.error('获取模板默认工作流失败:', error);
+        console.error('获取模板工作流失败:', error);
       }
     }
     

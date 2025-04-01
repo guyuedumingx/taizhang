@@ -5128,3 +5128,273 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-04-01 00:48:32 - root - INFO - 服务关闭
 2025-04-01 00:48:34 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
 2025-04-01 00:48:34 - root - INFO - 服务启动
+2025-04-01 10:55:45 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 10:55:45 - root - INFO - 服务启动
+2025-04-01 14:00:01 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-01 15:05:56 - casbin.policy - INFO - Model:
+2025-04-01 15:05:56 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-01 15:05:56 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-01 15:05:56 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-01 15:05:56 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-01 15:05:56 - casbin.policy - INFO - g.g: _, _
+2025-04-01 15:05:56 - casbin.policy - INFO - Policy:
+2025-04-01 15:05:56 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-01 15:05:56 - casbin.policy - INFO - g : _, _ : [['1', 'admin'], ['testuser', 'test_role'], ['testuser', 'test_role_2'], ['1', 'user'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user']]
+2025-04-01 15:05:56 - casbin.policy - INFO - Role links for: g
+2025-04-01 15:05:56 - casbin.role - INFO - 1 < (user, admin), testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user
+2025-04-01 15:06:22 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 15:06:22 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 15:06:22 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 15:06:22 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 15:07:16 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 15:07:16 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 15:07:16 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 15:07:16 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 15:08:38 - root - INFO - 服务关闭
+2025-04-01 15:08:39 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:08:40 - root - INFO - 服务启动
+2025-04-01 15:08:51 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-01 15:08:51 - casbin.policy - INFO - Model:
+2025-04-01 15:08:51 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-01 15:08:51 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-01 15:08:51 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-01 15:08:51 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-01 15:08:51 - casbin.policy - INFO - g.g: _, _
+2025-04-01 15:08:51 - casbin.policy - INFO - Policy:
+2025-04-01 15:08:51 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-01 15:08:51 - casbin.policy - INFO - g : _, _ : [['1', 'admin'], ['testuser', 'test_role'], ['testuser', 'test_role_2'], ['1', 'user'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user']]
+2025-04-01 15:08:51 - casbin.policy - INFO - Role links for: g
+2025-04-01 15:08:51 - casbin.role - INFO - 1 < (user, admin), testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user
+2025-04-01 15:08:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:08:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:08:55 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:08:55 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:09:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:09:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:09:25 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:09:25 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:15:30 - root - INFO - 服务关闭
+2025-04-01 15:15:32 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:15:32 - root - INFO - 服务启动
+2025-04-01 15:18:19 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-01 15:18:19 - casbin.policy - INFO - Model:
+2025-04-01 15:18:19 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-01 15:18:19 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-01 15:18:19 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-01 15:18:19 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-01 15:18:19 - casbin.policy - INFO - g.g: _, _
+2025-04-01 15:18:19 - casbin.policy - INFO - Policy:
+2025-04-01 15:18:19 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-01 15:18:19 - casbin.policy - INFO - g : _, _ : [['1', 'admin'], ['testuser', 'test_role'], ['testuser', 'test_role_2'], ['1', 'user'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user']]
+2025-04-01 15:18:19 - casbin.policy - INFO - Role links for: g
+2025-04-01 15:18:19 - casbin.role - INFO - 1 < (user, admin), testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user
+2025-04-01 15:18:19 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:18:19 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:18:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:18:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:18:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:18:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:18:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:18:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:19:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:19:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:20:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:20:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:20:46 - taizhang - INFO - [INFO] ledger.create: 创建台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-01 15:20:47 - taizhang - INFO - [INFO] ledger.create: 创建台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-01 15:22:23 - root - INFO - 服务关闭
+2025-04-01 15:22:25 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:22:25 - root - INFO - 服务启动
+2025-04-01 15:25:50 - root - INFO - 服务关闭
+2025-04-01 15:25:52 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:25:52 - root - INFO - 服务启动
+2025-04-01 15:26:58 - root - INFO - 服务关闭
+2025-04-01 15:27:00 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:27:00 - root - INFO - 服务启动
+2025-04-01 15:27:03 - root - INFO - 服务关闭
+2025-04-01 15:27:04 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:27:05 - root - INFO - 服务启动
+2025-04-01 15:27:42 - root - INFO - 服务关闭
+2025-04-01 15:27:44 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:27:44 - root - INFO - 服务启动
+2025-04-01 15:31:14 - root - INFO - 服务关闭
+2025-04-01 15:31:18 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:31:18 - root - INFO - 服务启动
+2025-04-01 15:31:33 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-01 15:31:34 - casbin.policy - INFO - Model:
+2025-04-01 15:31:34 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-01 15:31:34 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-01 15:31:34 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-01 15:31:34 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-01 15:31:34 - casbin.policy - INFO - g.g: _, _
+2025-04-01 15:31:34 - casbin.policy - INFO - Policy:
+2025-04-01 15:31:34 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-01 15:31:34 - casbin.policy - INFO - g : _, _ : [['1', 'admin'], ['testuser', 'test_role'], ['testuser', 'test_role_2'], ['1', 'user'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user']]
+2025-04-01 15:31:34 - casbin.policy - INFO - Role links for: g
+2025-04-01 15:31:34 - casbin.role - INFO - 1 < (user, admin), testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user
+2025-04-01 15:31:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:31:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:31:45 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 15:31:45 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 15:31:45 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 15:31:45 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 15:32:54 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:32:54 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:11 - taizhang - INFO - [INFO] ledger.create: 创建台账 误通过带拆除 - ledger:3 - User:84
+2025-04-01 15:33:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:24 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除 - ledger:3 - User:84
+2025-04-01 15:33:24 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除 - ledger:3 - User:84
+2025-04-01 15:33:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:27 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-01 15:33:27 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-01 15:33:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:30 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除 - ledger:3 - User:84
+2025-04-01 15:33:30 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除 - ledger:3 - User:84
+2025-04-01 15:33:35 - taizhang - INFO - [INFO] ledger.update: 更新台账 误通过带拆除122 - ledger:3 - User:84
+2025-04-01 15:33:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:39 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除122 - ledger:3 - User:84
+2025-04-01 15:33:39 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除122 - ledger:3 - User:84
+2025-04-01 15:33:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:45 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:45 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:45 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:33:49 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除122 - ledger:3 - User:84
+2025-04-01 15:33:49 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除122 - ledger:3 - User:84
+2025-04-01 15:34:01 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除122 - ledger:3 - User:84
+2025-04-01 15:34:01 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带拆除122 - ledger:3 - User:84
+2025-04-01 15:34:08 - taizhang - INFO - [INFO] ledger.update: 更新台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:34:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:34:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:34:13 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:13 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:14 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-01 15:34:14 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-01 15:34:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:22 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:34:22 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:34:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:29 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:34:29 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:34:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:34:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:35:29 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-01 15:35:29 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-01 15:35:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:35:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:36:32 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:36:32 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:36:53 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-01 15:36:53 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-01 15:36:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:36:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:37:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:37:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:38:02 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:38:02 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:39:06 - root - INFO - 服务关闭
+2025-04-01 15:39:21 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:39:21 - root - INFO - 服务启动
+2025-04-01 15:39:41 - root - INFO - 服务关闭
+2025-04-01 15:39:43 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:39:43 - root - INFO - 服务启动
+2025-04-01 15:39:51 - root - INFO - 服务关闭
+2025-04-01 15:39:52 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:39:53 - root - INFO - 服务启动
+2025-04-01 15:41:32 - root - INFO - 服务关闭
+2025-04-01 15:41:34 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:41:34 - root - INFO - 服务启动
+2025-04-01 15:44:47 - root - INFO - 服务关闭
+2025-04-01 15:44:49 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:44:49 - root - INFO - 服务启动
+2025-04-01 15:44:52 - root - INFO - 服务关闭
+2025-04-01 15:44:54 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-01 15:44:54 - root - INFO - 服务启动
+2025-04-01 15:45:26 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-01 15:45:26 - casbin.policy - INFO - Model:
+2025-04-01 15:45:26 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-01 15:45:26 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-01 15:45:26 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-01 15:45:26 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-01 15:45:26 - casbin.policy - INFO - g.g: _, _
+2025-04-01 15:45:26 - casbin.policy - INFO - Policy:
+2025-04-01 15:45:26 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-01 15:45:26 - casbin.policy - INFO - g : _, _ : [['1', 'admin'], ['testuser', 'test_role'], ['testuser', 'test_role_2'], ['1', 'user'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user']]
+2025-04-01 15:45:26 - casbin.policy - INFO - Role links for: g
+2025-04-01 15:45:26 - casbin.role - INFO - 1 < (user, admin), testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user
+2025-04-01 15:45:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:45:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:45:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:45:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:45:30 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:45:30 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:51:47 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:51:55 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:52:07 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:53:45 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:54:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:54:30 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:54:56 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:56:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:56:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:56:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:56:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 15:56:42 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 15:56:42 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-01 16:01:43 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 16:01:43 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 16:01:43 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 16:01:43 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 16:02:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:02:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:02:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:02:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:03:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:03:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:09:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:09:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:09:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:09:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:09:10 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 16:09:10 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 16:09:10 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-01 16:09:10 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-01 16:13:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:13:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-01 16:13:08 - root - INFO - 访问根路径
