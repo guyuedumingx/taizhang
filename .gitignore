@@ -29,7 +29,6 @@ yarn-debug.log
 yarn-error.log
 .pnpm-debug.log
 *.log
-*.db
 .DS_Store
 coverage/
 .env.local
