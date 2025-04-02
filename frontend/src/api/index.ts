@@ -6,13 +6,26 @@ import {
   Role, RoleCreate, RoleUpdate,
   Template, TemplateDetail, TemplateCreate, TemplateUpdate,
   Field, FieldCreate, FieldUpdate,
-  Ledger, LedgerCreate, LedgerUpdate, LedgerSubmit, LedgerApproval,
-  Workflow, WorkflowCreate, WorkflowUpdate,
-  WorkflowNode, WorkflowNodeCreate,
-  WorkflowInstance,
-  SystemLog, AuditLog, LogQueryParams,
   LoginResponse, RegisterRequest
 } from '../types';
+
+// 从独立文件导入API
+import * as WorkflowsAPI from './workflows';
+import * as WorkflowNodesAPI from './workflow_nodes';
+import * as WorkflowInstancesAPI from './workflow_instances';
+import * as LedgersAPI from './ledgers';
+import * as ApprovalsAPI from './approvals';
+import * as LogsAPI from './logs';
+
+// 导出所有API模块
+export { 
+  WorkflowsAPI,
+  WorkflowNodesAPI, 
+  WorkflowInstancesAPI,
+  LedgersAPI,
+  ApprovalsAPI,
+  LogsAPI
+};
 
 // 定义查询参数类型
 type QueryParams = Record<string, string | number | boolean | undefined>;
@@ -344,274 +357,6 @@ export default {
     // 删除模板字段
     deleteField: async (templateId: number, fieldId: number): Promise<Field> => {
       const response = await api.delete(`/templates/${templateId}/fields/${fieldId}`);
-      return response.data;
-    }
-  },
-  
-  // 台账管理API
-  ledgers: {
-    // 获取台账列表
-    getLedgers: async (params?: QueryParams): Promise<Ledger[]> => {
-      const query = buildQueryParams(params);
-      const response = await api.get(`/ledgers/${query}`);
-      return response.data;
-    },
-    
-    // 获取台账详情
-    getLedger: async (id: number): Promise<Ledger> => {
-      const response = await api.get(`/ledgers/${id}`);
-      return response.data;
-    },
-    
-    // 获取台账审计日志
-    getLedgerAuditLogs: async (id: number): Promise<AuditLog[]> => {
-      const response = await api.get(`/logs/audit/ledger/${id}`);
-      return response.data;
-    },
-    
-    // 创建台账
-    createLedger: async (data: LedgerCreate): Promise<Ledger> => {
-      const response = await api.post('/ledgers/', data);
-      return response.data;
-    },
-    
-    // 更新台账
-    updateLedger: async (id: number, data: LedgerUpdate): Promise<Ledger> => {
-      const response = await api.put(`/ledgers/${id}`, data);
-      return response.data;
-    },
-    
-    // 删除台账
-    deleteLedger: async (id: number): Promise<Ledger> => {
-      const response = await api.delete(`/ledgers/${id}`);
-      return response.data;
-    },
-    
-    // 导出台账
-    exportLedger: async (id: number, format: string): Promise<Blob> => {
-      const response = await api.get(`/ledgers/${id}/export?format=${format}`, {
-        responseType: 'blob',
-        headers: {
-          'Accept': format.toLowerCase() === 'excel' ? 
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
-            format.toLowerCase() === 'csv' ? 
-              'text/csv' : 'text/plain'
-        }
-      });
-      return response.data;
-    },
-    
-    // 导出所有台账
-    exportAllLedgers: async (format: string, templateId?: number): Promise<Blob> => {
-      // 确保format参数是正确的值
-      const safeFormat = format.toLowerCase();
-      if (!['excel', 'csv', 'txt'].includes(safeFormat)) {
-        throw new Error(`不支持的导出格式: ${format}，支持的格式：excel、csv、txt`);
-      }
-      
-      try {
-        // 构建基本URL
-        let url = `${API_BASE_URL}/ledgers/export-all?format=${encodeURIComponent(safeFormat)}`;
-        
-        // 只在有效的情况下添加模板ID
-        if (templateId !== undefined && templateId !== null) {
-          // 确保是数字
-          const numericTemplateId = Number(templateId);
-          if (!isNaN(numericTemplateId)) {
-            url += `&template_id=${numericTemplateId}`;
-          }
-        }
-        
-        // 获取身份验证令牌
-        const token = localStorage.getItem('auth-storage')
-          ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
-          : null;
-        
-        // 设置请求头
-        const headers: Record<string, string> = {
-          'Accept': safeFormat === 'excel' ? 
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
-            safeFormat === 'csv' ? 'text/csv' : 'text/plain'
-        };
-        
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-        
-        // 直接使用axios发起请求
-        console.log('导出请求URL:', url);
-        console.log('导出请求头:', headers);
-        
-        const response = await axios.get(url, {
-          responseType: 'blob',
-          headers
-        });
-        
-        return response.data;
-      } catch (error) {
-        console.error('API调用失败:', error);
-        throw error;
-      }
-    }
-  },
-  
-  // 工作流管理API
-  workflows: {
-    // 获取工作流列表
-    getWorkflows: async (params?: QueryParams): Promise<Workflow[]> => {
-      const query = buildQueryParams(params);
-      const response = await api.get(`/workflows/${query}`);
-      
-      // 记录API返回的数据格式
-      console.log('Workflows API 原始返回数据:', response.data);
-      
-      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
-      if (response.data && typeof response.data === 'object' && 'items' in response.data && Array.isArray(response.data.items)) {
-        console.log('从分页数据中提取workflows数组，共 ' + response.data.items.length + ' 条数据');
-        return response.data.items;
-      }
-      
-      // 如果返回的是数组，直接返回
-      if (Array.isArray(response.data)) {
-        console.log('Workflows数据已是数组格式，共 ' + response.data.length + ' 条数据');
-        return response.data;
-      }
-      
-      // 其他情况返回空数组
-      console.error('API返回的workflows格式不正确:', response.data);
-      return [];
-    },
-    
-    // 获取工作流详情
-    getWorkflow: async (id: number): Promise<Workflow> => {
-      const response = await api.get(`/workflows/${id}`);
-      return response.data;
-    },
-    
-    // 创建工作流
-    createWorkflow: async (data: WorkflowCreate): Promise<Workflow> => {
-      const response = await api.post('/workflows/', data);
-      return response.data;
-    },
-    
-    // 更新工作流
-    updateWorkflow: async (id: number, data: WorkflowUpdate): Promise<Workflow> => {
-      const response = await api.put(`/workflows/${id}`, data);
-      return response.data;
-    },
-    
-    // 删除工作流
-    deleteWorkflow: async (id: number): Promise<void> => {
-      await api.delete(`/workflows/${id}`);
-    },
-    
-    // 获取工作流节点
-    getWorkflowNodes: async (workflowId: number): Promise<WorkflowNode[]> => {
-      const response = await api.get(`/workflows/${workflowId}/nodes`);
-      return response.data;
-    },
-    
-    // 创建工作流节点
-    createWorkflowNode: async (workflowId: number, data: WorkflowNodeCreate): Promise<WorkflowNode> => {
-      const response = await api.post(`/workflows/${workflowId}/nodes`, data);
-      return response.data;
-    },
-    
-    // 删除工作流节点
-    deleteWorkflowNode: async (workflowId: number, nodeId: number): Promise<void> => {
-      await api.delete(`/workflows/${workflowId}/nodes/${nodeId}`);
-    },
-    
-    // 处理审批
-    processApproval: async (ledgerId: number, data: LedgerApproval): Promise<void> => {
-      await api.post(`/approvals/ledgers/${ledgerId}/approve`, data);
-    },
-  },
-  
-  // 审批管理API
-  approvals: {
-    // 获取待办任务
-    getPendingTasks: async (): Promise<Record<string, unknown>[]> => {
-      const response = await api.get('/approvals/tasks');
-      return response.data;
-    },
-    
-    // 获取待审批台账
-    getApprovalLedgers: async (params?: QueryParams): Promise<Ledger[]> => {
-      const query = buildQueryParams(params);
-      const response = await api.get(`/approvals/ledgers${query}`);
-      return response.data;
-    },
-    
-    // 提交台账审批
-    submitLedger: async (ledgerId: number, data: LedgerSubmit): Promise<Ledger> => {
-      const response = await api.post(`/approvals/ledgers/${ledgerId}/submit`, data);
-      return response.data;
-    },
-    
-    // 审批台账
-    approveLedger: async (ledgerId: number, data: LedgerApproval): Promise<Ledger> => {
-      const response = await api.post(`/approvals/ledgers/${ledgerId}/approve`, data);
-      return response.data;
-    },
-    
-    // 取消审批
-    cancelApproval: async (ledgerId: number): Promise<Ledger> => {
-      const response = await api.post(`/approvals/ledgers/${ledgerId}/cancel`, {});
-      return response.data;
-    },
-    
-    // 获取工作流实例
-    getWorkflowInstance: async (instanceId: number): Promise<WorkflowInstance> => {
-      const response = await api.get(`/approvals/workflow-instances/${instanceId}`);
-      return response.data;
-    },
-    
-    // 获取台账审计日志
-    getLedgerAuditLogs: async (ledgerId: number): Promise<AuditLog[]> => {
-      const response = await api.get(`/approvals/audit-logs/${ledgerId}`);
-      return response.data;
-    }
-  },
-  
-  // 日志管理API
-  logs: {
-    // 获取系统日志
-    getSystemLogs: async (params?: LogQueryParams): Promise<SystemLog[]> => {
-      const query = buildQueryParams(params as QueryParams);
-      const response = await api.get(`/logs/system${query}`);
-      return response.data;
-    },
-    
-    // 统计系统日志数量
-    countSystemLogs: async (params?: LogQueryParams): Promise<number> => {
-      const query = buildQueryParams(params as QueryParams);
-      const response = await api.get(`/logs/system/count${query}`);
-      return response.data;
-    },
-    
-    // 获取最近系统日志
-    getRecentSystemLogs: async (days: number = 7, limit: number = 100): Promise<SystemLog[]> => {
-      const response = await api.get(`/logs/system/recent?days=${days}&limit=${limit}`);
-      return response.data;
-    },
-    
-    // 获取错误日志
-    getErrorLogs: async (days: number = 7, limit: number = 100): Promise<SystemLog[]> => {
-      const response = await api.get(`/logs/system/errors?days=${days}&limit=${limit}`);
-      return response.data;
-    },
-    
-    // 获取资源日志
-    getResourceLogs: async (resourceType: string, resourceId: string, limit: number = 100): Promise<SystemLog[]> => {
-      const response = await api.get(`/logs/system/resource/${resourceType}/${resourceId}?limit=${limit}`);
-      return response.data;
-    },
-    
-    // 获取审计日志
-    getAuditLogs: async (params?: QueryParams): Promise<AuditLog[]> => {
-      const query = buildQueryParams(params);
-      const response = await api.get(`/logs/audit${query}`);
       return response.data;
     }
   }

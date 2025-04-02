@@ -1,6 +1,13 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
-import { WorkflowCreate, WorkflowUpdate, WorkflowNodeCreate, LedgerSubmit, LedgerApproval } from '../types';
+import { 
+  WorkflowCreate, 
+  WorkflowUpdate, 
+  LedgerSubmit, 
+  LedgerApproval, 
+  WorkflowNodeApproval, 
+  WorkflowNodeRejection 
+} from '../types';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -38,9 +45,11 @@ api.interceptors.response.use(
   }
 );
 
+// ----------------- 工作流管理API -----------------
+
 // 获取工作流列表
-export async function getWorkflows() {
-  const response = await api.get('/workflows/');
+export async function getWorkflows(skip = 0, limit = 100) {
+  const response = await api.get(`/workflows/?skip=${skip}&limit=${limit}`);
   return response.data;
 }
 
@@ -64,65 +73,19 @@ export async function updateWorkflow(id: number, workflow: WorkflowUpdate) {
 
 // 删除工作流
 export async function deleteWorkflow(id: number) {
-  const response = await api.delete(`/workflows/${id}`);
+  await api.delete(`/workflows/${id}`);
+  return null;
+}
+
+// ----------------- 工作流节点API -----------------
+
+// 获取工作流节点详情
+export async function getWorkflowNode(nodeId: number) {
+  const response = await api.get(`/workflow-nodes/${nodeId}`);
   return response.data;
 }
 
-// 获取工作流节点
-export async function getWorkflowNodes(workflowId: number) {
-  const response = await api.get(`/workflows/${workflowId}/nodes`);
-  return response.data;
-}
-
-// 创建工作流节点
-export async function createWorkflowNode(workflowId: number, node: WorkflowNodeCreate) {
-  const response = await api.post(`/workflows/${workflowId}/nodes`, node);
-  return response.data;
-}
-
-// 更新工作流节点
-export async function updateWorkflowNode(workflowId: number, nodeId: number, node: Partial<WorkflowNodeCreate>) {
-  const response = await api.put(`/workflows/${workflowId}/nodes/${nodeId}`, node);
-  return response.data;
-}
-
-// 删除工作流节点
-export async function deleteWorkflowNode(workflowId: number, nodeId: number) {
-  const response = await api.delete(`/workflows/${workflowId}/nodes/${nodeId}`);
-  return response.data;
-}
-
-// 获取工作流实例
-export async function getWorkflowInstances(ledgerId: number) {
-  const response = await api.get(`/ledgers/${ledgerId}/workflows`);
-  return response.data;
-}
-
-// 获取工作流实例详情
-export async function getWorkflowInstance(instanceId: number) {
-  const response = await api.get(`/workflow-instances/${instanceId}`);
-  return response.data;
-}
-
-// 提交台账审批
-export async function submitLedgerForApproval(ledgerId: number, data: LedgerSubmit) {
-  const response = await api.post(`/ledgers/${ledgerId}/submit`, data);
-  return response.data;
-}
-
-// 处理台账审批
-export async function processApproval(ledgerId: number, data: LedgerApproval) {
-  const response = await api.post(`/ledgers/${ledgerId}/approve`, data);
-  return response.data;
-}
-
-// 获取用户的待审批任务
-export async function getPendingApprovals() {
-  const response = await api.get('/workflow-instances/pending');
-  return response.data;
-}
-
-// 获取工作流节点的审批人
+// 获取工作流节点的审批人列表
 export async function getNodeApprovers(nodeId: number) {
   try {
     console.log(`正在请求节点ID=${nodeId}的审批人列表...`);
@@ -131,22 +94,6 @@ export async function getNodeApprovers(nodeId: number) {
     return response.data;
   } catch (error) {
     console.error(`获取节点ID=${nodeId}的审批人列表失败:`, error);
-    if (axios.isAxiosError(error)) {
-      console.error('错误状态码:', error.response?.status);
-      console.error('错误详情:', error.response?.data);
-    }
-    throw error;
-  }
-}
-
-// 添加审批人到工作流节点
-export async function addNodeApprovers(nodeId: number, userId: number) {
-  try {
-    console.log(`正在添加用户ID=${userId}到节点ID=${nodeId}的审批人...`);
-    const response = await api.post(`/workflow-nodes/${nodeId}/approvers`, { user_id: userId });
-    return response.data;
-  } catch (error) {
-    console.error(`添加审批人失败:`, error);
     if (axios.isAxiosError(error)) {
       console.error('错误状态码:', error.response?.status);
       console.error('错误详情:', error.response?.data);
@@ -171,21 +118,81 @@ export async function updateNodeApprovers(nodeId: number, userIds: number[]) {
   }
 }
 
-// 删除工作流节点的审批人
-export async function removeNodeApprover(nodeId: number, userId: number) {
-  try {
-    console.log(`正在从节点ID=${nodeId}移除用户ID=${userId}...`);
-    const response = await api.delete(`/workflow-nodes/${nodeId}/approvers?user_id=${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error(`移除审批人失败:`, error);
-    if (axios.isAxiosError(error)) {
-      console.error('错误状态码:', error.response?.status);
-      console.error('错误详情:', error.response?.data);
-    }
-    throw error;
-  }
+// ----------------- 工作流实例API -----------------
+
+// 获取工作流实例详情
+export async function getWorkflowInstance(instanceId: number) {
+  const response = await api.get(`/workflow-instances/${instanceId}`);
+  return response.data;
 }
+
+// 获取台账的工作流实例
+export async function getWorkflowInstanceByLedger(ledgerId: number) {
+  const response = await api.get(`/workflow-instances/ledger/${ledgerId}`);
+  return response.data;
+}
+
+// 获取工作流实例的节点列表
+export async function getWorkflowInstanceNodes(instanceId: number) {
+  const response = await api.get(`/workflow-instances/${instanceId}/nodes`);
+  return response.data;
+}
+
+// 审批通过工作流节点
+export async function approveWorkflowNode(instanceId: number, nodeId: number, approvalData: WorkflowNodeApproval) {
+  const response = await api.post(`/workflow-instances/${instanceId}/nodes/${nodeId}/approve`, approvalData);
+  return response.data;
+}
+
+// 拒绝工作流节点
+export async function rejectWorkflowNode(instanceId: number, nodeId: number, rejectionData: WorkflowNodeRejection) {
+  const response = await api.post(`/workflow-instances/${instanceId}/nodes/${nodeId}/reject`, rejectionData);
+  return response.data;
+}
+
+// ----------------- 审批相关API -----------------
+
+// 获取用户的待办任务
+export async function getPendingTasks() {
+  const response = await api.get('/approvals/tasks');
+  return response.data;
+}
+
+// 获取用户需要审批的台账列表
+export async function getApprovalLedgers(skip = 0, limit = 100, status?: string) {
+  let url = `/approvals/ledgers?skip=${skip}&limit=${limit}`;
+  if (status) {
+    url += `&status=${status}`;
+  }
+  const response = await api.get(url);
+  return response.data;
+}
+
+// 提交台账进入审批流程
+export async function submitLedgerForApproval(ledgerId: number, data: LedgerSubmit) {
+  const response = await api.post(`/approvals/ledgers/${ledgerId}/submit`, data);
+  return response.data;
+}
+
+// 审批台账
+export async function processApproval(ledgerId: number, data: LedgerApproval) {
+  const response = await api.post(`/approvals/ledgers/${ledgerId}/approve`, data);
+  return response.data;
+}
+
+// 取消台账审批流程
+export async function cancelApproval(ledgerId: number) {
+  const response = await api.post(`/approvals/ledgers/${ledgerId}/cancel`, {});
+  return response.data;
+}
+
+// 获取台账的审计日志
+export async function getLedgerAuditLogs(ledgerId: number) {
+  const response = await api.get(`/approvals/audit-logs/${ledgerId}`);
+  return response.data;
+}
+
+// ----------------- 辅助工具API -----------------
 
 // 获取模板列表
 export async function getTemplates() {

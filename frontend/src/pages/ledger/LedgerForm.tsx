@@ -140,21 +140,8 @@ const LedgerForm: React.FC = () => {
           template_id: templateId,
         };
         
-        // 如果有默认值且当前表单中没有值，则使用默认值
-        if (template.default_ledger_name && !form.getFieldValue('name')) {
-          formValues.name = template.default_ledger_name;
-        }
-        
         if (template.default_description && !form.getFieldValue('description')) {
           formValues.description = template.default_description;
-        }
-        
-        if (template.default_status && !form.getFieldValue('status')) {
-          formValues.status = template.default_status;
-        }
-        
-        if (template.default_team_id && !form.getFieldValue('team_id')) {
-          formValues.team_id = template.default_team_id;
         }
         
         // 更新表单值
@@ -191,10 +178,10 @@ const LedgerForm: React.FC = () => {
       const submitData = {
         template_id: values.template_id,
         data: values.data || {},
-        name: values.name || template.default_ledger_name || '',
+        name: values.name || '',
         description: values.description || template.default_description || '',
-        status: values.status || template.default_status || 'draft',
-        team_id: values.team_id || template.default_team_id || null
+        status: values.status || 'draft',
+        team_id: values.team_id || null
       };
       
       if (isEdit) {

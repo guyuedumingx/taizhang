@@ -29,7 +29,7 @@ class LedgerUpdate(LedgerBase):
 
 # 提交台账审核
 class LedgerSubmit(BaseModel):
-    workflow_id: Optional[int] = None  # 如果不提供，将使用模板默认工作流
+    # workflow_id: Optional[int] = None  # 如果不提供，将使用模板默认工作流
     comment: Optional[str] = None
     next_approver_id: Optional[int] = None  # 仅在需要指定下一审批人时使用
 

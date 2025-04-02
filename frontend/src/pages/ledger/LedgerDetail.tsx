@@ -108,7 +108,7 @@ const LedgerDetail: React.FC = () => {
     
     try {
       // 如果台账已经关联了工作流
-      if (ledger.workflow_id) {
+      if (ledger.active_workflow_instance?.workflow_id) {
         setTemplateHasWorkflow(true);
         return;
       }

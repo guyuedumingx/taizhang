@@ -1,10 +1,9 @@
-from typing import Any, List, Optional, Dict
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body
 from sqlalchemy.orm import Session
 from app.api import deps
 from app import crud, models, schemas
-from app.utils.logger import LoggerService
 from app.services.workflow.workflow_node_service import workflow_node_service
 
 # 工作流节点路由器 - 只保留审批人相关API
@@ -41,40 +40,6 @@ def get_node_approvers(
         raise HTTPException(status_code=403, detail="权限不足")
     
     return workflow_node_service.get_node_approvers(db, node_id=node_id)
-
-@router.post("/{node_id}/approvers", response_model=schemas.WorkflowNode)
-def add_node_approvers(
-    *,
-    db: Session = Depends(deps.get_db),
-    node_id: int = Path(..., title="工作流节点ID"),
-    user_id: int = Body(..., embed=True),
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    为工作流节点添加审批人
-    """
-    # 检查用户权限
-    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
-        raise HTTPException(status_code=403, detail="权限不足")
-    
-    return workflow_node_service.add_node_approver(db, node_id=node_id, user_id=user_id)
-
-@router.delete("/{node_id}/approvers", response_model=schemas.WorkflowNode)
-def remove_node_approvers(
-    *,
-    db: Session = Depends(deps.get_db),
-    node_id: int = Path(..., title="工作流节点ID"),
-    user_id: int = Query(..., title="用户ID"),
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    从工作流节点移除审批人
-    """
-    # 检查用户权限
-    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
-        raise HTTPException(status_code=403, detail="权限不足")
-    
-    return workflow_node_service.remove_node_approver(db, node_id=node_id, user_id=user_id)
 
 @router.put("/{node_id}/approvers", response_model=schemas.WorkflowNode)
 def update_node_approvers(

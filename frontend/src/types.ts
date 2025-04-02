@@ -230,6 +230,15 @@ export interface LedgerApproval {
   next_approver_id?: number;
 }
 
+export interface WorkflowNodeApproval {
+  comment?: string;
+  next_approver_id?: number;
+}
+
+export interface WorkflowNodeRejection {
+  comment?: string;
+}
+
 // 工作流类型
 export interface WorkflowNode {
   id: number;

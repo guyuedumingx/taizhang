@@ -92,9 +92,9 @@ const TemplateList: React.FC = () => {
     },
     {
       title: '字段数量',
-      dataIndex: 'field_count',
-      key: 'field_count',
-      sorter: (a, b) => a.field_count - b.field_count,
+      dataIndex: 'fields_count',
+      key: 'fields_count',
+      sorter: (a, b) => a.fields_count - b.fields_count,
     },
     {
       title: '创建人',
@@ -130,7 +130,7 @@ const TemplateList: React.FC = () => {
           <Button
             type="text"
             icon={<BranchesOutlined />}
-            onClick={() => navigate(`/dashboard/workflow?template_id=${record.id}`)}
+            onClick={() => navigate(`/dashboard/workflow?workflow_id=${record.workflow_id}`)}
             disabled={!hasPermission(PERMISSIONS.WORKFLOW_VIEW)}
             title="关联工作流"
           />
