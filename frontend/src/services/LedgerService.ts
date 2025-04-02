@@ -1,4 +1,3 @@
-import api from '../api';
 import * as ledgersAPI from '../api/ledgers';
 import { Ledger, LedgerCreate, LedgerUpdate, LedgerSubmit, AuditLog } from '../types';
 
@@ -9,7 +8,7 @@ export class LedgerService {
   // 获取台账列表
   static async getLedgers(params?: QueryParams): Promise<Ledger[]> {
     try {
-      const response = await ledgersAPI.getLedgers(params);
+      const response = await ledgersAPI.getLedgers(params || {});
       console.log('Ledgers API 返回数据:', response);
       
       // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
