@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import { Ledger, LedgerCreate, LedgerUpdate, AuditLog } from '../types';
+import { QueryParams, buildQueryParams } from './util';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -39,13 +40,9 @@ api.interceptors.response.use(
 );
 
 // 获取台账列表
-export async function getLedgers(skip = 0, limit = 100, status?: string, templateId?: number, teamId?: number) {
-  let url = `/ledgers/?skip=${skip}&limit=${limit}`;
-  if (status) url += `&status=${status}`;
-  if (templateId) url += `&template_id=${templateId}`;
-  if (teamId) url += `&team_id=${teamId}`;
-  
-  const response = await api.get(url);
+export async function getLedgers(queryParams: QueryParams) {
+  const query = buildQueryParams(queryParams);
+  const response = await api.get(`/ledgers/${query}`);
   return response.data;
 }
 

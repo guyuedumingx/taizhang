@@ -5721,3 +5721,26 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-04-02 11:07:13 - casbin.policy - INFO - g : _, _ : [['1', 'admin'], ['testuser', 'test_role'], ['testuser', 'test_role_2'], ['1', 'user'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user']]
 2025-04-02 11:07:13 - casbin.policy - INFO - Role links for: g
 2025-04-02 11:07:13 - casbin.role - INFO - 1 < (user, admin), testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user
+2025-04-02 12:46:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:46:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:46:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:46:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:46:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:46:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:46:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:47:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:47:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:48:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:48:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:48:44 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-02 12:48:44 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-02 12:48:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:48:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:49:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:49:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:49:03 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-02 12:49:03 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-02 12:49:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:49:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-02 12:49:08 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-02 12:49:08 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84

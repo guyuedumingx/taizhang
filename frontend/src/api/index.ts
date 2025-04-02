@@ -8,7 +8,7 @@ import {
   Field, FieldCreate, FieldUpdate,
   LoginResponse, RegisterRequest
 } from '../types';
-
+import { QueryParams, buildQueryParams } from './util';
 // 从独立文件导入API
 import * as WorkflowsAPI from './workflows';
 import * as WorkflowNodesAPI from './workflow_nodes';
@@ -26,9 +26,6 @@ export {
   ApprovalsAPI,
   LogsAPI
 };
-
-// 定义查询参数类型
-type QueryParams = Record<string, string | number | boolean | undefined>;
 
 // 创建一个内存存储，用于测试环境
 const tokenStorage = {
@@ -92,18 +89,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// 构建查询参数
-const buildQueryParams = (params?: QueryParams): string => {
-  if (!params) return '';
-  
-  const query = Object.entries(params)
-    .filter(([, value]) => value !== undefined)
-    .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
-    .join('&');
-  
-  return query ? `?${query}` : '';
-};
 
 // API客户端
 export default {
