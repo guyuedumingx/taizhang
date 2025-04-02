@@ -1,5 +1,6 @@
 import api from '../api';
 import { SystemLog, AuditLog, LogQueryParams } from '../types';
+import * as LogsAPI from '../api/logs';
 
 export class LogService {
   // 获取系统日志
@@ -8,9 +9,10 @@ export class LogService {
     total: number;
   }> {
     try {
-      const response = await api.logs.getSystemLogs(params);
+      const response = await LogsAPI.getSystemLogs(params);
       // 处理不同的响应格式
       if (Array.isArray(response)) {
+        console.log(response);
         return {
           items: response,
           total: response.length
@@ -26,7 +28,7 @@ export class LogService {
   // 获取最近系统日志
   static async getRecentSystemLogs(count: number = 10): Promise<SystemLog[]> {
     try {
-      return await api.logs.getRecentSystemLogs(count);
+      return await LogsAPI.getRecentSystemLogs(count);
     } catch (error) {
       console.error('获取最近系统日志失败:', error);
       throw error;
@@ -37,7 +39,7 @@ export class LogService {
   static async getSystemErrors(count: number = 10): Promise<SystemLog[]> {
     try {
       // 使用正确的API方法
-      return await api.logs.getErrorLogs(undefined, count);
+      return await LogsAPI.getErrorLogs(undefined, count);
     } catch (error) {
       console.error('获取系统错误日志失败:', error);
       throw error;
@@ -50,7 +52,7 @@ export class LogService {
     total: number;
   }> {
     try {
-      const response = await api.logs.getAuditLogs(params);
+      const response = await LogsAPI.getAuditLogs(params);
       // 处理不同的响应格式
       if (Array.isArray(response)) {
         return {
@@ -69,7 +71,7 @@ export class LogService {
   static async getLedgerAuditLogs(ledgerId: number): Promise<AuditLog[]> {
     try {
       // 使用正确的API方法
-      return await api.logs.getResourceLogs('ledger', ledgerId);
+      return await LogsAPI.getResourceLogs('ledger', ledgerId);
     } catch (error) {
       console.error(`获取台账 ${ledgerId} 审计日志失败:`, error);
       throw error;
