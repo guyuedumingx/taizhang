@@ -8,6 +8,7 @@ import { Team, TeamCreate, TeamUpdate, User } from '../../types';
 import { TeamService } from '../../services/TeamService';
 import type { ColumnsType } from 'antd/es/table';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
+import useDepartments from '../../hooks/useDepartments';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -24,6 +25,7 @@ const TeamManagement: React.FC = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [editingTeamId, setEditingTeamId] = useState<number | null>(null);
   const [form] = Form.useForm();
+  const { options: departmentOptions, filters: departmentFilters } = useDepartments();
 
   // 获取团队和用户数据
   const fetchData = async () => {
@@ -134,12 +136,7 @@ const TeamManagement: React.FC = () => {
       title: '部门',
       dataIndex: 'department',
       key: 'department',
-      filters: [
-        { text: '财务部', value: '财务部' },
-        { text: '生产部', value: '生产部' },
-        { text: '客服部', value: '客服部' },
-        { text: '设备部', value: '设备部' },
-      ],
+      filters: departmentFilters,
       onFilter: (value, record) => (record.department || '') === value.toString(),
     },
     {
@@ -273,10 +270,9 @@ const TeamManagement: React.FC = () => {
             rules={[{ required: true, message: '请选择部门' }]}
           >
             <Select placeholder="选择部门">
-              <Option value="财务部">财务部</Option>
-              <Option value="生产部">生产部</Option>
-              <Option value="客服部">客服部</Option>
-              <Option value="设备部">设备部</Option>
+              {departmentOptions.map((option) => (
+                <Option key={option.value} value={option.value}>{option.label}</Option>
+              ))}
             </Select>
           </Form.Item>
           

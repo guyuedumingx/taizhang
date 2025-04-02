@@ -7,12 +7,7 @@ import { checkPermission } from '../../utils/permission';
 import { Role, RoleCreate, RoleUpdate } from '../../types';
 import api from '../../api';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
-
-// 权限分组类型
-interface PermissionGroup {
-  groupName: string;
-  permissions: Array<{ key: string; label: string }>;
-}
+import { PermissionGroupSimple, getPermissionGroupsSimple } from '../../utils/PermissionGroups';
 
 const { Title } = Typography;
 
@@ -23,62 +18,10 @@ const RoleManagement: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('添加角色');
   const [editingRoleId, setEditingRoleId] = useState<number | null>(null);
-  const [permissionGroups, setPermissionGroups] = useState<PermissionGroup[]>([]);
+  const [permissionGroups, setPermissionGroups] = useState<PermissionGroupSimple[]>([]);
   const [form] = Form.useForm();
 
   const hasPermission = checkPermission([PERMISSIONS.ROLE_VIEW]);
-
-  // 获取所有权限并按组分类
-  const getPermissionGroups = (): PermissionGroup[] => {
-    return [
-      {
-        groupName: '台账管理',
-        permissions: [
-          { key: PERMISSIONS.LEDGER_VIEW, label: '查看台账' },
-          { key: PERMISSIONS.LEDGER_CREATE, label: '创建台账' },
-          { key: PERMISSIONS.LEDGER_EDIT, label: '编辑台账' },
-          { key: PERMISSIONS.LEDGER_DELETE, label: '删除台账' },
-          { key: PERMISSIONS.LEDGER_EXPORT, label: '导出台账' },
-        ],
-      },
-      {
-        groupName: '模板管理',
-        permissions: [
-          { key: PERMISSIONS.TEMPLATE_VIEW, label: '查看模板' },
-          { key: PERMISSIONS.TEMPLATE_CREATE, label: '创建模板' },
-          { key: PERMISSIONS.TEMPLATE_EDIT, label: '编辑模板' },
-          { key: PERMISSIONS.TEMPLATE_DELETE, label: '删除模板' },
-        ],
-      },
-      {
-        groupName: '用户管理',
-        permissions: [
-          { key: PERMISSIONS.USER_VIEW, label: '查看用户' },
-          { key: PERMISSIONS.USER_CREATE, label: '创建用户' },
-          { key: PERMISSIONS.USER_EDIT, label: '编辑用户' },
-          { key: PERMISSIONS.USER_DELETE, label: '删除用户' },
-        ],
-      },
-      {
-        groupName: '角色管理',
-        permissions: [
-          { key: PERMISSIONS.ROLE_VIEW, label: '查看角色' },
-          { key: PERMISSIONS.ROLE_CREATE, label: '创建角色' },
-          { key: PERMISSIONS.ROLE_EDIT, label: '编辑角色' },
-          { key: PERMISSIONS.ROLE_DELETE, label: '删除角色' },
-        ],
-      },
-      {
-        groupName: '团队管理',
-        permissions: [
-          { key: PERMISSIONS.TEAM_VIEW, label: '查看团队' },
-          { key: PERMISSIONS.TEAM_CREATE, label: '创建团队' },
-          { key: PERMISSIONS.TEAM_EDIT, label: '编辑团队' },
-          { key: PERMISSIONS.TEAM_DELETE, label: '删除团队' },
-        ],
-      },
-    ];
-  };
 
   // 加载数据
   useEffect(() => {
@@ -90,7 +33,7 @@ const RoleManagement: React.FC = () => {
     setLoading(true);
     
     // 获取权限分组
-    const permGroups = getPermissionGroups();
+    const permGroups = getPermissionGroupsSimple();
     setPermissionGroups(permGroups);
     
     // 获取角色列表

@@ -6,6 +6,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import { TeamService } from '../../services/TeamService';
 import { User, Team } from '../../types';
+import { getDepartmentColorByName } from '../../utils/DepartmentGroups';
 import type { ColumnsType } from 'antd/es/table';
 
 const { Title } = Typography;
@@ -72,6 +73,11 @@ const TeamMembers: React.FC = () => {
       title: '部门',
       dataIndex: 'department',
       key: 'department',
+      render: (department: string) => department ? (
+        <Tag color={getDepartmentColorByName(department)}>
+          {department}
+        </Tag>
+      ) : '-',
     },
     {
       title: '角色',

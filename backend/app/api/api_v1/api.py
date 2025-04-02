@@ -16,11 +16,6 @@ api_router.include_router(approvals.router, prefix="/approvals", tags=["审批�
 api_router.include_router(logs.router, prefix="/logs", tags=["日志管理"])
 api_router.include_router(statistics.router, prefix="/statistics", tags=["统计分析"])
 
-@api_router.get("/health", tags=["health"])
-def health_check():
-    """健康检查接口"""
-    return {"status": "ok"}
-
 @api_router.get("/test-token", tags=["test"])
 def test_token():
     """测试接口，返回一个有效的访问令牌"""
