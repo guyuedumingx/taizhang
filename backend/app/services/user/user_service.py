@@ -102,7 +102,19 @@ class UserService:
             update_data["last_password_change"] = datetime.now()
         
         # 更新角色
-        if "role" in update_data:
+        if "roles" in update_data:
+            roles = update_data.pop("roles")
+            # 获取现有角色
+            current_roles = get_roles_for_user(str(user.id))
+            
+            # 删除所有现有角色
+            for r in current_roles:
+                remove_role_for_user(str(user.id), r)
+            
+            # 添加新角色（支持多个）
+            for role in roles:
+                add_role_for_user(str(user.id), role)
+        elif "role" in update_data:  # 保持向后兼容
             role = update_data.pop("role")
             # 获取现有角色
             current_roles = get_roles_for_user(str(user.id))

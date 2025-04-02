@@ -33,7 +33,7 @@ class UserCreate(UserBase):
 # 更新用户时的属性
 class UserUpdate(UserBase):
     password: Optional[str] = None
-    role: Optional[str] = None
+    roles: Optional[list[str]] = None
 
 
 # 数据库中的用户
