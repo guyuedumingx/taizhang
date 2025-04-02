@@ -4,7 +4,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined, 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
-import api from '../../api';
+import { WorkflowService } from '../../services/WorkflowService';
 import type { ColumnsType } from 'antd/es/table';
 import { Workflow } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
@@ -38,7 +38,7 @@ const WorkflowList: React.FC = () => {
   const fetchWorkflows = async () => {
     setLoading(true);
     try {
-      const response = await api.workflows.getWorkflows();
+      const response = await WorkflowService.getWorkflows();
       setWorkflows(response);
       
     } catch (error) {
@@ -51,7 +51,7 @@ const WorkflowList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await api.workflows.deleteWorkflow(id);
+      await WorkflowService.deleteWorkflow(id);
       message.success('删除工作流程成功');
       fetchWorkflows();
     } catch (error) {

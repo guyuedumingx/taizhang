@@ -26,7 +26,7 @@ interface ImportResult {
 }
 
 const UserManagement: React.FC = () => {
-  const { hasPermission, token } = useAuthStore();
+  const { hasPermission } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -295,23 +295,8 @@ const UserManagement: React.FC = () => {
     
     setImportLoading(true);
     
-    const formData = new FormData();
-    formData.append('file', file);
-    
     try {
-      const response = await fetch('/api/v1/users/import', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.detail || '导入失败');
-      }
+      const result = await UserService.importUsers(file);
       
       setImportResult(result);
       onSuccess?.(result, file);

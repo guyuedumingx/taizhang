@@ -5,7 +5,7 @@ import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant
 import { PERMISSIONS } from '../../config';
 import { checkPermission } from '../../utils/permission';
 import { Role, RoleCreate, RoleUpdate } from '../../types';
-import api from '../../api';
+import { RoleService } from '../../services/RoleService';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 import { PermissionGroupSimple, getPermissionGroupsSimple } from '../../utils/PermissionGroups';
 
@@ -37,7 +37,7 @@ const RoleManagement: React.FC = () => {
     setPermissionGroups(permGroups);
     
     // 获取角色列表
-    api.roles.getRoles()
+    RoleService.getRoles()
       .then(data => {
         setRoles(data);
         setLoading(false);
@@ -83,7 +83,7 @@ const RoleManagement: React.FC = () => {
           permissions: values.permissions,
         };
         
-        api.roles.updateRole(editingRoleId, roleUpdate)
+        RoleService.updateRole(editingRoleId, roleUpdate)
           .then(updatedRole => {
             // 更新本地数据
             setRoles(roles.map(role => 
@@ -107,7 +107,7 @@ const RoleManagement: React.FC = () => {
           permissions: values.permissions || [],
         };
         
-        api.roles.createRole(roleCreate)
+        RoleService.createRole(roleCreate)
           .then(newRole => {
             setRoles([...roles, newRole]);
             message.success('角色添加成功');
@@ -125,7 +125,7 @@ const RoleManagement: React.FC = () => {
 
   const handleDelete = (id: number) => {
     setLoading(true);
-    api.roles.deleteRole(id)
+    RoleService.deleteRole(id)
       .then(() => {
         setRoles(roles.filter(role => role.id !== id));
         message.success('角色删除成功');

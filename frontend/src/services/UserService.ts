@@ -89,6 +89,46 @@ export class UserService {
     }
   }
 
+  // 批量导入用户
+  static async importUsers(file: File): Promise<{
+    success_count: number;
+    failed_count: number;
+    failed_users: Array<{
+      row: number;
+      username: string;
+      reason: string;
+    }>;
+  }> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('未授权，请先登录');
+      }
+      
+      const response = await fetch('/api/v1/users/import', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.detail || '导入失败');
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('导入用户失败:', error);
+      throw error;
+    }
+  }
+
   // 获取当前用户信息
   static async getCurrentUser(): Promise<User> {
     try {

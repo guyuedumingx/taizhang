@@ -3,7 +3,7 @@ import { Card, Typography, Descriptions, Tag, Steps, Divider, message, Spin } fr
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
-import api from '../../api';
+import { WorkflowService } from '../../services/WorkflowService';
 import { Workflow, WorkflowNode } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 
@@ -33,7 +33,7 @@ const WorkflowDetail: React.FC = () => {
   const fetchWorkflowDetail = async (workflowId: number) => {
     setLoading(true);
     try {
-      const response = await api.workflows.getWorkflow(workflowId);
+      const response = await WorkflowService.getWorkflow(workflowId);
       setWorkflow(response);
     } catch (error) {
       console.error('获取工作流程详情失败:', error);
