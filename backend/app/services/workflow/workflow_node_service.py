@@ -1,13 +1,42 @@
 from typing import Any, List, Optional, Dict
 
 from fastapi import HTTPException
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app import crud, models, schemas
 
 class WorkflowNodeService:
     @staticmethod
-    def get_workflow_node(db: Session, node_id: int) -> models.WorkflowNode:
+    def _serialize_node(node: models.WorkflowNode) -> Dict[str, Any]:
+        """
+        序列化工作流节点，返回可JSON序列化的字典
+        """
+        # 创建一个包含基本信息的字典
+        node_dict = {
+            "id": node.id,
+            "workflow_id": node.workflow_id,
+            "name": node.name,
+            "description": node.description,
+            "node_type": node.node_type,
+            "approver_role_id": node.approver_role_id,
+            "approver_user_id": node.approver_user_id,
+            "order_index": node.order_index,
+            "is_final": node.is_final,
+            "reject_to_node_id": node.reject_to_node_id,
+            "multi_approve_type": node.multi_approve_type,
+            "need_select_next_approver": node.need_select_next_approver,
+            "created_at": node.created_at,
+            "updated_at": node.updated_at,
+            "approver_ids": [user.id for user in node.approvers]
+        }
+        
+        # 使用 jsonable_encoder 确保所有值都是 JSON 可序列化的
+        return jsonable_encoder(node_dict)
+
+    @staticmethod
+    def get_workflow_node(db: Session, node_id: int) -> Dict[str, Any]:
         """
         获取工作流节点详情
         """
@@ -24,10 +53,10 @@ class WorkflowNodeService:
             if user:
                 node.approver_user_name = user.name
         
-        return node
+        return WorkflowNodeService._serialize_node(node)
 
     @staticmethod
-    def get_node_approvers(db: Session, node_id: int) -> List[models.User]:
+    def get_node_approvers(db: Session, node_id: int) -> List[Dict[str, Any]]:
         """
         获取工作流节点的审批人列表
         """
@@ -37,10 +66,10 @@ class WorkflowNodeService:
             raise HTTPException(status_code=404, detail="工作流节点不存在")
         
         approvers = crud.workflow_node.get_node_approvers(db, node_id=node_id)
-        return approvers
+        return jsonable_encoder([{"id": user.id, "name": user.name} for user in approvers])
 
     @staticmethod
-    def add_node_approver(db: Session, node_id: int, user_id: int) -> models.WorkflowNode:
+    def add_node_approver(db: Session, node_id: int, user_id: int) -> Dict[str, Any]:
         """
         为工作流节点添加审批人
         """
@@ -66,10 +95,10 @@ class WorkflowNodeService:
         db.commit()
         db.refresh(node)
         
-        return node
+        return WorkflowNodeService._serialize_node(node)
 
     @staticmethod
-    def remove_node_approver(db: Session, node_id: int, user_id: int) -> models.WorkflowNode:
+    def remove_node_approver(db: Session, node_id: int, user_id: int) -> Dict[str, Any]:
         """
         从工作流节点移除审批人
         """
@@ -87,10 +116,10 @@ class WorkflowNodeService:
         else:
             raise HTTPException(status_code=404, detail="该用户不是审批人")
         
-        return node
+        return WorkflowNodeService._serialize_node(node)
 
     @staticmethod
-    def update_node_approvers(db: Session, node_id: int, user_ids: List[int]) -> models.WorkflowNode:
+    def update_node_approvers(db: Session, node_id: int, user_ids: List[int]) -> Dict[str, Any]:
         """
         更新工作流节点的审批人列表
         """
@@ -111,7 +140,7 @@ class WorkflowNodeService:
         db.commit()
         db.refresh(node)
         
-        return node
+        return WorkflowNodeService._serialize_node(node)
 
 
 workflow_node_service = WorkflowNodeService()

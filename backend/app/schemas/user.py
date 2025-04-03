@@ -58,6 +58,10 @@ class User(UserInDBBase):
             three_months_ago = datetime.now() - timedelta(days=90)
             return values['last_password_change'] < three_months_ago
         return False
+    
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 
 # 数据库中存储的用户，包含哈希密码

@@ -37,9 +37,26 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
 
   // 确保值的一致性，用于调试
   useEffect(() => {
-    // 如果提供了allUsers数组，使用它而不是从后端获取
+    if (value !== localValue) {
+      setLocalValue(value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  // 从props解析用户列表，确保类型正确
+  const processUserOptions = useCallback(() => {
+    if (!allUsers) return [];
+    if (Array.isArray(allUsers)) return allUsers;
+    if (allUsers && 'items' in allUsers && Array.isArray(allUsers.items)) {
+      return allUsers.items;
+    }
+    return [];
+  }, [allUsers]);
+
+  useEffect(() => {
+    // 如果提供了allUsers，使用它而不是从后端获取
     if (allUsers) {
-      setApprovers(Array.isArray(allUsers) ? allUsers : allUsers.items);
+      setApprovers(processUserOptions());
       return;
     }
     
@@ -75,18 +92,25 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
         });
         
         console.log('获取审批人成功:', response.data);
-        setApprovers(response.data);
-        
-        // 如果审批人列表非空但当前没有选择值，根据模式自动选择
-        if (response.data.length > 0 && !value) {
-          if (mode === 'single') {
-            // 单选模式：选择第一个审批人
-            onChange(response.data[0].id);
-          } else if (mode === 'multiple') {
-            // 多选模式：默认选择所有审批人
-            const allIds = response.data.map((user: User) => user.id);
-            onChange(allIds);
+        // 确保后端返回值是数组
+        if (Array.isArray(response.data)) {
+          setApprovers(response.data);
+          
+          // 只在初始时自动选择，避免覆盖用户选择
+          if (response.data.length > 0 && value === undefined) {
+            if (mode === 'single') {
+              // 单选模式：选择第一个审批人
+              const firstId = String(response.data[0].id);
+              onChange(Number(firstId)); // 确保ID是数字
+            } else if (mode === 'multiple') {
+              // 多选模式：默认选择所有审批人
+              const allIds = response.data.map((user: User) => Number(String(user.id))); // 确保ID是数字
+              onChange(allIds);
+            }
           }
+        } else {
+          setApprovers([]);
+          console.error('后端返回的审批人数据不是数组:', response.data);
         }
       } catch (err) {
         console.error('获取审批人失败:', err);
@@ -126,7 +150,7 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
       }
     } else {
       // 单选模式直接返回数字ID
-      onChange(selectedValue !== undefined ? Number(selectedValue) : undefined as any);
+      onChange(selectedValue !== undefined ? Number(selectedValue) : undefined);
     }
   };
 
@@ -195,4 +219,4 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
   );
 };
 
-export default ApproverSelector; 
+export default ApproverSelector;

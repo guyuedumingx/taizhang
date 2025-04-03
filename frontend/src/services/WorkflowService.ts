@@ -273,6 +273,9 @@ export class WorkflowService {
       case 'reject_to_node_id':
         node.reject_to_node_id = value as number | null;
         break;
+      case 'approver_ids':
+        node.approver_ids = value as number[];
+        break;
       default:
         console.warn(`未知的字段: ${field}`);
         break;
