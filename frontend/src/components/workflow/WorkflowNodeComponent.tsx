@@ -167,9 +167,6 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
                 nodeId={0}
                 label=""
               />
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                可以选择多个审批人。
-              </Text>
             </Form.Item>
 
             <Form.Item label="审批方式" className="mb-2">

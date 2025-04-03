@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Select, Typography, Spin, Empty } from 'antd';
 import { User } from '../../types';
 import axios, { AxiosError } from 'axios';
@@ -15,7 +15,7 @@ interface ApproverSelectorProps {
   mode?: 'single' | 'multiple';
   required?: boolean;
   label?: string;
-  allUsers?: User[]; // 用于工作流编辑时提供所有可选用户
+  allUsers?: User[] | { items: User[]; total: number }; // 支持数组或分页对象
   disabled?: boolean;
 }
 
@@ -24,7 +24,7 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
   onChange,
   value,
   style,
-  mode = 'single',
+  mode = 'single', // 提供默认值，避免undefined
   required = true,
   label = '选择审批人',
   allUsers,
@@ -33,11 +33,13 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
   const [loading, setLoading] = useState(false);
   const [approvers, setApprovers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [localValue, setLocalValue] = useState<number | number[] | undefined>(value);
 
+  // 确保值的一致性，用于调试
   useEffect(() => {
     // 如果提供了allUsers数组，使用它而不是从后端获取
     if (allUsers) {
-      setApprovers(allUsers);
+      setApprovers(Array.isArray(allUsers) ? allUsers : allUsers.items);
       return;
     }
     
@@ -90,8 +92,6 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
         console.error('获取审批人失败:', err);
         if (axios.isAxiosError(err)) {
           const axiosError = err as AxiosError;
-          console.error('错误状态码:', axiosError.response?.status);
-          console.error('错误详情:', axiosError.response?.data);
           
           // 处理404错误（节点可能是新创建的，还没有审批人）
           if (axiosError.response?.status === 404) {
@@ -106,10 +106,28 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
     };
     
     fetchApprovers();
-  }, [nodeId, onChange, value, mode, allUsers]);
+  // 移除可能导致循环渲染的依赖项
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodeId, allUsers]);
 
+  // 安全地处理值变更，确保类型一致性
   const handleChange = (selectedValue: number | number[]) => {
-    onChange(selectedValue);
+    setLocalValue(selectedValue);
+    
+    // 确保返回给父组件的值类型正确
+    if (mode === 'multiple') {
+      // 确保多选模式返回数组
+      if (Array.isArray(selectedValue)) {
+        onChange(selectedValue.map(id => Number(id))); // 确保所有ID都是数字
+      } else if (selectedValue !== undefined) {
+        onChange([Number(selectedValue)]); // 如果只选了一个，包装为数组
+      } else {
+        onChange([]); // 未选择时返回空数组
+      }
+    } else {
+      // 单选模式直接返回数字ID
+      onChange(selectedValue !== undefined ? Number(selectedValue) : undefined as any);
+    }
   };
 
   if (loading && !allUsers) {
@@ -120,20 +138,30 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
     return <Text type="danger">{error}</Text>;
   }
 
-  // 工作流编辑模式或从后端获取的审批人
-  const userOptions = allUsers || approvers;
+  // 获取可用的用户选项
+  const userOptions = allUsers ? processUserOptions() : approvers;
   
-  if (userOptions.length === 0 && !allUsers) {
+  // 确保userOptions是数组
+  const safeUserOptions = Array.isArray(userOptions) ? userOptions : [];
+  
+  if (safeUserOptions.length === 0 && !allUsers) {
     return <Empty description="此节点没有可用的审批人" image={Empty.PRESENTED_IMAGE_SIMPLE} />;
   }
 
   // 单选模式且只有一个选项时，直接显示审批人名称
-  if (userOptions.length === 1 && mode === 'single' && !allUsers) {
+  if (safeUserOptions.length === 1 && mode === 'single' && !allUsers) {
     return (
       <div style={style}>
-        <Text>审批人: {userOptions[0].name}</Text>
+        <Text>审批人: {safeUserOptions[0].name}</Text>
       </div>
     );
+  }
+
+  // 确保value是正确的类型
+  let selectValue = localValue;
+  if (mode === 'multiple' && selectValue !== undefined) {
+    // 确保多选模式下value是数组
+    selectValue = Array.isArray(selectValue) ? selectValue : [selectValue];
   }
 
   return (
@@ -145,15 +173,15 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
       <Select
         placeholder={`请选择${mode === 'multiple' ? '一个或多个' : ''}审批人`}
         onChange={handleChange}
-        value={value}
+        value={selectValue}
         style={{ width: '100%' }}
         mode={mode === 'multiple' ? 'multiple' : undefined}
         showSearch
         optionFilterProp="children"
         disabled={disabled}
       >
-        {userOptions.map(user => (
-          <Option key={user.id} value={user.id}>
+        {safeUserOptions.map(user => (
+          <Option key={user.id} value={Number(user.id)}>
             {user.name} ({user.username})
           </Option>
         ))}
