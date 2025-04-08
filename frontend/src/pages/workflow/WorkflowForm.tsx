@@ -74,7 +74,7 @@ const WorkflowForm: React.FC = () => {
     setLoading(true);
     try {
       const response = await WorkflowService.getWorkflow(workflowId);
-      
+
       if (!response || !response.id) {
         throw new Error('无效的工作流数据');
       }
@@ -98,6 +98,7 @@ const WorkflowForm: React.FC = () => {
           order_index: node.order_index,
           is_final: node.is_final,
           reject_to_node_id: node.reject_to_node_id,
+          approver_ids: node.approver_ids,
         }));
         setNodes(formattedNodes);
       } else {

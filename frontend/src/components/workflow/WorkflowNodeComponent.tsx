@@ -51,9 +51,6 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
   const isFirst = index === 0;
   const isLast = index === totalNodes - 1;
 
-  // 确保审批人IDs是数组
-  const approverIds = Array.isArray(node.approver_ids) ? node.approver_ids : [];
-
   // 处理审批人变更
   const handleApproversChange = (selectedIds: number | number[]) => {
     // 确保始终传递数组给onUpdate
@@ -161,7 +158,7 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
             <Form.Item label="审批人" className="mb-2">
               <ApproverSelector
                 mode="multiple"
-                value={approverIds}
+                value={node.approver_ids}
                 onChange={handleApproversChange}
                 allUsers={users}
                 nodeId={0}

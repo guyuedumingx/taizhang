@@ -39,7 +39,6 @@ export class WorkflowService {
     try {
       console.log(`开始获取工作流 ${id} 详情`);
       const workflow = await workflowsAPI.getWorkflow(id);
-      
       // 确保工作流对象有效
       if (!workflow || !workflow.id) {
         throw new Error(`无效的工作流数据: ${JSON.stringify(workflow)}`);
@@ -48,10 +47,16 @@ export class WorkflowService {
       // 获取工作流节点
       try {
         console.log(`获取工作流 ${id} 的节点`);
-        // 使用单个节点获取函数来获取所有节点
-        const nodes = await workflowsAPI.getWorkflowNode(id);
-        workflow.nodes = nodes; // 将节点添加到工作流对象
-        console.log(`工作流 ${id} 的节点数量: ${nodes.length}`);
+        if (workflow.nodes && workflow.nodes.length > 0) {
+          // 使用 Promise.all 并行获取所有节点的详细信息
+          const nodePromises = workflow.nodes.map((node: WorkflowNode) => 
+            workflowsAPI.getWorkflowNode(node.id)
+          );
+          workflow.nodes = await Promise.all(nodePromises);
+          console.log(`工作流 ${id} 的节点数量: ${workflow.nodes.length}`);
+        } else {
+          workflow.nodes = []; // 如果没有节点，设置为空数组
+        }
       } catch (nodeError) {
         console.error(`获取工作流 ${id} 节点失败:`, nodeError);
         workflow.nodes = []; // 设置为空数组，避免undefined错误
