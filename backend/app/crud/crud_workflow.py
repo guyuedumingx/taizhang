@@ -9,6 +9,7 @@ from app.models.workflow import Workflow, WorkflowNode, workflow_node_approvers
 from app.schemas.workflow import WorkflowCreate, WorkflowUpdate, WorkflowNodeCreate, WorkflowNodeCreateWithId, WorkflowNodeUpdate
 from app.models.user import User
 from app.models.role import Role
+from app.services.casbin_service import get_users_for_roles
 
 class CRUDWorkflow(CRUDBase[Workflow, WorkflowCreate, WorkflowUpdate]):
     def create_with_nodes(self, db: Session, *, obj_in: WorkflowCreate, created_by: int) -> Workflow:
@@ -124,11 +125,7 @@ class CRUDWorkflowNode(CRUDBase[WorkflowNode, WorkflowNodeCreateWithId, Workflow
         
         # 如果有角色关联，也获取该角色的所有用户
         if node.approver_role_id:
-            role_users = db.query(User).join(
-                User.roles
-            ).filter(
-                Role.id == node.approver_role_id
-            ).all()
+            role_users = get_users_for_roles(node.approver_role_id)
             
             # 合并用户列表，去重
             approver_ids = {a.id for a in approvers}

@@ -64,6 +64,21 @@ def get_roles_for_user(user_id: str) -> list:
         print(f"获取用户角色时出错: {str(e)}")
         return ["user"]  # 出错时返回默认user角色
 
+def get_users_for_roles(role_id: str) -> list: 
+    """获取该角色下的所有用户"""
+    try:
+        e = get_enforcer_instance()
+        if e is None: 
+            print("Enforcer实例为空")
+            return ["user"]
+        users =  e.get_users_for_role(str(role_id))
+        if not users:
+            print("该角色下没有用户") 
+            return []
+    except Exception as e:
+        print(f"获取用户角色出错: {str(e)}")
+        return []
+
 def get_permissions_for_role(role: str) -> list:
     """获取角色的所有权限"""
     e = get_enforcer_instance()
