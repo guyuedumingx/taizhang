@@ -163,6 +163,7 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
   }
 
   // 获取可用的用户选项
+  // TODO 后续测试时需要改成审批人，现在是审批人跟所有用户二选一
   const userOptions = allUsers ? processUserOptions() : approvers;
   
   // 确保userOptions是数组

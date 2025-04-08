@@ -39,8 +39,9 @@ def get_node_approvers(
     if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
         raise HTTPException(status_code=403, detail="权限不足")
     
+    # 获取节点审批人列表
     approvers = workflow_node_service.get_node_approvers(db, node_id=node_id)
-    return [{"id": user.id, "name": user.name} for user in approvers]
+    return approvers
 
 @router.put("/{node_id}/approvers", response_model=Dict[str, Any])
 def update_node_approvers(

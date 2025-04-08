@@ -6687,3 +6687,1172 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-04-03 16:45:59 - root - INFO - 服务关闭
 2025-04-03 16:46:02 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
 2025-04-03 16:46:03 - root - INFO - 服务启动
+2025-04-03 16:51:48 - root - INFO - 服务关闭
+2025-04-03 16:51:51 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 16:51:51 - root - INFO - 服务启动
+2025-04-03 16:52:03 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 16:52:04 - casbin.policy - INFO - Model:
+2025-04-03 16:52:04 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 16:52:04 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 16:52:04 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 16:52:04 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 16:52:04 - casbin.policy - INFO - g.g: _, _
+2025-04-03 16:52:04 - casbin.policy - INFO - Policy:
+2025-04-03 16:52:04 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 16:52:04 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 16:52:04 - casbin.policy - INFO - Role links for: g
+2025-04-03 16:52:04 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试角色)
+2025-04-03 16:52:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 16:52:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 16:52:05 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-03 16:52:05 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-03 16:52:05 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-03 16:52:05 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-03 16:53:52 - root - INFO - 服务关闭
+2025-04-03 16:53:55 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 16:53:55 - root - INFO - 服务启动
+2025-04-03 16:54:17 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 16:54:17 - casbin.policy - INFO - Model:
+2025-04-03 16:54:17 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 16:54:17 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 16:54:17 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 16:54:17 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 16:54:17 - casbin.policy - INFO - g.g: _, _
+2025-04-03 16:54:17 - casbin.policy - INFO - Policy:
+2025-04-03 16:54:17 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 16:54:17 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 16:54:17 - casbin.policy - INFO - Role links for: g
+2025-04-03 16:54:17 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, user, 测试角色)
+2025-04-03 16:54:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 16:54:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 16:55:21 - root - INFO - 服务关闭
+2025-04-03 16:55:24 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 16:55:24 - root - INFO - 服务启动
+2025-04-03 16:55:27 - root - INFO - 服务关闭
+2025-04-03 16:55:30 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 16:55:30 - root - INFO - 服务启动
+2025-04-03 16:55:37 - root - INFO - 服务关闭
+2025-04-03 16:55:39 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 16:55:40 - root - INFO - 服务启动
+2025-04-03 16:55:48 - root - INFO - 服务关闭
+2025-04-03 16:55:51 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 16:55:51 - root - INFO - 服务启动
+2025-04-03 16:55:56 - root - INFO - 服务关闭
+2025-04-03 16:55:59 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 16:55:59 - root - INFO - 服务启动
+2025-04-03 16:57:26 - root - INFO - 服务关闭
+2025-04-03 16:57:29 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 16:57:29 - root - INFO - 服务启动
+2025-04-03 16:57:35 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 16:57:36 - casbin.policy - INFO - Model:
+2025-04-03 16:57:36 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 16:57:36 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 16:57:36 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 16:57:36 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 16:57:36 - casbin.policy - INFO - g.g: _, _
+2025-04-03 16:57:36 - casbin.policy - INFO - Policy:
+2025-04-03 16:57:36 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 16:57:36 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 16:57:36 - casbin.policy - INFO - Role links for: g
+2025-04-03 16:57:36 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, user, 测试角色)
+2025-04-03 16:57:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 16:57:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:00:47 - root - INFO - 服务关闭
+2025-04-03 17:00:49 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:00:49 - root - INFO - 服务启动
+2025-04-03 17:00:57 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:00:57 - casbin.policy - INFO - Model:
+2025-04-03 17:00:57 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:00:57 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:00:57 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:00:58 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:00:58 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:00:58 - casbin.policy - INFO - Policy:
+2025-04-03 17:00:58 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:00:58 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:00:58 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:00:58 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, 测试角色, admin)
+2025-04-03 17:00:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:00:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:01:01 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-03 17:01:01 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-03 17:01:01 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-03 17:01:01 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-03 17:01:23 - root - INFO - 服务关闭
+2025-04-03 17:01:25 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:01:26 - root - INFO - 服务启动
+2025-04-03 17:01:30 - root - INFO - 服务关闭
+2025-04-03 17:01:32 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:01:32 - root - INFO - 服务启动
+2025-04-03 17:01:41 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:01:42 - casbin.policy - INFO - Model:
+2025-04-03 17:01:42 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:01:42 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:01:42 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:01:42 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:01:42 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:01:42 - casbin.policy - INFO - Policy:
+2025-04-03 17:01:42 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:01:42 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:01:42 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:01:42 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试角色, admin, user)
+2025-04-03 17:01:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:01:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:01:58 - root - INFO - 服务关闭
+2025-04-03 17:02:01 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:02:01 - root - INFO - 服务启动
+2025-04-03 17:02:03 - root - INFO - 服务关闭
+2025-04-03 17:02:06 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:02:06 - root - INFO - 服务启动
+2025-04-03 17:02:14 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:02:14 - casbin.policy - INFO - Model:
+2025-04-03 17:02:14 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:02:14 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:02:14 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:02:14 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:02:14 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:02:14 - casbin.policy - INFO - Policy:
+2025-04-03 17:02:14 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:02:14 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:02:14 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:02:14 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试角色)
+2025-04-03 17:02:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:02:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:03:01 - root - INFO - 服务关闭
+2025-04-03 17:03:04 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:03:04 - root - INFO - 服务启动
+2025-04-03 17:03:11 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:03:11 - casbin.policy - INFO - Model:
+2025-04-03 17:03:11 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:03:11 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:03:11 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:03:11 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:03:11 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:03:11 - casbin.policy - INFO - Policy:
+2025-04-03 17:03:11 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:03:11 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:03:11 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:03:11 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试角色, user, admin)
+2025-04-03 17:03:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:03:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:03:40 - root - INFO - 服务关闭
+2025-04-03 17:03:42 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:03:42 - root - INFO - 服务启动
+2025-04-03 17:03:52 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:03:52 - casbin.policy - INFO - Model:
+2025-04-03 17:03:52 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:03:52 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:03:52 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:03:52 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:03:52 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:03:52 - casbin.policy - INFO - Policy:
+2025-04-03 17:03:52 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:03:52 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:03:52 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:03:52 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试角色, user, admin)
+2025-04-03 17:03:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:03:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:04:08 - root - INFO - 服务关闭
+2025-04-03 17:04:11 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:04:11 - root - INFO - 服务启动
+2025-04-03 17:04:14 - root - INFO - 服务关闭
+2025-04-03 17:04:17 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:04:17 - root - INFO - 服务启动
+2025-04-03 17:04:17 - root - INFO - 服务关闭
+2025-04-03 17:04:20 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:04:20 - root - INFO - 服务启动
+2025-04-03 17:04:26 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:04:26 - casbin.policy - INFO - Model:
+2025-04-03 17:04:26 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:04:26 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:04:26 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:04:26 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:04:26 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:04:26 - casbin.policy - INFO - Policy:
+2025-04-03 17:04:26 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:04:26 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:04:26 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:04:26 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试角色)
+2025-04-03 17:04:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:04:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:05:58 - root - INFO - 服务关闭
+2025-04-03 17:06:05 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:06:05 - root - INFO - 服务启动
+2025-04-03 17:06:13 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:06:14 - casbin.policy - INFO - Model:
+2025-04-03 17:06:14 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:06:14 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:06:14 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:06:14 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:06:14 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:06:14 - casbin.policy - INFO - Policy:
+2025-04-03 17:06:14 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:06:14 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:06:14 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:06:14 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试角色, user, admin)
+2025-04-03 17:06:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:06:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:06:51 - root - INFO - 服务关闭
+2025-04-03 17:06:55 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:06:55 - root - INFO - 服务启动
+2025-04-03 17:33:34 - root - INFO - 服务关闭
+2025-04-03 17:33:36 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:33:36 - root - INFO - 服务启动
+2025-04-03 17:33:49 - root - INFO - 服务关闭
+2025-04-03 17:33:52 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:33:52 - root - INFO - 服务启动
+2025-04-03 17:33:58 - root - INFO - 服务关闭
+2025-04-03 17:34:00 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:34:00 - root - INFO - 服务启动
+2025-04-03 17:34:28 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:34:28 - casbin.policy - INFO - Model:
+2025-04-03 17:34:28 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:34:28 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:34:28 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:34:28 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:34:28 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:34:28 - casbin.policy - INFO - Policy:
+2025-04-03 17:34:28 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:34:28 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:34:28 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:34:28 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试角色)
+2025-04-03 17:34:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:34:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:35:20 - root - INFO - 服务关闭
+2025-04-03 17:36:01 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:36:01 - root - INFO - 服务启动
+2025-04-03 17:36:01 - root - INFO - 服务关闭
+2025-04-03 17:36:04 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:36:04 - root - INFO - 服务启动
+2025-04-03 17:36:10 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:36:11 - casbin.policy - INFO - Model:
+2025-04-03 17:36:11 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:36:11 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:36:11 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:36:11 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:36:11 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:36:11 - casbin.policy - INFO - Policy:
+2025-04-03 17:36:11 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:36:11 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:36:11 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:36:11 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, user, 测试角色)
+2025-04-03 17:36:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:36:11 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:37:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:37:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:41:38 - root - INFO - 服务关闭
+2025-04-03 17:41:41 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:41:41 - root - INFO - 服务启动
+2025-04-03 17:41:41 - root - INFO - 服务关闭
+2025-04-03 17:41:43 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:41:43 - root - INFO - 服务启动
+2025-04-03 17:42:01 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:42:02 - casbin.policy - INFO - Model:
+2025-04-03 17:42:02 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:42:02 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:42:02 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:42:02 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:42:02 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:42:02 - casbin.policy - INFO - Policy:
+2025-04-03 17:42:02 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:42:02 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:42:02 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:42:02 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, 测试角色, admin)
+2025-04-03 17:42:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:42:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:48:11 - root - INFO - 服务关闭
+2025-04-03 17:48:14 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:48:14 - root - INFO - 服务启动
+2025-04-03 17:48:20 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:48:21 - casbin.policy - INFO - Model:
+2025-04-03 17:48:21 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:48:21 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:48:21 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:48:21 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:48:21 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:48:21 - casbin.policy - INFO - Policy:
+2025-04-03 17:48:21 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:48:21 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:48:21 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:48:21 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试角色, admin, user)
+2025-04-03 17:48:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:48:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:48:42 - root - INFO - 服务关闭
+2025-04-03 17:48:45 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:48:45 - root - INFO - 服务启动
+2025-04-03 17:48:52 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:48:52 - casbin.policy - INFO - Model:
+2025-04-03 17:48:52 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:48:52 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:48:52 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:48:52 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:48:52 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:48:52 - casbin.policy - INFO - Policy:
+2025-04-03 17:48:52 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:48:52 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:48:52 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:48:52 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试角色, user, admin)
+2025-04-03 17:48:52 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:48:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:49:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:49:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:49:55 - root - INFO - 服务关闭
+2025-04-03 17:49:57 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:49:58 - root - INFO - 服务启动
+2025-04-03 17:49:59 - root - INFO - 服务关闭
+2025-04-03 17:50:21 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:50:21 - root - INFO - 服务启动
+2025-04-03 17:50:29 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:50:29 - casbin.policy - INFO - Model:
+2025-04-03 17:50:29 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:50:29 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:50:29 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:50:29 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:50:29 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:50:29 - casbin.policy - INFO - Policy:
+2025-04-03 17:50:29 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:50:29 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:50:29 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:50:29 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试角色)
+2025-04-03 17:50:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:50:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:50:57 - root - INFO - 服务关闭
+2025-04-03 17:51:00 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-03 17:51:00 - root - INFO - 服务启动
+2025-04-03 17:51:08 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-03 17:51:09 - casbin.policy - INFO - Model:
+2025-04-03 17:51:09 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-03 17:51:09 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-03 17:51:09 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-03 17:51:09 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-03 17:51:09 - casbin.policy - INFO - g.g: _, _
+2025-04-03 17:51:09 - casbin.policy - INFO - Policy:
+2025-04-03 17:51:09 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-03 17:51:09 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-03 17:51:09 - casbin.policy - INFO - Role links for: g
+2025-04-03 17:51:09 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试角色)
+2025-04-03 17:51:09 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:51:09 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:51:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-03 17:51:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-07 08:57:04 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-07 08:57:04 - root - INFO - 服务启动
+2025-04-07 08:58:07 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-07 08:58:08 - casbin.policy - INFO - Model:
+2025-04-07 08:58:08 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-07 08:58:08 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-07 08:58:08 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-07 08:58:08 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-07 08:58:08 - casbin.policy - INFO - g.g: _, _
+2025-04-07 08:58:08 - casbin.policy - INFO - Policy:
+2025-04-07 08:58:08 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-07 08:58:08 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-07 08:58:08 - casbin.policy - INFO - Role links for: g
+2025-04-07 08:58:08 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试角色)
+2025-04-07 08:58:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-07 08:58:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 08:36:28 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 08:36:28 - root - INFO - 服务启动
+2025-04-08 08:37:41 - root - INFO - 访问根路径
+2025-04-08 08:38:02 - root - INFO - 访问根路径
+2025-04-08 08:38:57 - root - INFO - 服务关闭
+2025-04-08 08:39:01 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 08:39:01 - root - INFO - 服务启动
+2025-04-08 08:39:35 - root - INFO - 服务关闭
+2025-04-08 08:39:47 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 08:39:47 - root - INFO - 服务启动
+2025-04-08 08:41:15 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 08:41:16 - casbin.policy - INFO - Model:
+2025-04-08 08:41:16 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 08:41:16 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 08:41:16 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 08:41:16 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 08:41:16 - casbin.policy - INFO - g.g: _, _
+2025-04-08 08:41:16 - casbin.policy - INFO - Policy:
+2025-04-08 08:41:16 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 08:41:16 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-08 08:41:16 - casbin.policy - INFO - Role links for: g
+2025-04-08 08:41:16 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, user, 测试角色)
+2025-04-08 08:41:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 08:41:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 08:41:38 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 08:41:38 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 08:55:02 - root - INFO - 服务关闭
+2025-04-08 09:05:32 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 09:05:32 - root - INFO - 服务启动
+2025-04-08 09:05:32 - root - INFO - 访问根路径
+2025-04-08 09:05:40 - root - INFO - 服务关闭
+2025-04-08 09:05:43 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 09:05:43 - root - INFO - 服务启动
+2025-04-08 09:05:48 - root - INFO - 访问根路径
+2025-04-08 09:06:26 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 09:06:26 - casbin.policy - INFO - Model:
+2025-04-08 09:06:26 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 09:06:26 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 09:06:26 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 09:06:26 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 09:06:26 - casbin.policy - INFO - g.g: _, _
+2025-04-08 09:06:26 - casbin.policy - INFO - Policy:
+2025-04-08 09:06:26 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 09:06:26 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-08 09:06:26 - casbin.policy - INFO - Role links for: g
+2025-04-08 09:06:26 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, user, 测试角色)
+2025-04-08 09:08:08 - root - INFO - 服务关闭
+2025-04-08 09:08:11 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 09:08:11 - root - INFO - 服务启动
+2025-04-08 09:08:17 - root - INFO - 服务关闭
+2025-04-08 09:08:19 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 09:08:19 - root - INFO - 服务启动
+2025-04-08 09:08:32 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 09:08:32 - casbin.policy - INFO - Model:
+2025-04-08 09:08:32 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 09:08:32 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 09:08:32 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 09:08:32 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 09:08:32 - casbin.policy - INFO - g.g: _, _
+2025-04-08 09:08:32 - casbin.policy - INFO - Policy:
+2025-04-08 09:08:32 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 09:08:32 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-08 09:08:32 - casbin.policy - INFO - Role links for: g
+2025-04-08 09:08:32 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, 测试角色, admin)
+2025-04-08 09:08:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 09:08:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 09:12:51 - root - INFO - 服务关闭
+2025-04-08 09:12:56 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 09:12:56 - root - INFO - 服务启动
+2025-04-08 09:13:06 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 09:13:06 - casbin.policy - INFO - Model:
+2025-04-08 09:13:06 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 09:13:06 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 09:13:06 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 09:13:06 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 09:13:06 - casbin.policy - INFO - g.g: _, _
+2025-04-08 09:13:06 - casbin.policy - INFO - Policy:
+2025-04-08 09:13:06 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 09:13:06 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试角色']]
+2025-04-08 09:13:06 - casbin.policy - INFO - Role links for: g
+2025-04-08 09:13:06 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试角色)
+2025-04-08 09:13:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 09:13:06 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 09:14:25 - root - INFO - 服务关闭
+2025-04-08 09:14:27 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 09:14:28 - root - INFO - 服务启动
+2025-04-08 09:17:38 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 09:17:38 - casbin.policy - INFO - Model:
+2025-04-08 09:17:38 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 09:17:38 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 09:17:38 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 09:17:38 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 09:17:38 - casbin.policy - INFO - g.g: _, _
+2025-04-08 09:17:38 - casbin.policy - INFO - Policy:
+2025-04-08 09:17:38 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 09:17:38 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 09:17:38 - casbin.policy - INFO - Role links for: g
+2025-04-08 09:17:38 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, admin, user), 2 < (测试角色_ac2847da, 已更新的角色_28579610, user)
+2025-04-08 09:17:38 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 09:17:38 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 09:36:00 - root - INFO - 服务关闭
+2025-04-08 09:36:02 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 09:36:02 - root - INFO - 服务启动
+2025-04-08 09:51:35 - root - INFO - 服务关闭
+2025-04-08 09:51:37 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 09:51:37 - root - INFO - 服务启动
+2025-04-08 09:51:43 - root - INFO - 服务关闭
+2025-04-08 10:02:54 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 10:02:55 - root - INFO - 服务启动
+2025-04-08 10:03:00 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 10:03:00 - casbin.policy - INFO - Model:
+2025-04-08 10:03:00 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 10:03:00 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 10:03:00 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 10:03:00 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 10:03:00 - casbin.policy - INFO - g.g: _, _
+2025-04-08 10:03:00 - casbin.policy - INFO - Policy:
+2025-04-08 10:03:00 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 10:03:00 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 10:03:00 - casbin.policy - INFO - Role links for: g
+2025-04-08 10:03:00 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, user, 测试获取角色), 2 < (测试角色_ac2847da, 已更新的角色_28579610, user)
+2025-04-08 10:03:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 10:03:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 10:07:52 - root - INFO - 服务关闭
+2025-04-08 10:08:00 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 10:08:00 - root - INFO - 服务启动
+2025-04-08 10:08:26 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 10:08:26 - casbin.policy - INFO - Model:
+2025-04-08 10:08:26 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 10:08:26 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 10:08:26 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 10:08:26 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 10:08:26 - casbin.policy - INFO - g.g: _, _
+2025-04-08 10:08:26 - casbin.policy - INFO - Policy:
+2025-04-08 10:08:26 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 10:08:26 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 10:08:26 - casbin.policy - INFO - Role links for: g
+2025-04-08 10:08:26 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试获取角色), 2 < (user, 测试角色_ac2847da, 已更新的角色_28579610)
+2025-04-08 10:12:29 - root - INFO - 服务关闭
+2025-04-08 10:12:36 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 10:12:37 - root - INFO - 服务启动
+2025-04-08 10:12:58 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 10:12:58 - casbin.policy - INFO - Model:
+2025-04-08 10:12:58 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 10:12:58 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 10:12:58 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 10:12:58 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 10:12:58 - casbin.policy - INFO - g.g: _, _
+2025-04-08 10:12:58 - casbin.policy - INFO - Policy:
+2025-04-08 10:12:58 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 10:12:58 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 10:12:58 - casbin.policy - INFO - Role links for: g
+2025-04-08 10:12:58 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, 测试获取角色, admin), 2 < (测试角色_ac2847da, 已更新的角色_28579610, user)
+2025-04-08 10:15:45 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 10:15:45 - root - INFO - 服务启动
+2025-04-08 10:15:56 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 10:15:56 - casbin.policy - INFO - Model:
+2025-04-08 10:15:56 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 10:15:56 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 10:15:56 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 10:15:56 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 10:15:56 - casbin.policy - INFO - g.g: _, _
+2025-04-08 10:15:56 - casbin.policy - INFO - Policy:
+2025-04-08 10:15:56 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 10:15:56 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 10:15:56 - casbin.policy - INFO - Role links for: g
+2025-04-08 10:15:56 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, user, 测试获取角色), 2 < (测试角色_ac2847da, user, 已更新的角色_28579610)
+2025-04-08 10:15:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 10:15:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 10:23:13 - root - INFO - 服务关闭
+2025-04-08 10:27:18 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 10:27:19 - root - INFO - 服务启动
+2025-04-08 10:27:49 - root - INFO - 服务关闭
+2025-04-08 10:27:56 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 10:27:57 - root - INFO - 服务启动
+2025-04-08 10:28:43 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 10:28:43 - casbin.policy - INFO - Model:
+2025-04-08 10:28:43 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 10:28:43 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 10:28:43 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 10:28:43 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 10:28:43 - casbin.policy - INFO - g.g: _, _
+2025-04-08 10:28:43 - casbin.policy - INFO - Policy:
+2025-04-08 10:28:43 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 10:28:43 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 10:28:43 - casbin.policy - INFO - Role links for: g
+2025-04-08 10:28:43 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, 测试获取角色, user), 2 < (测试角色_ac2847da, 已更新的角色_28579610, user)
+2025-04-08 10:28:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 10:28:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 10:37:51 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 10:37:51 - root - INFO - 服务启动
+2025-04-08 10:38:03 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 10:38:04 - casbin.policy - INFO - Model:
+2025-04-08 10:38:04 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 10:38:04 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 10:38:04 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 10:38:04 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 10:38:04 - casbin.policy - INFO - g.g: _, _
+2025-04-08 10:38:04 - casbin.policy - INFO - Policy:
+2025-04-08 10:38:04 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 10:38:04 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 10:38:04 - casbin.policy - INFO - Role links for: g
+2025-04-08 10:38:04 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (已更新的角色_28579610, user, 测试角色_ac2847da)
+2025-04-08 10:38:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 10:38:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:02:17 - root - INFO - 服务关闭
+2025-04-08 11:02:23 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 11:02:24 - root - INFO - 服务启动
+2025-04-08 11:02:29 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 11:02:29 - casbin.policy - INFO - Model:
+2025-04-08 11:02:29 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 11:02:29 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 11:02:29 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 11:02:29 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 11:02:29 - casbin.policy - INFO - g.g: _, _
+2025-04-08 11:02:29 - casbin.policy - INFO - Policy:
+2025-04-08 11:02:29 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 11:02:29 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 11:02:29 - casbin.policy - INFO - Role links for: g
+2025-04-08 11:02:29 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试获取角色), 2 < (user, 测试角色_ac2847da, 已更新的角色_28579610)
+2025-04-08 11:02:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:02:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:07:55 - root - INFO - 服务关闭
+2025-04-08 11:08:02 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 11:08:03 - root - INFO - 服务启动
+2025-04-08 11:08:14 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 11:08:14 - casbin.policy - INFO - Model:
+2025-04-08 11:08:14 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 11:08:14 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 11:08:14 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 11:08:14 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 11:08:14 - casbin.policy - INFO - g.g: _, _
+2025-04-08 11:08:14 - casbin.policy - INFO - Policy:
+2025-04-08 11:08:14 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 11:08:14 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 11:08:14 - casbin.policy - INFO - Role links for: g
+2025-04-08 11:08:14 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试获取角色), 2 < (已更新的角色_28579610, user, 测试角色_ac2847da)
+2025-04-08 11:08:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:08:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:13:40 - root - INFO - 服务关闭
+2025-04-08 11:13:50 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 11:13:50 - root - INFO - 服务启动
+2025-04-08 11:13:57 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 11:13:57 - casbin.policy - INFO - Model:
+2025-04-08 11:13:57 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 11:13:57 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 11:13:57 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 11:13:57 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 11:13:57 - casbin.policy - INFO - g.g: _, _
+2025-04-08 11:13:57 - casbin.policy - INFO - Policy:
+2025-04-08 11:13:57 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 11:13:57 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 11:13:57 - casbin.policy - INFO - Role links for: g
+2025-04-08 11:13:57 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, 测试获取角色, admin), 2 < (已更新的角色_28579610, user, 测试角色_ac2847da)
+2025-04-08 11:13:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:13:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:28:54 - root - INFO - 服务关闭
+2025-04-08 11:29:00 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 11:29:01 - root - INFO - 服务启动
+2025-04-08 11:29:16 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 11:29:16 - casbin.policy - INFO - Model:
+2025-04-08 11:29:16 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 11:29:16 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 11:29:16 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 11:29:16 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 11:29:16 - casbin.policy - INFO - g.g: _, _
+2025-04-08 11:29:16 - casbin.policy - INFO - Policy:
+2025-04-08 11:29:16 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 11:29:16 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 11:29:16 - casbin.policy - INFO - Role links for: g
+2025-04-08 11:29:16 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, admin, user), 2 < (已更新的角色_28579610, user, 测试角色_ac2847da)
+2025-04-08 11:29:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:29:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:32:45 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: Test Workflow - workflow:1 - User:84
+2025-04-08 11:34:34 - root - INFO - 服务关闭
+2025-04-08 11:34:41 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 11:34:41 - root - INFO - 服务启动
+2025-04-08 11:34:41 - root - INFO - 服务关闭
+2025-04-08 11:34:48 - root - INFO - 日志系统已初始化，日志文件路径: d:\Programs\taizhang\backend.log
+2025-04-08 11:34:49 - root - INFO - 服务启动
+2025-04-08 11:34:59 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "c:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 11:35:00 - casbin.policy - INFO - Model:
+2025-04-08 11:35:00 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 11:35:00 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 11:35:00 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 11:35:00 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 11:35:00 - casbin.policy - INFO - g.g: _, _
+2025-04-08 11:35:00 - casbin.policy - INFO - Policy:
+2025-04-08 11:35:00 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 11:35:00 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 11:35:00 - casbin.policy - INFO - Role links for: g
+2025-04-08 11:35:00 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, admin, user), 2 < (测试角色_ac2847da, 已更新的角色_28579610, user)
+2025-04-08 11:35:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:35:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:37:58 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 11:37:59 - root - INFO - 服务启动
+2025-04-08 11:38:12 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 11:38:12 - casbin.policy - INFO - Model:
+2025-04-08 11:38:12 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 11:38:12 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 11:38:12 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 11:38:12 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 11:38:12 - casbin.policy - INFO - g.g: _, _
+2025-04-08 11:38:12 - casbin.policy - INFO - Policy:
+2025-04-08 11:38:12 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 11:38:12 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 11:38:12 - casbin.policy - INFO - Role links for: g
+2025-04-08 11:38:12 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 11:38:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:38:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:38:15 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-08 11:38:15 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-08 11:38:15 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-08 11:38:15 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-08 11:39:14 - root - INFO - 服务关闭
+2025-04-08 11:39:17 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 11:39:17 - root - INFO - 服务启动
+2025-04-08 11:39:54 - root - INFO - 服务关闭
+2025-04-08 11:39:56 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 11:39:56 - root - INFO - 服务启动
+2025-04-08 11:40:57 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 11:40:57 - casbin.policy - INFO - Model:
+2025-04-08 11:40:57 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 11:40:57 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 11:40:57 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 11:40:57 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 11:40:57 - casbin.policy - INFO - g.g: _, _
+2025-04-08 11:40:57 - casbin.policy - INFO - Policy:
+2025-04-08 11:40:57 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 11:40:57 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 11:40:57 - casbin.policy - INFO - Role links for: g
+2025-04-08 11:40:57 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, admin, user), 2 < (测试角色_ac2847da, 已更新的角色_28579610, user)
+2025-04-08 11:40:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:40:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:54:26 - root - INFO - 服务关闭
+2025-04-08 11:54:28 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 11:54:28 - root - INFO - 服务启动
+2025-04-08 11:54:41 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 11:54:42 - casbin.policy - INFO - Model:
+2025-04-08 11:54:42 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 11:54:42 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 11:54:42 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 11:54:42 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 11:54:42 - casbin.policy - INFO - g.g: _, _
+2025-04-08 11:54:42 - casbin.policy - INFO - Policy:
+2025-04-08 11:54:42 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 11:54:42 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 11:54:42 - casbin.policy - INFO - Role links for: g
+2025-04-08 11:54:42 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, 测试获取角色, admin), 2 < (测试角色_ac2847da, user, 已更新的角色_28579610)
+2025-04-08 11:54:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 11:54:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:03:14 - root - INFO - 服务关闭
+2025-04-08 14:03:16 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:03:17 - root - INFO - 服务启动
+2025-04-08 14:03:25 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 14:03:25 - casbin.policy - INFO - Model:
+2025-04-08 14:03:25 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 14:03:25 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 14:03:25 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 14:03:25 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 14:03:25 - casbin.policy - INFO - g.g: _, _
+2025-04-08 14:03:25 - casbin.policy - INFO - Policy:
+2025-04-08 14:03:25 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 14:03:25 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 14:03:25 - casbin.policy - INFO - Role links for: g
+2025-04-08 14:03:25 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 14:03:25 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:03:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:04:32 - root - INFO - 服务关闭
+2025-04-08 14:04:35 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:04:35 - root - INFO - 服务启动
+2025-04-08 14:04:45 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 14:04:46 - casbin.policy - INFO - Model:
+2025-04-08 14:04:46 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 14:04:46 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 14:04:46 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 14:04:46 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 14:04:46 - casbin.policy - INFO - g.g: _, _
+2025-04-08 14:04:46 - casbin.policy - INFO - Policy:
+2025-04-08 14:04:46 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 14:04:46 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 14:04:46 - casbin.policy - INFO - Role links for: g
+2025-04-08 14:04:46 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 14:04:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:04:46 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:05:09 - root - INFO - 服务关闭
+2025-04-08 14:05:11 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:05:12 - root - INFO - 服务启动
+2025-04-08 14:06:29 - root - INFO - 服务关闭
+2025-04-08 14:06:32 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:06:32 - root - INFO - 服务启动
+2025-04-08 14:11:04 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 14:11:04 - casbin.policy - INFO - Model:
+2025-04-08 14:11:04 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 14:11:04 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 14:11:04 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 14:11:04 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 14:11:04 - casbin.policy - INFO - g.g: _, _
+2025-04-08 14:11:04 - casbin.policy - INFO - Policy:
+2025-04-08 14:11:04 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 14:11:04 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 14:11:04 - casbin.policy - INFO - Role links for: g
+2025-04-08 14:11:04 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, admin, user), 2 < (测试角色_ac2847da, 已更新的角色_28579610, user)
+2025-04-08 14:11:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:11:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:12:27 - root - INFO - 服务关闭
+2025-04-08 14:12:29 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:12:29 - root - INFO - 服务启动
+2025-04-08 14:12:41 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 14:12:42 - casbin.policy - INFO - Model:
+2025-04-08 14:12:42 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 14:12:42 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 14:12:42 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 14:12:42 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 14:12:42 - casbin.policy - INFO - g.g: _, _
+2025-04-08 14:12:42 - casbin.policy - INFO - Policy:
+2025-04-08 14:12:42 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 14:12:42 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 14:12:42 - casbin.policy - INFO - Role links for: g
+2025-04-08 14:12:42 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, user, 测试获取角色), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 14:12:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:12:42 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:13:14 - root - INFO - 服务关闭
+2025-04-08 14:13:17 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:13:18 - root - INFO - 服务启动
+2025-04-08 14:14:07 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 14:14:08 - casbin.policy - INFO - Model:
+2025-04-08 14:14:08 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 14:14:08 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 14:14:08 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 14:14:08 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 14:14:08 - casbin.policy - INFO - g.g: _, _
+2025-04-08 14:14:08 - casbin.policy - INFO - Policy:
+2025-04-08 14:14:08 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 14:14:08 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 14:14:08 - casbin.policy - INFO - Role links for: g
+2025-04-08 14:14:08 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 14:14:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:14:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:14:22 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: Test Workflow - workflow:1 - User:84
+2025-04-08 14:20:10 - root - INFO - 服务关闭
+2025-04-08 14:20:13 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:20:13 - root - INFO - 服务启动
+2025-04-08 14:20:47 - root - INFO - 服务关闭
+2025-04-08 14:20:50 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:20:50 - root - INFO - 服务启动
+2025-04-08 14:26:30 - root - INFO - 服务关闭
+2025-04-08 14:26:33 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:26:33 - root - INFO - 服务启动
+2025-04-08 14:26:42 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 14:26:43 - casbin.policy - INFO - Model:
+2025-04-08 14:26:43 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 14:26:43 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 14:26:43 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 14:26:43 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 14:26:43 - casbin.policy - INFO - g.g: _, _
+2025-04-08 14:26:43 - casbin.policy - INFO - Policy:
+2025-04-08 14:26:43 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 14:26:43 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 14:26:43 - casbin.policy - INFO - Role links for: g
+2025-04-08 14:26:43 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, admin, 测试获取角色), 2 < (测试角色_ac2847da, user, 已更新的角色_28579610)
+2025-04-08 14:26:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:26:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:45:40 - root - INFO - 服务关闭
+2025-04-08 14:45:43 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:45:43 - root - INFO - 服务启动
+2025-04-08 14:46:57 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 14:46:57 - casbin.policy - INFO - Model:
+2025-04-08 14:46:57 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 14:46:57 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 14:46:57 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 14:46:57 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 14:46:57 - casbin.policy - INFO - g.g: _, _
+2025-04-08 14:46:57 - casbin.policy - INFO - Policy:
+2025-04-08 14:46:57 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 14:46:57 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 14:46:57 - casbin.policy - INFO - Role links for: g
+2025-04-08 14:46:57 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, 测试获取角色, admin), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 14:46:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:46:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 14:50:42 - root - INFO - 服务关闭
+2025-04-08 14:50:44 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:50:44 - root - INFO - 服务启动
+2025-04-08 14:50:57 - root - INFO - 服务关闭
+2025-04-08 14:50:59 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:50:59 - root - INFO - 服务启动
+2025-04-08 14:51:04 - root - INFO - 服务关闭
+2025-04-08 14:51:07 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:51:07 - root - INFO - 服务启动
+2025-04-08 14:51:15 - root - INFO - 服务关闭
+2025-04-08 14:51:18 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 14:51:18 - root - INFO - 服务启动
+2025-04-08 15:06:09 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 15:06:09 - casbin.policy - INFO - Model:
+2025-04-08 15:06:09 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 15:06:09 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 15:06:09 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 15:06:09 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 15:06:09 - casbin.policy - INFO - g.g: _, _
+2025-04-08 15:06:09 - casbin.policy - INFO - Policy:
+2025-04-08 15:06:09 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 15:06:09 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 15:06:09 - casbin.policy - INFO - Role links for: g
+2025-04-08 15:06:09 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 15:06:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:06:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:20:13 - root - INFO - 服务关闭
+2025-04-08 15:20:15 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 15:20:15 - root - INFO - 服务启动
+2025-04-08 15:24:34 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 15:24:34 - casbin.policy - INFO - Model:
+2025-04-08 15:24:34 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 15:24:34 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 15:24:34 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 15:24:34 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 15:24:34 - casbin.policy - INFO - g.g: _, _
+2025-04-08 15:24:34 - casbin.policy - INFO - Policy:
+2025-04-08 15:24:34 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 15:24:34 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 15:24:34 - casbin.policy - INFO - Role links for: g
+2025-04-08 15:24:34 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 15:24:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:24:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:25:30 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: Test Workflow - workflow:1 - User:84
+2025-04-08 15:25:45 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: Test Workflow - workflow:1 - User:84
+2025-04-08 15:25:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:25:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:25:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:25:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:26:02 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:26:02 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:27:12 - root - INFO - 服务关闭
+2025-04-08 15:27:15 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 15:27:15 - root - INFO - 服务启动
+2025-04-08 15:27:25 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 15:27:25 - casbin.policy - INFO - Model:
+2025-04-08 15:27:25 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 15:27:25 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 15:27:25 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 15:27:25 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 15:27:25 - casbin.policy - INFO - g.g: _, _
+2025-04-08 15:27:25 - casbin.policy - INFO - Policy:
+2025-04-08 15:27:25 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 15:27:25 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 15:27:25 - casbin.policy - INFO - Role links for: g
+2025-04-08 15:27:25 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (测试角色_ac2847da, 已更新的角色_28579610, user)
+2025-04-08 15:27:25 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:27:25 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:28:17 - taizhang - INFO - [INFO] workflow.create_workflow: 创建工作流: 新工作流 - workflow:6 - User:84
+2025-04-08 15:30:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:30:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:30:12 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:30:12 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:30:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:30:14 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:30:18 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:30:18 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:36:29 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:36:29 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:37:16 - root - INFO - 服务关闭
+2025-04-08 15:37:18 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 15:37:18 - root - INFO - 服务启动
+2025-04-08 15:37:27 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 15:37:27 - casbin.policy - INFO - Model:
+2025-04-08 15:37:27 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 15:37:27 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 15:37:27 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 15:37:27 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 15:37:27 - casbin.policy - INFO - g.g: _, _
+2025-04-08 15:37:27 - casbin.policy - INFO - Policy:
+2025-04-08 15:37:27 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 15:37:27 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 15:37:27 - casbin.policy - INFO - Role links for: g
+2025-04-08 15:37:27 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (admin, 测试获取角色, user), 2 < (已更新的角色_28579610, 测试角色_ac2847da, user)
+2025-04-08 15:37:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:37:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:37:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:37:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:37:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:37:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:39:03 - root - INFO - 服务关闭
+2025-04-08 15:39:06 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 15:39:06 - root - INFO - 服务启动
+2025-04-08 15:39:50 - root - INFO - 服务关闭
+2025-04-08 15:39:53 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 15:39:53 - root - INFO - 服务启动
+2025-04-08 15:39:53 - root - INFO - 服务关闭
+2025-04-08 15:39:55 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 15:39:55 - root - INFO - 服务启动
+2025-04-08 15:40:03 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 15:40:03 - casbin.policy - INFO - Model:
+2025-04-08 15:40:03 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 15:40:03 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 15:40:03 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 15:40:03 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 15:40:03 - casbin.policy - INFO - g.g: _, _
+2025-04-08 15:40:03 - casbin.policy - INFO - Policy:
+2025-04-08 15:40:03 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 15:40:03 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610']]
+2025-04-08 15:40:03 - casbin.policy - INFO - Role links for: g
+2025-04-08 15:40:03 - casbin.role - INFO - testuser < (test_role, test_role_2), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (user, 测试获取角色, admin), 2 < (user, 已更新的角色_28579610, 测试角色_ac2847da)
+2025-04-08 15:40:03 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:40:03 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:40:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:40:05 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:40:06 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:40:06 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:43:13 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:43:13 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
