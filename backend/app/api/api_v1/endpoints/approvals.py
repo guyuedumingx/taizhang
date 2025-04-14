@@ -199,16 +199,18 @@ def submit_ledger_for_approval(
     db.commit()
     db.refresh(ledger)
     
+    # 需要找到工作流实例
+
     # 记录审计日志
     log_audit(
         db=db,
         user_id=current_user.id,
         action="submit",
-        resource_type="ledger",
-        resource_id=ledger_id,
-        detail=f"提交台账进入审批流程，工作流实例ID: {workflow_instance.id}",
-        old_status="draft",
-        new_status="pending"
+        ledger_id=ledger_id,
+        workflow_instance_id = workflow_instance.id,
+        comment = [f"提交台账进入审批流程，工作流实例ID: {workflow_instance.id}"],
+        status_before = "draft",
+        status_after = "pending"
     )
     
     return ledger
@@ -309,11 +311,11 @@ def approve_ledger(
                 db=db,
                 user_id=current_user.id,
                 action="approve",
-                resource_type="ledger",
-                resource_id=ledger_id,
-                detail=f"台账审批通过，工作流实例ID: {workflow_instance.id}",
-                old_status="pending",
-                new_status="approved"
+                workflow_instance_id= workflow_instance.id,
+                ledger_id =ledger_id,
+                comment=[f"台账审批通过，工作流实例ID: {workflow_instance.id}"],
+                status_before = "pending",
+                status_after = "approved"
             )
         else:
             # 记录审计日志
@@ -321,11 +323,11 @@ def approve_ledger(
                 db=db,
                 user_id=current_user.id,
                 action="approve_node",
-                resource_type="ledger",
-                resource_id=ledger_id,
-                detail=f"台账节点审批通过，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}",
-                old_status="pending",
-                new_status="pending"
+                ledger_id=ledger_id,
+                workflow_instance_id= workflow_instance.id,
+                comment = [f"台账节点审批通过，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}"],
+                status_before="pending",
+                status_after ="pending"
             )
     
     elif approval_data.action == "reject":
@@ -351,11 +353,11 @@ def approve_ledger(
                 db=db,
                 user_id=current_user.id,
                 action="reject",
-                resource_type="ledger",
-                resource_id=ledger_id,
-                detail=f"台账审批拒绝，工作流实例ID: {workflow_instance.id}",
-                old_status="pending",
-                new_status="rejected"
+                ledger_id=ledger_id,
+                workflow_instance_id= workflow_instance.id,
+                comment = [f"台账审批拒绝，工作流实例ID: {workflow_instance.id}"],
+                status_before="pending",
+                status_after="rejected"
             )
         else:
             # 记录审计日志
@@ -363,11 +365,11 @@ def approve_ledger(
                 db=db,
                 user_id=current_user.id,
                 action="reject_node",
-                resource_type="ledger",
-                resource_id=ledger_id,
-                detail=f"台账节点审批拒绝，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}",
-                old_status="pending",
-                new_status="pending"
+                ledger_id=ledger_id,
+                workflow_instance_id = workflow_instance.id,
+                comment = [f"台账节点审批拒绝，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}"],
+                status_before = "pending",
+                status_after = "pending"
             )
     
     else:
@@ -437,11 +439,11 @@ def cancel_approval(
         db=db,
         user_id=current_user.id,
         action="cancel_approval",
-        resource_type="ledger",
-        resource_id=ledger_id,
-        detail=f"取消台账审批流程，工作流实例ID: {workflow_instance.id}",
-        old_status="pending",
-        new_status="draft"
+        workflow_instance_id = workflow_instance.id,
+        ledger_id=ledger_id,
+        comment= [f"取消台账审批流程，工作流实例ID: {workflow_instance.id}"],
+        status_before="pending",
+        status_after="draft"
     )
     
     return ledger

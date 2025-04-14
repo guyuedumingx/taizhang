@@ -322,6 +322,7 @@ def log_error(
 
 
 def log_audit(
+    db: Session,
     action: str,
     user_id: Optional[int] = None,
     ledger_id: Optional[int] = None,

@@ -142,7 +142,7 @@ const LedgerDetail: React.FC = () => {
       //   return;
       // }
       
-      // 否则获取模板关联的工作流
+      // 获取模板关联的工作流
       if (ledger?.template_id) {
         try {
           const template = await TemplateService.getTemplateDetail(ledger.template_id);
@@ -297,29 +297,10 @@ const LedgerDetail: React.FC = () => {
       const currentNodeId = ledger.active_workflow_instance.current_node_id;
       const workflowId = ledger.active_workflow_instance.workflow_id;
       
-      // 获取工作流
-      axios.get(`${API_BASE_URL}/workflows/${workflowId}`)
-        .then(response => {
-          console.log('获取审批工作流原始返回数据:', response.data);
-          
-          // 处理可能的嵌套数据结构
-          let workflowData;
-          if (response.data && typeof response.data === 'object') {
-            if ('item' in response.data && response.data.item) {
-              console.log('从嵌套数据中提取工作流详情');
-              workflowData = response.data.item;
-            } else if ('id' in response.data) {
-              workflowData = response.data;
-            } else {
-              console.error('无法识别工作流数据格式:', response.data);
-              message.error('无法识别工作流数据格式');
-              return;
-            }
-          } else {
-            console.error('获取工作流详情返回格式不正确:', response.data);
-            message.error('获取工作流详情返回格式不正确');
-            return;
-          }
+      // 使用 WorkflowService 获取工作流详情
+      WorkflowService.getWorkflow(workflowId)
+        .then(workflowData => {
+          console.log('获取审批工作流:', workflowData);
           
           const currentNode = workflowData.nodes.find((node: WorkflowNode) => node.id === currentNodeId);
           

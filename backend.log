@@ -7856,3 +7856,107 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-04-08 15:40:06 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
 2025-04-08 15:43:13 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
 2025-04-08 15:43:13 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:51:21 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误通过工作流 - workflow:5 - User:84
+2025-04-08 15:51:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:51:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:51:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:51:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:51:51 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:51:51 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:51:54 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:51:54 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:52:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:52:03 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:52:05 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:52:05 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:52:41 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-08 15:52:41 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-08 15:52:41 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:84
+2025-04-08 15:52:41 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:84
+2025-04-08 15:52:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:52:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:52:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:52:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:53:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:53:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:53:31 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误通过工作流 - workflow:5 - User:84
+2025-04-08 15:53:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:53:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:53:37 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:53:37 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:53:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:53:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:53:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:53:44 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:53:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:53:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:53:59 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:53:59 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:57:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:57:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:57:24 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-08 15:57:24 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:2 - User:84
+2025-04-08 15:57:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:57:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:57:45 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误通过工作流 - workflow:5 - User:84
+2025-04-08 15:57:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:57:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:57:49 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:57:49 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 15:57:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:57:58 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 15:58:00 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 15:58:00 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:02:34 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误通过工作流 - workflow:5 - User:84
+2025-04-08 16:02:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:02:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:02:40 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:02:40 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:03:20 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误通过工作流 - workflow:5 - User:84
+2025-04-08 16:03:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:03:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:03:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:03:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:03:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:03:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:03:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:03:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:03:37 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:03:37 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:21:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:21:45 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:24:29 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:26:33 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:26:39 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:27:09 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:27:33 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:30:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:30:54 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:41:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:41:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:41:18 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 16:41:18 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组wutsgo  - ledger:1 - User:84
+2025-04-08 16:41:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:41:24 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:84
+2025-04-08 16:41:25 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:41:25 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:43:19 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过带 - ledger:3 - User:84
+2025-04-08 16:52:07 - root - INFO - 服务关闭
+2025-04-08 16:52:09 - root - INFO - 日志系统已初始化，日志文件路径: D:\Programs\taizhang\backend.log
+2025-04-08 16:52:09 - root - INFO - 服务启动
+2025-04-08 16:52:38 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\10694\AppData\Local\Programs\Python\Python39\lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-08 16:52:38 - casbin.policy - INFO - Model:
+2025-04-08 16:52:38 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-08 16:52:38 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-08 16:52:38 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-08 16:52:38 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-08 16:52:38 - casbin.policy - INFO - g.g: _, _
+2025-04-08 16:52:38 - casbin.policy - INFO - Policy:
+2025-04-08 16:52:38 - casbin.policy - INFO - p : sub, obj, act : [['admin', '*', '*'], ['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['test_role', 'user', 'read']]
+2025-04-08 16:52:38 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['91', 'user'], ['95', 'user'], ['119', 'user'], ['165', 'user'], ['198', 'user'], ['1', 'user'], ['1', 'admin'], ['1', '测试获取角色'], ['2', 'user'], ['2', '测试角色_ac2847da'], ['2', '已更新的角色_28579610'], ['3', 'user'], ['3', '测试角色'], ['4', 'user'], ['4', '测试角色']]
+2025-04-08 16:52:38 - casbin.policy - INFO - Role links for: g
+2025-04-08 16:52:38 - casbin.role - INFO - testuser < (test_role_2, test_role), 91 < user, 95 < user, 119 < user, 165 < user, 198 < user, 1 < (测试获取角色, user, admin), 2 < (测试角色_ac2847da, user, 已更新的角色_28579610), 3 < (user, 测试角色), 4 < (user, 测试角色)
