@@ -3,9 +3,6 @@ import * as workflowNodesAPI from '../api/workflow_nodes';
 import * as templatesAPI from '../api/index';
 import { Workflow, WorkflowCreate, WorkflowUpdate, WorkflowNode, WorkflowNodeCreate, User } from '../types';
 
-// 定义查询参数类型
-type QueryParams = Record<string, string | number | boolean | undefined>;
-
 export class WorkflowService {
   // 获取工作流列表
   static async getWorkflows(): Promise<Workflow[]> {
@@ -140,7 +137,7 @@ export class WorkflowService {
         node_type: 'start',
         order_index: 0,
         multi_approve_type: 'any',
-        need_select_next_approver: false,
+        need_select_next_approver: true,
         approver_ids: [],
       },
       {

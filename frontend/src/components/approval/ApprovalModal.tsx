@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Input, Typography, message } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { ApprovalService } from '../../services/ApprovalService';
+import { WorkflowService } from '../../services/WorkflowService';
 import ApproverSelector from '../workflow/ApproverSelector';
 
 const { Text } = Typography;
@@ -57,7 +58,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
       const workflowId = instanceData.workflow_id;
       
       // 获取工作流详情
-      const workflowData = await ApprovalService.getWorkflow(workflowId);
+      const workflowData = await WorkflowService.getWorkflow(workflowId);
       if (!workflowData || !workflowData.nodes) return;
       
       // 找到当前节点

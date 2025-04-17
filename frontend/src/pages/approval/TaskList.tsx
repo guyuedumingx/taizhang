@@ -56,7 +56,6 @@ const TaskList: React.FC = () => {
     try {
       console.log('调用ApprovalService.getPendingTasks()...');
       const response = await ApprovalService.getPendingTasks();
-      
       console.log('API响应数据:', response);
       
       if (!response || !Array.isArray(response)) {

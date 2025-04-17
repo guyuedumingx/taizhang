@@ -9,10 +9,11 @@ export interface Department {
 // 获取所有部门列表
 export const getAllDepartments = (): Department[] => {
   return [
-    { key: 'finance', name: '财务部', description: '负责公司财务管理', color: 'blue' },
-    { key: 'production', name: '生产部', description: '负责产品生产', color: 'green' },
-    { key: 'customer_service', name: '客服部', description: '负责客户服务', color: 'purple' },
-    { key: 'equipment', name: '设备部', description: '负责设备管理和维护', color: 'orange' },
+    // { key: 'finance', name: '交易处理一', description: '负责公司财务管理', color: 'blue' },
+    { key: 'production', name: '审核处理', description: '审核处理团队', color: 'green' },
+    // { key: 'customer_service', name: '生产管理', description: '负责客户服务', color: 'purple' },
+    // { key: 'equipment', name: '账务服务', description: '负责设备管理和维护', color: 'orange' },
+    // { key: 'test', name: '综合管理', description: '负责设备管理和维护', color: 'red' },
   ];
 };
 

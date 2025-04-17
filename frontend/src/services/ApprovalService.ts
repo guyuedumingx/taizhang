@@ -1,5 +1,5 @@
 import * as approvalsAPI from '../api/approvals';
-import { WorkflowInstance, LedgerApproval } from '../types';
+import {  LedgerApproval } from '../types';
 
 // 定义approval数据接口
 export interface ApprovalData {
@@ -19,8 +19,7 @@ export class ApprovalService {
   // 获取当前用户的待办任务
   static async getPendingTasks() {
     try {
-      const response = await approvalsAPI.getPendingTasks();
-      return response.data;
+      return await approvalsAPI.getPendingTasks();
     } catch (error) {
       console.error('获取待办任务失败:', error);
       throw error;

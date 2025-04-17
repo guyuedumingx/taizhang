@@ -133,7 +133,7 @@ const LedgerDetail: React.FC = () => {
                 // 排序节点，找到第一个需要审批的节点
                 const nodes = [...bingWorkflow.nodes].sort((a, b) => a.order_index - b.order_index);
                 if (nodes.length > 0) {
-                  setNextNodeId(nodes[0].id);
+                  setNextNodeId(nodes[1].id);
                 }
               }
               

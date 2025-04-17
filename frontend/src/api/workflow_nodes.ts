@@ -1,5 +1,4 @@
 import { api } from './index';
-import axios from 'axios';
 
 // 获取工作流节点详情
 export async function getWorkflowNode(nodeId: number) {
@@ -16,10 +15,6 @@ export async function getNodeApprovers(nodeId: number) {
     return response.data;
   } catch (error) {
     console.error(`获取节点ID=${nodeId}的审批人列表失败:`, error);
-    if (axios.isAxiosError(error)) {
-      console.error('错误状态码:', error.response?.status);
-      console.error('错误详情:', error.response?.data);
-    }
     throw error;
   }
 }
@@ -32,10 +27,6 @@ export async function updateNodeApprovers(nodeId: number, userIds: number[]) {
     return response.data;
   } catch (error) {
     console.error(`更新审批人列表失败:`, error);
-    if (axios.isAxiosError(error)) {
-      console.error('错误状态码:', error.response?.status);
-      console.error('错误详情:', error.response?.data);
-    }
     throw error;
   }
 } 
