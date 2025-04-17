@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Card, Typography, Space, message, Tooltip, Empty, Alert } from 'antd';
-import { CheckOutlined, CloseOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EyeOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import { ApprovalService } from '../../services/ApprovalService';
 import type { ColumnsType } from 'antd/es/table';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
+import ApprovalModal from '../../components/approval/ApprovalModal';
 
 const { Title } = Typography;
 
@@ -15,6 +16,7 @@ interface Task {
   ledger_id: number;
   ledger_name: string;
   workflow_instance_id: number;
+  workflow_node_id?: number;
   workflow_node_name: string;
   created_by: string;
   created_at: string;
@@ -26,6 +28,10 @@ const TaskList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [error, setError] = useState<string | null>(null);
+  
+  // 审批相关状态
+  const [approvalModalVisible, setApprovalModalVisible] = useState(false);
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
 
   // 检查权限
   useEffect(() => {
@@ -66,6 +72,7 @@ const TaskList: React.FC = () => {
         ledger_id: Number(item.ledger_id || 0),
         ledger_name: String(item.ledger_name || '未命名台账'),
         workflow_instance_id: Number(item.workflow_instance_id || 0),
+        workflow_node_id: Number(item.workflow_node_id || 0),
         workflow_node_name: String(item.workflow_node_name || '未知节点'),
         created_by: String(item.created_by || '未知用户'),
         created_at: String(item.created_at || new Date().toISOString())
@@ -82,32 +89,17 @@ const TaskList: React.FC = () => {
     }
   };
 
-  // 处理审批
-  const handleApprove = async (taskId: number, instanceId: number) => {
-    try {
-      await ApprovalService.approveWorkflowNode(instanceId, taskId, {
-        comment: '同意',
-      });
-      message.success('审批通过成功');
-      fetchTasks();
-    } catch (error) {
-      console.error('审批失败:', error);
-      message.error('审批失败，请稍后重试');
-    }
+  // 打开审批对话框
+  const openApprovalModal = (task: Task) => {
+    setCurrentTask(task);
+    setApprovalModalVisible(true);
   };
 
-  // 处理拒绝
-  const handleReject = async (taskId: number, instanceId: number) => {
-    try {
-      await ApprovalService.rejectWorkflowNode(instanceId, taskId, {
-        comment: '不同意',
-      });
-      message.success('已拒绝审批');
-      fetchTasks();
-    } catch (error) {
-      console.error('拒绝失败:', error);
-      message.error('拒绝失败，请稍后重试');
-    }
+  // 处理审批成功
+  const handleApprovalSuccess = () => {
+    setApprovalModalVisible(false);
+    fetchTasks(); // 刷新任务列表
+    message.success('审批处理成功');
   };
 
   // 表格列定义
@@ -154,20 +146,14 @@ const TaskList: React.FC = () => {
               onClick={() => navigate(`/dashboard/ledgers/${record.ledger_id}`)}
             />
           </Tooltip>
-          <Tooltip title="同意">
+          <Tooltip title="处理审批">
             <Button
-              type="text"
-              icon={<CheckOutlined style={{ color: 'green' }} />}
-              onClick={() => handleApprove(record.task_id, record.workflow_instance_id)}
-            />
-          </Tooltip>
-          <Tooltip title="拒绝">
-            <Button
-              type="text"
-              danger
-              icon={<CloseOutlined />}
-              onClick={() => handleReject(record.task_id, record.workflow_instance_id)}
-            />
+              type="primary"
+              size="small"
+              onClick={() => openApprovalModal(record)}
+            >
+              处理
+            </Button>
           </Tooltip>
         </Space>
       ),
@@ -222,6 +208,18 @@ const TaskList: React.FC = () => {
           }}
         />
       </Card>
+
+      {/* 审批对话框 */}
+      {currentTask && (
+        <ApprovalModal
+          visible={approvalModalVisible}
+          onCancel={() => setApprovalModalVisible(false)}
+          onSuccess={handleApprovalSuccess}
+          workflowInstanceId={currentTask.workflow_instance_id}
+          taskId={currentTask.task_id}
+          currentNodeId={currentTask.workflow_node_id}
+        />
+      )}
     </>
   );
 };

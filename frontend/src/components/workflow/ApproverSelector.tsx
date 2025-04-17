@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Select, Typography, Spin, Empty } from 'antd';
 import { User } from '../../types';
-import axios, { AxiosError } from 'axios';
-import { API_BASE_URL } from '../../config';
+import { WorkflowService } from '../../services/WorkflowService';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -70,60 +69,22 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
       setLoading(true);
       setError(null);
       try {
-        console.log(`正在获取节点ID=${nodeId}的审批人...`);
-        const token = localStorage.getItem('auth-storage')
-          ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
-          : null;
-          
-        if (!token) {
-          console.error('未找到认证Token');
-          setError('认证失败：未找到有效的Token');
-          setLoading(false);
-          return;
-        }
+        const data = await WorkflowService.getNodeApprovers(nodeId);
+      
+        setApprovers(data);
         
-        const apiUrl = `${API_BASE_URL}/workflow-nodes/${nodeId}/approvers`;
-        console.log(`请求URL: ${apiUrl}`);
-        
-        const response = await axios.get(apiUrl, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        console.log('获取审批人成功:', response.data);
-        // 确保后端返回值是数组
-        if (Array.isArray(response.data)) {
-          setApprovers(response.data);
-          
-          // 只在初始时自动选择，避免覆盖用户选择
-          if (response.data.length > 0 && value === undefined) {
-            if (mode === 'single') {
-              // 单选模式：选择第一个审批人
-              const firstId = String(response.data[0].id);
-              onChange(Number(firstId)); // 确保ID是数字
-            } else if (mode === 'multiple') {
-              // 多选模式：默认选择所有审批人
-              const allIds = response.data.map((user: User) => Number(String(user.id))); // 确保ID是数字
-              onChange(allIds);
-            }
-          }
-        } else {
-          setApprovers([]);
-          console.error('后端返回的审批人数据不是数组:', response.data);
-        }
-      } catch (err) {
-        console.error('获取审批人失败:', err);
-        if (axios.isAxiosError(err)) {
-          const axiosError = err as AxiosError;
-          
-          // 处理404错误（节点可能是新创建的，还没有审批人）
-          if (axiosError.response?.status === 404) {
-            setApprovers([]);
-            return;
+        // 只在初始时自动选择，避免覆盖用户选择
+        if (data.length > 0 && value === undefined) {
+          if (mode === 'single') {
+            // 单选模式：选择第一个审批人
+            const firstId = String(data[0].id);
+            onChange(Number(firstId)); // 确保ID是数字
+          } else if (mode === 'multiple') {
+            // 多选模式：默认选择所有审批人
+            const allIds = data.map((user: User) => Number(String(user.id))); // 确保ID是数字
+            onChange(allIds);
           }
         }
-        setError('无法获取审批人列表，请检查网络连接或联系管理员');
       } finally {
         setLoading(false);
       }

@@ -1,12 +1,33 @@
 import * as approvalsAPI from '../api/approvals';
 import * as workflowInstancesAPI from '../api/workflow_instances';
+import axios from 'axios';
 import { WorkflowInstance, LedgerApproval, WorkflowNodeApproval, WorkflowNodeRejection, Ledger, LedgerSubmit } from '../types';
 
+interface ApprovalResult {
+  success: boolean;
+  message: string;
+}
+
+// 定义approval数据接口
+export interface ApprovalData {
+  action?: 'approve' | 'reject';
+  comment?: string;
+  next_approver_id?: number;
+}
+
+// 定义提交审批数据接口
+export interface SubmitApprovalData {
+  workflow_id: number;
+  comment?: string;
+  next_approver_id?: number;
+}
+
 export class ApprovalService {
-  // 获取用户待办任务
+  // 获取当前用户的待办任务
   static async getPendingTasks() {
     try {
-      return await approvalsAPI.getPendingTasks();
+      const response = await approvalsAPI.getPendingTasks();
+      return response.data;
     } catch (error) {
       console.error('获取待办任务失败:', error);
       throw error;
@@ -24,9 +45,10 @@ export class ApprovalService {
   }
 
   // 获取工作流实例详情
-  static async getWorkflowInstance(instanceId: number): Promise<WorkflowInstance> {
+  static async getWorkflowInstance(instanceId: number) {
     try {
-      return await workflowInstancesAPI.getWorkflowInstance(instanceId);
+      const response = await axios.get(`/api/workflow/instances/${instanceId}`);
+      return response.data;
     } catch (error) {
       console.error(`获取工作流实例 ${instanceId} 详情失败:`, error);
       throw error;
@@ -54,11 +76,16 @@ export class ApprovalService {
   }
 
   // 提交台账进入审批流程
-  static async submitLedgerForApproval(ledgerId: number, data: LedgerSubmit) {
+  static async submitLedgerForApproval(ledgerId: number, data: SubmitApprovalData) {
     try {
-      return await approvalsAPI.submitLedgerForApproval(ledgerId, data);
+      const response = await fetch(`/api/ledgers/${ledgerId}/submit-approval`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
     } catch (error) {
-      console.error(`提交台账 ${ledgerId} 进入审批流程失败:`, error);
+      console.error(`提交台账 ${ledgerId} 审批失败:`, error);
       throw error;
     }
   }
@@ -94,21 +121,58 @@ export class ApprovalService {
   }
 
   // 审批通过工作流节点
-  static async approveWorkflowNode(instanceId: number, nodeId: number, approvalData: WorkflowNodeApproval) {
+  static async approveWorkflowNode(instanceId: number, taskId: number, data: ApprovalData) {
     try {
-      return await workflowInstancesAPI.approveWorkflowNode(instanceId, nodeId, approvalData);
+      const response = await fetch(`/api/workflow/instances/${instanceId}/tasks/${taskId}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
     } catch (error) {
-      console.error(`审批通过工作流实例 ${instanceId} 节点 ${nodeId} 失败:`, error);
+      console.error(`审批通过工作流实例 ${instanceId} 节点 ${taskId} 失败:`, error);
       throw error;
     }
   }
 
   // 拒绝工作流节点
-  static async rejectWorkflowNode(instanceId: number, nodeId: number, rejectionData: WorkflowNodeRejection) {
+  static async rejectWorkflowNode(instanceId: number, taskId: number, data: ApprovalData) {
     try {
-      return await workflowInstancesAPI.rejectWorkflowNode(instanceId, nodeId, rejectionData);
+      const response = await fetch(`/api/workflow/instances/${instanceId}/tasks/${taskId}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
     } catch (error) {
-      console.error(`拒绝工作流实例 ${instanceId} 节点 ${nodeId} 失败:`, error);
+      console.error(`拒绝工作流实例 ${instanceId} 节点 ${taskId} 失败:`, error);
+      throw error;
+    }
+  }
+
+  // 统一处理台账审批（可用于通过或拒绝）
+  static async processLedgerApproval(ledgerId: number, instanceId: number, data: ApprovalData) {
+    const action = data.action || 'approve';
+    try {
+      const response = await fetch(`/api/ledgers/${ledgerId}/workflow/instances/${instanceId}/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    } catch (error) {
+      console.error(`处理台账 ${ledgerId} 审批失败:`, error);
+      throw error;
+    }
+  }
+
+  // 获取工作流详情
+  static async getWorkflow(workflowId: number) {
+    try {
+      const response = await fetch(`/api/workflows/${workflowId}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`获取工作流 ${workflowId} 详情失败:`, error);
       throw error;
     }
   }

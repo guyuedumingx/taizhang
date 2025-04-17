@@ -1,4 +1,3 @@
-import api from '../api';
 import { SystemLog, AuditLog, LogQueryParams } from '../types';
 import * as LogsAPI from '../api/logs';
 
