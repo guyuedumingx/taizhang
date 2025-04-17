@@ -100,29 +100,7 @@ export class UserService {
     }>;
   }> {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('未授权，请先登录');
-      }
-      
-      const response = await fetch('/api/v1/users/import', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.detail || '导入失败');
-      }
-      
-      return result;
+      return await api.users.importUsers(file);
     } catch (error) {
       console.error('导入用户失败:', error);
       throw error;

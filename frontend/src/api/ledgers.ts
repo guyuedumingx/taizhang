@@ -1,43 +1,6 @@
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
-import { Ledger, LedgerCreate, LedgerUpdate, AuditLog } from '../types';
+import { api } from './index';
+import { LedgerCreate, LedgerUpdate } from '../types';
 import { QueryParams, buildQueryParams } from './util';
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-});
-
-// 请求拦截器，添加token到请求头
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('auth-storage')
-      ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
-      : null;
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// 响应拦截器，处理错误
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    // 处理401错误，清除token并跳转到登录页
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('auth-storage');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
 
 // 获取台账列表
 export async function getLedgers(queryParams: QueryParams) {
