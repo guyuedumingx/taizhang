@@ -7,7 +7,7 @@ from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
 from app.models.role import Role
-from app.services.role.role_service import role_service
+from app.services.role_service import role_service
 
 router = APIRouter()
 

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from app.api import deps
 from app import crud, models, schemas
 from app.utils.logger import LoggerService
-from app.services.log.log_service import log_service
+from app.services.log_service import log_service
 
 router = APIRouter()
 

@@ -184,7 +184,7 @@ def submit_ledger_for_approval(
     # 前端提交时，如果需要指定下一审批人，则需要将next_approver_id传入
     # 如果不需要指定下一审批人，则不传入next_approver_id
     workflow_instance = crud.workflow_instance.create_with_nodes(
-        db, workflow_id=workflow_id, ledger_id=ledger_id, created_by=current_user.id
+        db, workflow_id=workflow_id, ledger_id=ledger_id, created_by=current_user.id,next_approver_id=submit_data.next_approver_id
     )
     
     # 更新台账状态
@@ -208,7 +208,7 @@ def submit_ledger_for_approval(
         action="submit",
         ledger_id=ledger_id,
         workflow_instance_id = workflow_instance.id,
-        comment = [f"提交台账进入审批流程，工作流实例ID: {workflow_instance.id}"],
+        comment = f"提交台账进入审批流程，工作流实例ID: {workflow_instance.id}",
         status_before = "draft",
         status_after = "pending"
     )
@@ -313,7 +313,7 @@ def approve_ledger(
                 action="approve",
                 workflow_instance_id= workflow_instance.id,
                 ledger_id =ledger_id,
-                comment=[f"台账审批通过，工作流实例ID: {workflow_instance.id}"],
+                comment=f"台账审批通过，工作流实例ID: {workflow_instance.id}",
                 status_before = "pending",
                 status_after = "approved"
             )
@@ -325,7 +325,7 @@ def approve_ledger(
                 action="approve_node",
                 ledger_id=ledger_id,
                 workflow_instance_id= workflow_instance.id,
-                comment = [f"台账节点审批通过，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}"],
+                comment = f"台账节点审批通过，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}",
                 status_before="pending",
                 status_after ="pending"
             )
@@ -355,7 +355,7 @@ def approve_ledger(
                 action="reject",
                 ledger_id=ledger_id,
                 workflow_instance_id= workflow_instance.id,
-                comment = [f"台账审批拒绝，工作流实例ID: {workflow_instance.id}"],
+                comment = f"台账审批拒绝，工作流实例ID: {workflow_instance.id}",
                 status_before="pending",
                 status_after="rejected"
             )
@@ -367,7 +367,7 @@ def approve_ledger(
                 action="reject_node",
                 ledger_id=ledger_id,
                 workflow_instance_id = workflow_instance.id,
-                comment = [f"台账节点审批拒绝，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}"],
+                comment = f"台账节点审批拒绝，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}",
                 status_before = "pending",
                 status_after = "pending"
             )
@@ -441,7 +441,7 @@ def cancel_approval(
         action="cancel_approval",
         workflow_instance_id = workflow_instance.id,
         ledger_id=ledger_id,
-        comment= [f"取消台账审批流程，工作流实例ID: {workflow_instance.id}"],
+        comment= f"取消台账审批流程，工作流实例ID: {workflow_instance.id}",
         status_before="pending",
         status_after="draft"
     )

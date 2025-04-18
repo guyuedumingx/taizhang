@@ -9,7 +9,7 @@ from app import models, schemas
 from app.api import deps
 from app.core.security import create_access_token, verify_password, get_password_hash
 from app.services.casbin_service import get_roles_for_user, get_permissions_for_role, add_role_for_user
-from app.services.user.auth_service import auth_service
+from app.services.auth_service import auth_service
 
 router = APIRouter()
 

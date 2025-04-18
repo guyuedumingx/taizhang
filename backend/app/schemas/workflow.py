@@ -14,12 +14,10 @@ class WorkflowNodeBase(BaseModel):
     description: Optional[str] = None
     node_type: str
     approver_role_id: Optional[int] = None
-    approver_user_id: Optional[int] = None
     order_index: int
     is_final: Optional[bool] = None
     reject_to_node_id: Optional[int] = None
     multi_approve_type: Optional[str] = "any"  # 'any' - 任一审批, 'all' - 所有人审批
-    need_select_next_approver: Optional[bool] = False
 
 # 创建工作流节点请求
 class WorkflowNodeCreate(WorkflowNodeBase):
@@ -58,12 +56,10 @@ class WorkflowNodeUpdate(BaseModel):
     description: Optional[str] = None
     node_type: Optional[str] = None
     approver_role_id: Optional[int] = None
-    approver_user_id: Optional[int] = None
     order_index: Optional[int] = None
     is_final: Optional[bool] = None
     reject_to_node_id: Optional[int] = None
     multi_approve_type: Optional[str] = None
-    need_select_next_approver: Optional[bool] = None
     approver_ids: Optional[List[int]] = None  # 多个审批人ID
 
 # 工作流基础模型
@@ -146,6 +142,7 @@ class WorkflowInstanceNode(WorkflowInstanceNodeInDBBase):
     approver_name: Optional[str] = None
     node_name: Optional[str] = None
     node_type: Optional[str] = None
+    approver: Optional['User'] = None
 
 # 更新工作流实例节点请求
 class WorkflowInstanceNodeUpdate(BaseModel):
@@ -186,6 +183,7 @@ class WorkflowInstance(WorkflowInstanceInDBBase):
     current_node_name: Optional[str] = None
     nodes: Optional[List[WorkflowInstanceNode]] = []
     current_node: Optional[WorkflowInstanceNode] = None
+    creator: Optional['User'] = None
 
 # 更新工作流实例请求
 class WorkflowInstanceUpdate(BaseModel):
@@ -216,5 +214,8 @@ class WorkflowNodeRejection(BaseModel):
 
 # 解决循环引用
 from app.schemas.user import User
+User.update_forward_refs()
 Workflow.model_rebuild()
-WorkflowNode.model_rebuild() 
+WorkflowNode.model_rebuild()
+WorkflowInstance.model_rebuild()
+WorkflowInstanceNode.model_rebuild() 

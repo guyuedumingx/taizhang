@@ -8,24 +8,28 @@ import io
 from app import models, schemas
 from app.core.security import get_password_hash
 from app.services.casbin_service import add_role_for_user, remove_role_for_user, get_roles_for_user
+from app.api import deps
 
 
 class UserService:
     """用户服务类，处理用户相关的业务逻辑"""
 
     @staticmethod
-    def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[models.User]:
+    def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.User]:
         """获取用户列表"""
         users = db.query(models.User).offset(skip).limit(limit).all()
         
-        # 获取每个用户的角色
+        # 将models.User转换为schemas.User
+        result = []
         for user in users:
-            user.roles = get_roles_for_user(str(user.id))
+            schema_user = deps.convert_user_to_schema(user)
+            if schema_user:
+                result.append(schema_user)
         
-        return users
+        return result
 
     @staticmethod
-    def create_user(db: Session, user_in: schemas.UserCreate) -> models.User:
+    def create_user(db: Session, user_in: schemas.UserCreate) -> schemas.User:
         """创建新用户"""
         # 检查用户名是否已存在
         user = db.query(models.User).filter(models.User.username == user_in.username).first()
@@ -67,25 +71,21 @@ class UserService:
             # 默认角色为普通用户
             add_role_for_user(str(user.id), "user")
         
-        # 获取用户角色
-        user.roles = get_roles_for_user(str(user.id))
-        
-        return user
+        # 将models.User转换为schemas.User
+        return deps.convert_user_to_schema(user)
 
     @staticmethod
-    def get_user(db: Session, user_id: int) -> models.User:
+    def get_user(db: Session, user_id: int) -> schemas.User:
         """获取用户详情"""
         user = db.query(models.User).filter(models.User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="用户不存在")
         
-        # 获取用户角色
-        user.roles = get_roles_for_user(str(user.id))
-        
-        return user
+        # 将models.User转换为schemas.User
+        return deps.convert_user_to_schema(user)
 
     @staticmethod
-    def update_user(db: Session, user_id: int, user_in: schemas.UserUpdate) -> models.User:
+    def update_user(db: Session, user_id: int, user_in: schemas.UserUpdate) -> schemas.User:
         """更新用户信息"""
         user = db.query(models.User).filter(models.User.id == user_id).first()
         if not user:
@@ -133,10 +133,8 @@ class UserService:
         db.commit()
         db.refresh(user)
         
-        # 获取用户角色
-        user.roles = get_roles_for_user(str(user.id))
-        
-        return user
+        # 将models.User转换为schemas.User
+        return deps.convert_user_to_schema(user)
 
     @staticmethod
     def delete_user(db: Session, user_id: int) -> models.User:

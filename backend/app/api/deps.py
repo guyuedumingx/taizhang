@@ -1,15 +1,18 @@
-from typing import Generator, Optional
-
+from typing import Generator, Optional, Any
+from datetime import datetime, timedelta
+from jose import jwt, JWTError
+from pydantic import ValidationError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
-from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from app import models, schemas
+from app import crud, models, schemas
 from app.core import security
 from app.core.config import settings
 from app.db.session import get_db
+from app.db.session import SessionLocal
+from app.models.user import User
+from app.services.casbin_service import get_enforcer_instance, get_roles_for_user, get_permissions_for_role, check_permission
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
@@ -79,33 +82,77 @@ def check_permissions(
     return check_permission(str(current_user.id), resource, action)
 
 
-def get_roles_for_user(user_id: str):
+# def get_roles_for_user(user_id: str):
+#     """
+#     获取用户的所有角色
+    
+#     Args:
+#         user_id: 用户ID
+    
+#     Returns:
+#         角色列表
+#     """
+#     from app.db.session import SessionLocal
+#     from app.models.user_role import UserRole
+#     from app.models.role import Role
+    
+#     db = SessionLocal()
+#     try:
+#         # 查询用户角色关系
+#         user_roles = db.query(UserRole).filter(UserRole.user_id == user_id).all()
+        
+#         # 获取角色名称
+#         role_ids = [ur.role_id for ur in user_roles]
+#         roles = db.query(Role.name).filter(Role.id.in_(role_ids)).all()
+        
+#         # 返回角色名称列表
+#         return [role[0] for role in roles]
+#     except Exception as e:
+#         print(f"获取用户角色失败: {str(e)}")
+#         return []
+#     finally:
+#         db.close()
+
+
+def convert_user_to_schema(user: User, db = None) -> schemas.User:
     """
-    获取用户的所有角色
+    将数据库User模型转换为API User schema
     
     Args:
-        user_id: 用户ID
+        user: 数据库User模型
+        db: 数据库会话(可选,用于某些需要数据库的操作)
     
     Returns:
-        角色列表
+        schemas.User: 转换后的schema对象
     """
-    from app.db.session import SessionLocal
-    from app.models.user_role import UserRole
-    from app.models.role import Role
+    if not user:
+        return None
+        
+    # 获取用户角色
+    roles = get_roles_for_user(str(user.id))
     
-    db = SessionLocal()
+    # 使用fastapi.encoders来避免循环引用
+    from fastapi.encoders import jsonable_encoder
     try:
-        # 查询用户角色关系
-        user_roles = db.query(UserRole).filter(UserRole.user_id == user_id).all()
+        user_dict = jsonable_encoder(user)
+        # 添加角色
+        user_dict["roles"] = roles
+        # 创建Pydantic模型
+        user_model = schemas.User.model_validate(user_dict)
         
-        # 获取角色名称
-        role_ids = [ur.role_id for ur in user_roles]
-        roles = db.query(Role.name).filter(Role.id.in_(role_ids)).all()
-        
-        # 返回角色名称列表
-        return [role[0] for role in roles]
+        # 为了测试目的，直接将hashed_password字段添加到模型
+        if hasattr(user, 'hashed_password'):
+            user_model.hashed_password = user.hashed_password
+            
+        return user_model
     except Exception as e:
-        print(f"获取用户角色失败: {str(e)}")
-        return []
+        print(f"转换用户到Pydantic模型时出错: {e}")
+        return None
+
+
+def get_db() -> Generator:
+    try:
+        db = SessionLocal()
+        yield db
     finally:
         db.close() 

@@ -50,6 +50,7 @@ class UserInDBBase(UserBase):
 class User(UserInDBBase):
     roles: Optional[List[str]] = []
     password_expired: Optional[bool] = False
+    hashed_password: Optional[str] = None  # 添加此字段用于测试
 
     @validator('password_expired', always=True)
     def check_password_expired(cls, v, values):

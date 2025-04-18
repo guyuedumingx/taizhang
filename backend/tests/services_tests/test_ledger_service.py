@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from io import BytesIO
 
 from app import models, schemas
-from app.services.ledger.ledger_service import ledger_service
+from app.services.ledger_service import ledger_service
 
 
 def test_get_ledgers(db: Session, ledger: models.Ledger, normal_user: models.User, template: models.Template, team: models.Team):

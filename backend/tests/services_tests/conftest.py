@@ -103,7 +103,7 @@ def team(db: Session, normal_user: models.User) -> models.Team:
         description="这是一个测试团队",
         department="测试部门"
     )
-    from app.services.team.team_service import team_service
+    from app.services.team_service import team_service
     team = team_service.create_team(db, team_in, normal_user.id)
     
     # 将普通用户添加到团队
@@ -152,7 +152,7 @@ def template(db: Session, normal_user: models.User) -> models.Template:
             )
         ]
     )
-    from app.services.template.template_service import template_service
+    from app.services.template_service import template_service
     template = template_service.create_template(db, template_in, normal_user.id)
     return template
 
@@ -166,7 +166,7 @@ def workflow(db: Session, normal_user: models.User) -> models.Workflow:
         name="测试工作流",
         description="这是一个测试工作流",
     )
-    from app.services.workflow.workflow_service import workflow_service
+    from app.services.workflow_service import workflow_service
     workflow = workflow_service.create_workflow(db, workflow_in, normal_user.id)
     
     # 创建工作流节点
@@ -221,6 +221,6 @@ def ledger(db: Session, template: models.Template, team: models.Team, normal_use
         template_id=template.id,
         data={"字段1": "测试值1", "字段2": 100}
     )
-    from app.services.ledger.ledger_service import ledger_service
+    from app.services.ledger_service import ledger_service
     ledger = ledger_service.create_ledger(db, ledger_in, normal_user)
     return ledger 

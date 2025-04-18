@@ -48,16 +48,15 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
             
             # 如果是第一个节点(开始节点)，设置为当前节点
             if node.order_index == 0:
-                # 设置审批人
-                if node.approver_user_id:
-                    db_node.approver_id = node.approver_user_id
-                elif node.approver_role_id:
+                if node.approver_role_id:
                     # 根据角色找审批人，这里简化为取该角色的第一个用户
                     role_user = db.query(User).join(User.roles).filter(
                         Role.id == node.approver_role_id
                     ).first()
                     if role_user:
                         db_node.approver_id = role_user.id
+                if next_approver_id:
+                    db_node.approver_id = next_approver_id
             
             db.add(db_node)
             instance_nodes.append(db_node)
@@ -226,8 +225,6 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
         # 设置下一个审批人
         if next_approver_id:
             next_node.approver_id = next_approver_id
-        elif next_workflow_node.approver_user_id:
-            next_node.approver_id = next_workflow_node.approver_user_id
         elif next_workflow_node.approver_role_id:
             # 根据角色找审批人
             role_user = db.query(User).join(User.roles).filter(
@@ -422,7 +419,7 @@ class CRUDWorkflowInstanceNode(CRUDBase[WorkflowInstanceNode, WorkflowInstanceNo
                 ).count()
                 
                 # 如果节点没有通过审批人关联表设置审批人，但有指定审批角色或用户，则总数为1
-                if total_approver_count == 0 and (workflow_node.approver_role_id or workflow_node.approver_user_id):
+                if total_approver_count == 0 and workflow_node.approver_role_id:
                     total_approver_count = 1
             
             result.append({

@@ -202,7 +202,6 @@ def insert_test_workflows(db: Session):
                     "name": "管理员审批",
                     "description": "管理员审批节点",
                     "node_type": "approval",
-                    "approver_user_id": admin_user.id if admin_user else None,
                     "order_index": 2,
                 },
                 {
@@ -230,7 +229,6 @@ def insert_test_workflows(db: Session):
                     "name": "部门经理审批",
                     "description": "部门经理审批",
                     "node_type": "approval",
-                    "approver_user_id": manager_user.id if manager_user else None,
                     "order_index": 1,
                 },
                 {

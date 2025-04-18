@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.services.template.template_service import template_service
+from app.services.template_service import template_service
 
 
 def test_get_templates(db: Session, normal_user: models.User):

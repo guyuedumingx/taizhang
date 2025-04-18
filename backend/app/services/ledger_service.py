@@ -143,20 +143,16 @@ class LedgerService:
                 raise HTTPException(status_code=404, detail="工作流不存在或未激活")
         
         # 创建台账
-        ledger = models.Ledger(
-            name=ledger_in.name,
-            description=description,
-            team_id=ledger_in.team_id,
-            template_id=ledger_in.template_id,
-            data=ledger_in.data or {},
-            status=status,
-            approval_status="pending",
+        ledger = crud.ledger.create(
+            db, 
+            obj_in=ledger_in,
             created_by_id=current_user.id,
-            updated_by_id=current_user.id,
+            updated_by_id=current_user.id
         )
-        db.add(ledger)
-        db.commit()
-        db.refresh(ledger)
+        
+        # 如果台账中包含data数据，同步创建字段值
+        if ledger.data and template:
+            LedgerService.sync_field_values_with_ledger_data(db, ledger.id)
         
         # 记录日志
         LoggerService.log_info(
@@ -168,40 +164,6 @@ class LedgerService:
             resource_type="ledger",
             resource_id=str(ledger.id)
         )
-
-        # 提交审批时才需要创建工作流 
-        # 如果有工作流，创建工作流实例
-        # if workflow_id:
-        #     # 创建实例
-        #     instance_create = WorkflowInstanceCreate(
-        #         workflow_id=workflow_id,
-        #         ledger_id=ledger.id,
-        #         creator_id=current_user.id,
-        #         status="active",
-        #     )
-        #     instance = crud.workflow_instance.create(db, obj_in=instance_create)
-            
-        #     # 启动工作流
-        #     started = crud.workflow_instance.start_workflow(db, instance_id=instance.id)
-            
-        #     if started:
-        #         # 更新台账状态
-        #         ledger.workflow_instance_id = instance.id
-        #         ledger.status = "in_progress"
-        #         db.add(ledger)
-        #         db.commit()
-        #         db.refresh(ledger)
-                
-        #         # 记录日志
-        #         LoggerService.log_info(
-        #             db=db,
-        #             module="workflow",
-        #             action="start",
-        #             message=f"启动台账 {ledger.name} 的工作流",
-        #             user_id=current_user.id,
-        #             resource_type="ledger",
-        #             resource_id=str(ledger.id)
-        #         )
         
         return ledger
 
@@ -326,97 +288,20 @@ class LedgerService:
             if not template:
                 raise HTTPException(status_code=404, detail="模板不存在")
         
-        # 检查工作流是否存在
-        if "workflow_id" in update_data and update_data["workflow_id"]:
-            workflow = db.query(models.Workflow).filter(
-                models.Workflow.id == update_data["workflow_id"],
-                models.Workflow.is_active == True
-            ).first()
-            if not workflow:
-                raise HTTPException(status_code=404, detail="工作流不存在或未激活")
-        
-        # 仅在提交时更新状态为in_progress
-        if "action" in update_data and update_data["action"] == "submit":
-            update_data["status"] = "in_progress"
+        # 标记数据变更
+        data_changed = "data" in update_data and update_data["data"] != ledger.data
             
-            # 确保有工作流
-            workflow_id = update_data.get("workflow_id", ledger.workflow_id)
-            
-            # 如果还是没有工作流，尝试从模板获取默认工作流
-            if not workflow_id and ledger.template_id:
-                template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
-                if template and template.workflow_id:
-                    workflow_id = template.workflow_id
-                    update_data["workflow_id"] = workflow_id
-            
-            if not workflow_id:
-                raise HTTPException(status_code=400, detail="提交台账需要关联工作流，请设置工作流或使用具有默认工作流的模板")
-            
-            # 如果没有工作流实例，创建一个
-            if not ledger.workflow_instance_id:
-                # 创建实例
-                from app.schemas.workflow import WorkflowInstanceCreate
-                instance_create = WorkflowInstanceCreate(
-                    workflow_id=workflow_id,
-                    ledger_id=ledger.id,
-                    creator_id=current_user.id,
-                    status="active"
-                )
-                instance = crud.workflow_instance.create(db, obj_in=instance_create)
-                
-                # 启动工作流
-                started = crud.workflow_instance.start_workflow(db, instance_id=instance.id)
-                
-                if started:
-                    # 更新台账状态
-                    update_data["workflow_instance_id"] = instance.id
-                    update_data["approval_status"] = "pending"
-                    
-                    # 记录日志
-                    LoggerService.log_info(
-                        db=db,
-                        module="workflow",
-                        action="start",
-                        message=f"启动台账 {ledger.name} 的工作流",
-                        user_id=current_user.id,
-                        resource_type="ledger",
-                        resource_id=str(ledger.id)
-                    )
-            else:
-                # 如果已有工作流实例，重新激活
-                instance = db.query(models.WorkflowInstance).filter(
-                    models.WorkflowInstance.id == ledger.workflow_instance_id
-                ).first()
-                
-                if instance and instance.status != "active":
-                    instance.status = "active"
-                    db.add(instance)
-                    db.commit()
-                    
-                    # 记录日志
-                    LoggerService.log_info(
-                        db=db,
-                        module="workflow",
-                        action="reactivate",
-                        message=f"重新激活台账 {ledger.name} 的工作流",
-                        user_id=current_user.id,
-                        resource_type="ledger",
-                        resource_id=str(ledger.id)
-                    )
-            
-            # 移除action字段，不保存到数据库
-            del update_data["action"]
-        
         # 更新台账
-        update_data["updated_by_id"] = current_user.id
-        update_data["updated_at"] = datetime.now()
+        ledger = crud.ledger.update(
+            db, 
+            db_obj=ledger,
+            obj_in=update_data,
+            updated_by_id=current_user.id
+        )
         
-        for key, value in update_data.items():
-            setattr(ledger, key, value)
-        
-        db.add(ledger)
-        db.commit()
-        db.refresh(ledger)
+        # 如果data字段有变更且模板存在，同步更新字段值
+        if data_changed and ledger.template_id:
+            LedgerService.sync_field_values_with_ledger_data(db, ledger.id)
         
         # 记录日志
         LoggerService.log_info(
@@ -652,6 +537,104 @@ class LedgerService:
         )
         
         return file_data, filename, content_type
+
+    @staticmethod
+    def sync_ledger_data_with_field_values(db: Session, ledger_id: int) -> Dict:
+        """
+        同步台账的data字段和field_values表
+        将field_values表中的数据同步到ledger的data字段中
+        
+        返回同步后的data字典
+        """
+        # 获取台账
+        ledger = db.query(models.Ledger).filter(models.Ledger.id == ledger_id).first()
+        if not ledger:
+            raise HTTPException(status_code=404, detail="台账不存在")
+        
+        # 获取字段值
+        field_values = crud.field_value.get_by_ledger(db, ledger_id=ledger_id)
+        
+        # 初始化data字典
+        data = {}
+        if ledger.data:
+            data = ledger.data
+        
+        # 获取模板字段信息，以便获取字段名称
+        template = None
+        if ledger.template_id:
+            template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
+        
+        # 更新data字典
+        for field_value in field_values:
+            # 获取字段信息
+            field = db.query(models.Field).filter(models.Field.id == field_value.field_id).first()
+            if field:
+                # 使用字段名称作为键
+                data[field.name] = field_value.value
+        
+        # 更新台账的data字段
+        ledger.data = data
+        db.add(ledger)
+        db.commit()
+        db.refresh(ledger)
+        
+        return data
+        
+        
+    @staticmethod
+    def sync_field_values_with_ledger_data(db: Session, ledger_id: int) -> List[models.FieldValue]:
+        """
+        同步field_values表和台账的data字段
+        将ledger的data字段中的数据同步到field_values表中
+        
+        返回同步后的字段值列表
+        """
+        # 获取台账
+        ledger = db.query(models.Ledger).filter(models.Ledger.id == ledger_id).first()
+        if not ledger:
+            raise HTTPException(status_code=404, detail="台账不存在")
+        
+        # 如果没有data或模板ID，则返回空列表
+        if not ledger.data or not ledger.template_id:
+            return []
+        
+        # 获取模板的所有字段
+        fields = db.query(models.Field).filter(models.Field.template_id == ledger.template_id).all()
+        
+        # 获取当前的字段值
+        current_field_values = crud.field_value.get_by_ledger(db, ledger_id=ledger_id)
+        current_field_values_dict = {fv.field_id: fv for fv in current_field_values}
+        
+        # 字段值列表
+        result_field_values = []
+        
+        # 遍历模板字段
+        for field in fields:
+            # 检查data中是否有对应的值
+            if field.name in ledger.data:
+                # 将所有值转换为字符串
+                value = ledger.data[field.name]
+                if value is not None:  # 确保值不为None
+                    value = str(value)  # 将所有类型转换为字符串
+                
+                # 如果已存在字段值，则更新
+                if field.id in current_field_values_dict:
+                    field_value = current_field_values_dict[field.id]
+                    field_value.value = value
+                    db.add(field_value)
+                    result_field_values.append(field_value)
+                else:
+                    # 如果不存在，则创建新的字段值
+                    field_value_in = schemas.FieldValueCreate(
+                        field_id=field.id,
+                        value=value
+                    )
+                    field_value = crud.field_value.create(db, obj_in=field_value_in, ledger_id=ledger_id)
+                    result_field_values.append(field_value)
+        
+        db.commit()
+        
+        return result_field_values
 
 
 ledger_service = LedgerService() 

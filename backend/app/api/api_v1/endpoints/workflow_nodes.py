@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body
 from sqlalchemy.orm import Session
 from app.api import deps
 from app import crud, models, schemas
-from app.services.workflow.workflow_node_service import workflow_node_service
+from app.services.workflow_node_service import workflow_node_service
 
 # 工作流节点路由器 - 只保留审批人相关API
 router = APIRouter()

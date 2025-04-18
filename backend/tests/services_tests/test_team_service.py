@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.services.team.team_service import team_service
+from app.services.team_service import team_service
 
 
 def test_get_teams(db: Session, team: models.Team):

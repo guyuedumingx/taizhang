@@ -11,8 +11,9 @@ class FieldValueBase(BaseModel):
 
 class FieldValueCreate(FieldValueBase):
     """创建FieldValue时的参数"""
-    ledger_id: int
     field_id: int
+    # ledger_id可以通过参数传递，所以这里改为Optional
+    ledger_id: Optional[int] = None
 
 
 class FieldValueUpdate(FieldValueBase):
@@ -35,11 +36,13 @@ class FieldValue(FieldValueInDBBase):
     pass
 
 
+# 以下类用于向后兼容，实际使用时请直接使用FieldValue相关类
+# 这些类将在未来版本中移除
 class LedgerItemCreate(FieldValueCreate):
-    """兼容原来的测试用例"""
+    """兼容原来的测试用例，请使用FieldValueCreate"""
     pass
 
 
 class LedgerItemUpdate(FieldValueUpdate):
-    """兼容原来的测试用例"""
+    """兼容原来的测试用例，请使用FieldValueUpdate"""
     pass 

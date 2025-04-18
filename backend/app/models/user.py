@@ -21,3 +21,7 @@ class User(Base):
     team = relationship("Team", back_populates="members", foreign_keys=[team_id])
     created_ledgers = relationship("Ledger", foreign_keys="[Ledger.created_by_id]", back_populates="creator")
     updated_ledgers = relationship("Ledger", foreign_keys="[Ledger.updated_by_id]", back_populates="updater") 
+    # workflow_nodes = relationship("WorkflowNode", secondary="workflow_node_approvers", back_populates="approvers")
+
+    def __repr__(self):
+        return f"<User {self.username}>"

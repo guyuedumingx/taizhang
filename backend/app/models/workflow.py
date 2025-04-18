@@ -39,11 +39,6 @@ class Workflow(Base):
     nodes = relationship("WorkflowNode", back_populates="workflow", cascade="all, delete-orphan")
     instances = relationship("WorkflowInstance", back_populates="workflow")
     creator = relationship("User", foreign_keys=[created_by])
-    # templates = relationship(
-    #     "Template",
-    #     back_populates="workflow",
-    #     primaryjoin="and_(Workflow.id==Template.workflow_id, Template.workflow_id!=None)"
-    # )
 
     def __repr__(self):
         return f"<Workflow {self.name}>"
@@ -59,19 +54,16 @@ class WorkflowNode(Base):
     description = Column(String, nullable=True)
     node_type = Column(String, nullable=False)  # 开始、审批、结束等
     approver_role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
-    approver_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     order_index = Column(Integer, nullable=False)  # 节点顺序
     is_final = Column(Boolean, default=False)  # 是否为最终节点
     reject_to_node_id = Column(Integer, ForeignKey("workflow_nodes.id"), nullable=True)
     multi_approve_type = Column(String, default="any")  # 'any' - 任一审批, 'all' - 所有人审批
-    need_select_next_approver = Column(Boolean, default=False)  # 是否需要选择下一审批人
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # 关系
     workflow = relationship("Workflow", back_populates="nodes")
     approver_role = relationship("Role", foreign_keys=[approver_role_id])
-    approver_user = relationship("User", foreign_keys=[approver_user_id])
     reject_to_node = relationship("WorkflowNode", remote_side=[id])
     approvers = relationship("User", secondary=workflow_node_approvers, backref="workflow_nodes")
     instance_nodes = relationship("WorkflowInstanceNode", back_populates="workflow_node")
@@ -96,7 +88,7 @@ class WorkflowInstance(Base):
 
     # 关系
     workflow = relationship("Workflow", back_populates="instances")
-    ledger = relationship("Ledger", back_populates="workflow_instance", uselist=False)  # 确保一对一关系
+    # ledger = relationship("Ledger", back_populates="workflow_instance", uselist=False)  # 确保一对一关系
     creator = relationship("User", foreign_keys=[created_by])
     instance_nodes = relationship("WorkflowInstanceNode", back_populates="workflow_instance", cascade="all, delete-orphan")
     

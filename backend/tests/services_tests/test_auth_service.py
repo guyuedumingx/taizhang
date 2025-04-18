@@ -4,7 +4,7 @@ from datetime import datetime
 from fastapi import HTTPException
 
 from app import crud, models, schemas
-from app.services.user.auth_service import AuthService as auth_service
+from app.services.auth_service import AuthService as auth_service
 from app.core.security import verify_password
 
 # 测试用户登录

@@ -10,7 +10,7 @@ from app import models, schemas
 from app.api import deps
 from app.core.security import get_password_hash
 from app.services.casbin_service import add_role_for_user, remove_role_for_user, get_roles_for_user, get_permissions_for_role
-from app.services.user.user_service import UserService as user_service
+from app.services.user_service import UserService as user_service
 
 router = APIRouter()
 

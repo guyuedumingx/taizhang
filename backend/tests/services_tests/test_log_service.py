@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
 from app import models, schemas
-from app.services.log.log_service import log_service
+from app.services.log_service import log_service
 from app.utils.logger import LoggerService
 
 

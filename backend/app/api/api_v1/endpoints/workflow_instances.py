@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Body
 from sqlalchemy.orm import Session
 from app.api import deps
 from app import crud, models, schemas
-from app.services.workflow.workflow_instance_service import workflow_instance_service
+from app.services.workflow_instance_service import workflow_instance_service
 
 router = APIRouter()
 

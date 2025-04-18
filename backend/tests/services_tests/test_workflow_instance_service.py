@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from app import models, schemas
-from app.services.workflow.workflow_instance_service import workflow_instance_service
+from app.services.workflow_instance_service import workflow_instance_service
 
 
 def create_workflow_instance(db: Session, workflow: models.Workflow, ledger: models.Ledger, creator: models.User) -> models.WorkflowInstance:

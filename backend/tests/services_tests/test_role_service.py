@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.services.role.role_service import RoleService
+from app.services.role_service import RoleService
 
 
 def test_get_roles(db: Session, role: models.Role):

@@ -6,7 +6,7 @@ from app.api import deps
 from app import crud, models, schemas
 from app.utils.logger import LoggerService
 from fastapi.encoders import jsonable_encoder
-from app.services.workflow.workflow_service import workflow_service
+from app.services.workflow_service import workflow_service
 
 # 主工作流路由器
 router = APIRouter()
@@ -60,7 +60,8 @@ def read_workflow(
     if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
         raise HTTPException(status_code=403, detail="权限不足")
     
-    return workflow_service.get_workflow(db, workflow_id)
+    workflow = workflow_service.get_workflow(db, workflow_id)
+    return workflow
 
 @router.put("/{workflow_id}", response_model=schemas.Workflow)
 def update_workflow(
