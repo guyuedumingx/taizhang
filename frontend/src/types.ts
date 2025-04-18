@@ -247,12 +247,10 @@ export interface WorkflowNode {
   description: string;
   node_type: string;
   approver_role_id: number | null;
-  approver_user_id: number | null;
   order_index: number;
   is_final: boolean;
   reject_to_node_id: number | null;
   multi_approve_type: string;
-  need_select_next_approver: boolean;
   created_at: string;
   updated_at: string | null;
   approvers?: Array<{id: number; name: string}>;
@@ -266,12 +264,10 @@ export interface WorkflowNodeCreate {
   description: string;
   node_type: string;
   approver_role_id?: number | null;
-  approver_user_id?: number | null;
   order_index: number;
   is_final?: boolean;
   reject_to_node_id?: number | null;
   multi_approve_type?: string;
-  need_select_next_approver?: boolean;
   approver_ids?: number[];
 }
 
@@ -280,12 +276,10 @@ export interface WorkflowNodeUpdate {
   description?: string;
   node_type?: string;
   approver_role_id?: number | null;
-  approver_user_id?: number | null;
   order_index?: number;
   is_final?: boolean;
   reject_to_node_id?: number | null;
   multi_approve_type?: string;
-  need_select_next_approver?: boolean;
   approver_ids?: number[];
 }
 

@@ -3,6 +3,7 @@ import { Modal, Button, Form, Input, Typography, message } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { ApprovalService } from '../../services/ApprovalService';
 import { WorkflowService } from '../../services/WorkflowService';
+import { getWorkflowInstance } from '../../api/workflow_instances';
 import ApproverSelector from '../workflow/ApproverSelector';
 
 const { Text } = Typography;
@@ -27,7 +28,6 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
   currentNodeId,
 }) => {
   const [approving, setApproving] = useState(false);
-  const [approvalAction, setApprovalAction] = useState<'approve' | 'reject'>('approve');
   const [approvalComment, setApprovalComment] = useState('');
   const [nextNodeId, setNextNodeId] = useState<number | undefined>(undefined);
   const [nextApproverId, setNextApproverId] = useState<number | undefined>(undefined);
@@ -52,22 +52,21 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
       setNextApproverId(undefined);
       
       // 获取工作流实例信息
-      const instanceData = await ApprovalService.getWorkflowInstance(instanceId);
+      const instanceData = await getWorkflowInstance(instanceId);
       if (!instanceData) return;
       
       const workflowId = instanceData.workflow_id;
-      
       // 获取工作流详情
       const workflowData = await WorkflowService.getWorkflow(workflowId);
       if (!workflowData || !workflowData.nodes) return;
-      
+
+      const instanceNode = instanceData.nodes.find(node => node.id === nodeId);
+
       // 找到当前节点
-      const currentNode = workflowData.nodes.find(node => node.id === nodeId);
+      const currentNode = workflowData.nodes.find(node => node.id === instanceNode.workflow_node_id);
       if (!currentNode) return;
-      
       // 设置当前节点的审批模式
       setCurrentNodeMultiApproveType(currentNode.multi_approve_type || 'any');
-      setCurrentNodeNeedSelectNextApprover(currentNode.need_select_next_approver || false);
       
       // 获取当前节点已审批的数量
       if (currentNode.approvers && Array.isArray(currentNode.approvers)) {
@@ -76,22 +75,22 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
         // 获取已审批人数 (这里需要实际数据支持)
         setCurrentNodeApprovedCount(instanceData.approved_count || 0);
       }
-      
       // 获取下一个节点
       const nextNodes = workflowData.nodes
         .filter(node => node.order_index > currentNode.order_index)
         .sort((a, b) => a.order_index - b.order_index);
-      
       if (nextNodes.length > 0) {
         const nextNode = nextNodes[0];
         setNextNodeId(nextNode.id);
-        
-        // 检查下一节点审批人选择需求
-        if (nextNode.need_select_next_approver) {
-          setCurrentNodeNeedSelectNextApprover(true);
-        } else if (nextNode.approvers && nextNode.approvers.length === 1) {
-          // 如果只有一个审批人，自动选择
-          setNextApproverId(nextNode.approvers[0].id);
+        if (nextNode.approvers) {
+          if (nextNode.approvers.length === 1){
+            // 如果只有一个审批人，自动选择
+            setNextApproverId(nextNode.approvers[0].id);
+          } else if(nextNode.approvers.length > 1) {
+            setCurrentNodeNeedSelectNextApprover(true);
+          } else {
+            setCurrentNodeNeedSelectNextApprover(false);
+          }
         }
       }
     } catch (error) {
@@ -101,7 +100,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
   };
 
   // 处理审批
-  const processApproval = async () => {
+  const processApproval = async (approvalAction: 'approve' | 'reject') => {
     // 验证：如果需要选择下一个审批人但没有选择
     if (currentNodeNeedSelectNextApprover && !nextApproverId) {
       message.error('请选择下一步审批人');
@@ -118,15 +117,11 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
       
       // 根据传入的参数判断调用方式
       if (workflowInstanceId && taskId) {
-        // TaskList页面调用方式
-        if (approvalAction === 'approve') {
-          await ApprovalService.approveWorkflowNode(workflowInstanceId, taskId, approvalData);
-        } else {
-          await ApprovalService.rejectWorkflowNode(workflowInstanceId, taskId, approvalData);
-        }
+        //TODO: TaskList页面调用方式 taskId 是 ledgerId 
+        await ApprovalService.approveLedger(taskId, approvalData);
       } else if (ledgerId && workflowInstanceId) {
-        // LedgerDetail页面调用方式
-        await ApprovalService.processLedgerApproval(ledgerId, workflowInstanceId, approvalData);
+        //TODO: LedgerDetail页面调用方式
+        await ApprovalService.approveLedger(ledgerId, approvalData);
       } else {
         throw new Error('缺少必要参数');
       }
@@ -153,10 +148,9 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
         <Button
           key="reject"
           danger
-          loading={approving && approvalAction === 'reject'}
+          loading={approving}
           onClick={() => {
-            setApprovalAction('reject');
-            processApproval();
+            processApproval('reject');
           }}
           icon={<CloseCircleOutlined />}
         >
@@ -165,10 +159,9 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
         <Button
           key="approve"
           type="primary"
-          loading={approving && approvalAction === 'approve'}
+          loading={approving}
           onClick={() => {
-            setApprovalAction('approve');
-            processApproval();
+            processApproval('approve');
           }}
           disabled={currentNodeNeedSelectNextApprover && !nextApproverId}
           icon={<CheckCircleOutlined />}
@@ -196,7 +189,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
         
         {/* 根据需要显示审批人选择器 */}
         {currentNodeNeedSelectNextApprover && (
-          <Form.Item label="选择下一步审批人" required style={{ marginTop: 16 }}>
+          <Form.Item required style={{ marginTop: 16 }}>
             <ApproverSelector
               nodeId={nextNodeId || 0}
               value={nextApproverId}

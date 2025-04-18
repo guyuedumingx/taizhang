@@ -6,115 +6,32 @@ import { Workflow, WorkflowCreate, WorkflowUpdate, WorkflowNode, WorkflowNodeCre
 export class WorkflowService {
   // 获取工作流列表
   static async getWorkflows(): Promise<Workflow[]> {
-    try {
-      const response = await workflowsAPI.getWorkflows();
-      
-      console.log('Workflows API 返回数据:', response);
-      
-      // 处理分页格式的数据 {items: Array, total: number, page: number, size: number}
-      if (response && typeof response === 'object' && 'items' in response && Array.isArray(response.items)) {
-        console.log('从分页数据中提取workflows数组');
-        return response.items;
-      }
-      
-      // 如果返回的是数组，直接返回
-      if (Array.isArray(response)) {
-        return response;
-      }
-      
-      // 其他情况返回空数组
-      console.error('API返回的workflows格式不正确:', response);
-      return [];
-    } catch (error) {
-      console.error('获取工作流列表失败:', error);
-      throw error;
-    }
+      return await workflowsAPI.getWorkflows();
   }
 
   // 获取工作流详情
   static async getWorkflow(id: number): Promise<Workflow> {
-    try {
-      console.log(`开始获取工作流 ${id} 详情`);
-      const workflow = await workflowsAPI.getWorkflow(id);
-      // 确保工作流对象有效
-      if (!workflow || !workflow.id) {
-        throw new Error(`无效的工作流数据: ${JSON.stringify(workflow)}`);
-      }
-      
-      // 获取工作流节点
-      try {
-        console.log(`获取工作流 ${id} 的节点`);
-        if (workflow.nodes && workflow.nodes.length > 0) {
-          // 使用 Promise.all 并行获取所有节点的详细信息
-          const nodePromises = workflow.nodes.map((node: WorkflowNode) => 
-            workflowsAPI.getWorkflowNode(node.id)
-          );
-          workflow.nodes = await Promise.all(nodePromises);
-          console.log(`工作流 ${id} 的节点数量: ${workflow.nodes.length}`);
-        } else {
-          workflow.nodes = []; // 如果没有节点，设置为空数组
-        }
-      } catch (nodeError) {
-        console.error(`获取工作流 ${id} 节点失败:`, nodeError);
-        workflow.nodes = []; // 设置为空数组，避免undefined错误
-      }
-      
-      console.log(`成功获取工作流 ${id} 详情:`, workflow);
-      return workflow;
-    } catch (error) {
-      console.error(`获取工作流 ${id} 详情失败:`, error);
-      throw error;
-    }
+    return await workflowsAPI.getWorkflow(id);
   }
 
   // 创建工作流
   static async createWorkflow(workflow: WorkflowCreate): Promise<Workflow> {
-    try {
-      return await workflowsAPI.createWorkflow(workflow);
-    } catch (error) {
-      console.error('创建工作流失败:', error);
-      throw error;
-    }
+    return await workflowsAPI.createWorkflow(workflow);
   }
 
   // 更新工作流
   static async updateWorkflow(id: number, workflow: WorkflowUpdate): Promise<Workflow> {
-    try {
-      return await workflowsAPI.updateWorkflow(id, workflow);
-    } catch (error) {
-      console.error(`更新工作流 ${id} 失败:`, error);
-      throw error;
-    }
+    return await workflowsAPI.updateWorkflow(id, workflow);
   }
 
   // 删除工作流
   static async deleteWorkflow(id: number): Promise<void> {
-    try {
-      await workflowsAPI.deleteWorkflow(id);
-    } catch (error) {
-      console.error(`删除工作流 ${id} 失败:`, error);
-      throw error;
-    }
-  }
-
-  // 获取模板列表
-  static async getTemplates() {
-    try {
-      return await templatesAPI.default.templates.getTemplates();
-    } catch (error) {
-      console.error('获取模板列表失败:', error);
-      throw error;
-    }
+    return await workflowsAPI.deleteWorkflow(id);
   }
 
   // 获取角色列表
   static async getRoles() {
-    try {
-      return await templatesAPI.default.roles.getRoles();
-    } catch (error) {
-      console.error('获取角色列表失败:', error);
-      throw error;
-    }
+    return await templatesAPI.default.roles.getRoles();
   }
 
   // 获取用户列表
@@ -129,41 +46,7 @@ export class WorkflowService {
 
   // 初始化节点
   static initializeNodes(): WorkflowNodeCreate[] {
-    return [
-      {
-        workflow_id: 0, // 临时值，提交时会被替换
-        name: '开始',
-        description: '工作流开始',
-        node_type: 'start',
-        order_index: 0,
-        multi_approve_type: 'any',
-        need_select_next_approver: true,
-        approver_ids: [],
-      },
-      {
-        workflow_id: 0,
-        name: '审批',
-        description: '主管审批',
-        node_type: 'approval',
-        approver_role_id: null,
-        approver_user_id: null,
-        order_index: 1,
-        multi_approve_type: 'any',
-        need_select_next_approver: false,
-        approver_ids: [],
-      },
-      {
-        workflow_id: 0,
-        name: '结束',
-        description: '工作流结束',
-        node_type: 'end',
-        order_index: 2,
-        is_final: true,
-        multi_approve_type: 'any',
-        need_select_next_approver: false,
-        approver_ids: [],
-      },
-    ];
+    return workflowsAPI.initializeNodes();
   }
 
   // 添加节点
@@ -175,11 +58,9 @@ export class WorkflowService {
       description: '审批',
       node_type: 'approval',
       approver_role_id: null,
-      approver_user_id: null,
       order_index: nodes.length - 1, // 插入到结束节点之前
       is_final: false,
       multi_approve_type: 'any',
-      need_select_next_approver: false,
       approver_ids: [],
     };
     
@@ -210,29 +91,7 @@ export class WorkflowService {
 
   // 移动节点
   static moveNode(nodes: WorkflowNodeCreate[], index: number, direction: 'up' | 'down'): WorkflowNodeCreate[] {
-    const updatedNodes = [...nodes];
-    
-    // 获取当前节点
-    const currentNode = updatedNodes[index];
-    
-    // 计算目标位置
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    
-    // 检查目标位置是否有效
-    if (targetIndex < 0 || targetIndex >= updatedNodes.length) {
-      return updatedNodes;
-    }
-    
-    // 交换节点位置
-    updatedNodes[index] = updatedNodes[targetIndex];
-    updatedNodes[targetIndex] = currentNode;
-    
-    // 更新排序
-    updatedNodes.forEach((node, idx) => {
-      node.order_index = idx;
-    });
-    
-    return updatedNodes;
+    return workflowsAPI.moveNode(nodes, index, direction);
   }
 
   // 更新节点字段
@@ -263,14 +122,8 @@ export class WorkflowService {
       case 'approver_role_id':
         node.approver_role_id = value as number | null;
         break;
-      case 'approver_user_id':
-        node.approver_user_id = value as number | null;
-        break;
       case 'multi_approve_type':
         node.multi_approve_type = value as string;
-        break;
-      case 'need_select_next_approver':
-        node.need_select_next_approver = value as boolean;
         break;
       case 'reject_to_node_id':
         node.reject_to_node_id = value as number | null;

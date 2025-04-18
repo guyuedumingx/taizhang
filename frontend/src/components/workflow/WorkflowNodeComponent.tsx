@@ -180,29 +180,6 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
                 </Text>
               </div>
             </Form.Item>
-
-            <Form.Item label="下级审批人" className="mb-2">
-              <Row>
-                <Col span={24}>
-                  <Switch
-                    checked={node.need_select_next_approver}
-                    onChange={(checked) => handleUpdateNode(index, 'need_select_next_approver', checked)}
-                  />
-                  <Text style={{ marginLeft: 8 }}>
-                    {node.need_select_next_approver 
-                      ? '需要选择下级审批人' 
-                      : '自动流转到下级审批人'}
-                  </Text>
-                </Col>
-                <Col span={24}>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {node.need_select_next_approver 
-                      ? '审批通过时需要选择下一个节点的审批人' 
-                      : '审批通过后自动流转到下个节点，如果下级节点有多个审批人，将自动分配'}
-                  </Text>
-                </Col>
-              </Row>
-            </Form.Item>
           </>
         )}
       </Space>

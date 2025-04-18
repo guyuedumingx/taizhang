@@ -1,4 +1,5 @@
 import * as approvalsAPI from '../api/approvals';
+import * as workflowInstanceAPI from '../api/workflow_instances';
 import {  LedgerApproval } from '../types';
 
 // 定义approval数据接口
@@ -46,7 +47,7 @@ export class ApprovalService {
     }
   }
 
-  // 审批通过台账
+  // 审批台账
   static async approveLedger(ledgerId: number, data: LedgerApproval) {
     try {
       return await approvalsAPI.approveLedger(ledgerId, data);
@@ -66,33 +67,24 @@ export class ApprovalService {
     }
   }
 
-  // 审批通过工作流节点
-  static async approveWorkflowNode(instanceId: number, taskId: number, data: ApprovalData) {
-    try {
-      return await approvalsAPI.approveWorkflowNode(instanceId, taskId, data)
-    } catch (error) {
-      console.error(`审批通过工作流实例 ${instanceId} 节点 ${taskId} 失败:`, error);
-      throw error;
-    }
-  }
+  // // 审批通过工作流节点
+  // static async approveWorkflowNode(instanceId: number, taskId: number, data: ApprovalData) {
+  //   try {
+  //     return await workflowInstanceAPI.approveWorkflowNode(instanceId, taskId, data)
+  //   } catch (error) {
+  //     console.error(`审批通过工作流实例 ${instanceId} 节点 ${taskId} 失败:`, error);
+  //     throw error;
+  //   }
+  // }
 
-  // 拒绝工作流节点
-  static async rejectWorkflowNode(instanceId: number, taskId: number, data: ApprovalData) {
-    try {
-      return await approvalsAPI.rejectWorkflowNode(instanceId, taskId, data)
-    } catch (error) {
-      console.error(`拒绝工作流实例 ${instanceId} 节点 ${taskId} 失败:`, error);
-      throw error;
-    }
-  }
-
-  // 统一处理台账审批（可用于通过或拒绝）
-  static async processLedgerApproval(ledgerId: number, instanceId: number, data: ApprovalData) {
-    try {
-      return await approvalsAPI.processLedgerApproval(ledgerId, instanceId, data)
-    } catch (error) {
-      console.error(`处理台账 ${ledgerId} 审批失败:`, error);
-      throw error;
-    }
-  }
+  // // 拒绝工作流节点
+  // static async rejectWorkflowNode(instanceId: number, taskId: number, data: ApprovalData) {
+  //   try {
+  //     // return await approvalsAPI.rejectWorkflowNode(instanceId, taskId, data)
+  //     return await workflowInstanceAPI.rejectWorkflowNode(instanceId, taskId, data)
+  //   } catch (error) {
+  //     console.error(`拒绝工作流实例 ${instanceId} 节点 ${taskId} 失败:`, error);
+  //     throw error;
+  //   }
+  // }
 }

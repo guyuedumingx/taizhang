@@ -9,6 +9,7 @@ import { TeamService } from '../../services/TeamService';
 import { WorkflowService } from '../../services/WorkflowService';
 import { TemplateCreate, TemplateUpdate, FieldCreate, Team, Workflow, FieldUpdate } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
+import useDepartments from '../../hooks/useDepartments';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -23,6 +24,7 @@ const TemplateForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [teams, setTeams] = useState<Team[]>([]);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const { options: departmentOptions, filters: departmentFilters } = useDepartments();
   
   const isEdit = !!id;
 
@@ -212,10 +214,9 @@ const TemplateForm: React.FC = () => {
             rules={[{ required: true, message: '请选择所属部门' }]}
           >
             <Select placeholder="选择部门">
-              <Option value="财务部">财务部</Option>
-              <Option value="生产部">生产部</Option>
-              <Option value="客服部">客服部</Option>
-              <Option value="设备部">设备部</Option>
+              {departmentOptions.map((option) => (
+                <Option key={option.value} value={option.value}>{option.label}</Option>
+              ))}
             </Select>
           </Form.Item>
           

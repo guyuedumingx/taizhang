@@ -77,16 +77,12 @@ const WorkflowDetail: React.FC = () => {
     if (node.node_type !== 'approval') {
       return '无需审批';
     }
-    
+
     if (node.approver_role_id) {
       return `角色ID: ${node.approver_role_id}`;
     }
     
-    if (node.approver_user_id) {
-      return `用户ID: ${node.approver_user_id}`;
-    }
-    
-    return '未指定审批人';
+    return '';
   };
 
   if (loading) {
@@ -146,7 +142,6 @@ const WorkflowDetail: React.FC = () => {
           <Descriptions.Item label="ID">{workflow.id}</Descriptions.Item>
           <Descriptions.Item label="名称">{workflow.name}</Descriptions.Item>
           <Descriptions.Item label="描述">{workflow.description || '无'}</Descriptions.Item>
-          <Descriptions.Item label="模板">{workflow.template_name || '未知模板'}</Descriptions.Item>
           <Descriptions.Item label="状态">
             <Tag color={workflow.is_active ? 'green' : 'red'}>
               {workflow.is_active ? '启用' : '禁用'}
@@ -171,7 +166,14 @@ const WorkflowDetail: React.FC = () => {
                       {getNodeTypeName(node.node_type)}
                     </Tag>
                     {node.node_type === 'approval' && (
-                      <Tag color="purple">{getApproverInfo(node)}</Tag>
+                      <>
+                        {node.approver_role_id && <Tag color="purple">{getApproverInfo(node)}</Tag>}
+                        {node.approvers?.map((approver) => (
+                          <Tag color="pink" key={approver.id}>
+                            {approver.name}
+                          </Tag>
+                        ))}
+                      </>
                     )}
                   </p>
                 </div>

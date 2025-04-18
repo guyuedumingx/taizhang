@@ -94,7 +94,6 @@ const WorkflowForm: React.FC = () => {
           description: node.description,
           node_type: node.node_type,
           approver_role_id: node.approver_role_id,
-          approver_user_id: node.approver_user_id,
           order_index: node.order_index,
           is_final: node.is_final,
           reject_to_node_id: node.reject_to_node_id,

@@ -32,7 +32,6 @@ const LedgerDetail: React.FC = () => {
   // 存储下一个节点的ID，用于审批人选择
   const [nextNodeId, setNextNodeId] = useState<number | undefined>(undefined);
   const [submitComment, setSubmitComment] = useState('');
-  const [workflows, setWorkflows] = useState<Workflow[]>([]);
   
   // 模板是否有工作流标志
   const [templateHasWorkflow, setTemplateHasWorkflow] = useState<boolean>(false);
@@ -126,14 +125,13 @@ const LedgerDetail: React.FC = () => {
             const bingWorkflow = await WorkflowService.getWorkflow(template.workflow_id);
             if (bingWorkflow) {
               setWorkflow(bingWorkflow);
-              setWorkflows([bingWorkflow]);
               
               // 设置默认的下一节点，如果工作流有节点
               if (bingWorkflow.nodes && bingWorkflow.nodes.length > 0) {
                 // 排序节点，找到第一个需要审批的节点
-                const nodes = [...bingWorkflow.nodes].sort((a, b) => a.order_index - b.order_index);
+                const nodes = [...bingWorkflow.nodes].sort((a, b) => a.order_index - b.order_index).filter(node => node.node_type === 'approval');
                 if (nodes.length > 0) {
-                  setNextNodeId(nodes[1].id);
+                  setNextNodeId(nodes[0].id);
                 }
               }
               
@@ -166,12 +164,12 @@ const LedgerDetail: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error('获取模板工作流失败:', error);
+        console.error('获取工作流失败:', error);
       }
     }
     
     if (!workflowToUse) {
-      message.error('请选择工作流');
+      message.error('无工作流');
       return;
     }
     
@@ -388,12 +386,17 @@ const LedgerDetail: React.FC = () => {
 
         <Descriptions bordered column={2}>
           <Descriptions.Item label="台账编号">{ledger.id}</Descriptions.Item>
+          <Descriptions.Item label="模板">{ledger.template_name || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">
             <Tag color={ledger.status === 'completed' ? 'success' : ledger.status === 'active' ? 'processing' : 'default'}>
               {ledger.status === 'completed' ? '已完成' : ledger.status === 'active' ? '处理中' : '草稿'}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="模板">{ledger.template_name || '-'}</Descriptions.Item>
+          <Descriptions.Item label="审批状态">
+            <Tag color={ledger.approval_status === 'approved' ? 'success' : ledger.approval_status === 'rejected' ? 'error' : ledger.approval_status === 'pending' ? 'processing' : 'default'}>
+              {ledger.approval_status === 'approved' ? '已审批' : ledger.approval_status === 'rejected' ? '未审批' : ledger.approval_status === 'pending' ? '审批中' : '草稿'}
+            </Tag>
+          </Descriptions.Item>
           <Descriptions.Item label="所属团队">{ledger.team_name || '-'}</Descriptions.Item>
           <Descriptions.Item label="创建人">{ledger.created_by_name || '-'}</Descriptions.Item>
           <Descriptions.Item label="创建时间">{ledger.created_at ? new Date(ledger.created_at).toLocaleString() : '-'}</Descriptions.Item>
@@ -451,35 +454,14 @@ const LedgerDetail: React.FC = () => {
         ]}
       >
         <Form layout="vertical">
-          {workflows.length > 1 ? (
-            <Form.Item label="选择工作流" required>
-              <Select
-                placeholder="请选择工作流"
-                value={workflow?.id}
-                onChange={(value) => {
-                  const selectedWorkflow = workflows.find(w => w.id === value) || null;
-                  setWorkflow(selectedWorkflow);
-                }}
-              >
-                {workflows.map(w => (
-                  <Select.Option key={w.id} value={w.id}>
-                    {w.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          ) : workflows.length === 1 ? (
+          {workflow && (
             <Form.Item label="工作流">
-              <Input value={workflows[0].name} disabled />
-              <div style={{ marginTop: 8 }}>
-                <Text type="secondary">使用模板关联的默认工作流</Text>
-              </div>
+              <Input value={workflow.name} disabled />
             </Form.Item>
-          ) : null}
+          )}
           
-          {workflow && workflow.nodes && nextNodeId && 
-           workflow.nodes.some(node => node.id === nextNodeId && node.need_select_next_approver) && (
-            <Form.Item label="选择审批人" required>
+          {workflow && workflow.nodes && nextNodeId && (
+            <Form.Item required>
               <ApproverSelector
                 nodeId={nextNodeId}
                 value={nextApproverId}

@@ -1,4 +1,3 @@
-import { API_BASE_URL } from '../config';
 import { api } from './index';
 import { 
   Workflow, 
@@ -197,7 +196,6 @@ export function initializeNodes(): WorkflowNodeCreate[] {
       node_type: 'start',
       order_index: 0,
       multi_approve_type: 'any',
-      need_select_next_approver: false,
       approver_ids: [],
     },
     {
@@ -206,10 +204,8 @@ export function initializeNodes(): WorkflowNodeCreate[] {
       description: '主管审批',
       node_type: 'approval',
       approver_role_id: null,
-      approver_user_id: null,
       order_index: 1,
       multi_approve_type: 'any',
-      need_select_next_approver: false,
       approver_ids: [],
     },
     {
@@ -220,7 +216,6 @@ export function initializeNodes(): WorkflowNodeCreate[] {
       order_index: 2,
       is_final: true,
       multi_approve_type: 'any',
-      need_select_next_approver: false,
       approver_ids: [],
     },
   ];
@@ -235,11 +230,9 @@ export function addNode(nodes: WorkflowNodeCreate[]): WorkflowNodeCreate[] {
     description: '审批',
     node_type: 'approval',
     approver_role_id: null,
-    approver_user_id: null,
     order_index: nodes.length - 1, // 插入到结束节点之前
     is_final: false,
     multi_approve_type: 'any',
-    need_select_next_approver: false,
     approver_ids: [],
   };
   
@@ -274,7 +267,7 @@ export function removeNode(nodes: WorkflowNodeCreate[], index: number): Workflow
 // 移动节点
 export function moveNode(nodes: WorkflowNodeCreate[], index: number, direction: 'up' | 'down'): WorkflowNodeCreate[] {
   const updatedNodes = [...nodes];
-  
+  console.log('移动节点:', updatedNodes, index, direction);
   // 不能移动开始和结束节点
   if (updatedNodes[index].node_type === 'start' || updatedNodes[index].node_type === 'end') {
     return updatedNodes;
@@ -295,64 +288,4 @@ export function moveNode(nodes: WorkflowNodeCreate[], index: number, direction: 
   
   // 更新 order_index
   return updatedNodes.map((node, i) => ({ ...node, order_index: i }));
-}
-
-// 更新节点字段
-export function updateNode(
-  nodes: WorkflowNodeCreate[], 
-  index: number, 
-  field: string, 
-  value: unknown
-): WorkflowNodeCreate[] {
-  const updatedNodes = [...nodes];
-  
-  // 检查索引有效
-  if (index < 0 || index >= updatedNodes.length) {
-    return updatedNodes;
-  }
-  
-  // 处理特殊字段
-  if (field === 'approver_ids' && Array.isArray(value)) {
-    // 更新审批人ID列表
-    updatedNodes[index] = {
-      ...updatedNodes[index],
-      approver_ids: value,
-    };
-  } else if (field === 'approver_role_id') {
-    // 更新审批角色ID
-    updatedNodes[index] = {
-      ...updatedNodes[index],
-      approver_role_id: value as number | null,
-      // 如果设置了角色，清除用户
-      approver_user_id: value ? null : updatedNodes[index].approver_user_id,
-    };
-  } else if (field === 'approver_user_id') {
-    // 更新审批用户ID
-    updatedNodes[index] = {
-      ...updatedNodes[index],
-      approver_user_id: value as number | null,
-      // 如果设置了用户，清除角色
-      approver_role_id: value ? null : updatedNodes[index].approver_role_id,
-    };
-  } else if (field === 'multi_approve_type') {
-    // 更新多人审批类型
-    updatedNodes[index] = {
-      ...updatedNodes[index],
-      multi_approve_type: value as string,
-    };
-  } else if (field === 'need_select_next_approver') {
-    // 更新是否需要选择下一个审批人
-    updatedNodes[index] = {
-      ...updatedNodes[index],
-      need_select_next_approver: value as boolean,
-    };
-  } else {
-    // 更新其他字段
-    updatedNodes[index] = {
-      ...updatedNodes[index],
-      [field]: value,
-    };
-  }
-  
-  return updatedNodes;
 }

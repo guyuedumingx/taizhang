@@ -72,37 +72,3 @@ export async function cancelApproval(ledgerId: number) {
     throw error;
   }
 }
-
-// 审批通过工作流节点
-export async function approveWorkflowNode(instanceId: number, taskId: number, data: ApprovalData) {
-  try {
-    const response = await api.post(`/workflow-instances/${instanceId}/tasks/${taskId}/approve`, data);
-    return response.data;
-  } catch (error) {
-    console.error(`审批通过工作流实例 ${instanceId} 节点 ${taskId} 失败:`, error);
-    throw error;
-  }
-}
-
-// 拒绝工作流节点
-export async function rejectWorkflowNode(instanceId: number, taskId: number, data: ApprovalData) {
-  try {
-    const response = await api.post(`/workflow-instances/${instanceId}/tasks/${taskId}/reject`, data);
-    return response.data;
-  } catch (error) {
-    console.error(`拒绝工作流实例 ${instanceId} 节点 ${taskId} 失败:`, error);
-    throw error;
-  }
-}
-
-// 统一处理台账审批（可用于通过或拒绝）
-export async function processLedgerApproval(ledgerId: number, instanceId: number, data: ApprovalData) {
-  try {
-    const action = data.action || 'approve';
-    const response = await api.post(`/ledgers/${ledgerId}/workflow/instances/${instanceId}/${action}`, data);
-    return response.data;
-  } catch (error) {
-    console.error(`处理台账 ${ledgerId} 审批失败:`, error);
-    throw error;
-  }
-}

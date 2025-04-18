@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Card, Typography, Tag, Space, message, Tooltip, Popconfirm, Input } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
@@ -117,6 +117,18 @@ const WorkflowList: React.FC = () => {
       width: 200,
       render: (_, record) => (
         <Space size="middle">
+          {hasPermission(PERMISSIONS.WORKFLOW_VIEW) &&(
+            <Tooltip title="详情">
+              <Button
+                type="link"
+                icon={<EyeOutlined />}
+                onClick={() => {
+                  console.log(`导航到工作流编辑页面，ID: ${record.id}`);
+                  navigate(`/dashboard/workflow/${record.id}`);
+                }}
+              />
+            </Tooltip>
+          )}
           {hasPermission(PERMISSIONS.WORKFLOW_EDIT) && (
             <Tooltip title="编辑">
               <Button
