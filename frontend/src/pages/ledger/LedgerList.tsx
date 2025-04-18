@@ -220,13 +220,14 @@ const LedgerList: React.FC = () => {
       width: 130,
       render: (text: string) => (
         <Tag color={text === 'approved' ? 'success' : text === 'rejected' ? 'error' : text === 'pending' ? 'processing' : 'default'}>
-          {text === 'approved' ? '已审批' : text === 'rejected' ? '未审批' : text === 'pending' ? '审批中' : '草稿'}
+          {text === 'approved' ? '已批准' : text === 'rejected' ? '已拒绝' : text === 'pending' ? '审批中' : '草稿'}
         </Tag>
       ),
       filters: [
-        { text: '已审批', value: 'approved' },
-        { text: '未审批', value: 'rejected' },
+        { text: '已批准', value: 'approved' },
+        { text: '已拒绝', value: 'rejected' },
         { text: '审批中', value: 'pending' },
+        { text: '草稿', value: 'draft' },
       ],
       onFilter: (value, record) => record.approval_status === value.toString(),
     },

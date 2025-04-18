@@ -294,7 +294,7 @@ const HelpPage: React.FC = () => {
             </Collapse>
           </TabPane>
           
-          <TabPane tab="视频教程" key="video">
+          {/* <TabPane tab="视频教程" key="video">
             <List
               itemLayout="horizontal"
               dataSource={[
@@ -341,7 +341,7 @@ const HelpPage: React.FC = () => {
               showIcon 
               style={{ marginTop: 16 }}
             />
-          </TabPane>
+          </TabPane> */}
           
           <TabPane tab="联系我们" key="contact">
             <Card>

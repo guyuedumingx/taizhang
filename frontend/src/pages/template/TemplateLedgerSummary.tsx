@@ -19,6 +19,8 @@ import {
   InputNumber,
   Divider,
   Tag,
+  Switch,
+  Tooltip,
 } from 'antd';
 import { 
   FileExcelOutlined, 
@@ -27,6 +29,7 @@ import {
   FilterOutlined,
   ClearOutlined,
   DownOutlined,
+  ColumnHeightOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TemplateService } from '../../services/TemplateService';
@@ -68,6 +71,7 @@ const TemplateLedgerSummary: React.FC = () => {
   const [advancedConditions, setAdvancedConditions] = useState<AdvancedSearchConditions>({});
   const [activeAdvancedSearch, setActiveAdvancedSearch] = useState(false);
   const [form] = Form.useForm();
+  const [showAllFields, setShowAllFields] = useState(true);
 
   // 获取模板详情和相关台账
   useEffect(() => {
@@ -533,63 +537,101 @@ const TemplateLedgerSummary: React.FC = () => {
   };
 
   // 表格列定义
-  const columns: ColumnsType<Ledger> = [
-    {
-      title: '台账名称',
-      dataIndex: 'name',
-      key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      key: 'description',
+  const getColumns = () => {
+    // 基础固定列
+    const baseColumns: ColumnsType<Ledger> = [
+      {
+        title: '台账名称',
+        dataIndex: 'name',
+        key: 'name',
+        sorter: (a, b) => a.name.localeCompare(b.name),
+        fixed: 'left',
+        width: 150,
+      },
+      {
+        title: '描述',
+        dataIndex: 'description',
+        key: 'description',
+        ellipsis: true,
+        width: 200,
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        width: 100,
+        render: (text: string) => (
+          <span style={{ color: text === '已完成' ? '#52c41a' : '#faad14' }}>
+            {text}
+          </span>
+        ),
+      },
+    ];
+
+    // 自定义字段列
+    const customColumns = showAllFields ? templateFields.map(field => ({
+      title: field.label || field.name || '未命名字段',
+      key: field.name || `field_${field.id}`,
+      dataIndex: ['data', field.name || ''],
+      width: 150,
       ellipsis: true,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      render: (text: string) => (
-        <span style={{ color: text === '已完成' ? '#52c41a' : '#faad14' }}>
-          {text}
-        </span>
-      ),
-    },
-    {
-      title: '团队',
-      dataIndex: 'team_name',
-      key: 'team_name',
-    },
-    {
-      title: '创建人',
-      dataIndex: 'created_by_name',
-      key: 'created_by_name',
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-      render: (text) => text ? new Date(text).toLocaleString() : '-',
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_, record) => (
-        <Space size="middle">
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/dashboard/ledgers/${record.id}`)}
-            disabled={!hasPermission(PERMISSIONS.LEDGER_VIEW)}
-          >
-            查看
-          </Button>
-        </Space>
-      ),
-    },
-  ];
+      render: (value: any) => {
+        // 根据字段类型渲染不同的显示方式
+        if (field.type === 'checkbox' && Array.isArray(value)) {
+          return value.join(', ');
+        } else if (field.type === 'date' && value) {
+          return dayjs(value).format('YYYY-MM-DD');
+        } else if (value === null || value === undefined) {
+          return '-';
+        }
+        return String(value);
+      }
+    })) : [];
+
+    // 尾部固定列
+    const endColumns: ColumnsType<Ledger> = [
+      {
+        title: '团队',
+        dataIndex: 'team_name',
+        key: 'team_name',
+        width: 120,
+      },
+      {
+        title: '创建人',
+        dataIndex: 'created_by_name',
+        key: 'created_by_name',
+        width: 120,
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'created_at',
+        key: 'created_at',
+        width: 180,
+        sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+        render: (text) => text ? new Date(text).toLocaleString() : '-',
+      },
+      {
+        title: '操作',
+        key: 'action',
+        fixed: 'right',
+        width: 100,
+        render: (_, record) => (
+          <Space size="middle">
+            <Button
+              type="link"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(`/dashboard/ledgers/${record.id}`)}
+              disabled={!hasPermission(PERMISSIONS.LEDGER_VIEW)}
+            >
+              查看
+            </Button>
+          </Space>
+        ),
+      },
+    ];
+
+    return [...baseColumns, ...customColumns, ...endColumns];
+  };
 
   const items: MenuProps['items'] = [
     {
@@ -698,11 +740,22 @@ const TemplateLedgerSummary: React.FC = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <Title level={4}>{template?.name || '模板'} - 台账汇总</Title>
-        <Dropdown menu={{ items }} trigger={['click']} disabled={loading || ledgers.length === 0}>
-          <Button type="primary" icon={<DownloadOutlined />} loading={exportLoading}>
-            导出台账 <DownOutlined />
-          </Button>
-        </Dropdown>
+        <Space>
+          <Tooltip title={showAllFields ? "隐藏自定义字段" : "显示所有自定义字段"}>
+            <Button 
+              icon={<ColumnHeightOutlined />} 
+              onClick={() => setShowAllFields(!showAllFields)}
+              type={showAllFields ? "primary" : "default"}
+            >
+              {showAllFields ? "隐藏字段" : "显示所有字段"}
+            </Button>
+          </Tooltip>
+          <Dropdown menu={{ items }} trigger={['click']} disabled={loading || ledgers.length === 0}>
+            <Button type="primary" icon={<DownloadOutlined />} loading={exportLoading}>
+              导出台账 <DownOutlined />
+            </Button>
+          </Dropdown>
+        </Space>
       </div>
 
       <Row gutter={16} style={{ marginBottom: 16 }}>
@@ -758,10 +811,11 @@ const TemplateLedgerSummary: React.FC = () => {
       {renderActiveSearchTags()}
 
       <Table
-        columns={columns}
+        columns={getColumns()}
         dataSource={filteredLedgers}
         rowKey="id"
         loading={loading}
+        scroll={{ x: 'max-content' }}
         pagination={{
           showSizeChanger: true,
           showQuickJumper: true,

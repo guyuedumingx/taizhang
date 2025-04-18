@@ -391,7 +391,7 @@ const LedgerDetail: React.FC = () => {
           </Descriptions.Item>
           <Descriptions.Item label="审批状态">
             <Tag color={ledger.approval_status === 'approved' ? 'success' : ledger.approval_status === 'rejected' ? 'error' : ledger.approval_status === 'pending' ? 'processing' : 'default'}>
-              {ledger.approval_status === 'approved' ? '已审批' : ledger.approval_status === 'rejected' ? '未审批' : ledger.approval_status === 'pending' ? '审批中' : '草稿'}
+              {ledger.approval_status === 'approved' ? '已批准' : ledger.approval_status === 'rejected' ? '已拒绝' : ledger.approval_status === 'pending' ? '审批中' : '草稿'}
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="所属团队">{ledger.team_name || '-'}</Descriptions.Item>
