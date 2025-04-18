@@ -158,13 +158,6 @@ const TeamManagement: React.FC = () => {
       sorter: (a, b) => a.member_count - b.member_count,
     },
     {
-      title: '创建时间',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      sorter: (a, b) => ((a.created_at || '') as string).localeCompare((b.created_at || '') as string),
-      render: (created_at: string | undefined) => created_at ? new Date(created_at).toLocaleDateString() : '-',
-    },
-    {
       title: '操作',
       key: 'action',
       render: (_, record) => (

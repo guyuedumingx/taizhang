@@ -10,7 +10,7 @@ import { WorkflowService } from '../../services/WorkflowService';
 import { Ledger, AuditLog, Field, Workflow } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 import ApproverSelector from '../../components/workflow/ApproverSelector';
-import { ApprovalService } from '../../services/ApprovalService';
+import { submitLedgerForApproval } from '../../api/approvals';
 import ApprovalModal from '../../components/approval/ApprovalModal';
 
 const { Title, Text } = Typography;
@@ -180,7 +180,7 @@ const LedgerDetail: React.FC = () => {
     
     setSubmitting(true);
     try {
-      await ApprovalService.submitLedgerForApproval(parseInt(id!), {
+      await submitLedgerForApproval(parseInt(id!), {
         workflow_id: workflowToUse.id,
         comment: submitComment,
         next_approver_id: nextApproverId
@@ -191,9 +191,6 @@ const LedgerDetail: React.FC = () => {
       if (id) {
         fetchLedgerDetails(parseInt(id));
       }
-    } catch (error) {
-      console.error('提交审批失败:', error);
-      message.error('提交审批失败');
     } finally {
       setSubmitting(false);
     }

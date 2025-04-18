@@ -130,7 +130,7 @@ const TemplateList: React.FC = () => {
           <Button
             type="text"
             icon={<BranchesOutlined />}
-            onClick={() => navigate(`/dashboard/workflow?workflow_id=${record.workflow_id}`)}
+            onClick={() => navigate(`/dashboard/workflow/${record.workflow_id}`)}
             disabled={!hasPermission(PERMISSIONS.WORKFLOW_VIEW)}
             title="关联工作流"
           />

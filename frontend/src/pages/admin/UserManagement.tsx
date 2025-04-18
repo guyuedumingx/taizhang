@@ -187,9 +187,9 @@ const UserManagement: React.FC = () => {
   };
 
   const filteredUsers = users.filter(user => 
-    user.username.toLowerCase().includes(searchText.toLowerCase()) ||
-    user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    user.ehr_id.toLowerCase().includes(searchText.toLowerCase()) ||
+    user.username?.toLowerCase().includes(searchText.toLowerCase()) ||
+    user.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+    user.ehr_id?.toLowerCase().includes(searchText.toLowerCase()) ||
     (user.team_name && user.team_name.toLowerCase().includes(searchText.toLowerCase()))
   );
 
@@ -230,12 +230,6 @@ const UserManagement: React.FC = () => {
       key: 'department',
       filters: departmentFilters,
       onFilter: (value, record) => record.department === value.toString(),
-    },
-    {
-      title: '团队',
-      dataIndex: 'team_name',
-      key: 'team_name',
-      render: (team_name: string | undefined) => team_name || <span>-</span>,
     },
     {
       title: '状态',

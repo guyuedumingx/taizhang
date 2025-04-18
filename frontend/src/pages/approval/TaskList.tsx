@@ -4,7 +4,7 @@ import { EyeOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
-import { ApprovalService } from '../../services/ApprovalService';
+import { getPendingTasks } from '../../api/approvals';
 import type { ColumnsType } from 'antd/es/table';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 import ApprovalModal from '../../components/approval/ApprovalModal';
@@ -54,16 +54,7 @@ const TaskList: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log('调用ApprovalService.getPendingTasks()...');
-      const response = await ApprovalService.getPendingTasks();
-      console.log('API响应数据:', response);
-      
-      if (!response || !Array.isArray(response)) {
-        console.error('API返回格式不正确:', response);
-        setError('获取任务数据格式不正确');
-        setTasks([]);
-        return;
-      }
+      const response = await getPendingTasks();
       
       // 转换响应数据以符合Task接口
       const taskList = response.map((item: Record<string, unknown>) => ({

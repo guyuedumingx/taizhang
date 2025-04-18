@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Input, Typography, message } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { ApprovalService } from '../../services/ApprovalService';
 import { WorkflowService } from '../../services/WorkflowService';
 import { getWorkflowInstance } from '../../api/workflow_instances';
 import ApproverSelector from '../workflow/ApproverSelector';
+import { approveLedger } from '../../api/approvals';
 
 const { Text } = Typography;
 
@@ -118,10 +118,10 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
       // 根据传入的参数判断调用方式
       if (workflowInstanceId && taskId) {
         //TODO: TaskList页面调用方式 taskId 是 ledgerId 
-        await ApprovalService.approveLedger(taskId, approvalData);
+        await approveLedger(taskId, approvalData);
       } else if (ledgerId && workflowInstanceId) {
         //TODO: LedgerDetail页面调用方式
-        await ApprovalService.approveLedger(ledgerId, approvalData);
+        await approveLedger(ledgerId, approvalData);
       } else {
         throw new Error('缺少必要参数');
       }
