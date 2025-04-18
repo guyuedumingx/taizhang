@@ -7,35 +7,9 @@ from fastapi.encoders import jsonable_encoder
 
 from app import models, schemas
 from app.utils.logger import LoggerService
-from app.api import deps
 from app.services.workflow_node_service import WorkflowNodeService
 
 class WorkflowService:
-    @staticmethod
-    def _orm_to_dict(obj):
-        """
-        将SQLAlchemy ORM对象转换为纯字典，只包含模型的属性字段
-        避免循环引用和非可序列化对象
-        """
-        if obj is None:
-            return None
-            
-        # 使用SQLAlchemy inspect获取所有属性
-        mapper = inspect(obj).mapper
-        result = {}
-        
-        # 遍历所有列字段
-        for column in mapper.columns:
-            attr_name = column.key
-            result[attr_name] = getattr(obj, attr_name)
-            
-        # 添加额外的属性
-        if hasattr(obj, "creator_name"):
-            result["creator_name"] = obj.creator_name
-        if hasattr(obj, "node_count"):
-            result["node_count"] = obj.node_count
-            
-        return result
     
     @staticmethod
     def _get_node_approvers(db: Session, node_id: int) -> List[Dict]:
@@ -89,21 +63,9 @@ class WorkflowService:
             pydantic_workflows = []
             for workflow in workflows:
                 try:
-                    # 获取创建者和更新者信息
-                    if workflow.created_by:
-                        creator = db.query(models.User).filter(models.User.id == workflow.created_by).first()
-                        if creator:
-                            # workflow.creator = deps.convert_user_to_schema(creator)
-                            workflow.creator = creator
-                            workflow.creator_name = creator.name
-                    
-                    # 获取节点数量
-                    workflow.node_count = db.query(models.WorkflowNode).filter(models.WorkflowNode.workflow_id == workflow.id).count()
-                    
-                    # 转换为Pydantic模型
-                    workflow_dict = jsonable_encoder(workflow)
-                    pydantic_workflow = schemas.Workflow.model_validate(workflow_dict)
-                    pydantic_workflows.append(pydantic_workflow)
+                    workflow.node_count = len(workflow.nodes)
+                    workflow.nodes = []
+                    pydantic_workflows.append(workflow)
                 except Exception as e:
                     print(f"处理工作流 {workflow.id} 的信息时出错: {e}")
             
@@ -151,6 +113,7 @@ class WorkflowService:
                     approver_role_id=node_data.approver_role_id,
                     multi_approve_type=node_data.multi_approve_type,
                     reject_to_node_id=node_data.reject_to_node_id,
+                    is_final=node_data.is_final
                 )
                 db.add(node)
                 db.flush()  # 获取数据库分配的ID

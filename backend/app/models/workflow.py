@@ -14,6 +14,7 @@ class ApprovalStatus(str, Enum):
     APPROVED = "approved"  # 已批准
     REJECTED = "rejected"  # 已拒绝
     CANCELLED = "cancelled" # 已取消
+    DRAFT = "draft" # 草稿
 
 # 工作流节点与审批人关联表
 workflow_node_approvers = Table(
@@ -78,7 +79,9 @@ class WorkflowInstance(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     workflow_id = Column(Integer, ForeignKey("workflows.id"), nullable=False)
-    ledger_id = Column(Integer, ForeignKey("ledgers.id"), nullable=False, unique=True)  # 确保一对一关系
+    #TODO 去掉外键约束
+    # ledger_id = Column(Integer, ForeignKey("ledgers.id"), nullable=False, unique=True)  # 确保一对一关系
+    ledger_id = Column(Integer, nullable=False, unique=True)  # 确保一对一关系
     status = Column(String, default="active")  # active, completed, cancelled
     current_node_id = Column(Integer, nullable=True)  # 移除外键约束，避免循环引用
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)

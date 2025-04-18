@@ -13,7 +13,7 @@ class LedgerBase(BaseModel):
     team_id: Optional[int] = None
     template_id: Optional[int] = None
     data: Optional[Dict[str, Any]] = None
-    approval_status: Optional[str] = "pending"
+    approval_status: Optional[str] = "draft"
 
 
 # 创建台账时的属性

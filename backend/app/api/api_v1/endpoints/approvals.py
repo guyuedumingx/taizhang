@@ -1,10 +1,8 @@
 from typing import Any, List, Optional, Dict
 from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, desc
-
 from app.api import deps
 from app.models.workflow import WorkflowInstanceNode, WorkflowNode
 from app import crud, models, schemas
@@ -152,7 +150,7 @@ def submit_ledger_for_approval(
         raise HTTPException(status_code=400, detail="只有草稿状态的台账可以提交审批")
     
     # 检查是否已有活动的工作流实例
-    active_instance = crud.workflow_instance.get_active_by_ledger(db, ledger_id=ledger_id)
+    active_instance = crud.workflow_instance.get_by_ledger(db, ledger_id=ledger_id)
     if active_instance:
         raise HTTPException(status_code=400, detail="台账已在审批流程中")
     
@@ -241,7 +239,7 @@ def approve_ledger(
         raise HTTPException(status_code=400, detail="台账不在待审批状态")
     
     # 获取活动的工作流实例
-    workflow_instance = crud.workflow_instance.get_active_by_ledger(db, ledger_id=ledger_id)
+    workflow_instance = crud.workflow_instance.get_by_ledger(db, ledger_id=ledger_id)
     if not workflow_instance:
         raise HTTPException(status_code=400, detail="台账没有活动的工作流实例")
     
@@ -269,11 +267,11 @@ def approve_ledger(
         can_approve = True
     
     # 检查是否在节点的审批人列表中
-    if not can_approve and workflow_node.approvers:
-        for approver in workflow_node.approvers:
-            if approver.id == current_user.id:
-                can_approve = True
-                break
+    # if not can_approve and workflow_node.approvers:
+    #     for approver in workflow_node.approvers:
+    #         if approver.id == current_user.id:
+    #             can_approve = True
+    #             break
     
     # 检查是否具有节点指定的审批角色
     if not can_approve and workflow_node.approver_role_id:
@@ -302,6 +300,7 @@ def approve_ledger(
         # 如果工作流完成，更新台账状态
         if result.get("workflow_completed"):
             ledger.approval_status = "approved"
+            ledger.status = "completed"
             ledger.approved_at = datetime.now()
             db.add(ledger)
             db.commit()
@@ -343,8 +342,9 @@ def approve_ledger(
             raise HTTPException(status_code=400, detail=result["message"])
         
         # 如果工作流完成（拒绝结束），更新台账状态
-        if result.get("workflow_completed"):
+        if result.get("workflow_rejected"):
             ledger.approval_status = "rejected"
+            ledger.status = "completed"
             db.add(ledger)
             db.commit()
             
@@ -420,7 +420,7 @@ def cancel_approval(
         raise HTTPException(status_code=400, detail="台账不在待审批状态")
     
     # 获取活动的工作流实例
-    workflow_instance = crud.workflow_instance.get_active_by_ledger(db, ledger_id=ledger_id)
+    workflow_instance = crud.workflow_instance.get_by_ledger(db, ledger_id=ledger_id)
     if not workflow_instance:
         raise HTTPException(status_code=400, detail="台账没有活动的工作流实例")
     

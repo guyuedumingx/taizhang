@@ -43,11 +43,11 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
             db_node = WorkflowInstanceNode(
                 workflow_instance_id=db_obj.id,
                 workflow_node_id=node.id,
-                status=ApprovalStatus.PENDING
+                status= ApprovalStatus.PENDING if node.node_type == 'approval' else ApprovalStatus.APPROVED
             )
             
             # 如果是第一个节点(开始节点)，设置为当前节点
-            if node.order_index == 0:
+            if node.order_index == 1:
                 if node.approver_role_id:
                     # 根据角色找审批人，这里简化为取该角色的第一个用户
                     role_user = db.query(User).join(User.roles).filter(
@@ -65,28 +65,18 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
         
         # 设置当前节点为第一个节点
         if instance_nodes:
-            db_obj.current_node_id = instance_nodes[0].id
+            db_obj.current_node_id = instance_nodes[1].id
         
         db.commit()
         db.refresh(db_obj)
         return db_obj
     
-    def get_by_ledger(self, db: Session, *, ledger_id: int) -> List[WorkflowInstance]:
-        """获取台账的所有工作流实例"""
-        return (
-            db.query(self.model)
-            .filter(self.model.ledger_id == ledger_id)
-            .order_by(desc(self.model.created_at))
-            .all()
-        )
-    
-    def get_active_by_ledger(self, db: Session, *, ledger_id: int) -> Optional[WorkflowInstance]:
+    def get_by_ledger(self, db: Session, *, ledger_id: int) -> Optional[WorkflowInstance]:
         """获取台账的活动工作流实例"""
         return (
             db.query(self.model)
             .filter(
                 self.model.ledger_id == ledger_id,
-                self.model.status == "active"
             )
             .first()
         )
@@ -206,14 +196,14 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
         ).first()
         
         # 如果没有下一个节点，或当前节点是最终节点，则完成工作流
-        if not next_workflow_node or workflow_node.is_final:
+        if not next_workflow_node or next_workflow_node.is_final:
             instance.status = "completed"
             instance.completed_at = datetime.now()
             db.add(instance)
             db.commit()
             return {"success": True, "message": "审批完成", "workflow_completed": True}
         
-        # 创建下一个节点的实例
+        # 下一个节点的实例
         next_node = db.query(WorkflowInstanceNode).filter(
             WorkflowInstanceNode.workflow_instance_id == instance.id,
             WorkflowInstanceNode.workflow_node_id == next_workflow_node.id

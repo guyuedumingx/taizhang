@@ -4,11 +4,9 @@ from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 import pandas as pd
 import io
-
 from app import models, schemas
 from app.core.security import get_password_hash
 from app.services.casbin_service import add_role_for_user, remove_role_for_user, get_roles_for_user
-from app.api import deps
 
 
 class UserService:
@@ -18,15 +16,7 @@ class UserService:
     def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.User]:
         """获取用户列表"""
         users = db.query(models.User).offset(skip).limit(limit).all()
-        
-        # 将models.User转换为schemas.User
-        result = []
-        for user in users:
-            schema_user = deps.convert_user_to_schema(user)
-            if schema_user:
-                result.append(schema_user)
-        
-        return result
+        return users
 
     @staticmethod
     def create_user(db: Session, user_in: schemas.UserCreate) -> schemas.User:
@@ -71,8 +61,7 @@ class UserService:
             # 默认角色为普通用户
             add_role_for_user(str(user.id), "user")
         
-        # 将models.User转换为schemas.User
-        return deps.convert_user_to_schema(user)
+        return user
 
     @staticmethod
     def get_user(db: Session, user_id: int) -> schemas.User:
@@ -81,8 +70,7 @@ class UserService:
         if not user:
             raise HTTPException(status_code=404, detail="用户不存在")
         
-        # 将models.User转换为schemas.User
-        return deps.convert_user_to_schema(user)
+        return user
 
     @staticmethod
     def update_user(db: Session, user_id: int, user_in: schemas.UserUpdate) -> schemas.User:
@@ -133,8 +121,7 @@ class UserService:
         db.commit()
         db.refresh(user)
         
-        # 将models.User转换为schemas.User
-        return deps.convert_user_to_schema(user)
+        return user
 
     @staticmethod
     def delete_user(db: Session, user_id: int) -> models.User:

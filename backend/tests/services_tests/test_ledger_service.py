@@ -82,7 +82,7 @@ def test_create_ledger(db: Session, normal_user: models.User, template: models.T
     assert ledger.data["字段1"] == "测试值"
     assert ledger.data["字段2"] == 300
     assert ledger.status == "draft"
-    assert ledger.approval_status == "pending"
+    assert ledger.approval_status == "draft"
     assert ledger.created_by_id == normal_user.id
     assert ledger.updated_by_id == normal_user.id
     

@@ -159,9 +159,9 @@ class WorkflowInstanceService:
                 raise HTTPException(status_code=403, detail="无权查看此台账的工作流实例")
         
         # 获取活动的工作流实例
-        instance = crud.workflow_instance.get_active_by_ledger(db, ledger_id=ledger_id)
+        instance = crud.workflow_instance.get_by_ledger(db, ledger_id=ledger_id)
         if not instance:
-            raise HTTPException(status_code=404, detail="台账没有活动的工作流实例")
+            return None
         
         return WorkflowInstanceService.get_workflow_instance(db, instance.id, current_user)
 

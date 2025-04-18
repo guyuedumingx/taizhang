@@ -7,7 +7,7 @@ from datetime import datetime
 from urllib.parse import quote
 from app import models, schemas, crud
 from app.utils.logger import LoggerService
-from app.schemas.workflow import WorkflowInstanceCreate
+from app.services.workflow_instance_service import WorkflowInstanceService
 
 
 class LedgerService:
@@ -93,6 +93,12 @@ class LedgerService:
                 approver = db.query(models.User).filter(models.User.id == ledger.current_approver_id).first()
                 if approver:
                     ledger.current_approver_name = approver.name
+
+            try:
+                # 获取当前活动的工作流实例
+                ledger.active_workflow_instance = WorkflowInstanceService.get_workflow_instance_by_ledger(db, ledger.id, current_user)
+            except:
+                ledger.active_workflow_instance = None
             
         return ledgers
 
@@ -181,7 +187,7 @@ class LedgerService:
         if not ledger:
             raise HTTPException(status_code=404, detail="台账不存在")
         
-        # 非超级管理员只能查看自己团队的台账
+        #TODO 非超级管理员只能查看自己团队的台账
         if not current_user.is_superuser and ledger.team_id != current_user.team_id:
             # 检查用户是否是创建者
             if ledger.created_by_id != current_user.id:
@@ -235,6 +241,9 @@ class LedgerService:
             approver = db.query(models.User).filter(models.User.id == ledger.current_approver_id).first()
             if approver:
                 ledger.current_approver_name = approver.name
+
+        # 获取当前活动的工作流实例
+        ledger.active_workflow_instance = WorkflowInstanceService.get_workflow_instance_by_ledger(db, ledger.id, current_user)
         
         # 记录日志
         LoggerService.log_info(
@@ -270,7 +279,8 @@ class LedgerService:
         
         # 非超级管理员只能更新自己创建的台账或自己团队的台账
         if not current_user.is_superuser:
-            if ledger.created_by_id != current_user.id and ledger.team_id != current_user.team_id:
+            # if ledger.created_by_id != current_user.id and ledger.team_id != current_user.team_id:
+            if ledger.created_by_id != current_user.id:
                 raise HTTPException(status_code=403, detail="无权更新此台账")
         
         # 更新台账信息
