@@ -375,7 +375,7 @@ const LedgerDetail: React.FC = () => {
                 icon={<CheckCircleOutlined />}
                 onClick={showApprovalModal}
               >
-                审批通过
+                审批
               </Button>
             )}
           </Space>

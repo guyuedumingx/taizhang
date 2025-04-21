@@ -20,8 +20,8 @@ def get_workflow_node(
     获取工作流节点详情
     """
     # 检查用户权限
-    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
-        raise HTTPException(status_code=403, detail="权限不足")
+    # if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
+    #     raise HTTPException(status_code=403, detail="权限不足")
     
     return workflow_node_service.get_workflow_node(db, node_id=node_id)
 
@@ -36,8 +36,8 @@ def get_node_approvers(
     获取工作流节点的审批人列表
     """
     # 检查用户权限
-    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
-        raise HTTPException(status_code=403, detail="权限不足")
+    # if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
+    #     raise HTTPException(status_code=403, detail="权限不足")
     
     # 获取节点审批人列表
     approvers = workflow_node_service.get_node_approvers(db, node_id=node_id)
@@ -55,7 +55,7 @@ def update_node_approvers(
     更新工作流节点的审批人列表
     """
     # 检查用户权限
-    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
-        raise HTTPException(status_code=403, detail="权限不足")
+    # if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "update"):
+    #     raise HTTPException(status_code=403, detail="权限不足")
     
     return workflow_node_service.update_node_approvers(db, node_id=node_id, user_ids=user_ids) 

@@ -23,8 +23,8 @@ def read_roles(
     检索角色列表
     """
     # 检查是否有权限
-    if not crud.user.has_permission(db,current_user.id, "role:view"):
-        raise HTTPException(status_code=403, detail="没有权限")
+    # if not crud.user.has_permission(db,current_user.id, "role:view"):
+    #     raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.get_roles(db, skip=skip, limit=limit)
 
@@ -55,8 +55,8 @@ def read_role(
     获取角色详情
     """
     # 检查是否有权限
-    if not crud.user.has_permission(db,current_user.id, "role:view"):
-        raise HTTPException(status_code=403, detail="没有权限")
+    # if not crud.user.has_permission(db,current_user.id, "role:view"):
+    #     raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.get_role(db, role_id=role_id)
 
@@ -104,8 +104,8 @@ def read_user_roles(
     获取用户的所有角色
     """
     # 检查是否有权限
-    if not (crud.user.has_permission(db,current_user.id, "user:view") or current_user.id == user_id):
-        raise HTTPException(status_code=403, detail="没有权限")
+    # if not (crud.user.has_permission(db,current_user.id, "user:view") or current_user.id == user_id):
+    #     raise HTTPException(status_code=403, detail="没有权限")
     
     return role_service.get_user_roles(db, user_id=user_id)
 

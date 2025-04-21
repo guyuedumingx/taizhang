@@ -43,9 +43,6 @@ const TeamManagement: React.FC = () => {
       
       setTeams(teamsData);
       setUsers(usersData);
-    } catch (error) {
-      console.error('获取数据失败:', error);
-      message.error('获取数据失败，请刷新页面重试');
     } finally {
       setLoading(false);
     }

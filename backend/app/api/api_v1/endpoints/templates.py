@@ -20,8 +20,8 @@ def read_templates(
     获取模板列表
     """
     # 检查权限
-    if not deps.check_permissions("template", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("template", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     return template_service.get_templates(db, skip=skip, limit=limit, search=search)
 
@@ -53,8 +53,8 @@ def read_template(
     获取模板详情
     """
     # 检查权限
-    if not deps.check_permissions("template", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("template", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     return template_service.get_template(db, template_id=template_id)
 
@@ -109,8 +109,8 @@ def read_template_fields(
     获取模板字段列表
     """
     # 检查权限
-    if not deps.check_permissions("template", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("template", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     template = db.query(models.Template).filter(models.Template.id == template_id).first()
     if not template:

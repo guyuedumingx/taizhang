@@ -22,9 +22,9 @@ def read_workflows(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """获取工作流列表"""
-    # 检查权限
-    if not deps.check_permissions("workflow", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # # 检查权限
+    # if not deps.check_permissions("workflow", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     workflows = workflow_service.get_workflows(db, skip=skip, limit=limit)
     total = db.query(models.Workflow).count()

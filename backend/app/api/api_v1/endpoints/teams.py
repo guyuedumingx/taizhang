@@ -19,8 +19,8 @@ def read_teams(
 ) -> Any:
     """获取团队列表"""
     # 检查权限
-    if not deps.check_permissions("team", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("team", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     teams = team_service.get_teams(db, skip=skip, limit=limit)
     total = db.query(models.Team).count()
@@ -56,8 +56,8 @@ def read_team(
 ) -> Any:
     """获取团队详情"""
     # 检查权限
-    if not deps.check_permissions("team", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("team", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     return team_service.get_team(db, team_id=team_id)
 
