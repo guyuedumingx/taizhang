@@ -314,6 +314,19 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
             db.refresh(instance)
         return instance
 
+    def delete_workflow_instance(
+        self,
+        db: Session,
+        *,
+        instance_id: int
+    ) -> WorkflowInstance:
+        """删除工作流实例"""
+        instance = db.query(WorkflowInstance).filter(WorkflowInstance.id == instance_id).first()
+        if instance:
+            db.delete(instance)
+            db.commit()
+
+
 class CRUDWorkflowInstanceNode(CRUDBase[WorkflowInstanceNode, WorkflowInstanceNodeCreate, WorkflowInstanceNodeUpdate]):
     def get_by_instance(self, db: Session, *, instance_id: int) -> List[WorkflowInstanceNode]:
         """获取工作流实例的所有节点"""
@@ -462,7 +475,7 @@ class CRUDWorkflowInstanceNode(CRUDBase[WorkflowInstanceNode, WorkflowInstanceNo
         db.commit()
         db.refresh(node)
         return node
-
+    
 # 导出实例
 workflow_instance = CRUDWorkflowInstance(WorkflowInstance)
 workflow_instance_node = CRUDWorkflowInstanceNode(WorkflowInstanceNode) 

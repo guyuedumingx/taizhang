@@ -152,8 +152,10 @@ def submit_ledger_for_approval(
     # 检查是否已有活动的工作流实例
     active_instance = crud.workflow_instance.get_by_ledger(db, ledger_id=ledger_id)
     if active_instance:
-        raise HTTPException(status_code=400, detail="台账已在审批流程中")
-    
+        # 删除活动的工作流实例
+        crud.workflow_instance.delete_workflow_instance(db, instance_id=active_instance.id)
+        # raise HTTPException(status_code=400, detail="台账已在审批流程中")
+     
     # 确定要使用的工作流 ID
     workflow_id = None
     
@@ -344,7 +346,7 @@ def approve_ledger(
         # 如果工作流完成（拒绝结束），更新台账状态
         if result.get("workflow_rejected"):
             ledger.approval_status = "rejected"
-            ledger.status = "completed"
+            ledger.status = "returned"
             db.add(ledger)
             db.commit()
             

@@ -202,14 +202,15 @@ const LedgerList: React.FC = () => {
       key: 'status',
       width: 100,
       render: (text: string) => (
-        <Tag color={text === 'completed' ? 'success' : text === 'active' ? 'processing' : 'default'}>
-          {text === 'completed' ? '已完成' : text === 'active' ? '处理中' : '草稿'}
+        <Tag color={text === 'completed' ? 'success' : text === 'active' ? 'processing' : text === 'returned' ? 'error' : 'default'}>
+          {text === 'completed' ? '已完成' : text === 'active' ? '处理中' : text === 'returned' ? '已退回' : '草稿'}
         </Tag>
       ),
       filters: [
         { text: '草稿', value: 'draft' },
         { text: '处理中', value: 'active' },
         { text: '已完成', value: 'completed' },
+        { text: '已退回', value: 'returned' },
       ],
       onFilter: (value, record) => record.status === value.toString(),
     },

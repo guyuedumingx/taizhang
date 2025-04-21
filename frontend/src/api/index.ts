@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
-import {User, LoginResponse, RegisterRequest } from '../types';
+import {User, LoginResponse, RegisterRequest, OverviewResponse } from '../types';
 // 从独立文件导入API
 import * as WorkflowsAPI from './workflows';
 import * as WorkflowNodesAPI from './workflow_nodes';
@@ -148,7 +148,7 @@ export default {
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
-    }
+    },
   },
   
   // 此处保留对象导出，方便直接引用
@@ -161,5 +161,11 @@ export default {
   workflowInstances: WorkflowInstancesAPI,
   ledgers: LedgersAPI,
   approvals: ApprovalsAPI,
-  logs: LogsAPI
+  logs: LogsAPI,
+  statistics: {
+    overview: async (): Promise<OverviewResponse> => {
+      const response = await api.get('/statistics/overview');
+      return response.data;
+    }
+  }
 }; 

@@ -11,6 +11,10 @@ from app.services.casbin_service import add_role_for_user, remove_role_for_user,
 
 class UserService:
     """用户服务类，处理用户相关的业务逻辑"""
+    @staticmethod
+    def get_users_count(db: Session) -> int:
+        """获取用户总数"""
+        return db.query(models.User).count()
 
     @staticmethod
     def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[schemas.User]:

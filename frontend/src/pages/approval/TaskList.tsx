@@ -206,7 +206,7 @@ const TaskList: React.FC = () => {
           onCancel={() => setApprovalModalVisible(false)}
           onSuccess={handleApprovalSuccess}
           workflowInstanceId={currentTask.workflow_instance_id}
-          taskId={currentTask.task_id}
+          ledgerId={currentTask.ledger_id}
           currentNodeId={currentTask.workflow_node_id}
         />
       )}

@@ -74,12 +74,6 @@ async def root():
     logging.info("访问根路径")
     return {"message": "台账管理系统API服务"}
 
-@app.get("/health")
-async def health_check():
-    """健康检查接口"""
-    logging.info("健康检查")
-    return {"status": "ok", "message": "服务正常运行"}
-
 @app.on_event("startup")
 async def startup_event():
     logging.info("服务启动")

@@ -360,7 +360,7 @@ const LedgerDetail: React.FC = () => {
                 编辑
               </Button>
             )}
-            {ledger.status === 'draft' && hasPermission(PERMISSIONS.LEDGER_SUBMIT) && templateHasWorkflow && (
+            {(ledger.approval_status === 'draft' || ledger.approval_status === 'returned') && hasPermission(PERMISSIONS.LEDGER_SUBMIT) && templateHasWorkflow && (
               <Button 
                 type="primary" 
                 icon={<UploadOutlined />} 
@@ -385,8 +385,8 @@ const LedgerDetail: React.FC = () => {
           <Descriptions.Item label="台账编号">{ledger.id}</Descriptions.Item>
           <Descriptions.Item label="模板">{ledger.template_name || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={ledger.status === 'completed' ? 'success' : ledger.status === 'active' ? 'processing' : 'default'}>
-              {ledger.status === 'completed' ? '已完成' : ledger.status === 'active' ? '处理中' : '草稿'}
+            <Tag color={ledger.status === 'completed' ? 'success' : ledger.status === 'active' ? 'processing' : ledger.status === 'returned' ? 'error' : 'default'}>
+              {ledger.status === 'completed' ? '已完成' : ledger.status === 'active' ? '处理中' : ledger.status === 'returned' ? '已退回' : '草稿'}
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="审批状态">

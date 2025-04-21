@@ -376,8 +376,6 @@ const LedgerForm: React.FC = () => {
               >
                 <Select>
                   <Option value="draft">草稿</Option>
-                  <Option value="active">处理中</Option>
-                  <Option value="completed">已完成</Option>
                 </Select>
               </Form.Item>
             </>

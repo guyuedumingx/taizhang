@@ -433,3 +433,10 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 } 
+
+export interface OverviewResponse {
+  users_count: number;
+  teams_count: number;
+  templates: Template[];
+  ledgers: Ledger[];
+}

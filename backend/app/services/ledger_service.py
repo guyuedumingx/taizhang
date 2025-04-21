@@ -52,8 +52,8 @@ class LedgerService:
             query = query.filter(models.Ledger.name.ilike(f"%{search}%"))
         
         # 非超级管理员只能看到自己团队的台账
-        if current_user and not current_user.is_superuser and not team_id:
-            query = query.filter(models.Ledger.team_id == current_user.team_id)
+        # if current_user and not current_user.is_superuser and not team_id:
+        #     query = query.filter(models.Ledger.team_id == current_user.team_id)
         
         # 获取台账列表
         ledgers = query.order_by(models.Ledger.updated_at.desc()).offset(skip).limit(limit).all()
@@ -285,6 +285,14 @@ class LedgerService:
         
         # 更新台账信息
         update_data = ledger_in.dict(exclude_unset=True)
+
+        # 退回台账修改后状态重置
+        if ledger.status == "returned":
+            update_data["status"] = "draft"
+            update_data["approval_status"] = "draft"
+            update_data["current_approver_id"] = None
+            update_data["current_approver_name"] = None
+            update_data["active_workflow_instance"] = None
         
         # 检查团队是否存在
         if "team_id" in update_data and update_data["team_id"]:

@@ -10,6 +10,11 @@ class TeamService:
     """团队服务类，处理团队相关的业务逻辑"""
 
     @staticmethod
+    def get_teams_count(db: Session) -> int:
+        """获取团队总数"""
+        return db.query(models.Team).count()
+
+    @staticmethod
     def get_teams(
         db: Session, 
         skip: int = 0, 
