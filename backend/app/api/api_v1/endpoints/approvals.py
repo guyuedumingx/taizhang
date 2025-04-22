@@ -155,7 +155,7 @@ def submit_ledger_for_approval(
         # 删除活动的工作流实例
         crud.workflow_instance.delete_workflow_instance(db, instance_id=active_instance.id)
         # raise HTTPException(status_code=400, detail="台账已在审批流程中")
-     
+
     # 确定要使用的工作流 ID
     workflow_id = None
     
@@ -314,7 +314,7 @@ def approve_ledger(
                 action="approve",
                 workflow_instance_id= workflow_instance.id,
                 ledger_id =ledger_id,
-                comment=f"台账审批通过，工作流实例ID: {workflow_instance.id}",
+                comment=f"台账审批通过，审批人: {current_user.name}",
                 status_before = "pending",
                 status_after = "approved"
             )
@@ -326,7 +326,7 @@ def approve_ledger(
                 action="approve_node",
                 ledger_id=ledger_id,
                 workflow_instance_id= workflow_instance.id,
-                comment = f"台账节点审批通过，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}",
+                comment = f"台账节点审批通过，审批人: {current_user.name}",
                 status_before="pending",
                 status_after ="pending"
             )
@@ -357,7 +357,7 @@ def approve_ledger(
                 action="reject",
                 ledger_id=ledger_id,
                 workflow_instance_id= workflow_instance.id,
-                comment = f"台账审批拒绝，工作流实例ID: {workflow_instance.id}",
+                comment = f"台账审批拒绝，审批人: {current_user.name}",
                 status_before="pending",
                 status_after="rejected"
             )
@@ -369,7 +369,7 @@ def approve_ledger(
                 action="reject_node",
                 ledger_id=ledger_id,
                 workflow_instance_id = workflow_instance.id,
-                comment = f"台账节点审批拒绝，工作流实例ID: {workflow_instance.id}, 节点ID: {current_node.id}",
+                comment = f"台账节点审批拒绝，审批人: {current_user.name}",
                 status_before = "pending",
                 status_after = "pending"
             )

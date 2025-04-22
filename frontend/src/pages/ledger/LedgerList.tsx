@@ -62,7 +62,7 @@ const LedgerList: React.FC = () => {
   const [searchText, setSearchText] = useState<string>('');
   
   // 高级搜索相关状态
-  const [advancedSearchVisible, setAdvancedSearchVisible] = useState(true);
+  const [advancedSearchVisible, setAdvancedSearchVisible] = useState(false);
   const [advancedSearchForm] = Form.useForm();
   const [advancedSearchParams, setAdvancedSearchParams] = useState<AdvancedSearchParams>({
     name: '',

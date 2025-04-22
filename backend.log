@@ -13450,3 +13450,349 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-04-22 09:24:59 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝 - ledger:15 - User:3
 2025-04-22 09:25:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
 2025-04-22 09:25:02 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:25:31 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:25:32 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:25:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:25:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:27:19 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:27:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:28:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:28:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:28:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:28:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:30:06 - root - INFO - 服务关闭
+2025-04-22 09:30:10 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 09:30:10 - root - INFO - 服务启动
+2025-04-22 09:30:11 - root - INFO - 服务关闭
+2025-04-22 09:30:14 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 09:30:14 - root - INFO - 服务启动
+2025-04-22 09:30:22 - root - INFO - 服务关闭
+2025-04-22 09:30:25 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 09:30:25 - root - INFO - 服务启动
+2025-04-22 09:30:39 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-22 09:30:40 - casbin.policy - INFO - Model:
+2025-04-22 09:30:40 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-22 09:30:40 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-22 09:30:40 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-22 09:30:40 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-22 09:30:40 - casbin.policy - INFO - g.g: _, _
+2025-04-22 09:30:40 - casbin.policy - INFO - Policy:
+2025-04-22 09:30:40 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['test_role', 'user', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['综合岗', 'ledger', 'view'], ['综合岗', 'ledger', 'create'], ['综合岗', 'ledger', 'edit'], ['综合岗', 'ledger', 'submit'], ['综合岗', 'ledger', 'export'], ['综合岗', 'ledger', 'delete'], ['综合岗', 'ledger', 'approve'], ['综合岗', 'ledger', 'admin_approve'], ['综合岗', 'template', 'view'], ['综合岗', 'template', 'delete'], ['综合岗', 'template', 'create'], ['综合岗', 'template', 'edit'], ['综合岗', 'workflow', 'view'], ['综合岗', 'workflow', 'delete'], ['综合岗', 'workflow', 'create'], ['综合岗', 'workflow', 'edit'], ['综合岗', 'approval', 'view'], ['综合岗', 'approval', 'reject'], ['综合岗', 'approval', 'submit'], ['综合岗', 'approval', 'approve'], ['组长', 'ledger', 'view'], ['组长', 'ledger', 'create'], ['组长', 'ledger', 'edit'], ['组长', 'ledger', 'submit'], ['组长', 'ledger', 'export'], ['组长', 'ledger', 'delete'], ['组长', 'ledger', 'approve'], ['组长', 'ledger', 'admin_approve'], ['组长', 'workflow', 'view'], ['组长', 'workflow', 'delete'], ['组长', 'approval', 'view'], ['组长', 'approval', 'reject'], ['组长', 'approval', 'submit'], ['组长', 'approval', 'approve'], ['组长', 'workflow', 'edit'], ['组长', 'workflow', 'create'], ['组长', 'template', 'view'], ['组长', 'team', 'view'], ['组长', 'team', 'create'], ['组长', 'team', 'edit']]
+2025-04-22 09:30:40 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['2', '综合岗'], ['1', 'user'], ['1', 'admin'], ['3', '组长']]
+2025-04-22 09:30:40 - casbin.policy - INFO - Role links for: g
+2025-04-22 09:30:40 - casbin.role - INFO - testuser < (test_role_2, test_role), 2 < 综合岗, 1 < (user, admin), 3 < 组长
+2025-04-22 09:31:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:31:10 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:3
+2025-04-22 09:31:12 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝12 - ledger:19 - User:3
+2025-04-22 09:31:12 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝12 - ledger:19 - User:3
+2025-04-22 09:33:20 - root - INFO - 服务关闭
+2025-04-22 09:33:23 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 09:33:24 - root - INFO - 服务启动
+2025-04-22 09:33:36 - root - INFO - 服务关闭
+2025-04-22 09:33:39 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 09:33:39 - root - INFO - 服务启动
+2025-04-22 09:33:44 - root - INFO - 服务关闭
+2025-04-22 09:33:47 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 09:33:48 - root - INFO - 服务启动
+2025-04-22 09:34:01 - root - INFO - 服务关闭
+2025-04-22 09:34:04 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 09:34:05 - root - INFO - 服务启动
+2025-04-22 09:34:05 - root - INFO - 服务关闭
+2025-04-22 09:34:08 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 09:34:09 - root - INFO - 服务启动
+2025-04-22 09:34:26 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-22 09:34:26 - casbin.policy - INFO - Model:
+2025-04-22 09:34:26 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-22 09:34:26 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-22 09:34:27 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-22 09:34:27 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-22 09:34:27 - casbin.policy - INFO - g.g: _, _
+2025-04-22 09:34:27 - casbin.policy - INFO - Policy:
+2025-04-22 09:34:27 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['test_role', 'user', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['综合岗', 'ledger', 'view'], ['综合岗', 'ledger', 'create'], ['综合岗', 'ledger', 'edit'], ['综合岗', 'ledger', 'submit'], ['综合岗', 'ledger', 'export'], ['综合岗', 'ledger', 'delete'], ['综合岗', 'ledger', 'approve'], ['综合岗', 'ledger', 'admin_approve'], ['综合岗', 'template', 'view'], ['综合岗', 'template', 'delete'], ['综合岗', 'template', 'create'], ['综合岗', 'template', 'edit'], ['综合岗', 'workflow', 'view'], ['综合岗', 'workflow', 'delete'], ['综合岗', 'workflow', 'create'], ['综合岗', 'workflow', 'edit'], ['综合岗', 'approval', 'view'], ['综合岗', 'approval', 'reject'], ['综合岗', 'approval', 'submit'], ['综合岗', 'approval', 'approve'], ['组长', 'ledger', 'view'], ['组长', 'ledger', 'create'], ['组长', 'ledger', 'edit'], ['组长', 'ledger', 'submit'], ['组长', 'ledger', 'export'], ['组长', 'ledger', 'delete'], ['组长', 'ledger', 'approve'], ['组长', 'ledger', 'admin_approve'], ['组长', 'workflow', 'view'], ['组长', 'workflow', 'delete'], ['组长', 'approval', 'view'], ['组长', 'approval', 'reject'], ['组长', 'approval', 'submit'], ['组长', 'approval', 'approve'], ['组长', 'workflow', 'edit'], ['组长', 'workflow', 'create'], ['组长', 'template', 'view'], ['组长', 'team', 'view'], ['组长', 'team', 'create'], ['组长', 'team', 'edit']]
+2025-04-22 09:34:27 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['2', '综合岗'], ['1', 'user'], ['1', 'admin'], ['3', '组长']]
+2025-04-22 09:34:27 - casbin.policy - INFO - Role links for: g
+2025-04-22 09:34:27 - casbin.role - INFO - testuser < (test_role, test_role_2), 2 < 综合岗, 1 < (user, admin), 3 < 组长
+2025-04-22 09:34:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:34:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:34:46 - taizhang - INFO - [INFO] ledger.create: 创建台账 第一组 - ledger:20 - User:1
+2025-04-22 09:34:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:34:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:34:56 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:34:56 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:35:00 - taizhang - INFO - AUDIT: submit - Ledger:20 - WorkflowInstance:20 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 20
+2025-04-22 09:35:00 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:35:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:35:04 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:35:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:35:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:35:14 - taizhang - INFO - AUDIT: approve_node - Ledger:20 - WorkflowInstance:20 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 09:35:14 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:35:25 - taizhang - INFO - AUDIT: approve - Ledger:20 - WorkflowInstance:20 - User:1 - Status:pending->approved - Comment:台账审批通过，审批人: 测试用户
+2025-04-22 09:35:25 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:37:56 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:37:56 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:37:58 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:37:58 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:38:11 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:38:22 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:38:35 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:38:55 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:39:30 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:39:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:39:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:39:35 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝11 - ledger:18 - User:1
+2025-04-22 09:39:35 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝11 - ledger:18 - User:1
+2025-04-22 09:39:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝11 - ledger:18 - User:1
+2025-04-22 09:39:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:39:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:39:55 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝 - ledger:15 - User:1
+2025-04-22 09:39:55 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝 - ledger:15 - User:1
+2025-04-22 09:40:17 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝 - ledger:15 - User:1
+2025-04-22 09:40:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:40:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:40:23 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝7 - ledger:14 - User:1
+2025-04-22 09:40:23 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝7 - ledger:14 - User:1
+2025-04-22 09:41:19 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝7 - ledger:14 - User:1
+2025-04-22 09:41:41 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝7 - ledger:14 - User:1
+2025-04-22 09:42:17 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝7 - ledger:14 - User:1
+2025-04-22 09:42:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:42:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:42:27 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过工作流1 - ledger:17 - User:1
+2025-04-22 09:42:27 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过工作流1 - ledger:17 - User:1
+2025-04-22 09:42:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:42:35 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:42:38 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组12324354 - ledger:16 - User:1
+2025-04-22 09:42:38 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组12324354 - ledger:16 - User:1
+2025-04-22 09:42:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:42:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:42:43 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:42:43 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组 - ledger:20 - User:1
+2025-04-22 09:42:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:42:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:43:01 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过工作流1 - ledger:17 - User:1
+2025-04-22 09:43:01 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过工作流1 - ledger:17 - User:1
+2025-04-22 09:54:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 09:54:15 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:12:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:12:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:19:41 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-04-22 10:19:41 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-04-22 10:19:41 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-04-22 10:19:41 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-04-22 10:21:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:21:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:21:39 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-04-22 10:21:39 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-04-22 10:21:39 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-04-22 10:21:39 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-04-22 10:22:16 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:22:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:22:19 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-04-22 10:22:19 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-04-22 10:22:19 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-04-22 10:22:19 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-04-22 10:22:22 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:22:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:22:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:22:43 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:22:45 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-04-22 10:22:45 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-04-22 10:22:45 - taizhang - INFO - [INFO] log.list_audit: 获取审计日志列表 - User:1
+2025-04-22 10:22:45 - taizhang - INFO - [INFO] log.list: 获取系统日志列表 - User:1
+2025-04-22 10:24:29 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:24:30 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:24:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:24:37 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:25:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:25:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:25:56 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:25:56 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:27:13 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:27:13 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:27:22 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:27:23 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:27:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:27:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:27:30 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组12324354 - ledger:16 - User:1
+2025-04-22 10:27:31 - taizhang - INFO - [INFO] ledger.view: 查看台账 第一组12324354 - ledger:16 - User:1
+2025-04-22 10:27:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:27:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:28:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:28:36 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:28:39 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:28:40 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:28:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过工作流1 - ledger:17 - User:1
+2025-04-22 10:28:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过工作流1 - ledger:17 - User:1
+2025-04-22 10:28:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:28:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:13 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:13 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:24 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝12 - ledger:19 - User:1
+2025-04-22 10:29:24 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝12 - ledger:19 - User:1
+2025-04-22 10:29:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:31 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过工作流1 - ledger:17 - User:1
+2025-04-22 10:29:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过工作流1 - ledger:17 - User:1
+2025-04-22 10:29:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:34 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:50 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:29:50 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:30:00 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:30:01 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:30:17 - taizhang - INFO - [INFO] ledger.create: 创建台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:30:17 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:30:18 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:30:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:30:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:30:38 - taizhang - INFO - AUDIT: submit - Ledger:21 - WorkflowInstance:21 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 21
+2025-04-22 10:30:38 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:30:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:30:46 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:30:53 - taizhang - INFO - AUDIT: approve_node - Ledger:21 - WorkflowInstance:21 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:30:53 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:30:58 - taizhang - INFO - AUDIT: reject - Ledger:21 - WorkflowInstance:21 - User:1 - Status:pending->rejected - Comment:台账审批拒绝，审批人: 测试用户
+2025-04-22 10:30:58 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:02 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:02 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:07 - taizhang - INFO - [INFO] ledger.update: 更新台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:31:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:31:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:14 - taizhang - INFO - AUDIT: submit - Ledger:21 - WorkflowInstance:21 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 21
+2025-04-22 10:31:14 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:20 - taizhang - INFO - AUDIT: approve_node - Ledger:21 - WorkflowInstance:21 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:31:20 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:37 - taizhang - INFO - AUDIT: approve - Ledger:21 - WorkflowInstance:21 - User:1 - Status:pending->approved - Comment:台账审批通过，审批人: 测试用户
+2025-04-22 10:31:37 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:47 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:31:48 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:31:55 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:31:55 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:32:46 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误拒绝工作流 - workflow:3 - User:1
+2025-04-22 10:32:51 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:32:51 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:32:53 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:32:53 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚22 - ledger:21 - User:1
+2025-04-22 10:32:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:32:57 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:33:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:33:08 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:33:20 - taizhang - INFO - [INFO] ledger.create: 创建台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:33:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:33:21 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:33:24 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过台账1 - ledger:1 - User:1
+2025-04-22 10:33:24 - taizhang - INFO - [INFO] ledger.view: 查看台账 误通过台账1 - ledger:1 - User:1
+2025-04-22 10:33:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:33:53 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:33:58 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:33:58 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:34:01 - taizhang - INFO - AUDIT: submit - Ledger:22 - WorkflowInstance:22 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 22
+2025-04-22 10:34:01 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:34:04 - taizhang - INFO - AUDIT: approve_node - Ledger:22 - WorkflowInstance:22 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:34:04 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:34:07 - taizhang - INFO - AUDIT: approve_node - Ledger:22 - WorkflowInstance:22 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:34:07 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:34:10 - taizhang - INFO - AUDIT: approve_node - Ledger:22 - WorkflowInstance:22 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:34:10 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:34:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:34:33 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:34:37 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:34:37 - taizhang - INFO - [INFO] ledger.view: 查看台账 误拒绝工作流121231232 - ledger:22 - User:1
+2025-04-22 10:36:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:36:12 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:36:26 - taizhang - INFO - [INFO] ledger.create: 创建台账 误聚聚2 - ledger:23 - User:1
+2025-04-22 10:36:26 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:36:27 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:36:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚2 - ledger:23 - User:1
+2025-04-22 10:36:32 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚2 - ledger:23 - User:1
+2025-04-22 10:36:34 - taizhang - INFO - AUDIT: submit - Ledger:23 - WorkflowInstance:23 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 23
+2025-04-22 10:36:34 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚2 - ledger:23 - User:1
+2025-04-22 10:39:48 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚2 - ledger:23 - User:1
+2025-04-22 10:40:34 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚2 - ledger:23 - User:1
+2025-04-22 10:42:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:42:07 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:42:19 - taizhang - INFO - [INFO] ledger.create: 创建台账 误聚聚 - ledger:24 - User:1
+2025-04-22 10:42:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:42:20 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:42:25 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚 - ledger:24 - User:1
+2025-04-22 10:42:25 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚 - ledger:24 - User:1
+2025-04-22 10:42:31 - taizhang - INFO - AUDIT: submit - Ledger:24 - WorkflowInstance:24 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 24
+2025-04-22 10:42:31 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚 - ledger:24 - User:1
+2025-04-22 10:42:41 - taizhang - INFO - AUDIT: approve_node - Ledger:24 - WorkflowInstance:24 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:42:41 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚 - ledger:24 - User:1
+2025-04-22 10:43:23 - taizhang - INFO - AUDIT: approve_node - Ledger:24 - WorkflowInstance:24 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:43:23 - taizhang - INFO - [INFO] ledger.view: 查看台账 误聚聚 - ledger:24 - User:1
+2025-04-22 10:49:44 - taizhang - INFO - AUDIT: approve_node - Ledger:24 - WorkflowInstance:24 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:49:44 - root - INFO - 服务关闭
+2025-04-22 10:49:49 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 10:49:49 - root - INFO - 服务启动
+2025-04-22 10:50:02 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-22 10:50:02 - casbin.policy - INFO - Model:
+2025-04-22 10:50:02 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-22 10:50:02 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-22 10:50:02 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-22 10:50:02 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-22 10:50:02 - casbin.policy - INFO - g.g: _, _
+2025-04-22 10:50:02 - casbin.policy - INFO - Policy:
+2025-04-22 10:50:02 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['test_role', 'user', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['综合岗', 'ledger', 'view'], ['综合岗', 'ledger', 'create'], ['综合岗', 'ledger', 'edit'], ['综合岗', 'ledger', 'submit'], ['综合岗', 'ledger', 'export'], ['综合岗', 'ledger', 'delete'], ['综合岗', 'ledger', 'approve'], ['综合岗', 'ledger', 'admin_approve'], ['综合岗', 'template', 'view'], ['综合岗', 'template', 'delete'], ['综合岗', 'template', 'create'], ['综合岗', 'template', 'edit'], ['综合岗', 'workflow', 'view'], ['综合岗', 'workflow', 'delete'], ['综合岗', 'workflow', 'create'], ['综合岗', 'workflow', 'edit'], ['综合岗', 'approval', 'view'], ['综合岗', 'approval', 'reject'], ['综合岗', 'approval', 'submit'], ['综合岗', 'approval', 'approve'], ['组长', 'ledger', 'view'], ['组长', 'ledger', 'create'], ['组长', 'ledger', 'edit'], ['组长', 'ledger', 'submit'], ['组长', 'ledger', 'export'], ['组长', 'ledger', 'delete'], ['组长', 'ledger', 'approve'], ['组长', 'ledger', 'admin_approve'], ['组长', 'workflow', 'view'], ['组长', 'workflow', 'delete'], ['组长', 'approval', 'view'], ['组长', 'approval', 'reject'], ['组长', 'approval', 'submit'], ['组长', 'approval', 'approve'], ['组长', 'workflow', 'edit'], ['组长', 'workflow', 'create'], ['组长', 'template', 'view'], ['组长', 'team', 'view'], ['组长', 'team', 'create'], ['组长', 'team', 'edit']]
+2025-04-22 10:50:02 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['2', '综合岗'], ['1', 'user'], ['1', 'admin'], ['3', '组长']]
+2025-04-22 10:50:02 - casbin.policy - INFO - Role links for: g
+2025-04-22 10:50:02 - casbin.role - INFO - testuser < (test_role, test_role_2), 2 < 综合岗, 1 < (admin, user), 3 < 组长
+2025-04-22 10:50:17 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误拒绝工作流 - workflow:3 - User:1
+2025-04-22 10:52:38 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误拒绝工作流 - workflow:3 - User:1
+2025-04-22 10:52:38 - root - INFO - 服务关闭
+2025-04-22 10:52:42 - root - INFO - 日志系统已初始化，日志文件路径: /Users/yohoyes/projects/cursor_projects/taizhang/backend.log
+2025-04-22 10:52:42 - root - INFO - 服务启动
+2025-04-22 10:53:03 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.11/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-04-22 10:53:04 - casbin.policy - INFO - Model:
+2025-04-22 10:53:04 - casbin.policy - INFO - r.r: sub, obj, act
+2025-04-22 10:53:04 - casbin.policy - INFO - p.p: sub, obj, act
+2025-04-22 10:53:04 - casbin.policy - INFO - e.e: some(where (p_eft == allow))
+2025-04-22 10:53:04 - casbin.policy - INFO - m.m: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
+2025-04-22 10:53:04 - casbin.policy - INFO - g.g: _, _
+2025-04-22 10:53:04 - casbin.policy - INFO - Policy:
+2025-04-22 10:53:04 - casbin.policy - INFO - p : sub, obj, act : [['test_role', 'user', 'create'], ['test_role', 'role', 'read'], ['test_role', 'user', 'read'], ['测试角色', 'user', 'create'], ['测试角色', 'user', 'read'], ['新角色', 'user', 'create'], ['新角色', 'user', 'update'], ['新角色', 'user', 'delete'], ['更新后的角色', 'user', 'read'], ['更新后的角色', 'user', 'update'], ['综合岗', 'ledger', 'view'], ['综合岗', 'ledger', 'create'], ['综合岗', 'ledger', 'edit'], ['综合岗', 'ledger', 'submit'], ['综合岗', 'ledger', 'export'], ['综合岗', 'ledger', 'delete'], ['综合岗', 'ledger', 'approve'], ['综合岗', 'ledger', 'admin_approve'], ['综合岗', 'template', 'view'], ['综合岗', 'template', 'delete'], ['综合岗', 'template', 'create'], ['综合岗', 'template', 'edit'], ['综合岗', 'workflow', 'view'], ['综合岗', 'workflow', 'delete'], ['综合岗', 'workflow', 'create'], ['综合岗', 'workflow', 'edit'], ['综合岗', 'approval', 'view'], ['综合岗', 'approval', 'reject'], ['综合岗', 'approval', 'submit'], ['综合岗', 'approval', 'approve'], ['组长', 'ledger', 'view'], ['组长', 'ledger', 'create'], ['组长', 'ledger', 'edit'], ['组长', 'ledger', 'submit'], ['组长', 'ledger', 'export'], ['组长', 'ledger', 'delete'], ['组长', 'ledger', 'approve'], ['组长', 'ledger', 'admin_approve'], ['组长', 'workflow', 'view'], ['组长', 'workflow', 'delete'], ['组长', 'approval', 'view'], ['组长', 'approval', 'reject'], ['组长', 'approval', 'submit'], ['组长', 'approval', 'approve'], ['组长', 'workflow', 'edit'], ['组长', 'workflow', 'create'], ['组长', 'template', 'view'], ['组长', 'team', 'view'], ['组长', 'team', 'create'], ['组长', 'team', 'edit']]
+2025-04-22 10:53:04 - casbin.policy - INFO - g : _, _ : [['testuser', 'test_role'], ['testuser', 'test_role_2'], ['2', '综合岗'], ['1', 'user'], ['1', 'admin'], ['3', '组长']]
+2025-04-22 10:53:04 - casbin.policy - INFO - Role links for: g
+2025-04-22 10:53:04 - casbin.role - INFO - testuser < (test_role, test_role_2), 2 < 综合岗, 1 < (user, admin), 3 < 组长
+2025-04-22 10:53:22 - taizhang - INFO - [INFO] workflow.update_workflow: 更新工作流: 误拒绝工作流 - workflow:3 - User:1
+2025-04-22 10:53:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:53:41 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:53:53 - taizhang - INFO - [INFO] ledger.create: 创建台账 ju1 - ledger:25 - User:1
+2025-04-22 10:53:54 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:53:54 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:53:59 - taizhang - INFO - [INFO] ledger.view: 查看台账 ju1 - ledger:25 - User:1
+2025-04-22 10:54:00 - taizhang - INFO - [INFO] ledger.view: 查看台账 ju1 - ledger:25 - User:1
+2025-04-22 10:54:02 - taizhang - INFO - AUDIT: submit - Ledger:25 - WorkflowInstance:25 - User:1 - Status:draft->pending - Comment:提交台账进入审批流程，工作流实例ID: 25
+2025-04-22 10:54:02 - taizhang - INFO - [INFO] ledger.view: 查看台账 ju1 - ledger:25 - User:1
+2025-04-22 10:54:09 - taizhang - INFO - AUDIT: approve_node - Ledger:25 - WorkflowInstance:25 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:54:09 - taizhang - INFO - [INFO] ledger.view: 查看台账 ju1 - ledger:25 - User:1
+2025-04-22 10:54:15 - taizhang - INFO - AUDIT: approve_node - Ledger:25 - WorkflowInstance:25 - User:1 - Status:pending->pending - Comment:台账节点审批通过，审批人: 测试用户
+2025-04-22 10:54:15 - taizhang - INFO - [INFO] ledger.view: 查看台账 ju1 - ledger:25 - User:1
+2025-04-22 10:54:21 - taizhang - INFO - AUDIT: approve - Ledger:25 - WorkflowInstance:25 - User:1 - Status:pending->approved - Comment:台账审批通过，审批人: 测试用户
+2025-04-22 10:54:21 - taizhang - INFO - [INFO] ledger.view: 查看台账 ju1 - ledger:25 - User:1
+2025-04-22 10:54:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1
+2025-04-22 10:54:28 - taizhang - INFO - [INFO] ledger.list: 查询台账列表 - User:1

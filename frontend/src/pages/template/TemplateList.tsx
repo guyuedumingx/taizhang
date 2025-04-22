@@ -111,6 +111,8 @@ const TemplateList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
+      fixed: 'right',
+      width: 250,
       render: (_, record) => (
         <Space size="middle">
           <Button

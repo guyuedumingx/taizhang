@@ -226,13 +226,13 @@ const LedgerDetail: React.FC = () => {
     
     return (
       <Timeline mode="left">
-        {auditLogs.map(log => (
+        {auditLogs.map((log, index) => (
           <Timeline.Item 
             key={log.id}
-            color={log.action === 'create' ? 'green' : log.action === 'approve' ? 'blue' : 'orange'}
+            color={log.action === 'submit' ? 'orange' : log.action === 'approve' ? 'green' : log.action === 'reject' ? 'red' : 'orange'}
           >
             <Space>
-              <Text strong>{log.user_id}</Text>
+              <Text strong>{auditLogs.length - index}</Text>
               <Text>{log.action}</Text>
               {log.comment && <Text type="secondary">{log.comment}</Text>}
             </Space>

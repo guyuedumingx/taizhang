@@ -174,6 +174,7 @@ const WorkflowForm: React.FC = () => {
         nodes: nodes.map(node => ({
           ...node,
           workflow_id: isEdit ? parseInt(id!, 10) : 0,
+          is_final: node.node_type === 'end'
         }))
       };
       

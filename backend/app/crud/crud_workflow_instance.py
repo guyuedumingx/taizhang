@@ -196,7 +196,7 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
         ).first()
         
         # 如果没有下一个节点，或当前节点是最终节点，则完成工作流
-        if not next_workflow_node or next_workflow_node.is_final:
+        if not next_workflow_node or next_workflow_node.node_type == 'end' or next_workflow_node.is_final:
             instance.status = "completed"
             instance.completed_at = datetime.now()
             db.add(instance)

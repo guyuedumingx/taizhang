@@ -64,6 +64,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
 
       // 找到当前节点
       const currentNode = workflowData.nodes.find(node => node.id === instanceNode.workflow_node_id);
+      console.log('curr', currentNode)
       if (!currentNode) return;
       // 设置当前节点的审批模式
       setCurrentNodeMultiApproveType(currentNode.multi_approve_type || 'any');

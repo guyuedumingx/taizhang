@@ -235,6 +235,7 @@ class WorkflowService:
                     order_index=node_data.order_index,
                     approver_role_id=node_data.approver_role_id,
                     multi_approve_type=node_data.multi_approve_type,
+                    is_final=node_data.is_final,
                     reject_to_node_id=None  # 先设为None，稍后更新
                 )
                 db.add(node)

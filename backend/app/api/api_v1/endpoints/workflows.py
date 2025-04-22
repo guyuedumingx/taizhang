@@ -57,8 +57,8 @@ def read_workflow(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """获取指定工作流"""
-    if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
-        raise HTTPException(status_code=403, detail="权限不足")
+    # if not crud.user.is_superuser(current_user) and not crud.user.has_role_permission(current_user, "workflow", "read"):
+    #     raise HTTPException(status_code=403, detail="权限不足")
     
     workflow = workflow_service.get_workflow(db, workflow_id)
     return workflow

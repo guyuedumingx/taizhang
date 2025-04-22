@@ -70,8 +70,8 @@ def read_user(
     获取用户详情
     """
     # 检查权限
-    # if not deps.check_permissions("user", "view", current_user) and current_user.id != user_id:
-    #     raise HTTPException(status_code=403, detail="没有足够的权限")
+    if not deps.check_permissions("user", "view", current_user) and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="没有足够的权限")
     
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
