@@ -28,14 +28,14 @@ const LoginTabs: React.FC<LoginTabsProps> = ({
     >
       <TabPane tab="登录" key="login">
         <LoginForm onFinish={onLoginFinish} />
-        <div className="form-actions">
+        {/* <div className="form-actions">
           <a className="login-form-forgot" href="#!">
             忘记密码
           </a>
           <Text type="secondary">
             没有账号? <a onClick={() => setActiveTab('register')}>立即注册</a>
           </Text>
-        </div>
+        </div> */}
       </TabPane>
       
       <TabPane tab="注册" key="register">

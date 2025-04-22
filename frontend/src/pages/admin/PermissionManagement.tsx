@@ -123,7 +123,7 @@ const PermissionManagement: React.FC = () => {
                 rowKey="key"
                 loading={loading}
                 pagination={{
-                  pageSize: 10,
+                  defaultPageSize: 10,
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total) => `共 ${total} 条记录`,

@@ -19,7 +19,6 @@ import {
   InputNumber,
   Divider,
   Tag,
-  Switch,
   Tooltip,
 } from 'antd';
 import { 
@@ -36,11 +35,12 @@ import { TemplateService } from '../../services/TemplateService';
 import { LedgerService } from '../../services/LedgerService';
 import { Ledger, Template, Field } from '../../types';
 import { useAuthStore } from '../../stores/authStore';
-import { PERMISSIONS, API_BASE_URL } from '../../config';
+import { PERMISSIONS } from '../../config';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
+import { exportLedgersViaAPI, exportTemplateAllLedgers } from '../../utils/exportUtils';
 
 // 初始化dayjs插件
 dayjs.extend(isBetween);
@@ -175,94 +175,15 @@ const TemplateLedgerSummary: React.FC = () => {
         return;
       }
       
-      // 构建下载URL（确保使用正确的API路径和整数模板ID）
-      const exportFormat = format.toLowerCase();
-      const downloadUrl = `${API_BASE_URL}/ledgers/export-all?format=${encodeURIComponent(exportFormat)}&template_id=${templateIdNumber}`;
-      console.log('导出URL:', downloadUrl);
-      
-      // 获取认证token
-      const token = localStorage.getItem('auth-storage')
-        ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token
-        : null;
-      
-      if (!token) {
-        message.error({ content: '未登录或会话已过期，请重新登录', key: 'export' });
-        return;
-      }
-      
-      // 输出调试信息
-      console.log('开始导出请求，URL:', downloadUrl);
-      console.log('模板ID (原始):', templateId);
-      console.log('模板ID (转换后):', templateIdNumber, '类型:', typeof templateIdNumber);
-      console.log('导出格式:', exportFormat);
-      
-      // 使用fetch API手动下载
-      const response = await fetch(downloadUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': exportFormat === 'excel' ? 
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
-            exportFormat === 'csv' ? 'text/csv' : 'text/plain'
-        }
-      });
-      
-      // 增加更多调试信息
-      console.log('服务器响应状态:', response.status, response.statusText);
-      console.log('响应头:', [...response.headers.entries()].reduce((obj, [key, value]) => {
-        obj[key] = value;
-        return obj;
-      }, {} as Record<string, string>));
-      
-      if (!response.ok) {
-        console.error('导出失败，服务器响应:', response.status, response.statusText);
-        
-        if (response.status === 422) {
-          throw new Error('参数错误，请检查模板ID是否有效');
-        } else if (response.status === 404) {
-          throw new Error('导出接口不存在，请检查API路径配置是否正确');
-        } else if (response.status === 403) {
-          throw new Error('没有导出权限，请联系管理员');
-        }
-        
-        const text = await response.text();
-        console.log('错误响应内容:', text);
-        
-        try {
-          const data = JSON.parse(text);
-          throw new Error(data.detail || `导出失败: ${response.statusText}`);
-        } catch {
-          throw new Error(`导出失败: ${response.statusText || '未知错误'}`);
-        }
-      }
-      
-      const contentType = response.headers.get('content-type');
-      console.log('响应内容类型:', contentType);
-      
-      // 判断是否为二进制文件
-      if (contentType && (
-        contentType.includes('spreadsheet') || 
-        contentType.includes('csv') || 
-        contentType.includes('text/plain') ||
-        contentType.includes('octet-stream')
-      )) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const extension = exportFormat === 'excel' ? 'xlsx' : exportFormat;
-        const filename = `${template?.name || '模板'}_台账汇总.${extension}`;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
+      // 使用新的导出工具函数
+      if (format === 'excel') {
+        // 使用客户端导出，支持多sheet
+        await exportTemplateAllLedgers(templateIdNumber, `${template?.name || '模板'}_台账汇总.xlsx`);
         message.success({ content: '导出成功', key: 'export' });
       } else {
-        // 如果不是预期的内容类型，可能是错误响应
-        const text = await response.text();
-        console.error('非预期响应内容:', text);
-        throw new Error('导出失败: 服务器返回了非预期的内容类型');
+        // 使用API导出，支持CSV和TXT格式
+        await exportLedgersViaAPI(format, templateIdNumber);
+        message.success({ content: '导出成功', key: 'export' });
       }
     } catch (error) {
       console.error('导出失败:', error);

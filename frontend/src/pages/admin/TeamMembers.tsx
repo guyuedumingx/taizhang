@@ -143,6 +143,7 @@ const TeamMembers: React.FC = () => {
         dataSource={members}
         rowKey="id"
         pagination={{
+          defaultPageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total) => `共 ${total} 条记录`,

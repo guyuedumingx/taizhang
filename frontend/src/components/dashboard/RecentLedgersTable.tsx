@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, Card, Typography } from 'antd';
+import { Table, Button, Card, Typography, Tag } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { Ledger } from '../../types';
@@ -28,11 +28,19 @@ const RecentLedgersTable: React.FC<RecentLedgersTableProps> = ({ ledgers, loadin
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      width: 100,
       render: (text: string) => (
-        <span style={{ color: text === '已完成' ? '#52c41a' : '#faad14' }}>
-          {text}
-        </span>
+        <Tag color={text === 'completed' ? 'success' : text === 'active' ? 'processing' : text === 'returned' ? 'error' : 'default'}>
+          {text === 'completed' ? '已完成' : text === 'active' ? '处理中' : text === 'returned' ? '已退回' : '草稿'}
+        </Tag>
       ),
+      filters: [
+        { text: '草稿', value: 'draft' },
+        { text: '处理中', value: 'active' },
+        { text: '已完成', value: 'completed' },
+        { text: '已退回', value: 'returned' },
+      ],
+      onFilter: (value, record) => record.status === value.toString(),
     },
     {
       title: '团队',

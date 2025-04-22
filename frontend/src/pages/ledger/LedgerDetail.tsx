@@ -12,6 +12,7 @@ import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 import ApproverSelector from '../../components/workflow/ApproverSelector';
 import { submitLedgerForApproval } from '../../api/approvals';
 import ApprovalModal from '../../components/approval/ApprovalModal';
+import { downloadBlobAsFile } from '../../utils/exportUtils';
 
 const { Title, Text } = Typography;
 
@@ -276,18 +277,9 @@ const LedgerDetail: React.FC = () => {
         fileExtension = 'xlsx';
       }
       
-      // 创建下载链接
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      
-      // 使用默认命名
+      // 使用工具函数下载文件
       const filename = `台账_${id}.${fileExtension}`;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      downloadBlobAsFile(blob, filename);
       
       message.success({ content: '导出成功', key: 'export' });
     } catch (error) {

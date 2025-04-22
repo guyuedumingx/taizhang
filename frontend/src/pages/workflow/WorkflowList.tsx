@@ -197,7 +197,7 @@ const WorkflowList: React.FC = () => {
           dataSource={filteredWorkflows}
           rowKey="id"
           loading={loading}
-          pagination={{ pageSize: 10 }}
+          pagination={{ defaultPageSize: 10 }}
         />
       </Card>
     </>

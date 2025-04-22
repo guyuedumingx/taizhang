@@ -192,7 +192,7 @@ const TaskList: React.FC = () => {
           dataSource={tasks}
           rowKey="task_id"
           loading={loading}
-          pagination={{ pageSize: 10 }}
+          pagination={{ defaultPageSize: 10 }}
           locale={{
             emptyText: <Empty description="没有待办任务" image={Empty.PRESENTED_IMAGE_SIMPLE} />
           }}
