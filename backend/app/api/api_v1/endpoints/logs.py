@@ -22,8 +22,8 @@ def read_system_logs(
     获取系统日志列表
     """
     # 检查权限
-    if not deps.check_permissions("log", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("log", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取日志
     logs = log_service.get_system_logs(db, params=params)
@@ -50,8 +50,8 @@ def count_system_logs(
     统计系统日志数量
     """
     # 检查权限
-    if not deps.check_permissions("log", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("log", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 统计日志数量
     count = log_service.count_system_logs(db, params=params)
@@ -70,8 +70,8 @@ def read_recent_system_logs(
     获取最近的系统日志
     """
     # 检查权限
-    if not deps.check_permissions("log", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("log", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取最近日志
     logs = log_service.get_recent_system_logs(db, days=days, limit=limit)
@@ -90,8 +90,8 @@ def read_error_logs(
     获取错误日志
     """
     # 检查权限
-    if not deps.check_permissions("log", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("log", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取错误日志
     logs = log_service.get_error_logs(db, days=days, limit=limit)
@@ -112,8 +112,8 @@ def read_resource_logs(
     获取指定资源的日志
     """
     # 检查权限
-    if not deps.check_permissions("log", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("log", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取资源日志
     logs = log_service.get_resource_logs(
@@ -145,8 +145,8 @@ def read_audit_logs(
     获取审计日志
     """
     # 检查权限
-    if not deps.check_permissions("log", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("log", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取审计日志
     logs = log_service.get_audit_logs(
@@ -181,8 +181,8 @@ def read_ledger_audit_logs(
     获取特定台账的审计日志
     """
     # 检查权限
-    if not deps.check_permissions("log", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("log", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取审计日志
     logs = log_service.get_ledger_audit_logs(db, ledger_id=ledger_id, limit=limit)
@@ -223,8 +223,8 @@ def read_user_audit_logs(
     获取特定用户的审计日志
     """
     # 检查权限
-    if not deps.check_permissions("log", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("log", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 获取审计日志
     logs = log_service.get_user_audit_logs(db, user_id=user_id, limit=limit)

@@ -19,7 +19,7 @@ const { Title, Text } = Typography;
 const LedgerDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { hasPermission } = useAuthStore();
+  const { hasPermission, user } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [ledger, setLedger] = useState<Ledger | null>(null);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
@@ -343,7 +343,10 @@ const LedgerDetail: React.FC = () => {
                 </Button>
               </Dropdown>
             )}
-            {hasPermission(PERMISSIONS.LEDGER_EDIT) && (
+            {hasPermission(PERMISSIONS.LEDGER_EDIT)
+              && user?.id === ledger.created_by_id 
+              && (ledger.approval_status === 'draft' || ledger.approval_status === 'rejected')
+              && (
               <Button 
                 type="primary" 
                 icon={<EditOutlined />} 

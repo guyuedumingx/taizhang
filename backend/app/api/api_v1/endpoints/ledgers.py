@@ -70,8 +70,8 @@ def create_ledger(
     创建新台账
     """
     # 检查权限
-    if not deps.check_permissions("ledger", "create", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("ledger", "create", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 创建台账
     ledger = ledger_service.create_ledger(db, ledger_in, current_user)
@@ -110,8 +110,8 @@ def update_ledger(
     更新台账
     """
     # 检查权限
-    if not deps.check_permissions("ledger", "update", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("ledger", "update", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 更新台账
     ledger = ledger_service.update_ledger(db, ledger_id, ledger_in, current_user)
@@ -151,8 +151,8 @@ def export_ledger(
     导出台账
     """
     # 检查权限
-    if not deps.check_permissions("ledger", "export", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("ledger", "export", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 导出台账
     file_data, filename, content_type = ledger_service.export_ledger(db, ledger_id, format, current_user)
@@ -366,8 +366,8 @@ def sync_field_values(
     如果台账有data字段，将其同步到field_values表中
     """
     # 检查权限
-    if not deps.check_permissions("ledger", "update", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("ledger", "update", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 检查台账是否存在
     ledger = db.query(models.Ledger).filter(models.Ledger.id == ledger_id).first()

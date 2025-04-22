@@ -22,7 +22,7 @@ import {
   DeleteOutlined, 
   DownloadOutlined,
   DownOutlined,
-  FormOutlined,
+  EyeOutlined,
   UpOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +54,7 @@ interface AdvancedSearchParams {
 
 const LedgerList: React.FC = () => {
   const navigate = useNavigate();
-  const { hasPermission, token } = useAuthStore();
+  const { hasPermission, token, user } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [ledgers, setLedgers] = useState<Ledger[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -634,9 +634,16 @@ const LedgerList: React.FC = () => {
         <Space size="middle">
           <Button
             type="text"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/dashboard/ledgers/${record.id}`)}
+            disabled={!hasPermission(PERMISSIONS.LEDGER_VIEW)}
+          />
+          <Button
+            type="text"
             icon={<EditOutlined />}
             onClick={() => navigate(`/dashboard/ledgers/edit/${record.id}`)}
-            disabled={!hasPermission(PERMISSIONS.LEDGER_EDIT)}
+            // disabled={!hasPermission(PERMISSIONS.LEDGER_EDIT) || (record.approval_status !== 'draft' && record.approval_status !== 'rejected')}
+            disabled={record.created_by_id !== user?.id || (record.approval_status !== 'draft' && record.approval_status !== 'rejected')}
           />
           <Dropdown
             menu={{

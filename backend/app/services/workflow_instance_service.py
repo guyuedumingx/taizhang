@@ -33,44 +33,44 @@ class WorkflowInstanceService:
             raise HTTPException(status_code=404, detail="关联的台账不存在")
         
         # 检查用户是否有权限查看
-        if not crud.user.is_superuser(current_user) and ledger.created_by_id != current_user.id:
-            # 检查用户是否是审批人
-            is_approver = False
+        # if not crud.user.is_superuser(current_user) and ledger.created_by_id != current_user.id:
+        #     # 检查用户是否是审批人
+        #     is_approver = False
             
-            # 获取实例的所有节点
-            instance_nodes = db.query(models.WorkflowInstanceNode).filter(
-                models.WorkflowInstanceNode.workflow_instance_id == instance_id
-            ).all()
+        #     # 获取实例的所有节点
+        #     instance_nodes = db.query(models.WorkflowInstanceNode).filter(
+        #         models.WorkflowInstanceNode.workflow_instance_id == instance_id
+        #     ).all()
             
-            for node in instance_nodes:
-                if node.approver_id == current_user.id:
-                    is_approver = True
-                    break
+        #     for node in instance_nodes:
+        #         if node.approver_id == current_user.id:
+        #             is_approver = True
+        #             break
                 
-                # 检查用户是否在节点的审批人列表中
-                workflow_node = db.query(models.WorkflowNode).filter(
-                    models.WorkflowNode.id == node.workflow_node_id
-                ).first()
+        #         # 检查用户是否在节点的审批人列表中
+        #         workflow_node = db.query(models.WorkflowNode).filter(
+        #             models.WorkflowNode.id == node.workflow_node_id
+        #         ).first()
                 
-                if workflow_node:
-                    # 获取节点审批人
-                    approvers = db.query(models.User).join(
-                        models.workflow_node_approvers,
-                        models.workflow_node_approvers.c.user_id == models.User.id
-                    ).filter(
-                        models.workflow_node_approvers.c.workflow_node_id == workflow_node.id
-                    ).all()
+        #         if workflow_node:
+        #             # 获取节点审批人
+        #             approvers = db.query(models.User).join(
+        #                 models.workflow_node_approvers,
+        #                 models.workflow_node_approvers.c.user_id == models.User.id
+        #             ).filter(
+        #                 models.workflow_node_approvers.c.workflow_node_id == workflow_node.id
+        #             ).all()
                     
-                    for approver in approvers:
-                        if approver.id == current_user.id:
-                            is_approver = True
-                            break
+        #             for approver in approvers:
+        #                 if approver.id == current_user.id:
+        #                     is_approver = True
+        #                     break
                 
-                if is_approver:
-                    break
+        #         if is_approver:
+        #             break
             
-            if not is_approver:
-                raise HTTPException(status_code=403, detail="无权查看此工作流实例")
+        #     if not is_approver:
+        #         raise HTTPException(status_code=403, detail="无权查看此工作流实例")
         
         # 获取当前节点
         current_node = None
@@ -149,14 +149,14 @@ class WorkflowInstanceService:
             raise HTTPException(status_code=404, detail="台账不存在")
         
         # 检查用户是否有权限查看
-        if not crud.user.is_superuser(current_user) and ledger.created_by_id != current_user.id:
-            # 检查用户是否在台账所属团队中
-            if ledger.team_id:
-                user_teams = [team.id for team in current_user.teams]
-                if ledger.team_id not in user_teams:
-                    raise HTTPException(status_code=403, detail="无权查看此台账的工作流实例")
-            else:
-                raise HTTPException(status_code=403, detail="无权查看此台账的工作流实例")
+        # if not crud.user.is_superuser(current_user) and ledger.created_by_id != current_user.id:
+        #     # 检查用户是否在台账所属团队中
+        #     if ledger.team_id:
+        #         user_teams = [team.id for team in current_user.teams]
+        #         if ledger.team_id not in user_teams:
+        #             raise HTTPException(status_code=403, detail="无权查看此台账的工作流实例")
+        #     else:
+        #         raise HTTPException(status_code=403, detail="无权查看此台账的工作流实例")
         
         # 获取活动的工作流实例
         instance = crud.workflow_instance.get_by_ledger(db, ledger_id=ledger_id)
@@ -185,19 +185,19 @@ class WorkflowInstanceService:
             raise HTTPException(status_code=404, detail="关联的台账不存在")
         
         # 检查用户是否有权限查看
-        if not crud.user.is_superuser(current_user) and ledger.created_by_id != current_user.id:
-            # 检查用户是否是审批人
-            is_approver = False
+        # if not crud.user.is_superuser(current_user) and ledger.created_by_id != current_user.id:
+        #     # 检查用户是否是审批人
+        #     is_approver = False
             
-            # 获取实例的所有节点
-            instance_nodes = crud.workflow_instance_node.get_by_instance(db, instance_id=instance_id)
-            for node in instance_nodes:
-                if node.approver_id == current_user.id:
-                    is_approver = True
-                    break
+        #     # 获取实例的所有节点
+        #     instance_nodes = crud.workflow_instance_node.get_by_instance(db, instance_id=instance_id)
+        #     for node in instance_nodes:
+        #         if node.approver_id == current_user.id:
+        #             is_approver = True
+        #             break
             
-            if not is_approver:
-                raise HTTPException(status_code=403, detail="无权查看此工作流实例的节点")
+        #     if not is_approver:
+        #         raise HTTPException(status_code=403, detail="无权查看此工作流实例的节点")
         
         # 获取所有节点
         nodes = crud.workflow_instance_node.get_by_instance(db, instance_id=instance_id)

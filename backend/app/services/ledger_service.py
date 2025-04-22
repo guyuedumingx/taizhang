@@ -188,25 +188,25 @@ class LedgerService:
             raise HTTPException(status_code=404, detail="台账不存在")
         
         #TODO 非超级管理员只能查看自己团队的台账
-        if not current_user.is_superuser and ledger.team_id != current_user.team_id:
-            # 检查用户是否是创建者
-            if ledger.created_by_id != current_user.id:
-                # 检查用户是否是审批人
-                if ledger.workflow_instance_id:
-                    # 检查用户是否在审批节点中
-                    workflow_instance = db.query(models.WorkflowInstance).filter(
-                        models.WorkflowInstance.id == ledger.workflow_instance_id
-                    ).first()
+        # if not current_user.is_superuser and ledger.team_id != current_user.team_id:
+        #     # 检查用户是否是创建者
+        #     if ledger.created_by_id != current_user.id:
+        #         # 检查用户是否是审批人
+        #         if ledger.workflow_instance_id:
+        #             # 检查用户是否在审批节点中
+        #             workflow_instance = db.query(models.WorkflowInstance).filter(
+        #                 models.WorkflowInstance.id == ledger.workflow_instance_id
+        #             ).first()
                     
-                    if workflow_instance and workflow_instance.current_node_id:
-                        current_node = db.query(models.WorkflowInstanceNode).filter(
-                            models.WorkflowInstanceNode.id == workflow_instance.current_node_id
-                        ).first()
+        #             if workflow_instance and workflow_instance.current_node_id:
+        #                 current_node = db.query(models.WorkflowInstanceNode).filter(
+        #                     models.WorkflowInstanceNode.id == workflow_instance.current_node_id
+        #                 ).first()
                         
-                        if current_node and current_node.approver_id != current_user.id:
-                            raise HTTPException(status_code=403, detail="无权查看此台账")
-                else:
-                    raise HTTPException(status_code=403, detail="无权查看此台账")
+        #                 if current_node and current_node.approver_id != current_user.id:
+        #                     raise HTTPException(status_code=403, detail="无权查看此台账")
+        #         else:
+        #             raise HTTPException(status_code=403, detail="无权查看此台账")
         
         # 获取台账的相关数据（团队名称、模板名称等）
         # 获取团队名称

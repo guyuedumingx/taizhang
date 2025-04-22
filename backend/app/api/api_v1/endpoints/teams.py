@@ -101,8 +101,8 @@ def read_team_members(
 ) -> Any:
     """获取团队成员列表"""
     # 检查权限
-    if not deps.check_permissions("team", "view", current_user):
-        raise HTTPException(status_code=403, detail="没有足够的权限")
+    # if not deps.check_permissions("team", "view", current_user):
+    #     raise HTTPException(status_code=403, detail="没有足够的权限")
     
     return team_service.get_team_members(db, team_id=team_id)
 
