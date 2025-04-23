@@ -136,7 +136,7 @@ const TaskList: React.FC = () => {
               onClick={() => navigate(`/dashboard/ledgers/${record.ledger_id}`)}
             />
           </Tooltip>
-          <Tooltip title="处理审批">
+          {/* <Tooltip title="处理审批">
             <Button
               type="primary"
               size="small"
@@ -144,7 +144,7 @@ const TaskList: React.FC = () => {
             >
               处理
             </Button>
-          </Tooltip>
+          </Tooltip> */}
         </Space>
       ),
     },
