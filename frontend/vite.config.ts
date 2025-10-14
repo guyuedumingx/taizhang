@@ -11,9 +11,5 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
-  },
-  test: {
-    setupFiles: ['./tests/setup.ts'],
-    environment: 'node'
   }
 })

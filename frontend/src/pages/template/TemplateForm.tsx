@@ -5,9 +5,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import { TemplateService } from '../../services/TemplateService';
-import { TeamService } from '../../services/TeamService';
 import { WorkflowService } from '../../services/WorkflowService';
-import { TemplateCreate, TemplateUpdate, FieldCreate, Team, Workflow, FieldUpdate } from '../../types';
+import { TemplateCreate, TemplateUpdate, FieldCreate, Workflow, FieldUpdate } from '../../types';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 import useDepartments from '../../hooks/useDepartments';
 
@@ -22,9 +21,8 @@ const TemplateForm: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [teams, setTeams] = useState<Team[]>([]);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
-  const { options: departmentOptions, filters: departmentFilters } = useDepartments();
+  const { options: departmentOptions } = useDepartments();
   
   const isEdit = !!id;
 
@@ -37,8 +35,6 @@ const TemplateForm: React.FC = () => {
       return;
     }
 
-    // 获取团队列表
-    fetchTeams();
     
     // 获取工作流列表
     fetchWorkflows();
@@ -48,16 +44,6 @@ const TemplateForm: React.FC = () => {
     }
   }, [isEdit, id, hasPermission, navigate]);
 
-  // 获取团队列表
-  const fetchTeams = async () => {
-    try {
-      const teamsData = await TeamService.getTeams();
-      setTeams(teamsData);
-    } catch (error) {
-      console.error('获取团队列表失败:', error);
-      message.error('获取团队列表失败');
-    }
-  };
   
   // 获取工作流列表
   const fetchWorkflows = async () => {
@@ -148,7 +134,7 @@ const TemplateForm: React.FC = () => {
           description: values.description as string,
           workflow_id: values.workflow_id as number,
           default_description: values.default_description as string,
-          fields: fields
+          fields: fields.filter(f => f !== null && f.name !== undefined) as FieldCreate[]
         };
         
         await TemplateService.updateTemplate(parseInt(id), updateData);
@@ -161,7 +147,8 @@ const TemplateForm: React.FC = () => {
           description: values.description as string,
           workflow_id: values.workflow_id as number,
           default_description: values.default_description as string,
-          fields: fields
+          is_system: false,
+          fields: fields.filter(f => f !== null && f.name !== undefined) as FieldCreate[]
         };
         
         await TemplateService.createTemplate(createData);

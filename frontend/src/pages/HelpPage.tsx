@@ -9,8 +9,7 @@ import {
   FormOutlined,
   AuditOutlined,
   FieldBinaryOutlined,
-  SettingOutlined,
-  VideoCameraOutlined
+  SettingOutlined
 } from '@ant-design/icons';
 import BreadcrumbNav from '../components/common/BreadcrumbNav';
 

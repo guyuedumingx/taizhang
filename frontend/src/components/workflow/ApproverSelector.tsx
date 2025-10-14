@@ -8,7 +8,7 @@ const { Option } = Select;
 
 interface ApproverSelectorProps {
   nodeId: number;
-  onChange: (approverId: number | number[]) => void;
+  onChange: (approverId: number | number[] | undefined) => void;
   value?: number | number[];
   style?: React.CSSProperties;
   mode?: 'single' | 'multiple';

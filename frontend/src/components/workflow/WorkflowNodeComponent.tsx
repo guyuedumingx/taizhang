@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Select, Button, Space, Typography, Radio, Row, Col, Switch, message } from 'antd';
+import { Form, Input, Select, Button, Space, Typography, Radio, message } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined } from '@ant-design/icons';
 import { WorkflowNodeCreate, User, Role } from '../../types';
 import ApproverSelector from './ApproverSelector';
@@ -52,10 +52,14 @@ const WorkflowNodeComponent: React.FC<WorkflowNodeComponentProps> = ({
   const isLast = index === totalNodes - 1;
 
   // 处理审批人变更
-  const handleApproversChange = (selectedIds: number | number[]) => {
+  const handleApproversChange = (selectedIds: number | number[] | undefined) => {
     // 确保始终传递数组给onUpdate
-    const ids = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
-    onUpdate(index, 'approver_ids', ids);
+    if (selectedIds === undefined) {
+      onUpdate(index, 'approver_ids', []);
+    } else {
+      const ids = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
+      onUpdate(index, 'approver_ids', ids);
+    }
   };
 
   // 更新节点属性

@@ -70,7 +70,7 @@ export class LogService {
   static async getLedgerAuditLogs(ledgerId: number): Promise<AuditLog[]> {
     try {
       // 使用正确的API方法
-      return await LogsAPI.getResourceLogs('ledger', ledgerId);
+      return await LogsAPI.getResourceLogs('ledger', ledgerId.toString());
     } catch (error) {
       console.error(`获取台账 ${ledgerId} 审计日志失败:`, error);
       throw error;

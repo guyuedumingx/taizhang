@@ -31,7 +31,7 @@ const TaskList: React.FC = () => {
   
   // 审批相关状态
   const [approvalModalVisible, setApprovalModalVisible] = useState(false);
-  const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const [currentTask] = useState<Task | null>(null);
 
   // 检查权限
   useEffect(() => {
@@ -79,11 +79,6 @@ const TaskList: React.FC = () => {
     }
   };
 
-  // 打开审批对话框
-  const openApprovalModal = (task: Task) => {
-    setCurrentTask(task);
-    setApprovalModalVisible(true);
-  };
 
   // 处理审批成功
   const handleApprovalSuccess = () => {

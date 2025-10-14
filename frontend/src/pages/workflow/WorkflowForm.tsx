@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Typography, Select, Switch, message } from 'antd';
+import { Form, Input, Button, Card, Typography, Switch, message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
@@ -97,7 +97,7 @@ const WorkflowForm: React.FC = () => {
           order_index: node.order_index,
           is_final: node.is_final,
           reject_to_node_id: node.reject_to_node_id,
-          approver_ids: node.approver_ids,
+          approver_ids: node.approvers?.map(a => a.id) || [],
         }));
         setNodes(formattedNodes);
       } else {

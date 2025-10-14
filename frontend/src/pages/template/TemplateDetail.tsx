@@ -128,7 +128,7 @@ const TemplateDetail: React.FC = () => {
               >
                 <Descriptions column={2} size="small">
                   <Descriptions.Item label="字段类型">
-                    <Tag color="blue">{getFieldTypeText(field.type)}</Tag>
+                    <Tag color="blue">{getFieldTypeText(field.type || '')}</Tag>
                   </Descriptions.Item>
                   <Descriptions.Item label="是否必填">
                     <Tag color={field.required ? 'red' : 'default'}>

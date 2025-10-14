@@ -195,7 +195,7 @@ const UserProfile: React.FC = () => {
                 <Descriptions.Item label="姓名">{userInfo.name}</Descriptions.Item>
                 <Descriptions.Item label="所属部门">{userInfo.department}</Descriptions.Item>
                 <Descriptions.Item label="EHR编号">{userInfo.ehr_id}</Descriptions.Item>
-                <Descriptions.Item label="所属团队">{userInfo.team_name || '未分配团队'}</Descriptions.Item>
+                <Descriptions.Item label="所属团队">{userInfo.team_id ? `团队ID: ${userInfo.team_id}` : '未分配团队'}</Descriptions.Item>
                 <Descriptions.Item label="账号状态" span={2}>
                   {userInfo.is_active ? (
                     <Text type="success">激活</Text>
@@ -204,7 +204,7 @@ const UserProfile: React.FC = () => {
                   )}
                 </Descriptions.Item>
                 <Descriptions.Item label="系统角色" span={2}>
-                  {userInfo.roles.map(role => (
+                  {(userInfo.roles || []).map(role => (
                     <Text key={role} style={{ marginRight: 8 }}>{role}</Text>
                   ))}
                 </Descriptions.Item>
@@ -222,7 +222,7 @@ const UserProfile: React.FC = () => {
                 <Form.Item
                   label="用户名"
                 >
-                  <Input value={userInfo.username} disabled />
+                  <Input value={userInfo.username || ''} disabled />
                 </Form.Item>
                 
                 <Form.Item

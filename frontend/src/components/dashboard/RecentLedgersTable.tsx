@@ -40,7 +40,7 @@ const RecentLedgersTable: React.FC<RecentLedgersTableProps> = ({ ledgers, loadin
         { text: '已完成', value: 'completed' },
         { text: '已退回', value: 'returned' },
       ],
-      onFilter: (value, record) => record.status === value.toString(),
+      onFilter: (value: any, record: any) => record.status === value.toString(),
     },
     {
       title: '团队',

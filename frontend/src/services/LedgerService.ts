@@ -1,5 +1,5 @@
 import * as ledgersAPI from '../api/ledgers';
-import { Ledger, LedgerCreate, LedgerUpdate, LedgerSubmit, AuditLog } from '../types';
+import { Ledger, LedgerCreate, LedgerUpdate, AuditLog } from '../types';
 
 // 定义查询参数类型
 type QueryParams = Record<string, string | number | boolean | undefined>;

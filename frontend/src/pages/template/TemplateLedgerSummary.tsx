@@ -334,7 +334,7 @@ const TemplateLedgerSummary: React.FC = () => {
         return (
           <Form.Item 
             label={field.label}
-            name={field.name}
+            name={field.name || ''}
           >
             <Select
               placeholder={`选择${field.label}`}
@@ -350,7 +350,7 @@ const TemplateLedgerSummary: React.FC = () => {
         return (
           <Form.Item 
             label={field.label}
-            name={field.name}
+            name={field.name || ''}
           >
             <Checkbox.Group>
               {field.options?.map((option, index) => (
@@ -363,7 +363,7 @@ const TemplateLedgerSummary: React.FC = () => {
         return (
           <Form.Item 
             label={field.label}
-            name={field.name}
+            name={field.name || ''}
           >
             <RangePicker style={{ width: '100%' }} />
           </Form.Item>
@@ -372,11 +372,11 @@ const TemplateLedgerSummary: React.FC = () => {
         return (
           <Form.Item 
             label={field.label}
-            name={field.name}
+            name={field.name || ''}
           >
             <Space direction="vertical" style={{ width: '100%' }}>
               <Form.Item 
-                name={[field.name, 'min']} 
+                name={[field.name || '', 'min']} 
                 noStyle
               >
                 <InputNumber
@@ -385,7 +385,7 @@ const TemplateLedgerSummary: React.FC = () => {
                 />
               </Form.Item>
               <Form.Item 
-                name={[field.name, 'max']} 
+                name={[field.name || '', 'max']} 
                 noStyle
               >
                 <InputNumber
@@ -400,7 +400,7 @@ const TemplateLedgerSummary: React.FC = () => {
         return (
           <Form.Item 
             label={field.label}
-            name={field.name}
+            name={field.name || ''}
           >
             <Input placeholder={`搜索${field.label}`} />
           </Form.Item>
@@ -602,7 +602,7 @@ const TemplateLedgerSummary: React.FC = () => {
             else if (field === 'created_at_range') label = '创建时间';
             else {
               const fieldDef = templateFields.find(f => f.name === field);
-              if (fieldDef) label = fieldDef.label;
+              if (fieldDef) label = fieldDef.label || '';
             }
 
             // 根据字段类型格式化值

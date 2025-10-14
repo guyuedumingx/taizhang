@@ -214,7 +214,7 @@ const LedgerForm: React.FC = () => {
       <>
         <Divider orientation="left">模板字段</Divider>
         {templateFields.map(field => {
-          const fieldName = ['data', field.name];
+          const fieldName = ['data', field.name || ''];
           
           // 根据字段类型渲染不同的表单控件
           if (field.type === 'input') {

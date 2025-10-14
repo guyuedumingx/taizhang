@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Descriptions, Button, Space, Tag, Divider, message, Spin, Timeline, Modal, Form, Select, Input, Dropdown } from 'antd';
+import { Card, Typography, Descriptions, Button, Space, Tag, Divider, message, Spin, Timeline, Modal, Form, Input, Dropdown } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import { EditOutlined, DownloadOutlined, ClockCircleOutlined, CheckCircleOutlined, UploadOutlined, DownOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
@@ -457,9 +457,11 @@ const LedgerDetail: React.FC = () => {
               <ApproverSelector
                 nodeId={nextNodeId}
                 value={nextApproverId}
-                onChange={(approverId: number | number[]) => {
+                onChange={(approverId: number | number[] | undefined) => {
                   if (typeof approverId === 'number') {
                     setNextApproverId(approverId);
+                  } else if (approverId === undefined) {
+                    setNextApproverId(undefined);
                   }
                 }}
               />

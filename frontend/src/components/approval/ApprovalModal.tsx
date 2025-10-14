@@ -60,7 +60,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
       const workflowData = await WorkflowService.getWorkflow(workflowId);
       if (!workflowData || !workflowData.nodes) return;
 
-      const instanceNode = instanceData.nodes.find(node => node.id === nodeId);
+      const instanceNode = instanceData.nodes.find((node: any) => node.id === nodeId);
 
       // 找到当前节点
       const currentNode = workflowData.nodes.find(node => node.id === instanceNode.workflow_node_id);

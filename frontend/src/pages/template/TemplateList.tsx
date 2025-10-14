@@ -94,7 +94,7 @@ const TemplateList: React.FC = () => {
       title: '字段数量',
       dataIndex: 'fields_count',
       key: 'fields_count',
-      sorter: (a, b) => a.fields_count - b.fields_count,
+      sorter: (a, b) => (a.fields_count || 0) - (b.fields_count || 0),
     },
     {
       title: '创建人',
@@ -105,7 +105,7 @@ const TemplateList: React.FC = () => {
       title: '创建时间',
       dataIndex: 'created_at',
       key: 'created_at',
-      sorter: (a, b) => a.created_at.localeCompare(b.created_at),
+      sorter: (a, b) => (a.created_at || '').localeCompare(b.created_at || ''),
       render: (text) => text ? new Date(text).toLocaleString() : '-',
     },
     {

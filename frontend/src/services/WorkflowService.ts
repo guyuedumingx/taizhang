@@ -145,7 +145,8 @@ export class WorkflowService {
   // 获取工作流节点
   static async getWorkflowNodes(workflowId: number): Promise<WorkflowNode[]> {
     try {
-      return await workflowsAPI.getWorkflowNode(workflowId);
+      const result = await workflowsAPI.getWorkflowNode(workflowId);
+      return Array.isArray(result) ? result : [result];
     } catch (error) {
       console.error(`获取工作流 ${workflowId} 节点失败:`, error);
       throw error;

@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { Typography } from 'antd';
 import BOCLogo from './BOCLogo';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 interface LoginPageLayoutProps {
   children: ReactNode;
@@ -11,7 +11,7 @@ interface LoginPageLayoutProps {
 const LoginPageLayout: React.FC<LoginPageLayoutProps> = ({ children }) => {
   return (
     <div className="login-page">
-      <div className="login-left">
+      <div className="login-left"> 
         <div className="login-left-content">
           <div className="login-branding">
             <BOCLogo />
@@ -33,4 +33,4 @@ const LoginPageLayout: React.FC<LoginPageLayoutProps> = ({ children }) => {
   );
 };
 
-export default LoginPageLayout; 
+export default LoginPageLayout;

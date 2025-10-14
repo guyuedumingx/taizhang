@@ -4,10 +4,6 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { PERMISSIONS } from '../config';
-import { LedgerService } from '../services/LedgerService';
-import { TemplateService } from '../services/TemplateService';
-import { TeamService } from '../services/TeamService';
-import { UserService } from '../services/UserService';
 import { Ledger, Template } from '../types';
 import { 
   StatisticCards, 
