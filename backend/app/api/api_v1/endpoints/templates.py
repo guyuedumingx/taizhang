@@ -1,9 +1,10 @@
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Dict
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from app import models, schemas
 from app.api import deps
 from app.services.template_service import template_service
+from app.schemas.field import FieldReorderRequest
 
 router = APIRouter()
 
@@ -274,4 +275,87 @@ def delete_template_field(
     db.delete(field)
     db.commit()
     
-    return field 
+    return field
+
+
+@router.put("/{template_id}/fields/reorder", response_model=List[schemas.Field])
+def reorder_template_fields(
+    *,
+    db: Session = Depends(deps.get_db),
+    template_id: int,
+    reorder_request: FieldReorderRequest,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    重新排序模板字段
+    """
+    # 检查权限
+    if not deps.check_permissions("template", "edit", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+    
+    # 验证模板存在
+    template = db.query(models.Template).filter(models.Template.id == template_id).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="模板不存在")
+    
+    # 获取模板的所有字段
+    existing_fields = db.query(models.Field).filter(
+        models.Field.template_id == template_id
+    ).all()
+    existing_field_ids = {field.id for field in existing_fields}
+    
+    # 验证请求中的字段ID是否都属于该模板
+    requested_field_ids = {item.field_id for item in reorder_request.field_orders}
+    if requested_field_ids != existing_field_ids:
+        missing_ids = existing_field_ids - requested_field_ids
+        extra_ids = requested_field_ids - existing_field_ids
+        error_msg = ""
+        if missing_ids:
+            error_msg += f"缺少字段ID: {missing_ids}. "
+        if extra_ids:
+            error_msg += f"多余的字段ID: {extra_ids}. "
+        raise HTTPException(
+            status_code=400,
+            detail=f"字段ID不匹配: {error_msg}请确保包含所有字段且不包含额外字段"
+        )
+    
+    # 创建字段ID到order的映射
+    field_order_map: Dict[int, int] = {item.field_id: item.order for item in reorder_request.field_orders}
+    
+    # 验证order值是否连续且从1开始
+    orders = sorted([item.order for item in reorder_request.field_orders])
+    if orders != list(range(1, len(orders) + 1)):
+        raise HTTPException(
+            status_code=400,
+            detail="order值必须是从1开始的连续整数"
+        )
+    
+    # 更新字段的order值
+    print(f"[字段重排序] 模板ID: {template_id}, 用户: {current_user.name}")
+    print(f"[字段重排序] 请求的字段顺序: {[(item.field_id, item.order) for item in reorder_request.field_orders]}")
+    
+    updated_fields = []
+    for field in existing_fields:
+        old_order = field.order
+        new_order = field_order_map[field.id]
+        field.order = new_order
+        db.add(field)
+        updated_fields.append(field)
+        print(f"[字段重排序] 字段ID {field.id} ({field.name}): {old_order} -> {new_order}")
+    
+    # 更新模板更新时间
+    template.updated_by_id = current_user.id
+    db.add(template)
+    
+    db.commit()
+    
+    # 刷新字段并重新排序返回
+    for field in updated_fields:
+        db.refresh(field)
+    
+    # 按新的order排序返回
+    updated_fields.sort(key=lambda x: x.order)
+    
+    print(f"[字段重排序] 重排序完成，最终顺序: {[(f.id, f.name, f.order) for f in updated_fields]}")
+    
+    return updated_fields 

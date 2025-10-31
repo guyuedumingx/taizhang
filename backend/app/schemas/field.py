@@ -37,4 +37,14 @@ class FieldInDBBase(FieldBase):
 
 # 返回给API的字段
 class Field(FieldInDBBase):
-    pass 
+    pass
+
+
+# 字段重排序请求
+class FieldReorderItem(BaseModel):
+    field_id: int
+    order: int
+
+
+class FieldReorderRequest(BaseModel):
+    field_orders: List[FieldReorderItem] 

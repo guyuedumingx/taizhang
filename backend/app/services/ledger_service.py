@@ -410,10 +410,10 @@ class LedgerService:
         if ledger.template_id and ledger.data:
             template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
             if template:
-                # 获取模板字段
+                # 获取模板字段（按order排序）
                 fields = db.query(models.Field).filter(
                     models.Field.template_id == template.id
-                ).all()
+                ).order_by(models.Field.order).all()
                 
                 for field in fields:
                     key = field.name
@@ -503,10 +503,10 @@ class LedgerService:
         if template_id:
             template = db.query(models.Template).filter(models.Template.id == template_id).first()
             if template:
-                # 获取模板字段
+                # 获取模板字段（按order排序）
                 fields = db.query(models.Field).filter(
                     models.Field.template_id == template.id
-                ).all()
+                ).order_by(models.Field.order).all()
                 
                 for field in fields:
                     key = field.name

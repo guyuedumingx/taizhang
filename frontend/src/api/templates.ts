@@ -61,4 +61,32 @@ export async function updateField(templateId: number, fieldId: number, data: Fie
 export async function deleteField(templateId: number, fieldId: number): Promise<Field> {
   const response = await api.delete(`/templates/${templateId}/fields/${fieldId}`);
   return response.data;
+}
+
+// 重排序模板字段
+export interface FieldReorderItem {
+  field_id: number;
+  order: number;
+}
+
+export interface FieldReorderRequest {
+  field_orders: FieldReorderItem[];
+}
+
+export async function reorderTemplateFields(
+  templateId: number,
+  fieldOrders: FieldReorderItem[]
+): Promise<Field[]> {
+  console.log('[API调用] 开始重排序字段');
+  console.log('[API调用] 模板ID:', templateId);
+  console.log('[API调用] 字段顺序:', fieldOrders);
+  
+  const request: FieldReorderRequest = {
+    field_orders: fieldOrders
+  };
+  
+  const response = await api.put(`/templates/${templateId}/fields/reorder`, request);
+  
+  console.log('[API调用] 重排序成功，返回的字段:', response.data);
+  return response.data;
 } 
