@@ -48,6 +48,12 @@ class Settings(BaseSettings):
     # Casbin配置
     CASBIN_MODEL_PATH: str = "app/core/rbac_model.conf"
     
+    # 数据库连接池配置
+    DB_POOL_SIZE: int = int(os.getenv("DB_POOL_SIZE", "5"))  # 连接池大小，默认5
+    DB_MAX_OVERFLOW: int = int(os.getenv("DB_MAX_OVERFLOW", "10"))  # 最大溢出连接数，默认10
+    DB_POOL_TIMEOUT: int = int(os.getenv("DB_POOL_TIMEOUT", "30"))  # 获取连接超时时间（秒），默认30
+    DB_POOL_RECYCLE: int = int(os.getenv("DB_POOL_RECYCLE", "3600"))  # 连接回收时间（秒），默认3600（1小时）
+    
     class Config:
         case_sensitive = True
         env_file = ".env"
