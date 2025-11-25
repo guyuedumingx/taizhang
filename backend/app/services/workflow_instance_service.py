@@ -1,17 +1,141 @@
 from typing import Any, List, Optional, Dict
 from datetime import datetime
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from fastapi.encoders import jsonable_encoder
+import time
+import logging
 
 from app import crud, models, schemas
 from app.utils.logger import LoggerService, log_audit
 from app.api import deps
 from app.services.workflow_node_service import WorkflowNodeService
 
+# 性能分析日志记录器
+perf_logger = logging.getLogger("taizhang.performance")
+
 
 class WorkflowInstanceService:
     """工作流实例服务"""
+
+    @staticmethod
+    def get_workflow_instances_by_ledger_ids(
+        db: Session,
+        ledger_ids: List[int],
+        *,
+        include_nodes: bool = False,
+        include_creator: bool = False,
+        include_workflow: bool = True,
+    ) -> Dict[int, schemas.WorkflowInstance]:
+        """
+        批量获取指定台账的工作流实例，避免逐条查询导致的N+1问题。
+        针对列表页优化：只加载必要字段，不加载节点详情。
+        返回字典，key为ledger_id，value为WorkflowInstance schema对象。
+        """
+        if not ledger_ids:
+            return {}
+
+        total_start = time.perf_counter()
+        step_times = {}
+
+        # 步骤1: 构建查询（只查询必要字段）
+        step_start = time.perf_counter()
+        # 使用更高效的查询方式：只选择需要的列
+        query = db.query(
+            models.WorkflowInstance.id,
+            models.WorkflowInstance.workflow_id,
+            models.WorkflowInstance.ledger_id,
+            models.WorkflowInstance.status,
+            models.WorkflowInstance.current_node_id,
+            models.WorkflowInstance.created_by,
+            models.WorkflowInstance.created_at,
+            models.WorkflowInstance.updated_at,
+            models.WorkflowInstance.completed_at,
+        ).filter(
+            models.WorkflowInstance.ledger_id.in_(ledger_ids)
+        )
+        step_times["1_构建查询"] = (time.perf_counter() - step_start) * 1000
+
+        # 步骤2: 执行查询（不使用预加载，直接查询）
+        step_start = time.perf_counter()
+        instances = query.all()
+        instance_count = len(instances)
+        step_times["2_执行查询"] = (time.perf_counter() - step_start) * 1000
+
+        # 步骤3: 批量获取工作流名称（如果需要）
+        step_start = time.perf_counter()
+        workflow_names = {}
+        if include_workflow and instances:
+            workflow_ids = {inst.workflow_id for inst in instances if inst.workflow_id}
+            if workflow_ids:
+                # 只查询id和name，减少数据传输
+                workflows = db.query(models.Workflow.id, models.Workflow.name).filter(
+                    models.Workflow.id.in_(workflow_ids)
+                ).all()
+                workflow_names = {w.id: w.name for w in workflows}
+        step_times["3_批量获取工作流名称"] = (time.perf_counter() - step_start) * 1000
+
+        # 步骤4: 批量获取创建人名称（如果需要）
+        step_start = time.perf_counter()
+        creator_names = {}
+        if include_creator and instances:
+            creator_ids = {inst.created_by for inst in instances if inst.created_by}
+            if creator_ids:
+                # 只查询id和name
+                creators = db.query(models.User.id, models.User.name).filter(
+                    models.User.id.in_(creator_ids)
+                ).all()
+                creator_names = {c.id: c.name for c in creators}
+        step_times["4_批量获取创建人名称"] = (time.perf_counter() - step_start) * 1000
+
+        # 步骤5: 快速数据转换
+        step_start = time.perf_counter()
+        result: Dict[int, schemas.WorkflowInstance] = {}
+
+        for instance in instances:
+            # 直接构建schema对象，使用最小字段集
+            instance_schema = schemas.WorkflowInstance(
+                id=instance.id,
+                workflow_id=instance.workflow_id,
+                ledger_id=instance.ledger_id,
+                status=instance.status,
+                current_node_id=instance.current_node_id,
+                created_by=instance.created_by,
+                created_at=instance.created_at,
+                updated_at=instance.updated_at,
+                completed_at=instance.completed_at,
+                workflow_name=workflow_names.get(instance.workflow_id) if include_workflow else None,
+                creator_name=creator_names.get(instance.created_by) if include_creator else None,
+                nodes=[],  # 列表页不需要节点
+                current_node=None,  # 列表页不需要当前节点详情
+            )
+
+            result[instance.ledger_id] = instance_schema
+        step_times["5_处理数据转换"] = (time.perf_counter() - step_start) * 1000
+
+        total_time = (time.perf_counter() - total_start) * 1000
+
+        # 输出性能日志
+        perf_logger.info(
+            f"[工作流实例批量加载] 参数: ledger_ids数量={len(ledger_ids)}, "
+            f"include_nodes={include_nodes}, include_creator={include_creator}, "
+            f"include_workflow={include_workflow}, 返回实例数={instance_count}"
+        )
+        perf_logger.info(
+            f"[工作流实例批量加载] 各步骤耗时(ms): "
+            f"1_构建查询={step_times.get('1_构建查询', 0):.2f}, "
+            f"2_执行查询={step_times.get('2_执行查询', 0):.2f}, "
+            f"3_批量获取工作流名称={step_times.get('3_批量获取工作流名称', 0):.2f}, "
+            f"4_批量获取创建人名称={step_times.get('4_批量获取创建人名称', 0):.2f}, "
+            f"5_处理数据转换={step_times.get('5_处理数据转换', 0):.2f}"
+        )
+        perf_logger.info(
+            f"[工作流实例批量加载] 总耗时={total_time:.2f}ms, "
+            f"平均每个实例={total_time/instance_count if instance_count > 0 else 0:.2f}ms, "
+            f"查询命中率={instance_count/len(ledger_ids)*100 if ledger_ids else 0:.1f}%"
+        )
+
+        return result
 
     @staticmethod
     def get_workflow_instance(

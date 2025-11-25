@@ -32,10 +32,10 @@
 
 ### 后端技术栈
 
-- **语言**：Python 3.11+
+- **语言**：Python 3.9
 - **Web框架**：FastAPI
 - **ORM**：SQLAlchemy
-- **数据库**：PostgreSQL
+- **数据库**：Oracle 19c（远程实例）
 - **身份认证**：JWT (JSON Web Tokens)
 - **权限管理**：Casbin
 - **API文档**：Swagger UI / ReDoc
@@ -69,7 +69,7 @@
                                                  │
                                           ┌──────┴──────┐
                                           │   数据库    │
-                                          │ PostgreSQL  │
+                                          │  Oracle19c  │
                                           └─────────────┘
 ```
 
@@ -86,7 +86,7 @@
    - 提供身份认证和权限控制
 
 3. **数据库（Database）**
-   - 使用PostgreSQL关系型数据库
+   - 使用 Oracle 19c 关系型数据库（通过局域网访问的远程实例）
    - 存储系统所有数据
    - 通过ORM进行数据访问
 

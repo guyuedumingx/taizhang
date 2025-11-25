@@ -1,6 +1,8 @@
 from typing import Any, List, Optional, Dict
+from collections import defaultdict
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
+from sqlalchemy import func
 
 from app import models, schemas
 from app.utils.logger import LoggerService
@@ -30,18 +32,37 @@ class TeamService:
             if search:
                 query = query.filter(models.Team.name.ilike(f"%{search}%"))
             
+            # 使用预加载优化查询，避免N+1问题
+            query = query.options(
+                selectinload(models.Team.leader),  # 预加载负责人
+            )
+            
             # 分页
             teams = query.offset(skip).limit(limit).all()
             
-            # 计算每个团队的成员数量
+            # 批量计算每个团队的成员数量（避免N+1查询）
+            team_ids = [team.id for team in teams]
+            member_counts = defaultdict(int)
+            if team_ids:
+                member_count_query = db.query(
+                    models.User.team_id,
+                    func.count(models.User.id).label('count')
+                ).filter(
+                    models.User.team_id.in_(team_ids)
+                ).group_by(models.User.team_id).all()
+                
+                for team_id, count in member_count_query:
+                    member_counts[team_id] = count
+            
+            # 设置团队信息
             for team in teams:
                 try:
-                    team.member_count = db.query(models.User).filter(models.User.team_id == team.id).count()
+                    # 获取成员数量（从批量查询结果获取）
+                    team.member_count = member_counts.get(team.id, 0)
                     
-                    # 获取团队负责人姓名
-                    if team.leader_id:
-                        leader = db.query(models.User).filter(models.User.id == team.leader_id).first()
-                        team.leader_name = leader.name if leader else None
+                    # 获取团队负责人姓名（已预加载）
+                    if team.leader:
+                        team.leader_name = team.leader.name
                     else:
                         team.leader_name = None
                 except Exception as e:
@@ -85,17 +106,19 @@ class TeamService:
     @staticmethod
     def get_team(db: Session, team_id: int) -> models.Team:
         """获取团队详情"""
-        team = db.query(models.Team).filter(models.Team.id == team_id).first()
+        # 使用预加载优化查询
+        team = db.query(models.Team).filter(models.Team.id == team_id).options(
+            selectinload(models.Team.leader),  # 预加载负责人
+        ).first()
         if not team:
             raise HTTPException(status_code=404, detail="团队不存在")
         
         # 计算成员数量
         team.member_count = db.query(models.User).filter(models.User.team_id == team.id).count()
         
-        # 获取团队负责人姓名
-        if team.leader_id:
-            leader = db.query(models.User).filter(models.User.id == team.leader_id).first()
-            team.leader_name = leader.name if leader else None
+        # 获取团队负责人姓名（已预加载）
+        if team.leader:
+            team.leader_name = team.leader.name
         else:
             team.leader_name = None
         

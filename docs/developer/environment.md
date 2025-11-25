@@ -1,213 +1,190 @@
 # 开发环境搭建
 
-本文档将指导您如何搭建台账管理系统的开发环境。
+本文档说明如何在 Windows 10 个人 PC 上搭建台账管理系统（`taizhang`）的本地开发环境。所有命令均假设在仓库根目录 `/Users/zhuojialin/taizhang` 下执行。
 
-## 系统要求
+## 1. 前置条件
 
-- **操作系统**：Windows 10+、macOS 10.15+、Linux (Ubuntu 20.04+)
-- **Python**：3.11+
-- **Node.js**：18.0+
-- **PostgreSQL**：14.0+
-- **Git**：2.30+
+| 软件 | 推荐版本 | 说明 |
+| --- | --- | --- |
+| Windows | Windows 10 | 需具备管理员权限 |
+| Python | 3.9.x | 建议从 python.org 获取官方安装包，安装时勾选 “Add Python to PATH” |
+| Node.js | 18 LTS | 自动包含 npm |
+| Git | 2.30+ | 用于拉取代码 |
+| Oracle Instant Client | 19c Basic | 供 `cx_Oracle` 使用，安装后将 `instantclient` 目录加入 `PATH` |
+| Nginx | 最新稳定版 | Windows 版，用于前端静态托管 |
 
-## 后端环境搭建
+> **提示**：首次运行前，请确认本机能够通过局域网访问 Oracle 19c 服务器，并取得数据库账号、service name 等连接信息。
 
-### 1. 克隆代码仓库
+## 2. 拉取代码
 
 ```bash
-git clone https://github.com/yourusername/taizhang.git
+git clone <仓库地址> taizhang
 cd taizhang
 ```
 
-### 2. 创建并激活虚拟环境
+## 3. 后端环境
 
-```bash
-# 在Windows上
-python -m venv backend/venv
-backend\venv\Scripts\activate
+### 3.1 创建并激活虚拟环境
 
-# 在macOS/Linux上
-python -m venv backend/venv
-source backend/venv/bin/activate
+```powershell
+cd backend
+python -m venv venv
+venv\Scripts\activate
 ```
 
-### 3. 安装依赖
+### 3.2 安装依赖
 
-```bash
-cd backend
+```powershell
 pip install -r requirements.txt
 ```
 
-### 4. 配置环境变量
+如果提示缺少 VC++ 运行库，请安装 [Microsoft Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)。
 
-创建`.env`文件：
+### 3.3 配置 `.env`
 
-```bash
-# 在backend目录下
-touch .env  # 在Windows上使用 type nul > .env
-```
+在 `backend` 目录下创建 `.env` 文件（使用 PowerShell：`New-Item -Path .env -ItemType File`），推荐模板如下：
 
-编辑`.env`文件，添加以下内容：
-
-```
-# 数据库配置
-POSTGRES_SERVER=localhost
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=password
-POSTGRES_DB=taizhang
-
-# 安全配置
-SECRET_KEY=your-secret-key-here
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# 跨域配置
-BACKEND_CORS_ORIGINS=["http://localhost:3000","http://localhost:5173"]
-
-# 其他配置
+```env
 PROJECT_NAME=台账管理系统
 API_V1_STR=/api/v1
+
+# JWT
+SECRET_KEY=<随机生成的32位密钥>
+ACCESS_TOKEN_EXPIRE_MINUTES=4320  # 8 天
+
+# 数据库（Oracle 远程实例）
+DATABASE_TYPE=oracle
+ORACLE_USER=<用户名>
+ORACLE_PASSWORD=<密码>
+ORACLE_HOST=<Oracle服务器IP>
+ORACLE_PORT=1521
+ORACLE_SERVICE=<service_name>
+
+# 连接池可选配置
+DB_POOL_SIZE=20
+DB_MAX_OVERFLOW=20
+DB_POOL_TIMEOUT=30
+DB_POOL_RECYCLE=1800
+
+# CORS
+CORS_ORIGINS=["http://localhost:5173"]
+
+# 首次部署用完后可清空
+FIRST_SUPERUSER=admin
+FIRST_SUPERUSER_PASSWORD=<初始密码>
 ```
 
-### 5. 初始化数据库
+> `.env` 内含敏感信息，请通过 `icacls` 或 BitLocker/EFS 等方式限制访问。
 
-```bash
-# 确保PostgreSQL服务已启动
-# 创建数据库
-createdb taizhang
+### 3.4 数据库初始化
 
-# 运行数据库迁移
+系统默认访问 Oracle 19c 远程库，无需本机安装数据库。首次搭建时仍需创建表结构：
+
+```powershell
 alembic upgrade head
+python -m app.db.init_db
 ```
 
-### 6. 启动后端服务
+如需导入测试用户，可执行 `python create_test_user.py`。
 
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+### 3.5 启动后端
+
+开发模式：
+
+```powershell
+python main.py
 ```
 
-现在，后端API服务应该已经在`http://localhost:8000`上运行。
+默认监听 `0.0.0.0:8080`。可访问 `http://localhost:8080/api/v1/docs` 查看 Swagger。
 
-## 前端环境搭建
+## 4. 前端环境
 
-### 1. 安装依赖
+### 4.1 安装依赖
 
-```bash
-cd frontend
+```powershell
+cd ..\frontend
 npm install
-# 或者使用pnpm
-# pnpm install
 ```
 
-### 2. 配置环境变量
+### 4.2 配置接口地址（可选）
 
-创建`.env.local`文件：
+开发阶段前端默认请求 `/api/v1`，当后端运行在本机的 `8080` 端口时无需额外配置。如需显式指定，可在 `frontend` 目录下创建 `.env.local`：
 
-```bash
-# 在frontend目录下
-touch .env.local  # 在Windows上使用 type nul > .env.local
+```env
+VITE_API_URL=http://localhost:8080/api/v1
 ```
 
-编辑`.env.local`文件，添加以下内容：
+### 4.3 启动开发服务器
 
-```
-VITE_API_URL=http://localhost:8000/api/v1
-```
-
-### 3. 启动开发服务器
-
-```bash
+```powershell
 npm run dev
-# 或者使用pnpm
-# pnpm dev
 ```
 
-现在，前端开发服务器应该已经在`http://localhost:5173`上运行。
+访问 `http://localhost:5173` 即可调试前端。
 
-## 数据库设置
+### 4.4 构建生产包
 
-### 安装PostgreSQL
-
-#### Windows
-
-1. 下载并安装[PostgreSQL](https://www.postgresql.org/download/windows/)
-2. 安装过程中设置用户名和密码
-3. 安装完成后，使用pgAdmin或psql创建数据库
-
-#### macOS
-
-使用Homebrew安装：
-
-```bash
-brew install postgresql
-brew services start postgresql
+```powershell
+npm run build
 ```
 
-#### Linux (Ubuntu)
+构建结果位于 `frontend/dist`，复制至 Nginx `html` 目录即可用于部署。
 
-```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
+## 5. Nginx 简易配置（本地调试/部署）
+
+在 `nginx/conf/nginx.conf` 的 `http` 区域新增 server 配置：
+
+```nginx
+server {
+    listen       80;
+    server_name  localhost;
+
+    root   C:/nginx/html;
+    index  index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
 ```
 
-### 创建数据库
+重新加载配置：`nginx -s reload`。
 
-```bash
-# 登录PostgreSQL
-sudo -u postgres psql
+## 6. 环境验证清单
 
-# 创建数据库
-CREATE DATABASE taizhang;
+- `http://localhost:8080/` 返回 `{"message":"台账管理系统API服务"}`
+- `http://localhost:8080/api/v1/docs` 可正常打开
+- 前端 `npm run dev` 后访问 `http://localhost:5173`，完成一次登录 → 台账查询 → 导出流程
+- Oracle 远程库可执行 `SELECT 1 FROM dual;`
 
-# 创建用户（如果需要）
-CREATE USER taizhang_user WITH PASSWORD 'password';
+## 7. 常见问题
 
-# 授权
-GRANT ALL PRIVILEGES ON DATABASE taizhang TO taizhang_user;
+| 问题 | 排查步骤 | 解决方案 |
+| --- | --- | --- |
+| `cx_Oracle.DatabaseError: DPI-1047` | 检查 Instant Client 是否安装并在 `PATH` 中 | 下载 64 位 Instant Client 19c，解压后将路径加入系统环境变量，重启终端 |
+| 无法连接 Oracle | 使用 `tnsping <service>` 测试网络，确认 `.env` 配置 | 修正主机/端口/service name，核对账号密码；检查局域网 ACL |
+| Python 依赖编译失败 | 查看报错中缺少的编译环境 | 安装 Visual C++ Build Tools 或运行 `pip install --upgrade pip setuptools wheel` |
+| 前端请求 404 / CORS | 检查前端 API 基础路径和后端 CORS 配置 | 在 `.env` 中调整 `CORS_ORIGINS`，确保 Nginx 代理到正确地址 |
+| 端口冲突 | PowerShell 执行 `netstat -ano | findstr :8080` | 停止占用进程或修改后端启动端口 |
 
-# 退出
-\q
-```
+### Oracle 性能调优建议
 
-## 验证环境
+- **索引规划**：确保在高频查询条件上存在索引，例如 `ledgers.team_id`、`ledgers.template_id`、`workflow_instances.ledger_id`、`workflow_instance_nodes.workflow_instance_id/current_node_id` 等列。
+- **统计信息**：定期执行 `EXEC DBMS_STATS.GATHER_TABLE_STATS('<schema>', '<table>');` 和 `EXEC DBMS_STATS.GATHER_INDEX_STATS('<schema>', '<index>');`，确保优化器掌握最新统计数据。
+- **游标批量参数**：通过环境变量 `ORACLE_CURSOR_ARRAYSIZE`、`ORACLE_CURSOR_PREFETCHROWS` 调整游标 `arraysize` / `prefetchrows`，配合 SQLAlchemy 事件自动设置，减少往返次数。
+- **性能监控**：调用 `/api/v1/statistics/pool-status` 查看连接池使用率，结合 AWR/ASH 或 `V$` 视图观察 SQL 等待事件，及时扩容或优化。
+- **分页与批量**：台账列表建议分页或滚动加载，避免一次性拉取数百条记录；对于导出类场景优先使用后台任务或流式处理。
 
-### 验证后端
+## 8. 参考
 
-访问`http://localhost:8000/docs`，应该能看到Swagger UI文档界面。
-
-### 验证前端
-
-访问`http://localhost:5173`，应该能看到系统登录界面。
-
-## 常见问题
-
-### 后端启动问题
-
-**Q: 启动后端服务时报"Address already in use"错误**
-
-A: 端口8000已被占用，可以使用不同的端口：
-
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
-```
-
-**Q: 数据库连接失败**
-
-A: 检查PostgreSQL服务是否启动，以及`.env`文件中的数据库配置是否正确。
-
-### 前端启动问题
-
-**Q: 安装依赖时报错**
-
-A: 尝试清除npm缓存后重新安装：
-
-```bash
-npm cache clean --force
-npm install
-```
-
-**Q: 前端无法连接到后端API**
-
-A: 检查`.env.local`文件中的API URL配置，以及后端服务是否正常运行。确保CORS配置正确。 
+- Oracle Instant Client 下载：<https://www.oracle.com/database/technologies/instant-client/downloads.html>
+- FastAPI 文档：<https://fastapi.tiangolo.com/>
+- Ant Design 组件库：<https://ant.design/>
+- Alembic 文档：<https://alembic.sqlalchemy.org/>

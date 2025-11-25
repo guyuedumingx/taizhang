@@ -28,46 +28,30 @@ backend/
 ├── app/                     # 应用代码
 │   ├── api/                 # API相关
 │   │   ├── api_v1/          # API v1版本
-│   │   │   ├── endpoints/   # API端点
-│   │   │   └── api.py       # API路由
+│   │   │   ├── endpoints/   # 各业务域路由
+│   │   │   └── api.py       # API 路由聚合
 │   │   └── deps.py          # 依赖注入
 │   ├── core/                # 核心模块
-│   │   ├── config.py        # 配置
-│   │   ├── security.py      # 安全相关
-│   │   └── settings.py      # 应用设置
+│   │   ├── config.py        # 配置，读取 .env（支持 Oracle/SQLite）
+│   │   ├── security.py      # JWT、密码哈希
+│   │   ├── rbac_model.conf  # Casbin 模型
+│   │   └── policy.csv       # Casbin 示例策略
 │   ├── db/                  # 数据库相关
-│   │   ├── base.py          # 基础模型
-│   │   ├── base_class.py    # 基类
-│   │   └── session.py       # 数据库会话
-│   ├── models/              # 数据模型
-│   │   ├── user.py          # 用户模型
-│   │   ├── team.py          # 团队模型
-│   │   ├── role.py          # 角色模型
-│   │   ├── ledger.py        # 台账模型
-│   │   ├── template.py      # 模板模型
-│   │   └── field.py         # 字段模型
-│   ├── schemas/             # Pydantic模型
-│   │   ├── user.py          # 用户模式
-│   │   ├── team.py          # 团队模式
-│   │   ├── role.py          # 角色模式
-│   │   ├── ledger.py        # 台账模式
-│   │   ├── template.py      # 模板模式
-│   │   └── token.py         # 令牌模式
-│   ├── services/            # 业务服务
-│   │   ├── user.py          # 用户服务
-│   │   ├── auth.py          # 认证服务
-│   │   ├── casbin.py        # 权限服务
-│   │   └── ledger.py        # 台账服务
-│   ├── utils/               # 工具函数
-│   │   └── security.py      # 安全工具
-│   └── main.py              # 应用入口
-├── tests/                   # 测试代码
-│   ├── api/                 # API测试
-│   ├── services/            # 服务测试
-│   └── conftest.py          # 测试配置
-├── .env                     # 环境变量
-├── requirements.txt         # 依赖列表
-└── pyproject.toml           # 项目配置
+│   │   ├── base.py          # Base 注册
+│   │   ├── session.py       # SQLAlchemy Engine / Session（含 Oracle 优化）
+│   │   ├── init_db.py       # 初始化角色、权限、超级用户
+│   │   └── insert_test_data.py # 可选测试数据脚本
+│   ├── models/              # SQLAlchemy 数据模型
+│   ├── schemas/             # Pydantic 模型
+│   ├── services/            # 业务服务层（auth_service、ledger_service 等）
+│   ├── utils/               # 工具函数（logger、通用工具）
+│   └── main.py              # FastAPI 应用入口
+├── tests/                   # 测试代码（API / 服务 / 数据库）
+│   └── ...                  # pytest 测试用例与配置
+├── requirements.txt         # Python 依赖
+├── main.py                  # 直接运行后端的入口（加载 app.main）
+├── init_db.py               # 便捷初始化脚本
+└── create_test_user.py      # 创建测试用户脚本
 ```
 
 ## 前端结构
@@ -80,42 +64,29 @@ frontend/
 │   ├── favicon.ico          # 网站图标
 │   └── index.html           # HTML模板
 ├── src/                     # 源代码
-│   ├── api/                 # API请求
-│   │   ├── auth.ts          # 认证API
-│   │   ├── user.ts          # 用户API
-│   │   ├── team.ts          # 团队API
-│   │   ├── role.ts          # 角色API
-│   │   ├── ledger.ts        # 台账API
-│   │   └── template.ts      # 模板API
+│   ├── api/                 # API 请求封装（auth、users、ledgers、workflows 等）
 │   ├── components/          # 组件
 │   │   ├── Layout.tsx       # 布局组件
 │   │   ├── Sidebar.tsx      # 侧边栏组件
 │   │   └── ...              # 其他组件
-│   ├── config/              # 配置
-│   │   ├── api.ts           # API配置
-│   │   └── index.ts         # 全局配置
+│   ├── config.ts            # 前端全局配置（API 基础地址、权限常量）
 │   ├── pages/               # 页面
 │   │   ├── LoginPage.tsx    # 登录页
 │   │   ├── Dashboard.tsx    # 首页
 │   │   ├── admin/           # 管理页面
 │   │   ├── ledger/          # 台账页面
 │   │   └── template/        # 模板页面
-│   ├── stores/              # 状态管理
-│   │   ├── authStore.ts     # 认证状态
-│   │   └── ...              # 其他状态
-│   ├── types/               # 类型定义
-│   │   ├── user.ts          # 用户类型
-│   │   └── ...              # 其他类型
-│   ├── utils/               # 工具函数
-│   │   ├── request.ts       # 请求工具
-│   │   └── ...              # 其他工具
-│   ├── App.css              # 全局样式
-│   ├── App.tsx              # 应用入口
-│   ├── index.css            # 入口样式
-│   └── main.tsx             # 入口文件
-├── .eslintrc.json           # ESLint配置
+│   ├── stores/              # 状态管理（authStore.ts）
+│   ├── types.ts             # 全局类型定义
+│   ├── utils/               # 工具函数（导出、权限分组等）
+│   ├── App.css / index.css  # 全局样式
+│   ├── App.tsx              # 路由配置
+│   └── main.tsx             # 程序入口
+├── eslint.config.js         # ESLint配置
 ├── package.json             # 依赖配置
-├── tsconfig.json            # TypeScript配置
+├── tsconfig.json            # TypeScript基础配置
+├── tsconfig.app.json        # 前端编译配置
+├── tsconfig.node.json       # Node 构建配置
 └── vite.config.ts           # Vite配置
 ```
 
@@ -128,15 +99,10 @@ docs/
 ├── user/                    # 用户文档
 │   └── README.md            # 用户手册
 ├── developer/               # 开发者文档
-│   ├── README.md            # 开发者手册
-│   ├── environment.md       # 环境搭建
-│   ├── structure.md         # 项目结构
-│   ├── backend.md           # 后端开发
-│   ├── frontend.md          # 前端开发
-│   ├── database.md          # 数据库设计
-│   ├── api.md               # API文档
-│   └── deployment.md        # 部署指南
-└── images/                  # 文档图片
+│   ├── README.md            # 开发说明（概览、技术栈）
+│   ├── environment.md       # 环境搭建指南
+│   └── structure.md         # 项目结构说明
+└── mermaid/                 # 架构/流程图（Mermaid）
 ```
 
 ## 关键文件说明
@@ -157,5 +123,6 @@ docs/
 - **src/App.tsx**: 应用组件，包含路由定义和全局配置
 - **src/components/Layout.tsx**: 布局组件，定义应用整体布局
 - **src/stores/authStore.ts**: 认证状态管理，使用Zustand
-- **src/utils/request.ts**: HTTP请求工具，基于Axios封装
-- **src/api/**: API请求定义，包含所有后端API的调用方法 
+- **src/api/index.ts**: Axios 实例与各业务 API 聚合
+- **src/utils/exportUtils.ts**: 前端导出工具函数
+- **src/config.ts**: 全局配置与权限常量

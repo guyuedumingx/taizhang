@@ -1,7 +1,8 @@
 from typing import Any, List, Optional, Dict
+from collections import defaultdict
 
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app import models, schemas
 
@@ -26,22 +27,46 @@ class TemplateService:
         # 获取总数
         total = query.count()
         
+        # 使用预加载优化查询，避免N+1问题
+        query = query.options(
+            selectinload(models.Template.creator),  # 预加载创建人
+            selectinload(models.Template.updater),  # 预加载更新人
+        )
+        
         # 分页
         templates = query.offset(skip).limit(limit).all()
         
-        # 获取关联信息
+        # 批量获取字段数量（避免N+1查询）
+        template_ids = [t.id for t in templates]
+        field_counts = defaultdict(int)
+        if template_ids:
+            from sqlalchemy import func
+            field_count_query = db.query(
+                models.Field.template_id,
+                func.count(models.Field.id).label('count')
+            ).filter(
+                models.Field.template_id.in_(template_ids)
+            ).group_by(models.Field.template_id).all()
+            
+            for template_id, count in field_count_query:
+                field_counts[template_id] = count
+        
+        # 设置关联信息
         for template in templates:
-            # 获取创建者和更新者信息
-            if template.created_by_id:
-                creator = db.query(models.User).filter(models.User.id == template.created_by_id).first()
-                template.created_by_name = creator.name if creator else None
+            # 获取创建者姓名（已预加载）
+            if template.creator:
+                template.created_by_name = template.creator.name
+            else:
+                template.created_by_name = None
             
-            if template.updated_by_id:
-                updater = db.query(models.User).filter(models.User.id == template.updated_by_id).first()
-                template.updated_by_name = updater.name if updater else None
+            # 获取更新者姓名（已预加载）
+            if template.updater:
+                template.updated_by_name = template.updater.name
+            else:
+                template.updated_by_name = None
             
-            # 获取字段数量
-            template.field_count = db.query(models.Field).filter(models.Field.template_id == template.id).count()
+            # 获取字段数量（从批量查询结果获取）
+            template.field_count = field_counts.get(template.id, 0)
             
         return templates
 
@@ -91,17 +116,23 @@ class TemplateService:
                 db.add(field)
             db.commit()
         
-        # 获取关联信息
-        if template.created_by_id:
-            creator = db.query(models.User).filter(models.User.id == template.created_by_id).first()
-            template.created_by_name = creator.name if creator else None
+        # 使用预加载获取关联信息
+        db.refresh(template, ['creator', 'updater'])
         
-        if template.updated_by_id:
-            updater = db.query(models.User).filter(models.User.id == template.updated_by_id).first()
-            template.updated_by_name = updater.name if updater else None
+        # 获取创建者姓名（已预加载）
+        if template.creator:
+            template.created_by_name = template.creator.name
+        else:
+            template.created_by_name = None
         
-        # 获取字段数量
-        template.field_count = db.query(models.Field).filter(models.Field.template_id == template.id).count()
+        # 获取更新者姓名（已预加载）
+        if template.updater:
+            template.updated_by_name = template.updater.name
+        else:
+            template.updated_by_name = None
+        
+        # 使用已创建字段数量，避免额外统计查询
+        template.field_count = len(template_in.fields or [])
         
         return template
 
@@ -110,22 +141,29 @@ class TemplateService:
         """
         获取模板详情
         """
-        template = db.query(models.Template).filter(models.Template.id == template_id).first()
+        # 使用预加载优化查询
+        template = db.query(models.Template).filter(models.Template.id == template_id).options(
+            selectinload(models.Template.creator),  # 预加载创建人
+            selectinload(models.Template.updater),  # 预加载更新人
+        ).first()
         if not template:
             raise HTTPException(status_code=404, detail="模板不存在")
         
-        # 获取关联信息
-        if template.created_by_id:
-            creator = db.query(models.User).filter(models.User.id == template.created_by_id).first()
-            template.created_by_name = creator.name if creator else None
+        # 获取关联信息（已预加载）
+        if template.creator:
+            template.created_by_name = template.creator.name
+        else:
+            template.created_by_name = None
         
-        if template.updated_by_id:
-            updater = db.query(models.User).filter(models.User.id == template.updated_by_id).first()
-            template.updated_by_name = updater.name if updater else None
+        if template.updater:
+            template.updated_by_name = template.updater.name
+        else:
+            template.updated_by_name = None
         
         # 获取字段
         fields = db.query(models.Field).filter(models.Field.template_id == template.id).order_by(models.Field.order).all()
         template.fields = fields
+        template.field_count = len(fields)
         
         return template
 
@@ -215,18 +253,24 @@ class TemplateService:
             
             db.commit()
         
-        # 获取关联信息
-        if template.created_by_id:
-            creator = db.query(models.User).filter(models.User.id == template.created_by_id).first()
-            template.created_by_name = creator.name if creator else None
+        # 刷新模板以加载关联（如果还没有加载）
+        db.refresh(template, ['creator', 'updater'])
         
-        if template.updated_by_id:
-            updater = db.query(models.User).filter(models.User.id == template.updated_by_id).first()
-            template.updated_by_name = updater.name if updater else None
+        # 获取关联信息（已预加载）
+        if template.creator:
+            template.created_by_name = template.creator.name
+        else:
+            template.created_by_name = None
+        
+        if template.updater:
+            template.updated_by_name = template.updater.name
+        else:
+            template.updated_by_name = None
         
         # 获取字段
         fields = db.query(models.Field).filter(models.Field.template_id == template.id).order_by(models.Field.order).all()
         template.fields = fields
+        template.field_count = len(fields)
         
         return template
 

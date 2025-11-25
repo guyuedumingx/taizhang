@@ -1,13 +1,18 @@
 from typing import Any, List, Optional, Dict
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload, joinedload
 import pandas as pd
 from io import BytesIO
 from datetime import datetime
 from urllib.parse import quote
+import time
+import logging
 from app import models, schemas, crud
 from app.utils.logger import LoggerService
 from app.services.workflow_instance_service import WorkflowInstanceService
+
+# 性能分析日志记录器
+perf_logger = logging.getLogger("taizhang.performance")
 
 
 class LedgerService:
@@ -26,9 +31,14 @@ class LedgerService:
         current_user: models.User = None,
     ) -> List[schemas.Ledger]:
         """
-        获取台账列表
+        获取台账列表（带性能分析日志）
         """
-        # 构建查询
+        # 开始计时
+        total_start = time.perf_counter()
+        step_times = {}
+        
+        # 步骤1: 构建查询条件
+        step_start = time.perf_counter()
         query = db.query(models.Ledger)
         
         # 按团队筛选
@@ -55,51 +65,105 @@ class LedgerService:
         # if current_user and not current_user.is_superuser and not team_id:
         #     query = query.filter(models.Ledger.team_id == current_user.team_id)
         
-        # 获取台账列表
-        ledgers = query.order_by(models.Ledger.updated_at.desc()).offset(skip).limit(limit).all()
+        step_times["1_构建查询条件"] = (time.perf_counter() - step_start) * 1000  # 转换为毫秒
         
-        # 获取台账的相关数据（团队名称、模板名称等）
-        for ledger in ledgers:
-            # 获取团队名称
-            if ledger.team_id:
-                team = db.query(models.Team).filter(models.Team.id == ledger.team_id).first()
-                if team:
-                    ledger.team_name = team.name
-            
-            # 获取模板名称
-            if ledger.template_id:
-                template = db.query(models.Template).filter(models.Template.id == ledger.template_id).first()
-                if template:
-                    ledger.template_name = template.name
+        # 步骤2: 添加预加载选项
+        step_start = time.perf_counter()
+        query = query.options(
+            selectinload(models.Ledger.team),  # 预加载团队
+            selectinload(models.Ledger.template),  # 预加载模板
+            selectinload(models.Ledger.creator),  # 预加载创建人
+            selectinload(models.Ledger.updater),  # 预加载更新人
+            selectinload(models.Ledger.current_approver),  # 预加载当前审批人
+        )
+        step_times["2_添加预加载选项"] = (time.perf_counter() - step_start) * 1000
+        
+        # 步骤3: 执行主查询（获取台账列表）
+        step_start = time.perf_counter()
+        ledgers = query.order_by(models.Ledger.updated_at.desc()).offset(skip).limit(limit).all()
+        ledger_count = len(ledgers)
+        step_times["3_执行主查询"] = (time.perf_counter() - step_start) * 1000
+        
+        # 步骤4: 批量获取工作流实例
+        step_start = time.perf_counter()
+        ledger_ids = [ledger.id for ledger in ledgers]
+        workflow_instances_map = WorkflowInstanceService.get_workflow_instances_by_ledger_ids(
+            db,
+            ledger_ids,
+            include_nodes=False,
+        )
+        step_times["4_批量获取工作流实例"] = (time.perf_counter() - step_start) * 1000
 
-                # 获取工作流名称
-                if template.workflow_id:
-                    workflow = db.query(models.Workflow).filter(models.Workflow.id == template.workflow_id).first()
+        # 步骤5: 批量获取模板关联的工作流名称
+        step_start = time.perf_counter()
+        workflow_ids = {
+            ledger.template.workflow_id
+            for ledger in ledgers
+            if ledger.template is not None and ledger.template.workflow_id
+        }
+        workflows_dict = {}
+        if workflow_ids:
+            workflows = db.query(models.Workflow).filter(models.Workflow.id.in_(workflow_ids)).all()
+            workflows_dict = {workflow.id: workflow for workflow in workflows}
+        step_times["5_批量获取工作流"] = (time.perf_counter() - step_start) * 1000
+
+        # 步骤6: 设置台账的相关数据（循环处理）
+        step_start = time.perf_counter()
+        for ledger in ledgers:
+            # 获取团队名称（已预加载）
+            if ledger.team:
+                ledger.team_name = ledger.team.name
+
+            # 获取模板名称（已预加载）
+            if ledger.template:
+                ledger.template_name = ledger.template.name
+
+                # 获取工作流名称（优先模板配置）
+                if ledger.template.workflow_id:
+                    workflow = workflows_dict.get(ledger.template.workflow_id)
                     if workflow:
                         ledger.workflow_name = workflow.name
-        
-            
-            # 获取创建人和更新人姓名
-            creator = db.query(models.User).filter(models.User.id == ledger.created_by_id).first()
-            if creator:
-                ledger.created_by_name = creator.name
-            
-            updater = db.query(models.User).filter(models.User.id == ledger.updated_by_id).first()
-            if updater:
-                ledger.updated_by_name = updater.name
-            
-            # 获取当前审批人姓名
-            if ledger.current_approver_id:
-                approver = db.query(models.User).filter(models.User.id == ledger.current_approver_id).first()
-                if approver:
-                    ledger.current_approver_name = approver.name
 
-            try:
-                # 获取当前活动的工作流实例
-                ledger.active_workflow_instance = WorkflowInstanceService.get_workflow_instance_by_ledger(db, ledger.id, current_user)
-            except:
-                ledger.active_workflow_instance = None
-            
+            # 获取创建人和更新人姓名（已预加载）
+            if ledger.creator:
+                ledger.created_by_name = ledger.creator.name
+            if ledger.updater:
+                ledger.updated_by_name = ledger.updater.name
+
+            # 获取当前审批人姓名（已预加载）
+            if ledger.current_approver:
+                ledger.current_approver_name = ledger.current_approver.name
+
+            # 设置当前工作流实例（使用批量查询结果）
+            ledger.active_workflow_instance = workflow_instances_map.get(ledger.id)
+            if ledger.active_workflow_instance and not ledger.workflow_name:
+                ledger.workflow_name = ledger.active_workflow_instance.workflow_name
+        step_times["6_设置关联数据"] = (time.perf_counter() - step_start) * 1000
+        
+        # 计算总耗时
+        total_time = (time.perf_counter() - total_start) * 1000
+        
+        # 输出性能日志
+        perf_logger.info(
+            f"[台账列表性能分析] 查询参数: skip={skip}, limit={limit}, "
+            f"team_id={team_id}, template_id={template_id}, search={search}, "
+            f"status={status}, approval_status={approval_status}, "
+            f"返回记录数={ledger_count}"
+        )
+        perf_logger.info(
+            f"[台账列表性能分析] 各步骤耗时(ms): "
+            f"1_构建查询条件={step_times.get('1_构建查询条件', 0):.2f}, "
+            f"2_添加预加载选项={step_times.get('2_添加预加载选项', 0):.2f}, "
+            f"3_执行主查询={step_times.get('3_执行主查询', 0):.2f}, "
+            f"4_批量获取工作流实例={step_times.get('4_批量获取工作流实例', 0):.2f}, "
+            f"5_批量获取工作流={step_times.get('5_批量获取工作流', 0):.2f}, "
+            f"6_设置关联数据={step_times.get('6_设置关联数据', 0):.2f}"
+        )
+        perf_logger.info(
+            f"[台账列表性能分析] 总耗时={total_time:.2f}ms, "
+            f"平均每条={total_time/ledger_count if ledger_count > 0 else 0:.2f}ms"
+        )
+        
         return ledgers
 
     @staticmethod
