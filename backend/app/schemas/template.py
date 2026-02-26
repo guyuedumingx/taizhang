@@ -13,10 +13,13 @@ class TemplateBase(BaseModel):
     department: Optional[str] = None
     is_system: Optional[bool] = False
     workflow_id: Optional[int] = None
-    
+
     # 台账元字段（默认值）
     default_description: Optional[str] = None
     default_metadata: Optional[Dict[str, Any]] = None
+
+    # 自动填充配置（enabled, key_field_name, trigger_on, debounce_ms, min_field_length, field_mapping）
+    auto_fill_config: Optional[Dict[str, Any]] = None
 
 
 # 创建模板时的属性

@@ -1,3 +1,4 @@
+import copy
 from typing import Any, List, Optional, Dict
 from fastapi import HTTPException
 from sqlalchemy.orm import Session, selectinload, joinedload
@@ -106,7 +107,9 @@ class LedgerService:
             workflows = db.query(models.Workflow).filter(models.Workflow.id.in_(workflow_ids)).all()
             workflows_dict = {workflow.id: workflow for workflow in workflows}
         step_times["5_批量获取工作流"] = (time.perf_counter() - step_start) * 1000
-
+        step_start = time.perf_counter()
+        ledgers = copy.deepcopy(ledgers)
+        step_times["5.5_批量深拷贝"] = (time.perf_counter() - step_start) * 1000
         # 步骤6: 设置台账的相关数据（循环处理）
         step_start = time.perf_counter()
         for ledger in ledgers:

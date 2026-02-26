@@ -18,7 +18,10 @@ class Template(Base):
     # 台账元字段（默认值）
     default_description = Column(Text, nullable=True)
     default_metadata = Column(JSON, nullable=True)  # 可以存储其他默认元数据
-    
+
+    # 自动填充配置（JSON：enabled, key_field_name, trigger_on, debounce_ms, min_field_length, field_mapping）
+    auto_fill_config = Column(JSON, nullable=True)
+
     # 外键
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     updated_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)

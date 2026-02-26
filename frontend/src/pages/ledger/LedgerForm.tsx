@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Form, Input, Select, Button, Card, Typography, DatePicker, message, Space, Divider } from 'antd';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -6,9 +6,11 @@ import { PERMISSIONS } from '../../config';
 import { LedgerService } from '../../services/LedgerService';
 import { TemplateService } from '../../services/TemplateService';
 import { TeamService } from '../../services/TeamService';
-import { Template, Team, Field } from '../../types';
+import { Template, TemplateDetail, Team, Field } from '../../types';
 import dayjs from 'dayjs';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
+import { autoFill as callAutoFillApi } from '../../api/autoFill';
+import { matchAndConvertFields } from '../../utils/autoFillUtils';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -36,7 +38,10 @@ const LedgerForm: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
   const [templateFields, setTemplateFields] = useState<Field[]>([]);
-  
+  const [selectedTemplateDetail, setSelectedTemplateDetail] = useState<TemplateDetail | null>(null);
+  const [autoFillLoading, setAutoFillLoading] = useState(false);
+  const autoFillDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const isEdit = !!id;
   
   // 从URL参数获取template_id和name
@@ -130,20 +135,22 @@ const LedgerForm: React.FC = () => {
   // 获取模板字段
   const fetchTemplateFields = async (templateId: number) => {
     setLoading(true);
+    setSelectedTemplateDetail(null);
     try {
       const template = await TemplateService.getTemplateDetail(templateId);
       if (template) {
         setTemplateFields(template.fields || []);
-        
+        setSelectedTemplateDetail(template as TemplateDetail);
+
         // 使用模板默认值填充表单
         const formValues: Record<string, unknown> = {
           template_id: templateId,
         };
-        
+
         if (template.default_description && !form.getFieldValue('description')) {
           formValues.description = template.default_description;
         }
-        
+
         // 更新表单值
         form.setFieldsValue(formValues);
       }
@@ -154,6 +161,56 @@ const LedgerForm: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // 自动填充：根据关键字段值调用接口并填充表单
+  const handleAutoFill = useCallback(
+    async (fieldName: string, fieldValue: string) => {
+      if (!selectedTemplate || !selectedTemplateDetail?.auto_fill_config?.enabled) return;
+      const config = selectedTemplateDetail.auto_fill_config;
+      const keyFieldName = config?.key_field_name;
+      const minLength = config?.min_field_length ?? 2;
+      const trimmed = (fieldValue ?? '').toString().trim();
+      if (keyFieldName !== fieldName || trimmed.length < minLength) return;
+
+      setAutoFillLoading(true);
+      try {
+        const res = await callAutoFillApi(selectedTemplate, fieldName, trimmed);
+        if (res.matched && res.raw_data && templateFields.length > 0) {
+          const converted = matchAndConvertFields(
+            res.raw_data as Record<string, unknown>,
+            templateFields,
+            config?.field_mapping
+          );
+          const currentData = form.getFieldValue('data') || {};
+          form.setFieldsValue({
+            data: { ...currentData, ...converted },
+          });
+          message.success('已自动填充');
+        } else if (!res.matched && res.message) {
+          message.info(res.message);
+        }
+      } catch (err: unknown) {
+        const msg = err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+          : '自动填充失败';
+        message.error(typeof msg === 'string' ? msg : '自动填充失败');
+      } finally {
+        setAutoFillLoading(false);
+      }
+    },
+    [selectedTemplate, selectedTemplateDetail, templateFields, form]
+  );
+
+  // 防抖 2 秒后触发自动填充（停止输入触发）
+  const debouncedAutoFill = useMemo(() => {
+    return (fieldName: string, fieldValue: string) => {
+      if (autoFillDebounceRef.current) clearTimeout(autoFillDebounceRef.current);
+      autoFillDebounceRef.current = setTimeout(() => {
+        handleAutoFill(fieldName, fieldValue);
+        autoFillDebounceRef.current = null;
+      }, 2000);
+    };
+  }, [handleAutoFill]);
 
   // 处理模板变更
   const handleTemplateChange = (value: number) => {
@@ -204,18 +261,31 @@ const LedgerForm: React.FC = () => {
     }
   };
 
+  // 是否为自动填充关键字段
+  const isAutoFillKeyField = (field: Field) => {
+    const config = selectedTemplateDetail?.auto_fill_config;
+    return !!(config?.enabled && config?.key_field_name && field.name === config.key_field_name);
+  };
+
+  // 自动填充：失焦触发
+  const onAutoFillBlur = (field: Field) => {
+    const value = form.getFieldValue(['data', field.name ?? '']);
+    handleAutoFill(field.name ?? '', value != null ? String(value) : '');
+  };
+
   // 渲染模板字段
   const renderTemplateFields = () => {
     if (!selectedTemplate || templateFields.length === 0) {
       return null;
     }
-    
+
     return (
       <>
         <Divider orientation="left">模板字段</Divider>
         {templateFields.map(field => {
           const fieldName = ['data', field.name || ''];
-          
+          const keyField = isAutoFillKeyField(field);
+
           // 根据字段类型渲染不同的表单控件
           if (field.type === 'input') {
             return (
@@ -225,11 +295,15 @@ const LedgerForm: React.FC = () => {
                 name={fieldName}
                 rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
               >
-                <Input />
+                <Input
+                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
+                  onChange={keyField ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
+                  placeholder={keyField && autoFillLoading ? '正在查询...' : undefined}
+                />
               </Form.Item>
             );
           }
-          
+
           if (field.type === 'textarea') {
             return (
               <Form.Item
@@ -238,11 +312,15 @@ const LedgerForm: React.FC = () => {
                 name={fieldName}
                 rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
               >
-                <TextArea rows={4} />
+                <TextArea
+                  rows={4}
+                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
+                  onChange={keyField ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
+                />
               </Form.Item>
             );
           }
-          
+
           if (field.type === 'select' && field.options) {
             return (
               <Form.Item
@@ -251,7 +329,10 @@ const LedgerForm: React.FC = () => {
                 name={fieldName}
                 rules={[{ required: field.required, message: `请选择${field.label || field.name}` }]}
               >
-                <Select>
+                <Select
+                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
+                  onChange={keyField ? (v) => debouncedAutoFill(field.name ?? '', v != null ? String(v) : '') : undefined}
+                >
                   {field.options.map(option => (
                     <Option key={option} value={option}>{option}</Option>
                   ))}
@@ -259,7 +340,7 @@ const LedgerForm: React.FC = () => {
               </Form.Item>
             );
           }
-          
+
           if (field.type === 'number') {
             return (
               <Form.Item
@@ -268,11 +349,15 @@ const LedgerForm: React.FC = () => {
                 name={fieldName}
                 rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
               >
-                <Input type="number" />
+                <Input
+                  type="number"
+                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
+                  onChange={keyField ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
+                />
               </Form.Item>
             );
           }
-          
+
           if (field.type === 'date') {
             return (
               <Form.Item
@@ -281,11 +366,15 @@ const LedgerForm: React.FC = () => {
                 name={fieldName}
                 rules={[{ required: field.required, message: `请选择${field.label || field.name}` }]}
               >
-                <DatePicker style={{ width: '100%' }} />
+                <DatePicker
+                  style={{ width: '100%' }}
+                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
+                  onChange={keyField ? (_, dateStr) => debouncedAutoFill(field.name ?? '', Array.isArray(dateStr) ? dateStr[0] ?? '' : dateStr ?? '') : undefined}
+                />
               </Form.Item>
             );
           }
-          
+
           // 默认使用文本输入框
           return (
             <Form.Item
@@ -294,7 +383,10 @@ const LedgerForm: React.FC = () => {
               name={fieldName}
               rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
             >
-              <Input />
+              <Input
+                onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
+                onChange={keyField ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
+              />
             </Form.Item>
           );
         })}

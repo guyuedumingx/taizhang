@@ -88,6 +88,16 @@ export interface RoleUpdate {
 }
 
 // 模板类型
+/** 自动填充配置（与后端 auto_fill_config 一致） */
+export interface AutoFillConfig {
+  enabled?: boolean;
+  key_field_name?: string;
+  trigger_on?: string[];
+  debounce_ms?: number;
+  min_field_length?: number;
+  field_mapping?: Record<string, string>;
+}
+
 export interface Template {
   id: number;
   name: string;
@@ -99,6 +109,7 @@ export interface Template {
   updated_at: string | null;
   default_description?: string;
   default_metadata?: object | null;
+  auto_fill_config?: AutoFillConfig | null;
   created_by_name?: string;
   updated_by_name?: string;
   fields_count?: number;
@@ -117,9 +128,10 @@ export interface TemplateCreate {
   department: string;
   is_system: boolean | null;
   default_description?: string | null;
+  default_metadata?: object | null;
+  auto_fill_config?: AutoFillConfig | null;
   fields: FieldCreate[];
   workflow_id?: number | null;
-  default_metadata?: object | null;
 }
 
 export interface TemplateUpdate {
@@ -129,6 +141,7 @@ export interface TemplateUpdate {
   is_system?: boolean | null;
   default_description?: string;
   default_metadata?: object | null;
+  auto_fill_config?: AutoFillConfig | null;
   workflow_id?: number | null;
   fields?: FieldCreate[];
 }

@@ -3,8 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from app import models, schemas
 from app.api import deps
+from app.core.config import settings
 from app.services.template_service import template_service
+from app.services.auto_fill_token_service import get_token_for_auto_fill
+from app.services.auto_fill_external_service import call_external_api
 from app.schemas.field import FieldReorderRequest
+from app.schemas.auto_fill import AutoFillRequest, AutoFillResponse, AutoFillSource
 
 router = APIRouter()
 
@@ -98,6 +102,74 @@ def delete_template(
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
     return template_service.delete_template(db, template_id=template_id)
+
+
+@router.post("/{template_id}/auto-fill", response_model=AutoFillResponse)
+def template_auto_fill(
+    template_id: int,
+    payload: AutoFillRequest,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    自动填充：根据关键字段值调用外部系统，返回匹配的原始数据。
+    仅当模板启用自动填充且当前用户有 Token（或备用 Token）时可用。
+    """
+    template = db.query(models.Template).filter(models.Template.id == template_id).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="模板不存在")
+    auto_fill_config = template.auto_fill_config or {}
+    if not auto_fill_config.get("enabled"):
+        raise HTTPException(
+            status_code=400,
+            detail="该模板未启用自动填充",
+        )
+    key_field_name = auto_fill_config.get("key_field_name")
+    if not key_field_name or payload.field_name != key_field_name:
+        raise HTTPException(
+            status_code=400,
+            detail="字段名与模板自动填充关键字段不一致",
+        )
+    min_length = auto_fill_config.get("min_field_length", 2)
+    value_trimmed = (payload.field_value or "").strip()
+    if len(value_trimmed) < min_length:
+        raise HTTPException(
+            status_code=400,
+            detail=f"字段值过短，请输入至少{min_length}个字符",
+        )
+    system_config = settings.get_auto_fill_external_system_config()
+    if not system_config:
+        raise HTTPException(
+            status_code=503,
+            detail="自动填充服务未配置",
+        )
+    user_id_str = str(current_user.id)
+    token = get_token_for_auto_fill(user_id_str)
+    if not token:
+        raise HTTPException(
+            status_code=503,
+            detail="未找到可用 Token，请先通过接收 Token 接口设置",
+        )
+    try:
+        items = call_external_api(system_config, token, value_trimmed)
+    except ValueError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    if not items:
+        return AutoFillResponse(
+            success=True,
+            matched=False,
+            message="未找到匹配记录",
+        )
+    raw_data = items[0] if isinstance(items[0], dict) else {}
+    return AutoFillResponse(
+        success=True,
+        matched=True,
+        raw_data=raw_data,
+        source=AutoFillSource(
+            system_name=system_config.get("name", "外部系统"),
+            external_id=raw_data.get("id") or raw_data.get("external_id"),
+        ),
+    )
 
 
 @router.get("/{template_id}/fields", response_model=List[schemas.Field])
