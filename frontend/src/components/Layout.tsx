@@ -16,6 +16,7 @@ import {
   FileSearchOutlined,
   FieldBinaryOutlined,
   SolutionOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -178,6 +179,11 @@ const AppLayout: React.FC = () => {
                   key: 'permissions',
                   icon: <AuditOutlined />,
                   label: <Link to="/dashboard/admin/permissions">权限管理</Link>,
+                } : null,
+                hasPermission(PERMISSIONS.TEMPLATE_EDIT) ? {
+                  key: 'auto-fill-configs',
+                  icon: <ThunderboltOutlined />,
+                  label: <Link to="/dashboard/admin/auto-fill-configs">自动填充配置</Link>,
                 } : null,
               ].filter(Boolean),
             } : null,

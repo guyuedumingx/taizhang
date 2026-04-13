@@ -167,7 +167,13 @@ class TemplateService:
         fields = db.query(models.Field).filter(models.Field.template_id == template.id).order_by(models.Field.order).all()
         template.fields = fields
         template.field_count = len(fields)
-        
+
+        # 从配置文件中查找该模板中哪些字段名配置了自动填充触发
+        from app.core.auto_fill_trigger_loader import get_trigger_field_names
+        all_trigger_names = set(get_trigger_field_names())
+        field_names = [f.name for f in fields if f.name]
+        template.auto_fill_trigger_fields = [n for n in field_names if n in all_trigger_names]
+
         return template
 
     @staticmethod

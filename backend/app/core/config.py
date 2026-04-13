@@ -71,36 +71,6 @@ class Settings(BaseSettings):
     DB_POOL_TIMEOUT: int = int(os.getenv("DB_POOL_TIMEOUT", "30"))  # 获取连接超时时间（秒），默认30
     DB_POOL_RECYCLE: int = int(os.getenv("DB_POOL_RECYCLE", _default_pool_recycle))  # 连接回收时间（秒），Oracle默认1800（30分钟），SQLite默认3600（1小时）
 
-    # 自动填充：唯一外部系统配置（可选，不配置则自动填充不可用）
-    AUTO_FILL_ENABLED: bool = os.getenv("AUTO_FILL_ENABLED", "false").lower() in ("true", "1")
-    AUTO_FILL_API_BASE_URL: Optional[str] = os.getenv("AUTO_FILL_API_BASE_URL")
-    AUTO_FILL_API_ENDPOINT: Optional[str] = os.getenv("AUTO_FILL_API_ENDPOINT")
-    AUTO_FILL_REQUEST_METHOD: str = os.getenv("AUTO_FILL_REQUEST_METHOD", "GET")
-    # request_config 为 JSON 字符串，包含 headers/params/body/response_path/timeout/retry_times
-    AUTO_FILL_REQUEST_CONFIG_JSON: Optional[str] = os.getenv("AUTO_FILL_REQUEST_CONFIG_JSON")
-    AUTO_FILL_EXTERNAL_SYSTEM_NAME: str = os.getenv("AUTO_FILL_EXTERNAL_SYSTEM_NAME", "外部系统")
-    # 备用 Token 对应用户号，该用户 Token 由「接收 Token 接口」写入缓存
-    AUTO_FILL_BACKUP_TOKEN_USER_ID: Optional[str] = os.getenv("AUTO_FILL_BACKUP_TOKEN_USER_ID")
-
-    def get_auto_fill_external_system_config(self) -> Optional[Dict[str, Any]]:
-        """返回唯一外部系统配置，未配置或未启用时返回 None。"""
-        if not self.AUTO_FILL_ENABLED or not self.AUTO_FILL_API_BASE_URL or not self.AUTO_FILL_API_ENDPOINT:
-            return None
-        request_config: Dict[str, Any] = {}
-        if self.AUTO_FILL_REQUEST_CONFIG_JSON:
-            try:
-                request_config = json.loads(self.AUTO_FILL_REQUEST_CONFIG_JSON)
-            except json.JSONDecodeError:
-                pass
-        return {
-            "name": self.AUTO_FILL_EXTERNAL_SYSTEM_NAME,
-            "api_base_url": self.AUTO_FILL_API_BASE_URL.rstrip("/"),
-            "api_endpoint": self.AUTO_FILL_API_ENDPOINT,
-            "request_method": self.AUTO_FILL_REQUEST_METHOD,
-            "request_config": request_config,
-            "backup_token_user_id": self.AUTO_FILL_BACKUP_TOKEN_USER_ID,
-        }
-
     class Config:
         case_sensitive = True
         env_file = ".env"

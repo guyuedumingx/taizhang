@@ -3,12 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from app import models, schemas
 from app.api import deps
-from app.core.config import settings
 from app.services.template_service import template_service
-from app.services.auto_fill_token_service import get_token_for_auto_fill
 from app.services.auto_fill_external_service import call_external_api
 from app.schemas.field import FieldReorderRequest
-from app.schemas.auto_fill import AutoFillRequest, AutoFillResponse, AutoFillSource
+from app.schemas.auto_fill import AutoFillRequest, AutoFillResponse
 
 router = APIRouter()
 
@@ -112,63 +110,59 @@ def template_auto_fill(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    自动填充：根据关键字段值调用外部系统，返回匹配的原始数据。
-    仅当模板启用自动填充且当前用户有 Token（或备用 Token）时可用。
+    自动填充：根据字段名查找全局配置的 API，用字段值作为请求参数调用，返回匹配数据。
+    响应数据中与模板字段名称一致的键会自动填充到表单。
     """
+    # 1. 从配置文件查找触发配置
+    from app.core.auto_fill_trigger_loader import get_trigger_by_field_name
+    trigger = get_trigger_by_field_name(payload.field_name)
+    if not trigger:
+        raise HTTPException(status_code=400, detail="该字段未配置自动填充")
+
+    # 2. 验证模板存在
     template = db.query(models.Template).filter(models.Template.id == template_id).first()
     if not template:
         raise HTTPException(status_code=404, detail="模板不存在")
-    auto_fill_config = template.auto_fill_config or {}
-    if not auto_fill_config.get("enabled"):
-        raise HTTPException(
-            status_code=400,
-            detail="该模板未启用自动填充",
-        )
-    key_field_name = auto_fill_config.get("key_field_name")
-    if not key_field_name or payload.field_name != key_field_name:
-        raise HTTPException(
-            status_code=400,
-            detail="字段名与模板自动填充关键字段不一致",
-        )
-    min_length = auto_fill_config.get("min_field_length", 2)
+
+    # 3. 验证模板中存在该字段
+    field_exists = db.query(models.Field).filter(
+        models.Field.template_id == template_id,
+        models.Field.name == payload.field_name,
+    ).first()
+    if not field_exists:
+        raise HTTPException(status_code=400, detail="该模板中不存在此字段")
+
+    # 4. 验证字段值非空
     value_trimmed = (payload.field_value or "").strip()
-    if len(value_trimmed) < min_length:
-        raise HTTPException(
-            status_code=400,
-            detail=f"字段值过短，请输入至少{min_length}个字符",
-        )
-    system_config = settings.get_auto_fill_external_system_config()
-    if not system_config:
-        raise HTTPException(
-            status_code=503,
-            detail="自动填充服务未配置",
-        )
-    user_id_str = str(current_user.id)
-    token = get_token_for_auto_fill(user_id_str)
-    if not token:
-        raise HTTPException(
-            status_code=503,
-            detail="未找到可用 Token，请先通过接收 Token 接口设置",
-        )
+    if not value_trimmed:
+        raise HTTPException(status_code=400, detail="字段值不能为空")
+
+    # 5. 调用外部 API
+    headers = trigger.headers or {}
+    body = {payload.field_name: value_trimmed}
+
     try:
-        items = call_external_api(system_config, token, value_trimmed)
+        raw_data = call_external_api(
+            trigger.api_url,
+            headers,
+            body,
+            timeout=trigger.timeout or 5,
+            retry_times=trigger.retry_times or 3,
+        )
     except ValueError as e:
         raise HTTPException(status_code=502, detail=str(e))
-    if not items:
+
+    if not raw_data:
         return AutoFillResponse(
             success=True,
             matched=False,
             message="未找到匹配记录",
         )
-    raw_data = items[0] if isinstance(items[0], dict) else {}
+
     return AutoFillResponse(
         success=True,
         matched=True,
         raw_data=raw_data,
-        source=AutoFillSource(
-            system_name=system_config.get("name", "外部系统"),
-            external_id=raw_data.get("id") or raw_data.get("external_id"),
-        ),
     )
 
 

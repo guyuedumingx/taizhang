@@ -25,8 +25,9 @@ import {
   EyeOutlined,
   UpOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import { useLedgerListStore } from '../../stores/ledgerListStore';
 import { PERMISSIONS } from '../../config';
 import { LedgerService } from '../../services/LedgerService';
 import { TemplateService } from '../../services/TemplateService';
@@ -54,27 +55,33 @@ interface AdvancedSearchParams {
 
 const LedgerList: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { hasPermission, token, user } = useAuthStore();
+
+  // Use Zustand store for state persistence
+  const {
+    searchText,
+    setSearchText,
+    advancedSearchParams,
+    setAdvancedSearchParams,
+    isAdvancedSearchActive,
+    setIsAdvancedSearchActive,
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    resetAdvancedSearch,
+    resetAll,
+    lastPath,
+    setLastPath,
+  } = useLedgerListStore();
+
   const [loading, setLoading] = useState(true);
   const [ledgers, setLedgers] = useState<Ledger[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [searchText, setSearchText] = useState<string>('');
-  
-  // 高级搜索相关状态
   const [advancedSearchVisible, setAdvancedSearchVisible] = useState(false);
   const [advancedSearchForm] = Form.useForm();
-  const [advancedSearchParams, setAdvancedSearchParams] = useState<AdvancedSearchParams>({
-    name: '',
-    description: '',
-    team: undefined,
-    template: undefined,
-    status: undefined,
-    approvalStatus: undefined,
-    createdBy: '',
-    createdAtRange: undefined
-  });
-  const [isAdvancedSearchActive, setIsAdvancedSearchActive] = useState<boolean>(false);
 
   // 获取台账列表和相关数据
   const fetchData = async () => {
@@ -109,22 +116,35 @@ const LedgerList: React.FC = () => {
     fetchData();
   }, [token, navigate]);
 
+  // 监听路由变化，当从其他模块进入台账管理时清除状态
+  useEffect(() => {
+    const currentPath = location.pathname;
+
+    // 当前是否在台账列表页
+    const isLedgerListPage = currentPath === '/dashboard/ledgers';
+
+    if (isLedgerListPage && lastPath) {
+      // 如果上一次的路由不是台账相关的子页面，说明是从外部进入
+      const isFromOutside = !lastPath.startsWith('/dashboard/ledgers');
+
+      if (isFromOutside) {
+        // 从外部进入，清除状态
+        resetAll();
+        advancedSearchForm.resetFields();
+      }
+    }
+
+    // 更新上一次的路由记录（在判断之后）
+    setLastPath(currentPath);
+  }, [location.pathname]); // 只依赖 location.pathname
+
   // 处理简单搜索
   const handleSearch = (value: string) => {
     setSearchText(value);
     // 如果开启了高级搜索，清除高级搜索条件
     if (isAdvancedSearchActive) {
       setIsAdvancedSearchActive(false);
-      setAdvancedSearchParams({
-        name: '',
-        description: '',
-        team: undefined,
-        template: undefined,
-        status: undefined,
-        approvalStatus: undefined,
-        createdBy: '',
-        createdAtRange: undefined
-      });
+      resetAdvancedSearch();
       advancedSearchForm.resetFields();
     }
   };
@@ -147,21 +167,7 @@ const LedgerList: React.FC = () => {
     setAdvancedSearchVisible(false);
   };
 
-  // 重置高级搜索
-  const resetAdvancedSearch = () => {
-    advancedSearchForm.resetFields();
-    setAdvancedSearchParams({
-      name: '',
-      description: '',
-      team: undefined,
-      template: undefined,
-      status: undefined,
-      approvalStatus: undefined,
-      createdBy: '',
-      createdAtRange: undefined
-    });
-    setIsAdvancedSearchActive(false);
-  };
+  // 重置高级搜索 - 这个函数现在从 store 调用
 
   // 删除台账
   const handleDelete = async (id: number) => {
@@ -416,21 +422,7 @@ const LedgerList: React.FC = () => {
         <Row>
           <Col span={24} style={{ textAlign: 'right' }}>
             <Space>
-              <Button
-                onClick={() => {
-                  setAdvancedSearchParams({
-                    name: '',
-                    description: '',
-                    team: undefined,
-                    template: undefined,
-                    status: undefined,
-                    approvalStatus: undefined,
-                    createdBy: '',
-                    createdAtRange: undefined
-                  });
-                  setIsAdvancedSearchActive(false);
-                }}
-              >
+              <Button onClick={resetAdvancedSearch}>
                 重置
               </Button>
               <Button type="primary" onClick={handleAdvancedSearch}>
@@ -452,22 +444,25 @@ const LedgerList: React.FC = () => {
 
     if (params.name) {
       tags.push(<Tag key="name" closable onClose={() => {
-        advancedSearchForm.setFieldValue('name', undefined);
-        handleAdvancedSearch();
+        const newParams = { ...params, name: undefined };
+        setAdvancedSearchParams(newParams);
+        advancedSearchForm.setFieldsValue({ name: undefined });
       }}>台账名称: {params.name}</Tag>);
     }
 
     if (params.description) {
       tags.push(<Tag key="description" closable onClose={() => {
-        advancedSearchForm.setFieldValue('description', undefined);
-        handleAdvancedSearch();
+        const newParams = { ...params, description: undefined };
+        setAdvancedSearchParams(newParams);
+        advancedSearchForm.setFieldsValue({ description: undefined });
       }}>描述: {params.description}</Tag>);
     }
 
     if (params.createdBy) {
       tags.push(<Tag key="createdBy" closable onClose={() => {
-        advancedSearchForm.setFieldValue('createdBy', undefined);
-        handleAdvancedSearch();
+        const newParams = { ...params, createdBy: undefined };
+        setAdvancedSearchParams(newParams);
+        advancedSearchForm.setFieldsValue({ createdBy: undefined });
       }}>创建人: {params.createdBy}</Tag>);
     }
 
@@ -475,8 +470,9 @@ const LedgerList: React.FC = () => {
       const templateId = typeof params.template === 'string' ? parseInt(params.template, 10) : params.template;
       const template = templates.find(t => t.id === templateId);
       tags.push(<Tag key="template" closable onClose={() => {
-        advancedSearchForm.setFieldValue('template', undefined);
-        handleAdvancedSearch();
+        const newParams = { ...params, template: undefined };
+        setAdvancedSearchParams(newParams);
+        advancedSearchForm.setFieldsValue({ template: undefined });
       }}>模板: {template?.name || params.template}</Tag>);
     }
 
@@ -484,8 +480,9 @@ const LedgerList: React.FC = () => {
       const teamId = typeof params.team === 'string' ? parseInt(params.team, 10) : params.team;
       const team = teams.find(t => t.id === teamId);
       tags.push(<Tag key="team" closable onClose={() => {
-        advancedSearchForm.setFieldValue('team', undefined);
-        handleAdvancedSearch();
+        const newParams = { ...params, team: undefined };
+        setAdvancedSearchParams(newParams);
+        advancedSearchForm.setFieldsValue({ team: undefined });
       }}>团队: {team?.name || params.team}</Tag>);
     }
 
@@ -496,10 +493,11 @@ const LedgerList: React.FC = () => {
         completed: '已完成',
         returned: '已退回'
       }[params.status] || params.status;
-      
+
       tags.push(<Tag key="status" closable onClose={() => {
-        advancedSearchForm.setFieldValue('status', undefined);
-        handleAdvancedSearch();
+        const newParams = { ...params, status: undefined };
+        setAdvancedSearchParams(newParams);
+        advancedSearchForm.setFieldsValue({ status: undefined });
       }}>状态: {statusText}</Tag>);
     }
 
@@ -510,10 +508,11 @@ const LedgerList: React.FC = () => {
         approved: '已批准',
         rejected: '已拒绝'
       }[params.approvalStatus] || params.approvalStatus;
-      
+
       tags.push(<Tag key="approvalStatus" closable onClose={() => {
-        advancedSearchForm.setFieldValue('approvalStatus', undefined);
-        handleAdvancedSearch();
+        const newParams = { ...params, approvalStatus: undefined };
+        setAdvancedSearchParams(newParams);
+        advancedSearchForm.setFieldsValue({ approvalStatus: undefined });
       }}>审批状态: {statusText}</Tag>);
     }
 
@@ -521,8 +520,9 @@ const LedgerList: React.FC = () => {
       const startDate = params.createdAtRange[0].format('YYYY-MM-DD');
       const endDate = params.createdAtRange[1].format('YYYY-MM-DD');
       tags.push(<Tag key="createdAtRange" closable onClose={() => {
-        advancedSearchForm.setFieldValue('createdAtRange', undefined);
-        handleAdvancedSearch();
+        const newParams = { ...params, createdAtRange: undefined };
+        setAdvancedSearchParams(newParams);
+        advancedSearchForm.setFieldsValue({ createdAtRange: undefined });
       }}>创建时间: {startDate} 至 {endDate}</Tag>);
     }
 
@@ -778,10 +778,18 @@ const LedgerList: React.FC = () => {
             rowKey="id"
             loading={loading}
             pagination={{
-              defaultPageSize: 10,
+              current: currentPage,
+              pageSize: pageSize,
+              total: filteredLedgers.length,
               showQuickJumper: true,
               showSizeChanger: true,
-              showTotal: (total) => `共 ${total} 条记录`
+              showTotal: (total, range) => `共 ${total} 条记录，显示 ${range[0]}-${range[1]} 条`,
+              onChange: (page, size) => {
+                setCurrentPage(page);
+                if (size && size !== pageSize) {
+                  setPageSize(size);
+                }
+              }
             }}
             scroll={{ x: 1300 }}
           />

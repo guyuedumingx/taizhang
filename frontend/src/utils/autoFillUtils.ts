@@ -1,24 +1,23 @@
 /**
- * 自动填充：将外部系统返回的 raw_data 按模板字段做字段映射与类型转换，
+ * 自动填充：将外部 API 返回的 raw_data 按模板字段名精确匹配并做类型转换，
  * 得到表单可用的键值对。类型与格式与当前项目中 Field 类型及 LedgerForm 表单项约定一致。
  */
 import type { Field } from '../types';
 import dayjs, { Dayjs } from 'dayjs';
 
 /**
- * 将 raw_data 按模板字段与可选 field_mapping 做匹配，并按字段类型转换后返回。
+ * 将 raw_data 按模板字段名直接匹配，并按字段类型转换后返回。
  * 用于自动填充时 form.setFieldsValue({ data: result })。
  */
 export function matchAndConvertFields(
   rawData: Record<string, unknown>,
   templateFields: Field[],
-  fieldMapping?: Record<string, string>
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   for (const field of templateFields) {
-    const externalFieldName = fieldMapping?.[field.name ?? ''] ?? field.name ?? '';
-    if (externalFieldName === '' || !(externalFieldName in rawData)) continue;
-    const rawValue = rawData[externalFieldName];
+    const fieldName = field.name ?? '';
+    if (fieldName === '' || !(fieldName in rawData)) continue;
+    const rawValue = rawData[fieldName];
     const fieldType = (field.type ?? 'input').toLowerCase();
     switch (fieldType) {
       case 'input':

@@ -162,15 +162,15 @@ const LedgerForm: React.FC = () => {
     }
   };
 
-  // 自动填充：根据关键字段值调用接口并填充表单
+  // 自动填充：根据字段名查找全局配置的 API 并填充表单
   const handleAutoFill = useCallback(
     async (fieldName: string, fieldValue: string) => {
-      if (!selectedTemplate || !selectedTemplateDetail?.auto_fill_config?.enabled) return;
-      const config = selectedTemplateDetail.auto_fill_config;
-      const keyFieldName = config?.key_field_name;
-      const minLength = config?.min_field_length ?? 2;
+      if (!selectedTemplate) return;
+      const triggerFields = selectedTemplateDetail?.auto_fill_trigger_fields ?? [];
+      if (!triggerFields.includes(fieldName)) return;
+
       const trimmed = (fieldValue ?? '').toString().trim();
-      if (keyFieldName !== fieldName || trimmed.length < minLength) return;
+      if (!trimmed) return;
 
       setAutoFillLoading(true);
       try {
@@ -179,7 +179,6 @@ const LedgerForm: React.FC = () => {
           const converted = matchAndConvertFields(
             res.raw_data as Record<string, unknown>,
             templateFields,
-            config?.field_mapping
           );
           const currentData = form.getFieldValue('data') || {};
           form.setFieldsValue({
@@ -261,10 +260,10 @@ const LedgerForm: React.FC = () => {
     }
   };
 
-  // 是否为自动填充关键字段
-  const isAutoFillKeyField = (field: Field) => {
-    const config = selectedTemplateDetail?.auto_fill_config;
-    return !!(config?.enabled && config?.key_field_name && field.name === config.key_field_name);
+  // 是否为自动填充触发字段
+  const isAutoFillTriggerField = (field: Field) => {
+    const triggerFields = selectedTemplateDetail?.auto_fill_trigger_fields ?? [];
+    return triggerFields.includes(field.name ?? '');
   };
 
   // 自动填充：失焦触发
@@ -284,7 +283,7 @@ const LedgerForm: React.FC = () => {
         <Divider orientation="left">模板字段</Divider>
         {templateFields.map(field => {
           const fieldName = ['data', field.name || ''];
-          const keyField = isAutoFillKeyField(field);
+          const isTrigger = isAutoFillTriggerField(field);
 
           // 根据字段类型渲染不同的表单控件
           if (field.type === 'input') {
@@ -296,9 +295,9 @@ const LedgerForm: React.FC = () => {
                 rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
               >
                 <Input
-                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
-                  onChange={keyField ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
-                  placeholder={keyField && autoFillLoading ? '正在查询...' : undefined}
+                  onBlur={isTrigger ? () => onAutoFillBlur(field) : undefined}
+                  onChange={isTrigger ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
+                  placeholder={isTrigger && autoFillLoading ? '正在查询...' : undefined}
                 />
               </Form.Item>
             );
@@ -314,8 +313,8 @@ const LedgerForm: React.FC = () => {
               >
                 <TextArea
                   rows={4}
-                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
-                  onChange={keyField ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
+                  onBlur={isTrigger ? () => onAutoFillBlur(field) : undefined}
+                  onChange={isTrigger ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
                 />
               </Form.Item>
             );
@@ -330,8 +329,8 @@ const LedgerForm: React.FC = () => {
                 rules={[{ required: field.required, message: `请选择${field.label || field.name}` }]}
               >
                 <Select
-                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
-                  onChange={keyField ? (v) => debouncedAutoFill(field.name ?? '', v != null ? String(v) : '') : undefined}
+                  onBlur={isTrigger ? () => onAutoFillBlur(field) : undefined}
+                  onChange={isTrigger ? (v) => debouncedAutoFill(field.name ?? '', v != null ? String(v) : '') : undefined}
                 >
                   {field.options.map(option => (
                     <Option key={option} value={option}>{option}</Option>
@@ -351,8 +350,8 @@ const LedgerForm: React.FC = () => {
               >
                 <Input
                   type="number"
-                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
-                  onChange={keyField ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
+                  onBlur={isTrigger ? () => onAutoFillBlur(field) : undefined}
+                  onChange={isTrigger ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
                 />
               </Form.Item>
             );
@@ -368,8 +367,8 @@ const LedgerForm: React.FC = () => {
               >
                 <DatePicker
                   style={{ width: '100%' }}
-                  onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
-                  onChange={keyField ? (_, dateStr) => debouncedAutoFill(field.name ?? '', Array.isArray(dateStr) ? dateStr[0] ?? '' : dateStr ?? '') : undefined}
+                  onBlur={isTrigger ? () => onAutoFillBlur(field) : undefined}
+                  onChange={isTrigger ? (_, dateStr) => debouncedAutoFill(field.name ?? '', Array.isArray(dateStr) ? dateStr[0] ?? '' : dateStr ?? '') : undefined}
                 />
               </Form.Item>
             );
@@ -384,8 +383,8 @@ const LedgerForm: React.FC = () => {
               rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
             >
               <Input
-                onBlur={keyField ? () => onAutoFillBlur(field) : undefined}
-                onChange={keyField ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
+                onBlur={isTrigger ? () => onAutoFillBlur(field) : undefined}
+                onChange={isTrigger ? (e) => debouncedAutoFill(field.name ?? '', e.target.value) : undefined}
               />
             </Form.Item>
           );

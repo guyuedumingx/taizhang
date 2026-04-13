@@ -91,10 +91,9 @@ export interface RoleUpdate {
 /** 自动填充配置（与后端 auto_fill_config 一致） */
 export interface AutoFillConfig {
   enabled?: boolean;
+  api_url?: string;
+  headers?: Record<string, string>;
   key_field_name?: string;
-  trigger_on?: string[];
-  debounce_ms?: number;
-  min_field_length?: number;
   field_mapping?: Record<string, string>;
 }
 
@@ -120,6 +119,7 @@ export interface Template {
 
 export interface TemplateDetail extends Template {
   fields: Field[];
+  auto_fill_trigger_fields?: string[];
 }
 
 export interface TemplateCreate {
@@ -452,4 +452,38 @@ export interface OverviewResponse {
   teams_count: number;
   templates: Template[];
   ledgers: Ledger[];
+}
+
+// 自动填充触发配置
+export interface AutoFillTriggerConfig {
+  id: number;
+  field_name: string;
+  api_url: string;
+  headers?: Record<string, string> | null;
+  timeout?: number;
+  retry_times?: number;
+  enabled: boolean;
+  description?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface AutoFillTriggerConfigCreate {
+  field_name: string;
+  api_url: string;
+  headers?: Record<string, string> | null;
+  timeout?: number;
+  retry_times?: number;
+  enabled?: boolean;
+  description?: string | null;
+}
+
+export interface AutoFillTriggerConfigUpdate {
+  field_name?: string;
+  api_url?: string;
+  headers?: Record<string, string> | null;
+  timeout?: number;
+  retry_times?: number;
+  enabled?: boolean;
+  description?: string | null;
 }

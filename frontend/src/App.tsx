@@ -19,6 +19,7 @@ import RoleManagement from './pages/admin/RoleManagement';
 import PermissionManagement from './pages/admin/PermissionManagement';
 import TeamManagement from './pages/admin/TeamManagement';
 import TeamMembers from './pages/admin/TeamMembers';
+import AutoFillConfigManagement from './pages/admin/AutoFillConfigManagement';
 import WorkflowList from './pages/workflow/WorkflowList';
 import WorkflowForm from './pages/workflow/WorkflowForm';
 import WorkflowDetail from './pages/workflow/WorkflowDetail';
@@ -115,6 +116,7 @@ function App() {
               <Route path="admin/permissions" element={<PermissionManagement />} />
               <Route path="admin/teams" element={<TeamManagement />} />
               <Route path="admin/teams/:id/members" element={<TeamMembers />} />
+              <Route path="admin/auto-fill-configs" element={<AutoFillConfigManagement />} />
               <Route path="help" element={<HelpPage />} />
               <Route path="user-profile" element={<UserProfile />} />
             </Route>

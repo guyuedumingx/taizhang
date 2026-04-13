@@ -392,6 +392,14 @@ class CRUDWorkflowInstanceNode(CRUDBase[WorkflowInstanceNode, WorkflowInstanceNo
             if not ledger:
                 continue
             
+            # 获取模板信息
+            template_name = None
+            if ledger.template_id:
+                from app.models.template import Template
+                template = db.query(Template).filter(Template.id == ledger.template_id).first()
+                if template:
+                    template_name = template.name
+
             # 获取提交人信息
             creator = db.query(User).filter(User.id == instance.created_by).first()
             creator_name = creator.name if creator else "未知"
@@ -429,6 +437,8 @@ class CRUDWorkflowInstanceNode(CRUDBase[WorkflowInstanceNode, WorkflowInstanceNo
                 "task_id": node.id,
                 "ledger_id": ledger.id,
                 "ledger_name": ledger.name,
+                "template_id": ledger.template_id,
+                "template_name": template_name,
                 "workflow_instance_id": instance.id,
                 "workflow_node_name": node_name,
                 "created_by": creator_name,

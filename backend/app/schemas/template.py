@@ -56,4 +56,5 @@ class Template(TemplateInDBBase):
 
 # 返回给API的模板详情
 class TemplateDetail(Template):
-    fields: List[Field] = [] 
+    fields: List[Field] = []
+    auto_fill_trigger_fields: Optional[List[str]] = None

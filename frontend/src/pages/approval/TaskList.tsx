@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Card, Typography, Space, message, Tooltip, Empty, Alert } from 'antd';
-import { EyeOutlined, ReloadOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Table, Button, Card, Typography, Space, message, Tooltip, Empty, Alert, Select } from 'antd';
+import { EyeOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
@@ -15,6 +15,8 @@ interface Task {
   task_id: number;
   ledger_id: number;
   ledger_name: string;
+  template_id: number | null;
+  template_name: string | null;
   workflow_instance_id: number;
   workflow_node_id?: number;
   workflow_node_name: string;
@@ -28,6 +30,24 @@ const TaskList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+
+  // 从 tasks 中提取去重的模板选项
+  const templateOptions = useMemo(() => {
+    const map = new Map<number, string>();
+    tasks.forEach(t => {
+      if (t.template_id && t.template_name && !map.has(t.template_id)) {
+        map.set(t.template_id, t.template_name);
+      }
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [tasks]);
+
+  // 前端按模板筛选
+  const filteredTasks = useMemo(() => {
+    if (!selectedTemplateId) return tasks;
+    return tasks.filter(t => t.template_id === selectedTemplateId);
+  }, [tasks, selectedTemplateId]);
   
   // 审批相关状态
   const [approvalModalVisible, setApprovalModalVisible] = useState(false);
@@ -61,6 +81,8 @@ const TaskList: React.FC = () => {
         task_id: Number(item.task_id || 0),
         ledger_id: Number(item.ledger_id || 0),
         ledger_name: String(item.ledger_name || '未命名台账'),
+        template_id: item.template_id ? Number(item.template_id) : null,
+        template_name: item.template_name ? String(item.template_name) : null,
         workflow_instance_id: Number(item.workflow_instance_id || 0),
         workflow_node_id: Number(item.workflow_node_id || 0),
         workflow_node_name: String(item.workflow_node_name || '未知节点'),
@@ -156,10 +178,21 @@ const TaskList: React.FC = () => {
       
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-          <Title level={4}>待办任务</Title>
-          <Button 
-            type="primary" 
-            icon={<ReloadOutlined />} 
+          <Space size="middle" align="center">
+            <Title level={4} style={{ margin: 0 }}>待办任务</Title>
+            <Select
+              placeholder="按模板筛选"
+              allowClear
+              style={{ width: 200 }}
+              value={selectedTemplateId}
+              onChange={(value) => setSelectedTemplateId(value ?? null)}
+              suffixIcon={<FilterOutlined />}
+              options={templateOptions.map(t => ({ label: t.name, value: t.id }))}
+            />
+          </Space>
+          <Button
+            type="primary"
+            icon={<ReloadOutlined />}
             onClick={fetchTasks}
             loading={loading}
           >
@@ -184,7 +217,7 @@ const TaskList: React.FC = () => {
         
         <Table
           columns={columns}
-          dataSource={tasks}
+          dataSource={filteredTasks}
           rowKey="task_id"
           loading={loading}
           pagination={{ defaultPageSize: 10 }}

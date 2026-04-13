@@ -1,0 +1,11 @@
+[
+  {
+    "field_name": "company_name",
+    "api_url": "http://192.168.1.100:8080/api/query",
+    "headers": {},
+    "timeout": 5,
+    "retry_times": 3,
+    "enabled": true,
+    "description": "示例：企业名称字段触发查询"
+  }
+]
