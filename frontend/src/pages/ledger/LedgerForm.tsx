@@ -108,21 +108,37 @@ const LedgerForm: React.FC = () => {
     setLoading(true);
     try {
       const ledger = await LedgerService.getLedger(ledgerId);
-      
-      // 设置表单初始值
+
+      // 设置表单初始值（data 暂不设置，等模板字段加载后做类型转换）
       form.setFieldsValue({
         name: ledger.name,
         description: ledger.description,
         team_id: ledger.team_id,
         template_id: ledger.template_id,
         status: ledger.status,
-        data: ledger.data || {},
       });
-      
+
       // 如果有模板ID，获取模板字段
       if (ledger.template_id) {
         setSelectedTemplate(ledger.template_id);
-        await fetchTemplateFields(ledger.template_id);
+        const template = await TemplateService.getTemplateDetail(ledger.template_id);
+        if (template) {
+          setTemplateFields(template.fields || []);
+          setSelectedTemplateDetail(template as TemplateDetail);
+
+          // 根据模板字段类型转换已有的 data 值（如日期字符串→dayjs 对象）
+          const convertedData = matchAndConvertFields(
+            (ledger.data || {}) as Record<string, unknown>,
+            template.fields || [],
+          );
+          form.setFieldsValue({
+            data: convertedData,
+            template_id: ledger.template_id,
+          });
+        }
+      } else {
+        // 没有模板时直接设置 data
+        form.setFieldsValue({ data: ledger.data || {} });
       }
     } catch (error) {
       console.error('获取台账详情失败:', error);

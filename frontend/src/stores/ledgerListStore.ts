@@ -55,7 +55,7 @@ const DEFAULT_ADVANCED_SEARCH_PARAMS: AdvancedSearchParams = {
 
 export const useLedgerListStore = create<LedgerListStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Simple search
       searchText: '',
       setSearchText: (text: string) => set({ searchText: text }),

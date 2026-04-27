@@ -41,18 +41,6 @@ import dayjs from 'dayjs';
 const { Title } = Typography;
 const { Search } = Input;
 
-// 高级搜索条件接口
-interface AdvancedSearchParams {
-  name?: string;
-  description?: string;
-  team?: string;
-  template?: string;
-  status?: string;
-  approvalStatus?: string;
-  createdBy?: string;
-  createdAtRange?: [dayjs.Dayjs, dayjs.Dayjs] | null;
-}
-
 const LedgerList: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
