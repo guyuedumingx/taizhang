@@ -133,10 +133,12 @@ const generateSheetData = (ledgers: Ledger[], fields: Field[]): Array<Array<stri
         return value.join(', ');
       } else if (customField.type === 'date' && value) {
         return new Date(value as string).toLocaleDateString();
+      } else if (customField.type === 'datetime' && value) {
+        return new Date(value as string).toLocaleString();
       } else if (value === null || value === undefined) {
         return '';
       }
-      
+
       return String(value);
     });
   });
