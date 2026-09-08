@@ -67,6 +67,9 @@ export const PERMISSIONS = {
   
   // 日志权限
   LOG_VIEW: 'log:view',
+
+  // 统计分析权限
+  STATISTICS_VIEW: 'statistics:view',
 };
 
 // 登录页面背景图

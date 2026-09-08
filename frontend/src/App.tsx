@@ -14,6 +14,7 @@ import TemplateList from './pages/template/TemplateList';
 import TemplateForm from './pages/template/TemplateForm';
 import TemplateDetail from './pages/template/TemplateDetail';
 import TemplateLedgerSummary from './pages/template/TemplateLedgerSummary';
+import LedgerQuery from './pages/statistics/LedgerQuery';
 import UserManagement from './pages/admin/UserManagement';
 import RoleManagement from './pages/admin/RoleManagement';
 import PermissionManagement from './pages/admin/PermissionManagement';
@@ -100,6 +101,7 @@ function App() {
               <Route path="ledgers/new" element={<LedgerForm />} />
               <Route path="ledgers/edit/:id" element={<LedgerForm />} />
               <Route path="ledgers/:id" element={<LedgerDetail />} />
+              <Route path="statistics/ledger-query" element={<LedgerQuery />} />
               <Route path="templates" element={<TemplateList />} />
               <Route path="templates/new" element={<TemplateForm />} />
               <Route path="templates/edit/:id" element={<TemplateForm />} />

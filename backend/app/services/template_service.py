@@ -95,7 +95,6 @@ class TemplateService:
             workflow_id=template_in.workflow_id,
             default_description=getattr(template_in, "default_description", None),
             default_metadata=getattr(template_in, "default_metadata", None),
-            auto_fill_config=getattr(template_in, "auto_fill_config", None),
             created_by_id=current_user_id,
             updated_by_id=current_user_id,
         )

@@ -112,6 +112,12 @@ export const getPermissionGroups = (): PermissionGroup[] => {
         { key: PERMISSIONS.LOG_VIEW, name: '查看日志', description: '允许查看系统日志', group: '日志管理' },
       ],
     },
+    {
+      name: '统计分析',
+      permissions: [
+        { key: PERMISSIONS.STATISTICS_VIEW, name: '查看统计分析', description: '允许使用台账汇总查询与导出（默认不授予，按需赋权）', group: '统计分析' },
+      ],
+    },
   ];
 };
 

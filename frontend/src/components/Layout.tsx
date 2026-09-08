@@ -17,6 +17,7 @@ import {
   FieldBinaryOutlined,
   SolutionOutlined,
   ThunderboltOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -122,7 +123,21 @@ const AppLayout: React.FC = () => {
               icon: <FileOutlined />,
               label: <Link to="/dashboard/ledgers">台账管理</Link>,
             } : null,
-            
+
+            // 统计分析
+            hasPermission(PERMISSIONS.STATISTICS_VIEW) ? {
+              key: 'statistics',
+              icon: <BarChartOutlined />,
+              label: '统计分析',
+              children: [
+                {
+                  key: 'statistics-ledger-query',
+                  icon: <BarChartOutlined />,
+                  label: <Link to="/dashboard/statistics/ledger-query">台账汇总查询</Link>,
+                },
+              ],
+            } : null,
+
             // 模板管理
             hasPermission(PERMISSIONS.TEMPLATE_VIEW) ? {
               key: 'templates',

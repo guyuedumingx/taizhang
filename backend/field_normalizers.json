@@ -1,0 +1,18 @@
+[
+  {
+    "template_name": "特殊业务台账",
+    "field_name": "金额",
+    "pipeline": [
+      { "type": "strip_whitespace" },
+      { "type": "fullwidth_to_half" },
+      { "type": "semantic_null", "words": ["无", "没有", "暂无", "N/A"], "as_value": 0 },
+      { "type": "uppercase_amount", "allow_lowercase": true },
+      { "type": "remove_currency", "symbols": ["¥", "￥", "元", "$", "＄"] },
+      { "type": "remove_thousands" },
+      { "type": "extract_number" },
+      { "type": "unit_multiplier", "mapping": { "万": 10000, "w": 10000, "W": 10000, "千": 1000, "k": 1000, "K": 1000 } },
+      { "type": "range_check", "min": 0, "max": 100000000, "out_of_range": "flag" }
+    ],
+    "invalid_policy": { "action": "flag", "reason": "金额无法解析" }
+  }
+]

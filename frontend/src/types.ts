@@ -88,15 +88,6 @@ export interface RoleUpdate {
 }
 
 // 模板类型
-/** 自动填充配置（与后端 auto_fill_config 一致） */
-export interface AutoFillConfig {
-  enabled?: boolean;
-  api_url?: string;
-  headers?: Record<string, string>;
-  key_field_name?: string;
-  field_mapping?: Record<string, string>;
-}
-
 export interface Template {
   id: number;
   name: string;
@@ -108,7 +99,6 @@ export interface Template {
   updated_at: string | null;
   default_description?: string;
   default_metadata?: object | null;
-  auto_fill_config?: AutoFillConfig | null;
   created_by_name?: string;
   updated_by_name?: string;
   fields_count?: number;
@@ -129,7 +119,6 @@ export interface TemplateCreate {
   is_system: boolean | null;
   default_description?: string | null;
   default_metadata?: object | null;
-  auto_fill_config?: AutoFillConfig | null;
   fields: FieldCreate[];
   workflow_id?: number | null;
 }
@@ -141,9 +130,89 @@ export interface TemplateUpdate {
   is_system?: boolean | null;
   default_description?: string;
   default_metadata?: object | null;
-  auto_fill_config?: AutoFillConfig | null;
   workflow_id?: number | null;
   fields?: FieldCreate[];
+}
+
+// 台账汇总查询（统计分析）
+export interface FieldFilterCondition {
+  operator: 'contains' | 'equals' | 'gte' | 'lte' | 'between' | 'in' | 'normalized_between';
+  value?: any;
+}
+
+export interface StatisticsSystemFilters {
+  status?: string[];
+  approval_status?: string[];
+  team_ids?: number[];
+  created_by_ids?: number[];
+  created_at_range?: [string, string] | null;
+  updated_at_range?: [string, string] | null;
+}
+
+export interface StatisticsQueryRequest {
+  template_ids: number[];
+  system_filters: StatisticsSystemFilters;
+  field_filters: Record<string, FieldFilterCondition>;
+  keyword: string;
+  page: number;
+  page_size: number;
+  sort_by: string;
+  sort_order: 'asc' | 'desc';
+}
+
+export interface LedgerQueryItem {
+  id: number;
+  name: string;
+  template_id: number | null;
+  template_name: string | null;
+  status: string | null;
+  approval_status: string | null;
+  team_id: number | null;
+  team_name: string | null;
+  created_by_id: number | null;
+  created_by_name: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  data: Record<string, any>;
+}
+
+export interface SuspiciousItem {
+  ledger_id: number;
+  ledger_name: string;
+  field: string;
+  raw: string;
+  reason: string;
+}
+
+export interface FieldQuality {
+  field_name: string;
+  sum: number | null;
+  numeric_count: number;
+  cleaned_count: number;
+  suspicious_count: number;
+  suspicious_items: SuspiciousItem[];
+}
+
+export interface DataQualityReport {
+  total_count: number;
+  fields: FieldQuality[];
+}
+
+export interface LedgerQueryResponse {
+  items: LedgerQueryItem[];
+  total: number;
+  page: number;
+  page_size: number;
+  data_quality: DataQualityReport;
+}
+
+export interface QueryField {
+  name: string;
+  label: string;
+  type: string | null;
+  required: boolean;
+  options: string[] | null;
+  has_pipeline: boolean;
 }
 
 // 字段类型
@@ -452,38 +521,4 @@ export interface OverviewResponse {
   teams_count: number;
   templates: Template[];
   ledgers: Ledger[];
-}
-
-// 自动填充触发配置
-export interface AutoFillTriggerConfig {
-  id: number;
-  field_name: string;
-  api_url: string;
-  headers?: Record<string, string> | null;
-  timeout?: number;
-  retry_times?: number;
-  enabled: boolean;
-  description?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-}
-
-export interface AutoFillTriggerConfigCreate {
-  field_name: string;
-  api_url: string;
-  headers?: Record<string, string> | null;
-  timeout?: number;
-  retry_times?: number;
-  enabled?: boolean;
-  description?: string | null;
-}
-
-export interface AutoFillTriggerConfigUpdate {
-  field_name?: string;
-  api_url?: string;
-  headers?: Record<string, string> | null;
-  timeout?: number;
-  retry_times?: number;
-  enabled?: boolean;
-  description?: string | null;
 }

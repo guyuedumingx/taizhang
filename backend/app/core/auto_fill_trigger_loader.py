@@ -1,13 +1,14 @@
 """
 自动填充触发配置加载器：从 JSON 配置文件读取字段名→API 映射。
 文件路径: backend/auto_fill_triggers.json
-修改后重启服务生效。
+修改后重启服务（或调用 reload()）生效。
 """
 import json
 import os
 from typing import Dict, List, Optional
 
-_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# loader.py 位于 backend/app/core/，向上三级即 backend/
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 _CONFIG_PATH = os.path.join(_BASE_DIR, "auto_fill_triggers.json")
 
 
