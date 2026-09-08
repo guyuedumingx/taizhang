@@ -40,7 +40,7 @@ _SYSTEM_COLUMNS = ["ID", "台账名称", "模板", "状态", "审批状态", "�
 
 
 def _fmt_number(v: float) -> str:
-    return f"{v:g}"
+    return f"{v:.10g}"
 
 
 def _parse_range(range_list: Optional[List[str]]) -> Tuple[Optional[_dt.datetime], Optional[_dt.datetime]]:

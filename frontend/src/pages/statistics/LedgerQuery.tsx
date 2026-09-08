@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Alert, Button, Card, Collapse, DatePicker, Input, InputNumber, Select, Space,
+  Alert, Button, Card, Collapse, DatePicker, Empty, Input, InputNumber, List, message, Modal, Select, Space,
   Table, Tag, Tooltip, Typography,
 } from 'antd';
 import {
-  DownloadOutlined, ReloadOutlined, SearchOutlined, WarningOutlined,
+  DownloadOutlined, ReloadOutlined, SaveOutlined, SearchOutlined, SettingOutlined, WarningOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
@@ -43,6 +43,38 @@ interface FieldFilterState {
   value?: any;
 }
 
+// ---------- 视图管理（localStorage 个人级持久化，零后端改动） ----------
+
+const VIEWS_STORAGE_KEY = 'taizhang_ledger_query_views';
+
+interface SavedView {
+  name: string;
+  saved_at: string;
+  filters: {
+    selectedTemplateIds: number[];
+    keyword: string;
+    statusSel: string[];
+    approvalSel: string[];
+    teamIds: number[];
+    creatorIds: number[];
+    createdAtRange: [string, string] | null;
+    fieldFilters: Record<string, FieldFilterState>;
+  };
+}
+
+const loadSavedViews = (): SavedView[] => {
+  try {
+    const raw = localStorage.getItem(VIEWS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const persistSavedViews = (views: SavedView[]) => {
+  localStorage.setItem(VIEWS_STORAGE_KEY, JSON.stringify(views));
+};
+
 const LedgerQuery: React.FC = () => {
   const { hasPermission } = useAuthStore();
 
@@ -74,10 +106,26 @@ const LedgerQuery: React.FC = () => {
     sortBy: 'created_at', sortOrder: 'desc',
   });
 
+  // 视图管理状态
+  const [savedViews, setSavedViews] = useState<SavedView[]>(loadSavedViews);
+  const [saveViewOpen, setSaveViewOpen] = useState(false);
+  const [newViewName, setNewViewName] = useState('');
+  const [manageViewsOpen, setManageViewsOpen] = useState(false);
+
   useEffect(() => {
-    Promise.all([getTemplates({ limit: 100 }), getTeams({ limit: 100 }), getUsers({ limit: 200 })])
-      .then(([t, tm, u]) => { setTemplates(t); setTeams(tm); setUsers(u); })
-      .catch(() => {});
+    // 团队/用户接口返回分页对象 {items:[...]}，模板接口返回数组——统一归一化；
+    // 用 allSettled 独立加载，单个接口失败只缺对应筛选数据，不拖垮整个页面
+    const asArray = <T,>(v: T[] | { items?: T[] } | undefined): T[] => {
+      if (Array.isArray(v)) return v;
+      const items = (v as { items?: T[] } | undefined)?.items;
+      return Array.isArray(items) ? items : [];
+    };
+    Promise.allSettled([getTemplates({ limit: 100 }), getTeams({ limit: 100 }), getUsers({ limit: 200 })])
+      .then(([t, tm, u]) => {
+        if (t.status === "fulfilled") setTemplates(asArray(t.value));
+        if (tm.status === "fulfilled") setTeams(asArray(tm.value));
+        if (u.status === "fulfilled") setUsers(asArray(u.value));
+      });
   }, []);
 
   // 选中单个模板时加载其字段（动态筛选）
@@ -158,6 +206,60 @@ const LedgerQuery: React.FC = () => {
     setTotal(0);
     setQuality([]);
     setQualityTotal(0);
+  };
+
+  // ---------- 视图管理 ----------
+
+  const captureFilters = (): SavedView['filters'] => ({
+    selectedTemplateIds,
+    keyword,
+    statusSel,
+    approvalSel,
+    teamIds,
+    creatorIds,
+    createdAtRange: createdAtRange?.[0]
+      ? [
+          createdAtRange[0].format('YYYY-MM-DD'),
+          createdAtRange[1]?.format('YYYY-MM-DD') || createdAtRange[0].format('YYYY-MM-DD'),
+        ]
+      : null,
+    fieldFilters,
+  });
+
+  const handleSaveView = () => {
+    const name = newViewName.trim();
+    if (!name) {
+      message.warning('请输入视图名称');
+      return;
+    }
+    const view: SavedView = { name, saved_at: dayjs().format('YYYY-MM-DD HH:mm'), filters: captureFilters() };
+    const next = [...savedViews.filter((v) => v.name !== name), view];
+    setSavedViews(next);
+    persistSavedViews(next);
+    setSaveViewOpen(false);
+    setNewViewName('');
+    message.success(`视图「${name}」已保存（仅保存在本浏览器）`);
+  };
+
+  const applyView = (view: SavedView) => {
+    const f = view.filters;
+    setSelectedTemplateIds(f.selectedTemplateIds || []);
+    setKeyword(f.keyword || '');
+    setStatusSel(f.statusSel || []);
+    setApprovalSel(f.approvalSel || []);
+    setTeamIds(f.teamIds || []);
+    setCreatorIds(f.creatorIds || []);
+    setCreatedAtRange(
+      f.createdAtRange?.[0] ? [dayjs(f.createdAtRange[0]), dayjs(f.createdAtRange[1] || f.createdAtRange[0])] : null,
+    );
+    setFieldFilters(f.fieldFilters || {});
+    message.info(`已加载视图「${view.name}」，点击查询执行`);
+  };
+
+  const handleDeleteView = (name: string) => {
+    const next = savedViews.filter((v) => v.name !== name);
+    setSavedViews(next);
+    persistSavedViews(next);
   };
 
   const handleTableChange = (
@@ -335,6 +437,17 @@ const LedgerQuery: React.FC = () => {
               onChange={setCreatorIds}
             />
             <RangePicker value={createdAtRange} onChange={setCreatedAtRange} placeholder={['创建开始', '创建结束']} />
+            <Select
+              placeholder="加载视图" style={{ minWidth: 130 }} allowClear value={null}
+              options={savedViews.map((v) => ({ value: v.name, label: v.name }))}
+              onChange={(name) => {
+                const v = savedViews.find((x) => x.name === name);
+                if (v) applyView(v);
+              }}
+            />
+            <Button icon={<SaveOutlined />} onClick={() => setSaveViewOpen(true)}>保存视图</Button>
+            <Button icon={<SettingOutlined />} disabled={savedViews.length === 0}
+                    onClick={() => setManageViewsOpen(true)} />
             <Button type="primary" icon={<SearchOutlined />} loading={loading} onClick={() => handleQuery(1)}>
               查询
             </Button>
@@ -430,6 +543,60 @@ const LedgerQuery: React.FC = () => {
           }}
         />
       </Card>
+
+      {/* 保存视图 */}
+      <Modal
+        open={saveViewOpen}
+        title="保存当前筛选条件为视图"
+        onCancel={() => setSaveViewOpen(false)}
+        onOk={handleSaveView}
+        okText="保存"
+        destroyOnClose
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Input
+            placeholder="视图名称，例如: 本月大额台账"
+            value={newViewName}
+            onChange={(e) => setNewViewName(e.target.value)}
+            onPressEnter={handleSaveView}
+          />
+          <Text type="secondary">视图保存在当前浏览器（localStorage），换设备或清理浏览器数据后不可恢复。</Text>
+        </Space>
+      </Modal>
+
+      {/* 管理视图 */}
+      <Modal
+        open={manageViewsOpen}
+        title="管理已保存视图"
+        footer={null}
+        onCancel={() => setManageViewsOpen(false)}
+      >
+        {savedViews.length === 0 ? (
+          <Empty description="暂无视图" />
+        ) : (
+          <List
+            size="small"
+            dataSource={savedViews}
+            renderItem={(v) => (
+              <List.Item
+                actions={[
+                  <Button key="load" size="small" type="link" onClick={() => {
+                    applyView(v);
+                    setManageViewsOpen(false);
+                  }}>载入</Button>,
+                  <Button key="del" size="small" type="link" danger
+                          onClick={() => handleDeleteView(v.name)}>删除</Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={v.name}
+                  description={`保存于 ${v.saved_at} · 模板 ${v.filters.selectedTemplateIds.length || '全部'}`}
+                />
+              </List.Item>
+            )}
+          />
+        )}
+      </Modal>
     </div>
   );
 };
