@@ -52,6 +52,10 @@ const AppLayout: React.FC = () => {
           // 系统管理子菜单
           setSelectedKeys([pathSegments[2]]);
           setOpenKeys(['admin']);
+        } else if (pathSegments[1] === 'ledgers' && pathSegments.length >= 3) {
+          // 台账管理子菜单(如 /dashboard/ledgers/import)
+          setSelectedKeys([`ledgers-${pathSegments[2]}`]);
+          setOpenKeys(['ledgers']);
         } else {
           // 普通菜单
           setSelectedKeys([pathSegments[1]]);
@@ -121,7 +125,24 @@ const AppLayout: React.FC = () => {
             hasPermission(PERMISSIONS.LEDGER_VIEW) ? {
               key: 'ledgers',
               icon: <FileOutlined />,
-              label: <Link to="/dashboard/ledgers">台账管理</Link>,
+              label: '台账管理',
+              children: [
+                {
+                  key: 'ledgers-list',
+                  icon: <FileOutlined />,
+                  label: <Link to="/dashboard/ledgers">台账列表</Link>,
+                },
+                {
+                  key: 'ledgers-import',
+                  icon: <ThunderboltOutlined />,
+                  label: <Link to="/dashboard/ledgers/import">台账导入</Link>,
+                },
+                {
+                  key: 'ledgers-import-history',
+                  icon: <FileSearchOutlined />,
+                  label: <Link to="/dashboard/ledgers/import-history">导入历史</Link>,
+                },
+              ],
             } : null,
 
             // 统计分析

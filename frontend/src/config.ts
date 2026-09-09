@@ -15,6 +15,7 @@ export const PERMISSIONS = {
   LEDGER_EDIT: 'ledger:edit',
   LEDGER_DELETE: 'ledger:delete',
   LEDGER_EXPORT: 'ledger:export',
+  LEDGER_IMPORT: 'ledger:import',
   LEDGER_SUBMIT: 'ledger:submit',
   LEDGER_APPROVE: 'ledger:approve',
   LEDGER_ADMIN_APPROVE: 'ledger:admin_approve',

@@ -10,6 +10,9 @@ import Dashboard from './pages/Dashboard';
 import LedgerList from './pages/ledger/LedgerList';
 import LedgerForm from './pages/ledger/LedgerForm';
 import LedgerDetail from './pages/ledger/LedgerDetail';
+import LedgerImport from './pages/ledger/LedgerImport';
+import ImportHistory from './pages/ledger/ImportHistory';
+import ImportHistoryDetail from './pages/ledger/ImportHistoryDetail';
 import TemplateList from './pages/template/TemplateList';
 import TemplateForm from './pages/template/TemplateForm';
 import TemplateDetail from './pages/template/TemplateDetail';
@@ -101,6 +104,9 @@ function App() {
               <Route path="ledgers/new" element={<LedgerForm />} />
               <Route path="ledgers/edit/:id" element={<LedgerForm />} />
               <Route path="ledgers/:id" element={<LedgerDetail />} />
+              <Route path="ledgers/import" element={<LedgerImport />} />
+              <Route path="ledgers/import-history" element={<ImportHistory />} />
+              <Route path="ledgers/import-history/:batchId" element={<ImportHistoryDetail />} />
               <Route path="statistics/ledger-query" element={<LedgerQuery />} />
               <Route path="templates" element={<TemplateList />} />
               <Route path="templates/new" element={<TemplateForm />} />

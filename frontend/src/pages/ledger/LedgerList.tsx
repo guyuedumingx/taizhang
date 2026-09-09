@@ -16,14 +16,15 @@ import {
   Popconfirm,
   Dropdown,
 } from 'antd';
-import { 
-  PlusOutlined, 
-  EditOutlined, 
-  DeleteOutlined, 
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
   DownloadOutlined,
   DownOutlined,
   EyeOutlined,
   UpOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
@@ -732,6 +733,14 @@ const LedgerList: React.FC = () => {
                   导出
                 </Button>
               </Dropdown>
+              {hasPermission(PERMISSIONS.LEDGER_IMPORT) && (
+                <Button
+                  icon={<ThunderboltOutlined />}
+                  onClick={() => navigate('/dashboard/ledgers/import')}
+                >
+                  导入
+                </Button>
+              )}
               {hasPermission(PERMISSIONS.LEDGER_CREATE) && (
                 <Button
                   type="primary"
