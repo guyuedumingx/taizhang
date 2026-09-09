@@ -1,0 +1,43 @@
+{
+  "configs": [
+    {
+      "template_name": "特殊业务台账",
+      "max_rows": 2000,
+      "warn_rows": 5000,
+      "max_rows_hard_limit": 5000,
+      "name_field": "流水号",
+      "unique_keys": ["流水号"],
+      "identity_mapping": {
+        "team": "组别",
+        "created_by": "柜员号"
+      },
+      "field_order": ["流水号", "交易码", "金额", "柜员号", "组别", "业务日期", "摘要"]
+    },
+    {
+      "template_name": "测试导入",
+      "max_rows": 2000,
+      "warn_rows": 5000,
+      "max_rows_hard_limit": 5000,
+      "name_field": "流水号",
+      "unique_keys": ["流水号"],
+      "identity_mapping": {
+        "team": "组别",
+        "created_by": "柜员号"
+      },
+      "field_order": ["流水号", "核准员姓名", "交易码", "柜员号", "组别", "备注"]
+    },
+    {
+      "template_name": "测试导入2",
+      "max_rows": 2000,
+      "warn_rows": 5000,
+      "max_rows_hard_limit": 5000,
+      "name_field": "流水号",
+      "unique_keys": ["流水号"],
+      "identity_mapping": {
+        "team": "组别",
+        "created_by": "柜员号"
+      },
+      "field_order": ["流水号", "柜员号",  "核准柜员姓名", "备注"]
+    }
+  ]
+}
