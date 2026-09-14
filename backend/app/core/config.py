@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "台账管理系统"
     BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     print(BASE_DIR)
+
+    # 超级管理员
+    FIRST_SUPERUSER: str = os.getenv("FIRST_SUPERUSER", "admin")
+    FIRST_SUPERUSER_PASSWORD: str = os.getenv("FIRST_SUPERUSER_PASSWORD", "admin123")
+
     # 数据库配置
     DATABASE_TYPE: str = os.getenv("DATABASE_TYPE", "sqlite")  # sqlite 或 oracle
     

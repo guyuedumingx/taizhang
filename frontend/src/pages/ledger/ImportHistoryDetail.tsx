@@ -96,10 +96,17 @@ const ImportHistoryDetailPage: React.FC = () => {
       render: (v: string) => {
         const colorMap: Record<string, string> = {
           draft: 'default',
-          active: 'green',
-          completed: 'blue',
+          active: 'blue',
+          completed: 'green',
+          returned: 'orange',
         };
-        return <Tag color={colorMap[v] || 'default'}>{v}</Tag>;
+        const labelMap: Record<string, string> = {
+          draft: '草稿',
+          active: '处理中',
+          completed: '已完成',
+          returned: '已退回',
+        };
+        return <Tag color={colorMap[v] || 'default'}>{labelMap[v] || v}</Tag>;
       },
     },
     {
@@ -112,7 +119,12 @@ const ImportHistoryDetailPage: React.FC = () => {
           approved: 'green',
           rejected: 'red',
         };
-        return <Tag color={colorMap[v] || 'default'}>{v}</Tag>;
+        const labelMap: Record<string, string> = {
+          pending: '审批中',
+          approved: '已批准',
+          rejected: '已拒绝',
+        };
+        return <Tag color={colorMap[v] || 'default'}>{labelMap[v] || v}</Tag>;
       },
     },
     {

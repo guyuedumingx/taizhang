@@ -8,7 +8,7 @@
   - 写入字段:
       data        = 原始行值(不做清洗落库)
       name        = name_field → data.name → import-{template}-{seq}
-      status      = active
+      status      = completed
       approval_status = approved
       team_id     = identity_mapping 反查(失败用 fallback_team_id)
       created_by_id = 柜员号反查(失败兜底当前操作者)
@@ -155,7 +155,7 @@ async def run_commit(
             ledger_obj = models.Ledger(
                 name=ledger_name,
                 description=None,
-                status="active",
+                status="completed",
                 approval_status="approved",
                 team_id=team_id,
                 template_id=template.id,

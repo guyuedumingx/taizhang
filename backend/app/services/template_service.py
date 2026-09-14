@@ -117,10 +117,10 @@ class TemplateService:
                 )
                 db.add(field)
             db.commit()
-        
-        # 使用预加载获取关联信息
-        db.refresh(template, ['creator', 'updater'])
-        
+
+        # commit 之后所有属性已 expire，让关联（creator/updater）在下次访问时重新加载
+        db.expire(template)
+
         # 获取创建者姓名（已预加载）
         if template.creator:
             template.created_by_name = template.creator.name
@@ -260,10 +260,10 @@ class TemplateService:
                     db.delete(field)
             
             db.commit()
-        
-        # 刷新模板以加载关联（如果还没有加载）
-        db.refresh(template, ['creator', 'updater'])
-        
+
+        # commit 之后所有属性已 expire，让关联（creator/updater）在下次访问时重新加载
+        db.expire(template)
+
         # 获取关联信息（已预加载）
         if template.creator:
             template.created_by_name = template.creator.name

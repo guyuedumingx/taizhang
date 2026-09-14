@@ -59,6 +59,7 @@ export interface ImportValidationReport {
   total_rows: number;
   importable_count: number;
   cleanable_count: number;
+  problem_rows: number;     // 去重后的"问题行"数;区别于 issues.length(单元格数)
   issues: ImportIssue[];
   cleanable_previews: CleanablePreview[];
   row_limit_warning?: string | null;

@@ -11,7 +11,6 @@ import {
   Statistic,
   Steps,
   Table,
-  Tabs,
   Tag,
   Typography,
   Upload,
@@ -43,7 +42,6 @@ import {
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
 const { Step } = Steps;
-const { TabPane } = Tabs;
 
 const ISSUE_TYPE_LABEL: Record<string, string> = {
   missing_required: '必填缺失',
@@ -54,6 +52,12 @@ const ISSUE_TYPE_LABEL: Record<string, string> = {
   type_mismatch: '类型错误',
   row_limit_exceeded: '行数超限',
   extra_column: '未知列',
+};
+
+// 格式化原始值:空值/缺失统一显示 (空),其余 toString
+const formatRaw = (v: unknown): string => {
+  if (v === null || v === undefined || v === '') return '(空)';
+  return String(v);
 };
 
 const LedgerImport: React.FC = () => {
@@ -129,7 +133,7 @@ const LedgerImport: React.FC = () => {
       if (r.importable_count === 0) {
         message.warning('没有可导入的行,请检查问题清单');
       } else {
-        message.success(`预校验完成:可导入 ${r.importable_count} 行,问题 ${r.issues.length} 行`);
+        message.success(`预校验完成:可导入 ${r.importable_count} 行,问题 ${r.problem_rows} 行`);
       }
     } catch (err: any) {
       const detail = err?.response?.data?.detail;
@@ -169,23 +173,34 @@ const LedgerImport: React.FC = () => {
     form.resetFields();
   };
 
-  const issueGroups = useMemo(() => {
-    if (!report) return {};
-    const groups: Record<string, ImportIssue[]> = {};
+  const { headerIssues, rowIssuesByRow } = useMemo(() => {
+    if (!report) return { headerIssues: [], rowIssuesByRow: [] };
+    const headers: ImportIssue[] = [];
+    const byRow = new Map<number, ImportIssue[]>();
     for (const issue of report.issues) {
-      const key = issue.type in ISSUE_TYPE_LABEL ? issue.type : 'other';
-      groups[key] = groups[key] || [];
-      groups[key].push(issue);
+      if (issue.row === 0) {
+        headers.push(issue);
+      } else {
+        const list = byRow.get(issue.row) || [];
+        list.push(issue);
+        byRow.set(issue.row, list);
+      }
     }
-    return groups;
+    // 按行号升序,行内按 field 字典序(空 field 排后面)
+    const sorted = Array.from(byRow.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([row, items]) => ({
+        row,
+        items: [...items].sort((x, y) => {
+          const fx = x.field || '';
+          const fy = y.field || '';
+          if (!fx && fy) return 1;
+          if (fx && !fy) return -1;
+          return fx.localeCompare(fy, 'zh-CN');
+        }),
+      }));
+    return { headerIssues: headers, rowIssuesByRow: sorted };
   }, [report]);
-
-  const issueColumns = [
-    { title: '行号', dataIndex: 'row', width: 80 },
-    { title: '字段', dataIndex: 'field', width: 140, render: (v: any) => v || '-' },
-    { title: '原始值', dataIndex: 'raw', width: 160, render: (v: any) => (v === null || v === undefined || v === '' ? '(空)' : String(v)) },
-    { title: '原因', dataIndex: 'reason' },
-  ];
 
   return (
     <div style={{ padding: 24 }}>
@@ -309,7 +324,7 @@ const LedgerImport: React.FC = () => {
               <Card style={{ minWidth: 160 }}>
                 <Statistic
                   title="问题行"
-                  value={report.issues.filter(i => i.row > 0).length}
+                  value={report.problem_rows}
                   valueStyle={{ color: '#cf1322' }}
                 />
               </Card>
@@ -321,38 +336,86 @@ const LedgerImport: React.FC = () => {
               </Card>
             )}
 
-            <Tabs defaultActiveKey={Object.keys(issueGroups)[0] || 'duplicate'}>
-              {Object.entries(issueGroups).map(([type, items]) => (
-                <TabPane
-                  tab={`${ISSUE_TYPE_LABEL[type] || type} (${items.length})`}
-                  key={type}
-                >
-                  <Table
-                    rowKey={(r) => `${r.row}-${r.field}-${r.reason}`}
-                    columns={issueColumns}
-                    dataSource={items}
-                    pagination={{ pageSize: 20 }}
-                    size="small"
-                  />
-                </TabPane>
-              ))}
-              {report.cleanable_previews.length > 0 && (
-                <TabPane tab={`可清洗预览 (${report.cleanable_previews.length})`} key="cleanable">
-                  <Table
-                    rowKey={(r) => `${r.row}-${r.field}`}
-                    size="small"
-                    pagination={{ pageSize: 20 }}
-                    columns={[
-                      { title: '行号', dataIndex: 'row', width: 80 },
-                      { title: '字段', dataIndex: 'field', width: 140 },
-                      { title: '原始值', dataIndex: 'raw', render: (v) => String(v) },
-                      { title: '清洗后', dataIndex: 'clean', render: (v) => String(v) },
-                    ]}
-                    dataSource={report.cleanable_previews}
-                  />
-                </TabPane>
+            {/* 表头问题 banner(row=0) */}
+            {headerIssues.length > 0 && (
+              <Card
+                size="small"
+                style={{ marginBottom: 16, background: '#fffbe6', borderColor: '#ffe58f' }}
+              >
+                <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                  <Text strong type="warning">
+                    ⚠️ 表头问题({headerIssues.length})
+                  </Text>
+                  {headerIssues.map((issue, idx) => (
+                    <Text key={idx} type="warning">
+                      • {issue.field || ISSUE_TYPE_LABEL[issue.type] || issue.type} — {issue.reason}
+                    </Text>
+                  ))}
+                </Space>
+              </Card>
+            )}
+
+            {/* 问题行清单:按行分组,平铺全部明细 */}
+            <Card
+              size="small"
+              title={`问题行清单(${rowIssuesByRow.length})`}
+              style={{ marginBottom: 16 }}
+            >
+              {rowIssuesByRow.length === 0 ? (
+                <Text type="secondary">无问题行 ✓</Text>
+              ) : (
+                <Space direction="vertical" size={12} style={{ width: '100%' }}>
+                  {rowIssuesByRow.map(({ row, items }) => (
+                    <div
+                      key={row}
+                      style={{
+                        borderLeft: '3px solid #cf1322',
+                        paddingLeft: 12,
+                        paddingTop: 4,
+                        paddingBottom: 4,
+                      }}
+                    >
+                      <Text strong style={{ color: '#cf1322' }}>
+                        第 {row} 行 · 共 {items.length} 个问题
+                      </Text>
+                      <div style={{ marginTop: 6 }}>
+                        {items.map((issue, idx) => (
+                          <div key={idx} style={{ marginBottom: 4 }}>
+                            <Text strong>
+                              {issue.field || ISSUE_TYPE_LABEL[issue.type] || issue.type}
+                            </Text>
+                            <Text> — {issue.reason}</Text>
+                            <Text type="secondary">（原始值: {formatRaw(issue.raw)}）</Text>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </Space>
               )}
-            </Tabs>
+            </Card>
+
+            {/* 可清洗预览:辅助信息,不属于问题行 */}
+            {report.cleanable_previews.length > 0 && (
+              <Card
+                size="small"
+                title={`可自动清洗(${report.cleanable_previews.length})`}
+                style={{ marginBottom: 16 }}
+              >
+                <Table
+                  rowKey={(r) => `${r.row}-${r.field}`}
+                  size="small"
+                  pagination={{ pageSize: 10 }}
+                  columns={[
+                    { title: '行号', dataIndex: 'row', width: 80 },
+                    { title: '字段', dataIndex: 'field', width: 140 },
+                    { title: '原始值', dataIndex: 'raw', render: (v) => formatRaw(v) },
+                    { title: '清洗后', dataIndex: 'clean', render: (v) => String(v) },
+                  ]}
+                  dataSource={report.cleanable_previews}
+                />
+              </Card>
+            )}
 
             <Space style={{ marginTop: 16 }}>
               <Button icon={<ReloadOutlined />} onClick={handleReset}>

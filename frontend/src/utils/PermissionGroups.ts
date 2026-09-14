@@ -34,6 +34,7 @@ export const getPermissionGroups = (): PermissionGroup[] => {
         { key: PERMISSIONS.LEDGER_SUBMIT, name: '提交台账', description: '允许提交台账进入审批流程', group: '台账管理' },
         { key: PERMISSIONS.LEDGER_APPROVE, name: '审批台账', description: '允许审批台账', group: '台账管理' },
         { key: PERMISSIONS.LEDGER_ADMIN_APPROVE, name: '管理员审批台账', description: '允许管理员审批台账', group: '台账管理' },
+        { key: PERMISSIONS.LEDGER_IMPORT, name: '导入台账', description: '允许批量导入台账数据', group: '台账管理' },
       ],
     },
     {
@@ -135,6 +136,7 @@ export const getPermissionGroupsSimple = (): PermissionGroupSimple[] => {
         { key: PERMISSIONS.LEDGER_SUBMIT, label: '提交台账' },
         { key: PERMISSIONS.LEDGER_APPROVE, label: '审批台账' },
         { key: PERMISSIONS.LEDGER_ADMIN_APPROVE, label: '管理员审批台账' },
+        { key: PERMISSIONS.LEDGER_IMPORT, label: '导入台账' },
       ],
     },
     {
@@ -211,6 +213,12 @@ export const getPermissionGroupsSimple = (): PermissionGroupSimple[] => {
       groupName: '日志管理',
       permissions: [
         { key: PERMISSIONS.LOG_VIEW, label: '查看日志' },
+      ],
+    },
+    {
+      groupName: '统计分析',
+      permissions: [
+        { key: PERMISSIONS.STATISTICS_VIEW, label: '查看统计分析' },
       ],
     },
   ];

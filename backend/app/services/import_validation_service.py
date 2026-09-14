@@ -375,6 +375,9 @@ def validate_rows(
 
     preview_batch_id = f"IMP-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:8]}"
 
+    # 问题行数:按 row 去重(row>0 排除表头级 issue),与 issues 单元格数区分
+    problem_rows = len({issue.row for issue in issues if issue.row > 0})
+
     return schemas.ImportValidationReport(
         template_id=template.id,
         template_name=template.name,
@@ -382,6 +385,7 @@ def validate_rows(
         total_rows=len(rows),
         importable_count=importable_rows,
         cleanable_count=cleanable_count,
+        problem_rows=problem_rows,
         issues=issues,
         cleanable_previews=cleanable_previews,
     )

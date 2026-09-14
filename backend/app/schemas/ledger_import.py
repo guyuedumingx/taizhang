@@ -48,6 +48,7 @@ class ImportValidationReport(BaseModel):
     total_rows: int
     importable_count: int
     cleanable_count: int
+    problem_rows: int = 0  # 去重后的"问题行"数(按 row 去重),区别于 issues 的单元格数
     issues: List[ImportIssue] = []
     cleanable_previews: List[CleanablePreview] = []
     row_limit_warning: Optional[str] = None
