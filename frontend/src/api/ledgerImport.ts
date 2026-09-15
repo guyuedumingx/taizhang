@@ -62,6 +62,7 @@ export interface ImportValidationReport {
   problem_rows: number;     // 去重后的"问题行"数;区别于 issues.length(单元格数)
   issues: ImportIssue[];
   cleanable_previews: CleanablePreview[];
+  fallback_notice?: string | null;   // 团队兜底生效提示(选了所属团队且有组别反查失败时)
   row_limit_warning?: string | null;
 }
 

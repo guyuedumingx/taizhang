@@ -34,23 +34,25 @@ class _FakeUploadFile:
         return self.content
 
 
-def _build_xlsx_bytes(headers: List[str], data_rows: List[List]) -> bytes:
+def _build_xlsx_bytes(headers: List[str], data_rows: List[List], with_example: bool = True) -> bytes:
     """
     构造符合 load_workbook_rows 期望的 xlsx:
       - Sheet 1: 「填表说明」(任意内容)
-      - Sheet 2: 「数据」,第 1 行表头,第 2 行 hint,第 3 行示例,第 4 行起数据
+      - Sheet 2: 「数据」,第 1 行表头,第 2 行 hint,第 3 行示例(可去掉),其后为数据
+    示例行携带与 import_template_service 相同的「示例行,请删除后从下一行开始填写」标记。
     """
     wb = Workbook()
     # 默认 Sheet 1 改名 + 写一行说明
     ws1 = wb.active
     ws1.title = "填表说明"
-    ws1.append(["导入模板说明", "数据从第 4 行开始填写"])
+    ws1.append(["导入模板说明", "数据从示例行之后开始填写"])
 
     ws2 = wb.create_sheet("数据")
     ws2.append(headers)              # 第 1 行:表头
     ws2.append(["hint", "hint"])      # 第 2 行:hint
-    ws2.append(["示例", 100])         # 第 3 行:示例
-    for row in data_rows:            # 第 4 行起:数据
+    if with_example:
+        ws2.append(["示例行,请删除后从下一行开始填写"] + [None] * (len(headers) - 1))  # 第 3 行:示例
+    for row in data_rows:            # 数据紧跟其后
         ws2.append(row)
 
     buf = BytesIO()

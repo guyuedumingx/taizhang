@@ -140,20 +140,26 @@ def load_workbook_rows(content: bytes) -> Tuple[List[str], List[Dict[str, Any]]]
     header_row = all_rows[0]  # 第 1 行: 表头
     headers = [str(h).strip() if h is not None else "" for h in header_row]
 
-    # 数据行:跳过 hint 行(第2行)和示例行(第3行)
+    # 数据行:跳过 hint 行(第2行);第3行按「示例行」标记判断——
+    # 模板说明让用户删除示例行,删除后第3行就是首条数据,不能盲跳
+    # (标记文本见 import_template_service._EXAMPLE_ROW,写在最后一列外一格)
+    start_idx = 2
+    if len(all_rows) > 2 and any(
+        isinstance(v, str) and "示例行" in v for v in all_rows[2]
+    ):
+        start_idx = 3
     # 注意:openpyxl values_only 模式会截掉尾部全空列,导致列错位,
     # 所以这里按表头数量显式对齐,不足补 None
-    data_rows = all_rows[3:]
     rows: List[Dict[str, Any]] = []
     n_cols = len(headers)
-    for row_offset, values in enumerate(data_rows, start=4):
-        values = list(values)[:n_cols] + [None] * max(0, n_cols - len(values))
+    for row_idx in range(start_idx, len(all_rows)):
+        values = list(all_rows[row_idx])[:n_cols] + [None] * max(0, n_cols - len(all_rows[row_idx]))
         # 全空行跳过
         if all(_normalize_cell(v) is None for v in values):
             continue
         row_data = {headers[i]: _normalize_cell(values[i]) if i < len(values) else None
                     for i in range(len(headers)) if headers[i]}
-        rows.append({"_row": row_offset, **row_data})
+        rows.append({"_row": row_idx + 1, **row_data})
 
     return headers, rows
 
@@ -229,6 +235,7 @@ def validate_rows(
     seen_keys: Dict[str, int] = {}  # 文件内已见 unique_keys -> row
     importable_rows = 0
     cleanable_count = 0
+    fallback_rows = 0  # 组别反查失败、靠 fallback_team_id 兜底的行数
 
     for row_data in rows:
         excel_row: int = row_data["_row"]
@@ -319,6 +326,7 @@ def validate_rows(
                 if team_id is None:
                     if fallback_team_id is not None:
                         team_id = fallback_team_id
+                        fallback_rows += 1
                     else:
                         row_issues.append(schemas.ImportIssue(
                             row=excel_row,
@@ -378,6 +386,15 @@ def validate_rows(
     # 问题行数:按 row 去重(row>0 排除表头级 issue),与 issues 单元格数区分
     problem_rows = len({issue.row for issue in issues if issue.row > 0})
 
+    # 团队兜底提示:让"兜底静默生效"可感知
+    fallback_notice = None
+    if fallback_rows > 0 and fallback_team_id is not None:
+        team_name = next((n for n, i in teams.items() if i == fallback_team_id), None)
+        fallback_notice = (
+            f"已启用团队兜底:{fallback_rows} 行组别无法识别,"
+            f"已归入「{team_name or fallback_team_id}」"
+        )
+
     return schemas.ImportValidationReport(
         template_id=template.id,
         template_name=template.name,
@@ -388,6 +405,7 @@ def validate_rows(
         problem_rows=problem_rows,
         issues=issues,
         cleanable_previews=cleanable_previews,
+        fallback_notice=fallback_notice,
     )
 
 

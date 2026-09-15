@@ -51,6 +51,7 @@ class ImportValidationReport(BaseModel):
     problem_rows: int = 0  # 去重后的"问题行"数(按 row 去重),区别于 issues 的单元格数
     issues: List[ImportIssue] = []
     cleanable_previews: List[CleanablePreview] = []
+    fallback_notice: Optional[str] = None  # 团队兜底生效提示(如"3 行组别无法识别,已归入「XX」")
     row_limit_warning: Optional[str] = None
 
 
