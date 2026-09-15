@@ -232,19 +232,53 @@ const LedgerQuery: React.FC = () => {
     aggregations,
   });
 
+  const doSaveView = (name: string, filters: SavedViewFilters) => {
+    const view: SavedView = { name, saved_at: dayjs().format('YYYY-MM-DD HH:mm'), filters };
+    const next = [...savedViews.filter((v) => v.name !== name), view];
+    setSavedViews(next);
+    persistSavedViews(next);
+    setSaveViewOpen(false);
+    setNewViewName('');
+    message.success(`视图「${name}」已保存，可在左侧「统计分析」菜单打开`);
+  };
+
   const handleSaveView = () => {
     const name = newViewName.trim();
     if (!name) {
       message.warning('请输入视图名称');
       return;
     }
-    const view: SavedView = { name, saved_at: dayjs().format('YYYY-MM-DD HH:mm'), filters: captureFilters() };
-    const next = [...savedViews.filter((v) => v.name !== name), view];
-    setSavedViews(next);
-    persistSavedViews(next);
-    setSaveViewOpen(false);
-    setNewViewName('');
-    message.success(`视图「${name}」已保存（仅保存在本浏览器）`);
+    const filters = captureFilters();
+    if (!filters.aggregations.length) {
+      // 软提醒：无指标视图打开时只展示明细表格
+      Modal.confirm({
+        title: '未配置统计指标',
+        content: '该视图打开时将只展示明细表格，仍要保存吗？',
+        okText: '仍要保存',
+        onOk: () => doSaveView(name, filters),
+      });
+      return;
+    }
+    doSaveView(name, filters);
+  };
+
+  // 视图页（只读模式）顶栏的删除：确认后回生成器页，菜单同步消失
+  const handleDeleteCurrentView = () => {
+    const name = searchParams.get('view');
+    if (!name) return;
+    Modal.confirm({
+      title: `删除视图「${name}」？`,
+      content: '删除后左侧菜单同步消失，不可恢复。',
+      okText: '删除',
+      okButtonProps: { danger: true },
+      onOk: () => {
+        const next = loadSavedViews().filter((v) => v.name !== name);
+        setSavedViews(next);
+        persistSavedViews(next);
+        setSearchParams({}, { replace: true });
+        message.success(`视图「${name}」已删除`);
+      },
+    });
   };
 
   const applyFilters = (f: SavedViewFilters, opts: { autoRun?: boolean; name?: string }) => {
@@ -415,6 +449,57 @@ const LedgerQuery: React.FC = () => {
   }, [queryFields, selectedTemplateIds]);
 
   const hasSuspicious = quality.some((q) => q.suspicious_count > 0);
+
+  // ---------- 视图只读模式：视图栏 + 指标卡片 + 明细表格，不含任何生成器控件 ----------
+  const viewName = searchParams.get('view');
+  if (viewName) {
+    const currentView = findSavedView(viewName);
+    return (
+      <div style={{ padding: 24 }}>
+        <Card>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <Space align="baseline">
+              <Typography.Title level={4} style={{ margin: 0 }}>{viewName}</Typography.Title>
+              {currentView && <Text type="secondary">保存于 {currentView.saved_at}</Text>}
+            </Space>
+            <Button danger icon={<DeleteOutlined />} onClick={handleDeleteCurrentView}>
+              删除视图
+            </Button>
+          </div>
+
+          {aggResults.length > 0 && (
+            <Space wrap size={40} style={{ marginBottom: 16 }}>
+              {aggResults.map((a, i) => (
+                <Statistic
+                  key={`${a.type}-${a.field}-${i}`}
+                  title={a.label || a.type}
+                  value={a.value === null ? '-' : a.value}
+                  precision={a.value !== null && !Number.isInteger(a.value) ? 2 : 0}
+                />
+              ))}
+            </Space>
+          )}
+
+          <Table<LedgerQueryItem>
+            rowKey="id"
+            size="middle"
+            loading={loading}
+            columns={columns}
+            dataSource={result}
+            onChange={handleTableChange}
+            pagination={{
+              current: pagination.page,
+              pageSize: pagination.pageSize,
+              total,
+              showSizeChanger: true,
+              pageSizeOptions: [10, 20, 50, 100],
+              showTotal: (t) => `共 ${t} 条`,
+            }}
+          />
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: 24 }}>
