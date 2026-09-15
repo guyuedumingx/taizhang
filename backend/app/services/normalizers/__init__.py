@@ -27,6 +27,7 @@ from app.services.normalizers.builtin import (  # noqa: F401
     extract_number,
     unit_multiplier,
     semantic_null,
+    currency_check,
     range_check,
 )
 

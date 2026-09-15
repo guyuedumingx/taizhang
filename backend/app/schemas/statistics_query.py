@@ -19,10 +19,26 @@ class SystemFilters(BaseModel):
     updated_at_range: Optional[List[str]] = None
 
 
+class AggregationSpec(BaseModel):
+    """动态统计指标：sum/count/avg/max/min 需要字段（须配置清洗规则）；row_count 为台账条数。"""
+    type: str = "sum"
+    field: Optional[str] = None
+    label: Optional[str] = None
+
+
+class AggregationResult(BaseModel):
+    type: str
+    field: Optional[str] = None
+    label: Optional[str] = None
+    value: Optional[float] = None
+    numeric_count: int = 0   # 参与计算的清洗有效值条数
+
+
 class StatisticsQueryRequest(BaseModel):
     template_ids: List[int] = []                   # 空 = 全部模板
     system_filters: SystemFilters = SystemFilters()
     field_filters: Dict[str, FieldFilterCondition] = {}
+    aggregations: List[AggregationSpec] = []       # 动态统计指标（前端选择）
     keyword: str = ""
     page: int = 1
     page_size: int = 20
@@ -74,6 +90,7 @@ class LedgerQueryResponse(BaseModel):
     page: int
     page_size: int
     data_quality: DataQualityReport
+    aggregations: List[AggregationResult] = []
 
 
 class QueryField(BaseModel):

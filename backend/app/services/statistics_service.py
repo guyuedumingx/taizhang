@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import models
 from app.schemas.statistics_query import (
+    AggregationResult,
     DataQualityReport,
     FieldFilterCondition,
     FieldQuality,
@@ -97,6 +98,11 @@ class StatisticsService:
         # ④ 数据质量聚合（对过滤后的结果集）
         data_quality = StatisticsService._aggregate_quality(matched, pipelines_by_template, pipeline_result)
 
+        # 动态统计指标（前端选择，算在过滤后的结果集上）
+        aggregations = StatisticsService._compute_aggregations(
+            matched, pipelines_by_template, pipeline_result, query.aggregations
+        )
+
         # 排序
         matched = StatisticsService._sort(matched, query, pipelines_by_template, pipeline_result)
 
@@ -114,6 +120,7 @@ class StatisticsService:
             page=query.page if not fetch_all else 1,
             page_size=query.page_size if not fetch_all else total,
             data_quality=data_quality,
+            aggregations=aggregations,
         )
 
     # ---------- SQL 粗筛 ----------
@@ -250,6 +257,71 @@ class StatisticsService:
             target.suspicious_items.extend(fq.suspicious_items[:max(remaining, 0)])
         return DataQualityReport(total_count=total, fields=list(merged.values()))
 
+    # ---------- 动态统计指标 ----------
+
+    _AGG_TYPES = {"sum", "count", "avg", "max", "min", "row_count"}
+    _AGG_LABELS = {"sum": "合计", "count": "有效计数", "avg": "平均", "max": "最大", "min": "最小", "row_count": "台账条数"}
+
+    @staticmethod
+    def _compute_aggregations(matched, pipelines_by_template, pipeline_result, specs) -> List[AggregationResult]:
+        """按前端传入的指标逐个计算，全部基于过滤后的结果集。
+
+        - row_count: 台账条数（无字段）
+        - sum/count/avg/max/min: 数值字段指标，只取配置了清洗规则的模板中
+          「清洗有效且不可疑」的值（外币/脏值自动排除）
+        """
+        results: List[AggregationResult] = []
+        for spec in specs or []:
+            agg_type = (spec.type or "").lower()
+            if agg_type not in StatisticsService._AGG_TYPES:
+                results.append(AggregationResult(type=agg_type, field=spec.field, label=spec.label))
+                continue
+
+            if agg_type == "row_count":
+                results.append(AggregationResult(
+                    type=agg_type,
+                    label=spec.label or StatisticsService._AGG_LABELS[agg_type],
+                    value=float(len(matched)),
+                    numeric_count=len(matched),
+                ))
+                continue
+
+            field = spec.field
+            values: List[float] = []
+            if field:
+                for led in matched:
+                    entry = pipelines_by_template.get(led.template.name if led.template else "", {}).get(field)
+                    if not entry:
+                        continue  # 该模板未配置此字段的清洗规则，不参与
+                    nr = pipeline_result(led, field)
+                    if nr is not None and nr.is_numeric and not nr.is_suspicious:
+                        values.append(nr.value)
+
+            value = None
+            if agg_type == "count":
+                value = float(len(values))
+            elif values:
+                if agg_type == "sum":
+                    value = sum(values)
+                elif agg_type == "avg":
+                    value = sum(values) / len(values)
+                elif agg_type == "max":
+                    value = max(values)
+                elif agg_type == "min":
+                    value = min(values)
+
+            results.append(AggregationResult(
+                type=agg_type,
+                field=field,
+                label=spec.label or (
+                    f"{field}·{StatisticsService._AGG_LABELS[agg_type]}"
+                    if field else StatisticsService._AGG_LABELS[agg_type]
+                ),
+                value=value,
+                numeric_count=len(values),
+            ))
+        return results
+
     # ---------- 排序与转换 ----------
 
     @staticmethod
@@ -263,18 +335,30 @@ class StatisticsService:
                 return (v is None, v)
             return sorted(ledgers, key=sys_key, reverse=reverse)
 
-        def field_key(led):
+        def classify(led):
             raw = (led.data or {}).get(sort_by)
             nr = pipeline_result(led, sort_by)
             if nr is not None:
                 if nr.is_numeric and not nr.is_suspicious:
-                    return (0, nr.value, "")
-                return (1, 0.0, nr.raw)
+                    return nr.value, None
+                return None, nr.raw
             try:
-                return (0, float(str(raw)), "")
+                return float(str(raw)), None
             except (TypeError, ValueError):
-                return (1, 0.0, str(raw if raw is not None else ""))
-        return sorted(ledgers, key=field_key, reverse=reverse)
+                return None, str(raw if raw is not None else "")
+
+        # 数值行按值参与方向排序；无法解析/可疑的行始终排在末尾（不随方向翻转）
+        numeric: List[Tuple[float, int, models.Ledger]] = []
+        textual: List[Tuple[int, str, models.Ledger]] = []
+        for idx, led in enumerate(ledgers):
+            value, raw = classify(led)
+            if value is None:
+                textual.append((idx, raw, led))
+            else:
+                numeric.append((value, idx, led))
+        numeric.sort(key=lambda p: p[0], reverse=reverse)
+        textual.sort(key=lambda p: p[1], reverse=reverse)
+        return [led for _, _, led in numeric] + [led for _, _, led in textual]
 
     @staticmethod
     def _to_item(led: models.Ledger) -> LedgerQueryItem:

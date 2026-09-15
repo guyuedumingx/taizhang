@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert, Button, Card, Collapse, DatePicker, Empty, Input, InputNumber, List, message, Modal, Select, Space,
-  Table, Tag, Tooltip, Typography,
+  Statistic, Table, Tag, Tooltip, Typography,
 } from 'antd';
 import {
-  DownloadOutlined, ReloadOutlined, SaveOutlined, SearchOutlined, SettingOutlined, WarningOutlined,
+  DeleteOutlined, DownloadOutlined, PlusOutlined, ReloadOutlined, SaveOutlined, SearchOutlined, SettingOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
@@ -17,7 +18,7 @@ import { getUsers } from '../../api/users';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
 import type {
-  FieldFilterCondition, FieldQuality, LedgerQueryItem, QueryField,
+  AggregationResult, AggregationSpec, FieldFilterCondition, FieldQuality, LedgerQueryItem, QueryField,
   StatisticsQueryRequest, SuspiciousItem,
 } from '../../types';
 
@@ -37,6 +38,15 @@ const APPROVAL_OPTIONS = [
 
 const STATUS_LABELS: Record<string, string> = { draft: '草稿', active: '活跃', completed: '已完成' };
 const APPROVAL_LABELS: Record<string, string> = { pending: '审批中', approved: '已批准', rejected: '已拒绝' };
+
+const METRIC_OPTIONS = [
+  { value: 'sum', label: '求和' },
+  { value: 'count', label: '有效计数' },
+  { value: 'avg', label: '平均' },
+  { value: 'max', label: '最大' },
+  { value: 'min', label: '最小' },
+  { value: 'row_count', label: '台账条数' },
+] as const;
 
 interface FieldFilterState {
   operator: FieldFilterCondition['operator'];
@@ -59,6 +69,7 @@ interface SavedView {
     creatorIds: number[];
     createdAtRange: [string, string] | null;
     fieldFilters: Record<string, FieldFilterState>;
+    aggregations: AggregationSpec[];
   };
 }
 
@@ -94,11 +105,15 @@ const LedgerQuery: React.FC = () => {
   const [queryFields, setQueryFields] = useState<QueryField[]>([]);
   const [fieldFilters, setFieldFilters] = useState<Record<string, FieldFilterState>>({});
 
+  // 动态统计指标
+  const [aggregations, setAggregations] = useState<AggregationSpec[]>([]);
+
   // 结果
   const [result, setResult] = useState<LedgerQueryItem[]>([]);
   const [total, setTotal] = useState(0);
   const [quality, setQuality] = useState<FieldQuality[]>([]);
   const [qualityTotal, setQualityTotal] = useState(0);
+  const [aggResults, setAggResults] = useState<AggregationResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, pageSize: 20 });
@@ -170,6 +185,8 @@ const LedgerQuery: React.FC = () => {
         updated_at_range: null,
       },
       field_filters,
+      // 未选完字段的指标不提交（row_count 无需字段）
+      aggregations: aggregations.filter((a) => a.type === 'row_count' || !!a.field),
       keyword: keyword.trim(),
       page,
       page_size: pageSize,
@@ -186,6 +203,7 @@ const LedgerQuery: React.FC = () => {
         setTotal(resp.total);
         setQuality(resp.data_quality.fields);
         setQualityTotal(resp.data_quality.total_count);
+        setAggResults(resp.aggregations || []);
         setPagination({ page: resp.page, pageSize: resp.page_size });
       })
       .catch(() => {})
@@ -202,10 +220,12 @@ const LedgerQuery: React.FC = () => {
     setCreatedAtRange(null);
     setFieldFilters({});
     setQueryFields([]);
+    setAggregations([]);
     setResult([]);
     setTotal(0);
     setQuality([]);
     setQualityTotal(0);
+    setAggResults([]);
   };
 
   // ---------- 视图管理 ----------
@@ -224,6 +244,7 @@ const LedgerQuery: React.FC = () => {
         ]
       : null,
     fieldFilters,
+    aggregations,
   });
 
   const handleSaveView = () => {
@@ -253,6 +274,7 @@ const LedgerQuery: React.FC = () => {
       f.createdAtRange?.[0] ? [dayjs(f.createdAtRange[0]), dayjs(f.createdAtRange[1] || f.createdAtRange[0])] : null,
     );
     setFieldFilters(f.fieldFilters || {});
+    setAggregations(f.aggregations || []);
     message.info(`已加载视图「${view.name}」，点击查询执行`);
   };
 
@@ -278,6 +300,7 @@ const LedgerQuery: React.FC = () => {
         setTotal(resp.total);
         setQuality(resp.data_quality.fields);
         setQualityTotal(resp.data_quality.total_count);
+        setAggResults(resp.aggregations || []);
         setPagination({ page: resp.page, pageSize: resp.page_size });
       })
       .catch(() => {})
@@ -475,7 +498,58 @@ const LedgerQuery: React.FC = () => {
               }]}
             />
           )}
+
+          {/* 动态统计指标 */}
+          <div>
+            <Space wrap align="center">
+              <Text type="secondary" style={{ display: 'inline-block', width: 100 }}>统计指标</Text>
+              {aggregations.map((a, i) => (
+                <Space key={i} wrap>
+                  <Select
+                    style={{ width: 120 }}
+                    value={a.type}
+                    options={METRIC_OPTIONS.map((m) => ({ value: m.value, label: m.label }))}
+                    onChange={(t) => setAggregations((prev) =>
+                      prev.map((x, xi) => (xi === i ? { ...x, type: t, field: t === 'row_count' ? null : x.field } : x)),
+                    )}
+                  />
+                  {a.type !== 'row_count' && (
+                    <Select
+                      placeholder="选择字段" style={{ width: 150 }}
+                      value={a.field || undefined}
+                      options={queryFields.filter((f) => f.has_pipeline).map((f) => ({ value: f.name, label: f.label }))}
+                      onChange={(v) => setAggregations((prev) => prev.map((x, xi) => (xi === i ? { ...x, field: v } : x)))}
+                    />
+                  )}
+                  <Button type="text" danger size="small" icon={<DeleteOutlined />}
+                          onClick={() => setAggregations((prev) => prev.filter((_, xi) => xi !== i))} />
+                </Space>
+              ))}
+              <Button size="small" icon={<PlusOutlined />}
+                      onClick={() => setAggregations((prev) => [...prev, { type: 'sum', field: undefined }])}>
+                添加指标
+              </Button>
+              <Tooltip title="求和/计数/平均/最大/最小只支持配置了清洗规则的字段；外币等可疑值自动排除。">
+                <Text type="secondary" style={{ fontSize: 12 }}>ⓘ</Text>
+              </Tooltip>
+            </Space>
+          </div>
         </Space>
+
+        {/* 动态指标结果 */}
+        {aggResults.length > 0 && (
+          <Space wrap size={40} style={{ marginTop: 16 }}>
+            {aggResults.map((a, i) => (
+              <Statistic
+                key={`${a.type}-${a.field}-${i}`}
+                title={a.label || a.type}
+                value={a.value === null ? '-' : a.value}
+                precision={a.value !== null && !Number.isInteger(a.value) ? 2 : 0}
+                suffix={a.type !== 'row_count' && a.value !== null ? '' : '条'}
+              />
+            ))}
+          </Space>
+        )}
 
         {/* 数据质量报告 */}
         {quality.length > 0 && (

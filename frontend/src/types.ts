@@ -149,10 +149,26 @@ export interface StatisticsSystemFilters {
   updated_at_range?: [string, string] | null;
 }
 
+// 动态统计指标
+export interface AggregationSpec {
+  type: 'sum' | 'count' | 'avg' | 'max' | 'min' | 'row_count';
+  field?: string | null;   // row_count 不需要字段；其余须为配置了清洗规则的字段
+  label?: string | null;
+}
+
+export interface AggregationResult {
+  type: string;
+  field: string | null;
+  label: string | null;
+  value: number | null;
+  numeric_count: number;
+}
+
 export interface StatisticsQueryRequest {
   template_ids: number[];
   system_filters: StatisticsSystemFilters;
   field_filters: Record<string, FieldFilterCondition>;
+  aggregations: AggregationSpec[];
   keyword: string;
   page: number;
   page_size: number;
@@ -204,6 +220,7 @@ export interface LedgerQueryResponse {
   page: number;
   page_size: number;
   data_quality: DataQualityReport;
+  aggregations: AggregationResult[];
 }
 
 export interface QueryField {

@@ -10,6 +10,7 @@ AMOUNT_PIPELINE = [
     {"type": "strip_whitespace"},
     {"type": "fullwidth_to_half"},
     {"type": "semantic_null", "words": ["无", "没有", "暂无", "N/A"], "as_value": 0},
+    {"type": "currency_check"},
     {"type": "uppercase_amount", "allow_lowercase": True},
     {"type": "remove_currency", "symbols": ["¥", "￥", "元", "$", "＄"]},
     {"type": "remove_thousands"},
@@ -127,6 +128,30 @@ class TestDirtyPatterns:
     def test_empty_and_none(self):
         assert clean("").is_suspicious
         assert clean(None).is_suspicious
+
+
+class TestCurrencyCheck:
+    """非人民币金额标可疑（2026-09-09 决策），人民币形态不受影响。"""
+
+    @pytest.mark.parametrize("raw", [
+        "$1000", "USD 500", "usd500", "1000美元", "€200", "200欧元",
+        "日元3000", "3000円", "港元150", "HKD99",
+    ])
+    def test_foreign_currency_suspicious(self, raw):
+        r = clean(raw)
+        assert r.is_suspicious, f"raw={raw}, note={r.note}"
+        assert "非人民币" in r.note
+
+    @pytest.mark.parametrize("raw,expected", [
+        ("¥1000", 1000),          # 人民币符号放行
+        ("￥2500", 2500),
+        ("3700元", 3700),
+        ("人民币壹佰元整", 100),   # 大写金额自带人民币前缀，不受影响
+    ])
+    def test_cny_untouched(self, raw, expected):
+        r = clean(raw)
+        assert r.is_numeric and not r.is_suspicious, f"raw={raw}, note={r.note}"
+        assert r.value == expected
 
 
 class TestInvalidPolicy:

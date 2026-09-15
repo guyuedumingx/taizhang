@@ -7,4 +7,5 @@ from app.services.normalizers.builtin import remove_thousands  # noqa: F401
 from app.services.normalizers.builtin import extract_number  # noqa: F401
 from app.services.normalizers.builtin import unit_multiplier  # noqa: F401
 from app.services.normalizers.builtin import semantic_null  # noqa: F401
+from app.services.normalizers.builtin import currency_check  # noqa: F401
 from app.services.normalizers.builtin import range_check  # noqa: F401
