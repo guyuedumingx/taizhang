@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Alert, Button, Card, Collapse, DatePicker, Empty, Input, InputNumber, List, message, Modal, Select, Space,
   Statistic, Table, Tag, Tooltip, Typography,
@@ -17,6 +18,10 @@ import { getTeams } from '../../api/teams';
 import { getUsers } from '../../api/users';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
+import {
+  findSavedView, loadSavedViews, persistSavedViews, VIEWS_CHANGED_EVENT,
+  type SavedView, type SavedViewFilters,
+} from '../../utils/statisticsViews';
 import type {
   AggregationResult, AggregationSpec, FieldFilterCondition, FieldQuality, LedgerQueryItem, QueryField,
   StatisticsQueryRequest, SuspiciousItem,
@@ -53,38 +58,9 @@ interface FieldFilterState {
   value?: any;
 }
 
-// ---------- 视图管理（localStorage 个人级持久化，零后端改动） ----------
-
-const VIEWS_STORAGE_KEY = 'taizhang_ledger_query_views';
-
-interface SavedView {
-  name: string;
-  saved_at: string;
-  filters: {
-    selectedTemplateIds: number[];
-    keyword: string;
-    statusSel: string[];
-    approvalSel: string[];
-    teamIds: number[];
-    creatorIds: number[];
-    createdAtRange: [string, string] | null;
-    fieldFilters: Record<string, FieldFilterState>;
-    aggregations: AggregationSpec[];
-  };
-}
-
-const loadSavedViews = (): SavedView[] => {
-  try {
-    const raw = localStorage.getItem(VIEWS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-};
-
-const persistSavedViews = (views: SavedView[]) => {
-  localStorage.setItem(VIEWS_STORAGE_KEY, JSON.stringify(views));
-};
+// ---------- 视图管理：存储在 utils/statisticsViews.ts（localStorage 个人级，零后端改动） ----------
+// 视图保存后会作为「统计分析」菜单下的动态条目出现，点菜单即进入该视图并自动查询；
+// 本页是视图生成器，保留 保存/管理 能力。
 
 const LedgerQuery: React.FC = () => {
   const { hasPermission } = useAuthStore();
@@ -126,6 +102,8 @@ const LedgerQuery: React.FC = () => {
   const [saveViewOpen, setSaveViewOpen] = useState(false);
   const [newViewName, setNewViewName] = useState('');
   const [manageViewsOpen, setManageViewsOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const appliedViewRef = useRef<string | null>(null);
 
   useEffect(() => {
     // 团队/用户接口返回分页对象 {items:[...]}，模板接口返回数组——统一归一化；
@@ -155,39 +133,37 @@ const LedgerQuery: React.FC = () => {
     }
   }, [selectedTemplateIds]);
 
-  const buildRequest = (
+  const buildRequestFrom = (
+    f: SavedViewFilters,
     page: number,
     pageSize: number,
     sortBy = sortInfo.sortBy,
     sortOrder = sortInfo.sortOrder,
   ): StatisticsQueryRequest => {
     const field_filters: Record<string, FieldFilterCondition> = {};
-    Object.entries(fieldFilters).forEach(([name, st]) => {
+    Object.entries(f.fieldFilters || {}).forEach(([name, st]) => {
       if (st.value === undefined || st.value === null || st.value === '' ||
           (Array.isArray(st.value) && (st.value as any[]).every((v) => v === undefined || v === null || v === ''))) {
         return;
       }
-      field_filters[name] = { operator: st.operator, value: st.value };
+      field_filters[name] = { operator: st.operator as FieldFilterCondition['operator'], value: st.value };
     });
     return {
-      template_ids: selectedTemplateIds,
+      template_ids: f.selectedTemplateIds || [],
       system_filters: {
-        status: statusSel,
-        approval_status: approvalSel,
-        team_ids: teamIds,
-        created_by_ids: creatorIds,
-        created_at_range: createdAtRange?.[0]
-          ? [
-              createdAtRange[0].format('YYYY-MM-DD'),
-              createdAtRange[1]?.format('YYYY-MM-DD') || createdAtRange[0].format('YYYY-MM-DD'),
-            ]
+        status: f.statusSel || [],
+        approval_status: f.approvalSel || [],
+        team_ids: f.teamIds || [],
+        created_by_ids: f.creatorIds || [],
+        created_at_range: f.createdAtRange?.[0]
+          ? [f.createdAtRange[0], f.createdAtRange[1] || f.createdAtRange[0]]
           : null,
         updated_at_range: null,
       },
       field_filters,
       // 未选完字段的指标不提交（row_count 无需字段）
-      aggregations: aggregations.filter((a) => a.type === 'row_count' || !!a.field),
-      keyword: keyword.trim(),
+      aggregations: (f.aggregations || []).filter((a) => a.type === 'row_count' || !!a.field),
+      keyword: (f.keyword || '').trim(),
       page,
       page_size: pageSize,
       sort_by: sortBy,
@@ -195,9 +171,16 @@ const LedgerQuery: React.FC = () => {
     };
   };
 
-  const handleQuery = (page = 1, pageSize = pagination.pageSize) => {
+  const buildRequest = (
+    page: number,
+    pageSize: number,
+    sortBy = sortInfo.sortBy,
+    sortOrder = sortInfo.sortOrder,
+  ): StatisticsQueryRequest => buildRequestFrom(captureFilters(), page, pageSize, sortBy, sortOrder);
+
+  const runQuery = (req: StatisticsQueryRequest) => {
     setLoading(true);
-    ledgerQuery(buildRequest(page, pageSize))
+    ledgerQuery(req)
       .then((resp) => {
         setResult(resp.items);
         setTotal(resp.total);
@@ -209,6 +192,8 @@ const LedgerQuery: React.FC = () => {
       .catch(() => {})
       .finally(() => setLoading(false));
   };
+
+  const handleQuery = (page = 1, pageSize = pagination.pageSize) => runQuery(buildRequest(page, pageSize));
 
   const handleReset = () => {
     setSelectedTemplateIds([]);
@@ -262,8 +247,7 @@ const LedgerQuery: React.FC = () => {
     message.success(`视图「${name}」已保存（仅保存在本浏览器）`);
   };
 
-  const applyView = (view: SavedView) => {
-    const f = view.filters;
+  const applyFilters = (f: SavedViewFilters, opts: { autoRun?: boolean; name?: string }) => {
     setSelectedTemplateIds(f.selectedTemplateIds || []);
     setKeyword(f.keyword || '');
     setStatusSel(f.statusSel || []);
@@ -273,16 +257,46 @@ const LedgerQuery: React.FC = () => {
     setCreatedAtRange(
       f.createdAtRange?.[0] ? [dayjs(f.createdAtRange[0]), dayjs(f.createdAtRange[1] || f.createdAtRange[0])] : null,
     );
-    setFieldFilters(f.fieldFilters || {});
-    setAggregations(f.aggregations || []);
-    message.info(`已加载视图「${view.name}」，点击查询执行`);
+    setFieldFilters((f.fieldFilters || {}) as Record<string, FieldFilterState>);
+    setAggregations((f.aggregations || []) as AggregationSpec[]);
+    if (opts.autoRun) {
+      runQuery(buildRequestFrom(f, 1, pagination.pageSize));
+    } else {
+      message.info(`已载入视图「${opts.name}」，点击查询执行`);
+    }
   };
+
+  const applyView = (view: SavedView, autoRun = false) => applyFilters(view.filters, { autoRun, name: view.name });
 
   const handleDeleteView = (name: string) => {
     const next = savedViews.filter((v) => v.name !== name);
     setSavedViews(next);
     persistSavedViews(next);
   };
+
+  // 侧边菜单（Layout）保存/删除视图后通过该事件刷新动态菜单项
+  useEffect(() => {
+    const h = () => setSavedViews(loadSavedViews());
+    window.addEventListener(VIEWS_CHANGED_EVENT, h);
+    return () => window.removeEventListener(VIEWS_CHANGED_EVENT, h);
+  }, []);
+
+  // 菜单点击视图 → ?view=名称 → 自动载入筛选并执行查询
+  useEffect(() => {
+    const name = searchParams.get('view');
+    if (!name) {
+      appliedViewRef.current = null;
+      return;
+    }
+    if (appliedViewRef.current === name) return;
+    appliedViewRef.current = name;
+    const v = findSavedView(name);
+    if (!v) {
+      message.warning(`视图「${name}」不存在或已被删除`);
+      return;
+    }
+    applyFilters(v.filters, { autoRun: true, name: v.name });
+  }, [searchParams]);
 
   const handleTableChange = (
     pag: TablePaginationConfig,
@@ -293,18 +307,7 @@ const LedgerQuery: React.FC = () => {
     const sortBy = (s?.field as string) || 'created_at';
     const sortOrder = s?.order === 'ascend' ? 'asc' : 'desc';
     setSortInfo({ sortBy, sortOrder });
-    setLoading(true);
-    ledgerQuery(buildRequest(pag.current || 1, pag.pageSize || 20, sortBy, sortOrder))
-      .then((resp) => {
-        setResult(resp.items);
-        setTotal(resp.total);
-        setQuality(resp.data_quality.fields);
-        setQualityTotal(resp.data_quality.total_count);
-        setAggResults(resp.aggregations || []);
-        setPagination({ page: resp.page, pageSize: resp.page_size });
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    runQuery(buildRequest(pag.current || 1, pag.pageSize || 20, sortBy, sortOrder));
   };
 
   const handleExport = async () => {
@@ -460,15 +463,9 @@ const LedgerQuery: React.FC = () => {
               onChange={setCreatorIds}
             />
             <RangePicker value={createdAtRange} onChange={setCreatedAtRange} placeholder={['创建开始', '创建结束']} />
-            <Select
-              placeholder="加载视图" style={{ minWidth: 130 }} allowClear value={null}
-              options={savedViews.map((v) => ({ value: v.name, label: v.name }))}
-              onChange={(name) => {
-                const v = savedViews.find((x) => x.name === name);
-                if (v) applyView(v);
-              }}
-            />
-            <Button icon={<SaveOutlined />} onClick={() => setSaveViewOpen(true)}>保存视图</Button>
+            <Tooltip title="视图保存在左侧「统计分析」菜单下，点菜单即进入该视图">
+              <Button icon={<SaveOutlined />} onClick={() => setSaveViewOpen(true)}>保存视图</Button>
+            </Tooltip>
             <Button icon={<SettingOutlined />} disabled={savedViews.length === 0}
                     onClick={() => setManageViewsOpen(true)} />
             <Button type="primary" icon={<SearchOutlined />} loading={loading} onClick={() => handleQuery(1)}>

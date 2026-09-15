@@ -18,10 +18,12 @@ import {
   SolutionOutlined,
   ThunderboltOutlined,
   BarChartOutlined,
+  FilterOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { PERMISSIONS } from '../config';
+import { loadSavedViews, VIEWS_CHANGED_EVENT } from '../utils/statisticsViews';
 
 const { Header, Sider, Content } = Layout;
 
@@ -33,6 +35,15 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
   const { user, logout, hasPermission } = useAuthStore();
   const { token } = theme.useToken();
+
+  // 统计分析下动态渲染已保存的视图（生成器保存/删除后通过事件通知刷新）
+  const [viewsVersion, setViewsVersion] = useState(0);
+  useEffect(() => {
+    const h = () => setViewsVersion((v) => v + 1);
+    window.addEventListener(VIEWS_CHANGED_EVENT, h);
+    return () => window.removeEventListener(VIEWS_CHANGED_EVENT, h);
+  }, []);
+  const savedViews = viewsVersion >= 0 ? loadSavedViews() : [];
 
   // 当路由变化时，更新选中的菜单项
   useEffect(() => {
@@ -156,6 +167,15 @@ const AppLayout: React.FC = () => {
                   icon: <BarChartOutlined />,
                   label: <Link to="/dashboard/statistics/ledger-query">台账汇总查询</Link>,
                 },
+                // 已保存的视图：生成器产出的一等菜单条目，点击自动载入并查询
+                ...savedViews.map((v) => ({
+                  key: `statistics-view-${v.name}`,
+                  icon: <FilterOutlined />,
+                  label: <Link
+                    to={`/dashboard/statistics/ledger-query?view=${encodeURIComponent(v.name)}`}
+                    title={`保存于 ${v.saved_at}`}
+                  >{v.name}</Link>,
+                })),
               ],
             } : null,
 
