@@ -336,6 +336,16 @@ const LedgerImport: React.FC = () => {
               </Card>
             )}
 
+            {/* 团队兜底提示 */}
+            {report.fallback_notice && (
+              <Card
+                size="small"
+                style={{ marginBottom: 16, background: '#fff7e6', borderColor: '#ffd591' }}
+              >
+                <Text type="warning">🛟 {report.fallback_notice}</Text>
+              </Card>
+            )}
+
             {/* 表头问题 banner(row=0) */}
             {headerIssues.length > 0 && (
               <Card
