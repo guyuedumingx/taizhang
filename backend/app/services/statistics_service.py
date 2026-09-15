@@ -199,10 +199,20 @@ class StatisticsService:
                     return False
                 v = nr.value
             else:
+                raw_str = str(raw) if raw is not None else ""
                 try:
-                    v = float(str(raw))
-                except (TypeError, ValueError):
-                    return False
+                    v = float(raw_str)
+                except ValueError:
+                    # 非数值（如 ISO 日期字符串）回退字符串比较
+                    try:
+                        if op == "gte":
+                            return raw_str >= str(value)
+                        if op == "lte":
+                            return raw_str <= str(value)
+                        lo, hi = str(value[0]), str(value[1])
+                        return lo <= raw_str <= hi
+                    except (TypeError, ValueError, IndexError):
+                        return False
             try:
                 if op == "gte":
                     return v >= float(value)

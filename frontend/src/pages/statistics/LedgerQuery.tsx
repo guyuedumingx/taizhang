@@ -83,6 +83,8 @@ const LedgerQuery: React.FC = () => {
 
   // 动态统计指标
   const [aggregations, setAggregations] = useState<AggregationSpec[]>([]);
+  // 视图页月份切换器：用户显式选择的月份（null = 用视图保存的默认范围）
+  const [switchMonth, setSwitchMonth] = useState<string | null>(null);
 
   // 结果
   const [result, setResult] = useState<LedgerQueryItem[]>([]);
@@ -450,16 +452,62 @@ const LedgerQuery: React.FC = () => {
 
   const hasSuspicious = quality.some((q) => q.suspicious_count > 0);
 
-  // ---------- 视图只读模式：视图栏 + 指标卡片 + 明细表格，不含任何生成器控件 ----------
+  // 视图切换轴：视图里第一个「日期字段 + between」筛选；没有则回退创建时间
   const viewName = searchParams.get('view');
+  const currentView = viewName ? findSavedView(viewName) : null;
+  const viewFilters = currentView?.filters ?? null;
+  const axisField = useMemo(() => {
+    if (!viewFilters || !queryFields.length) return null;
+    const dateFields = queryFields.filter((f) => f.type === 'date').map((f) => f.name);
+    const ff = viewFilters.fieldFilters || {};
+    return Object.keys(ff).find((k) => dateFields.includes(k) && ff[k]?.operator === 'between') ?? null;
+  }, [viewFilters, queryFields]);
+  // 当前生效月份（优先显式切换值，否则从视图自身时间范围派生）
+  const currentAxisMonth = useMemo(() => {
+    if (switchMonth) return switchMonth;
+    const hit = axisField ? (viewFilters?.fieldFilters?.[axisField]?.value as [string, string] | undefined) : undefined;
+    const v = hit?.[0] || viewFilters?.createdAtRange?.[0];
+    return v ? v.slice(0, 7) : null;
+  }, [switchMonth, axisField, viewFilters]);
+
+  // ---------- 视图只读模式：视图栏 + 指标卡片 + 明细表格，不含任何生成器控件 ----------
   if (viewName) {
-    const currentView = findSavedView(viewName);
+    // 切换月份：只改时间口径重查，不改动已保存的视图；清除选择还原默认
+    const handleSwitchMonth = (month: dayjs.Dayjs | null) => {
+      if (!viewFilters) return;
+      const overridden: SavedViewFilters = {
+        ...viewFilters,
+        fieldFilters: { ...(viewFilters.fieldFilters || {}) },
+        createdAtRange: viewFilters.createdAtRange ?? null,
+      };
+      if (month) {
+        const start = month.startOf('month').format('YYYY-MM-DD');
+        const end = month.endOf('month').format('YYYY-MM-DD');
+        if (axisField) {
+          overridden.fieldFilters[axisField] = { operator: 'between', value: [start, end] };
+        } else {
+          overridden.createdAtRange = [start, end];
+        }
+        setSwitchMonth(month.format('YYYY-MM'));
+      } else {
+        setSwitchMonth(null);
+      }
+      runQuery(buildRequestFrom(overridden, 1, pagination.pageSize));
+    };
+
     return (
       <div style={{ padding: 24 }}>
         <Card>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <Space align="baseline">
+            <Space align="baseline" wrap>
               <Typography.Title level={4} style={{ margin: 0 }}>{viewName}</Typography.Title>
+              <DatePicker
+                picker="month"
+                allowClear
+                placeholder="切换月份"
+                value={currentAxisMonth ? dayjs(currentAxisMonth) : null}
+                onChange={handleSwitchMonth}
+              />
               {currentView && <Text type="secondary">保存于 {currentView.saved_at}</Text>}
             </Space>
             <Button danger icon={<DeleteOutlined />} onClick={handleDeleteCurrentView}>
