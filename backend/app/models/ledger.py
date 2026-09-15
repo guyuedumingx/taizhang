@@ -23,6 +23,12 @@ class Ledger(Base):
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     updated_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     # workflow_id = Column(Integer, ForeignKey("workflows.id"), nullable=True)
+
+    # 导入相关字段（本次新增，手工创建台账为 NULL）
+    # imported_by_id = 实际执行导入操作的用户，与 created_by_id（柜员号反查的业务所属用户）区分
+    # import_batch_id = 导入批次 UUID，便于按批次反查、审计追溯、未来扩展撤回功能
+    imported_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    import_batch_id = Column(String(40), nullable=True, index=True)
     
     # 数据，存储为JSON
     data = Column(JSON, nullable=True)
@@ -39,6 +45,7 @@ class Ledger(Base):
     creator = relationship("User", foreign_keys=[created_by_id], back_populates="created_ledgers")
     updater = relationship("User", foreign_keys=[updated_by_id], back_populates="updated_ledgers")
     current_approver = relationship("User", foreign_keys=[current_approver_id])
+    imported_by = relationship("User", foreign_keys=[imported_by_id])
     field_values = relationship("FieldValue", back_populates="ledger", cascade="all, delete-orphan")
     # workflow = relationship("Workflow", foreign_keys=[workflow_id])
     audit_logs = relationship("AuditLog", back_populates="ledger", cascade="all, delete-orphan") 

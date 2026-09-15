@@ -1,13 +1,13 @@
 alembic==1.13.1
 annotated-types==0.7.0
 anyio==4.8.0
-bcrypt==4.3.0
+bcrypt==3.2.2
 casbin==1.36.0
-casbin-sqlalchemy-adapter==0.6.0
+casbin-sqlalchemy-adapter<0.5
 click==8.1.8
-cx_Oracle==8.3.0
+cx-Oracle==8.3.0
 ecdsa==0.19.0
-et_xmlfile==2.0.0
+et-xmlfile==2.0.0
 fastapi==0.115.11
 greenlet==3.1.1
 h11==0.14.0

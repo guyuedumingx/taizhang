@@ -23,8 +23,7 @@ from app.core.config import settings
 # connect_args用于传递必要的Oracle特定参数（若有）
 connect_args = {}
 
-engine = create_engine(
-    settings.SQLALCHEMY_DATABASE_URI,
+engine_kwargs = dict(
     pool_pre_ping=True,  # 连接前ping，确保连接有效（对Oracle很重要）
     pool_size=settings.DB_POOL_SIZE,  # 连接池大小
     max_overflow=settings.DB_MAX_OVERFLOW,  # 最大溢出连接数
@@ -33,6 +32,13 @@ engine = create_engine(
     echo_pool=False,  # 是否打印连接池日志（调试时设为True）
     connect_args=connect_args if connect_args else {},  # Oracle特定连接参数
 )
+
+# SQLite 使用 NullPool,不支持 pool_size/max_overflow 等参数
+if settings.DATABASE_TYPE != "oracle":
+    for key in ("pool_size", "max_overflow", "pool_timeout", "pool_recycle"):
+        engine_kwargs.pop(key, None)
+
+engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, **engine_kwargs)
 
 if settings.DATABASE_TYPE == "oracle":
     @event.listens_for(engine, "connect")

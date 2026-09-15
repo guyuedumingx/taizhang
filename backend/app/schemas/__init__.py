@@ -18,4 +18,12 @@ from app.schemas.field_value import FieldValue, FieldValueCreate, FieldValueUpda
 from app.schemas.statistics_query import (
     StatisticsQueryRequest, LedgerQueryItem, LedgerQueryResponse,
     QueryField, FieldFilterCondition, SystemFilters, DataQualityReport, FieldQuality, SuspiciousItem,
+)
+from app.schemas.ledger_import import (
+    ImportConfig, ImportConfigList,
+    ImportIssue, CleanablePreview, ImportValidationReport,
+    ImportFailedItem, ImportCommitResult,
+)
+from app.schemas.import_history import (
+    ImportHistoryItem, ImportHistoryDetail, ImportHistoryList,
 ) 

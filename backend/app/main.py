@@ -23,17 +23,23 @@ def setup_logging():
     for handler in logger.handlers[:]:
         logger.removeHandler(handler)
     
-    # 添加控制台处理程序
+    # 添加控制台处理程序（UTF-8 编码以正确显示中文）
+    if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(log_format)
     logger.addHandler(console_handler)
-    
-    # 添加文件处理程序
+
+    # 添加文件处理程序（UTF-8 编码）
     log_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'backend.log')
     file_handler = RotatingFileHandler(
         log_file,
         maxBytes=10485760,  # 10MB
-        backupCount=5
+        backupCount=5,
+        encoding='utf-8'
     )
     file_handler.setFormatter(log_format)
     logger.addHandler(file_handler)

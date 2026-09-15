@@ -47,6 +47,8 @@ class LedgerInDBBase(LedgerBase):
     created_by_id: int
     updated_by_id: int
     current_approver_id: Optional[int] = None
+    imported_by_id: Optional[int] = None  # 导入功能新增:实际导入者
+    import_batch_id: Optional[str] = None  # 导入批次 UUID
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     submitted_at: Optional[datetime] = None
@@ -62,6 +64,7 @@ class Ledger(LedgerInDBBase):
     template_name: Optional[str] = None
     created_by_name: Optional[str] = None
     updated_by_name: Optional[str] = None
+    imported_by_name: Optional[str] = None  # 导入功能新增:实际导入者姓名
     current_approver_name: Optional[str] = None
     workflow_name: Optional[str] = None
     active_workflow_instance: Optional[WorkflowInstance] = None  # 当前活动的工作流实例 

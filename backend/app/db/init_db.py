@@ -21,6 +21,7 @@ def init_permissions():
             ("ledger", "edit"),
             ("ledger", "delete"),
             ("ledger", "export"),
+            ("ledger", "import"),
             ("template", "view"),
             ("template", "create"),
             ("template", "edit"),
@@ -45,6 +46,7 @@ def init_permissions():
             ("ledger", "edit"),
             ("ledger", "delete"),
             ("ledger", "export"),
+            ("ledger", "import"),
             ("template", "view"),
             ("template", "create"),
             ("template", "edit"),
@@ -114,6 +116,13 @@ def init_db(db: Session) -> None:
     """
     # Casbin 规则表初始化
     init_casbin_rules(db)
+
+    # 补充 ledger:import 权限(迁移已有部署时可能缺失)
+    try:
+        add_permission_for_role("admin", "ledger", "import")
+        add_permission_for_role("manager", "ledger", "import")
+    except Exception as exc:
+        logger.warning(f"补充 ledger:import 权限失败(可能已存在): {exc}")
     
     # 超级管理员角色
     create_admin_role(db)
@@ -126,7 +135,7 @@ def init_db(db: Session) -> None:
                 username=settings.FIRST_SUPERUSER,
                 password=settings.FIRST_SUPERUSER_PASSWORD,
                 is_superuser=True,
-                ehr_id="admin",
+                ehr_id="0000001",
                 name="超级管理员",
                 department="系统",
             )

@@ -1,0 +1,312 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "台账导入时序图",
+    "locale": "zh-CN",
+    "output": "ledger-import-sequence.html",
+    "viewBox": [1080, 1320],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "validate",
+        "label": "预校验阶段",
+        "focus": ["user", "web", "api", "auth", "val", "db"],
+        "note": "前端上传 Excel,后端解析后跑校验链,返回报告,不落库。"
+      },
+      {
+        "id": "commit",
+        "label": "二次校验与落库",
+        "focus": ["api", "auth", "commit", "val", "db"],
+        "note": "复用同一套校验函数,按 200 行/批写入 ledgers,并写 system_logs。"
+      },
+      {
+        "id": "audit",
+        "label": "审计日志与结果",
+        "focus": ["commit", "db", "api", "web", "user"],
+        "note": "批次结果回传前端,失败明细写入日志供 history/{batch_id}/failures 下载。"
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "导入操作员",
+      "sublabel": "业务人员"
+    },
+    {
+      "id": "web",
+      "type": "frontend",
+      "label": "导入页面",
+      "sublabel": "LedgerImport.tsx"
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "导入 API",
+      "sublabel": "ledgers_import.py"
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "Casbin 权限",
+      "sublabel": "ledger:import"
+    },
+    {
+      "id": "val",
+      "type": "backend",
+      "label": "校验服务",
+      "sublabel": "import_validation_service"
+    },
+    {
+      "id": "commit",
+      "type": "backend",
+      "label": "落库服务",
+      "sublabel": "import_commit_service"
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "Postgres DB",
+      "sublabel": "4 张表聚合"
+    }
+  ],
+  "segments": [
+    { "from": 160, "to": 580, "label": "① 预校验" },
+    { "from": 600, "to": 970, "label": "② 二次校验 + 落库" },
+    { "from": 990, "to": 1260, "label": "③ 审计日志 + 返回" }
+  ],
+  "messages": [
+    {
+      "id": "m-pick-template",
+      "from": "user",
+      "to": "web",
+      "y": 195,
+      "label": "选择模板 + 上传 xlsx"
+    },
+    {
+      "id": "m-validate-req",
+      "from": "web",
+      "to": "api",
+      "y": 235,
+      "label": "POST /import/validate (multipart)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m-validate-auth",
+      "from": "api",
+      "to": "auth",
+      "y": 275,
+      "label": "check ledger:import",
+      "variant": "security"
+    },
+    {
+      "id": "m-validate-auth-ok",
+      "from": "auth",
+      "to": "api",
+      "y": 310,
+      "label": "claims ok",
+      "variant": "return"
+    },
+    {
+      "id": "m-run-validation",
+      "from": "api",
+      "to": "val",
+      "y": 350,
+      "label": "run_validation(template_id, file)"
+    },
+    {
+      "id": "m-load-context",
+      "from": "val",
+      "to": "db",
+      "y": 395,
+      "label": "load template + teams + existing_keys",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m-context-rows",
+      "from": "db",
+      "to": "val",
+      "y": 430,
+      "label": "上下文数据",
+      "variant": "return"
+    },
+    {
+      "id": "m-report",
+      "from": "val",
+      "to": "api",
+      "y": 510,
+      "label": "ImportValidationReport",
+      "note": "校验链 a 必填 → b 清洗 → c 类型 → d EHR → e 团队 → f 重复 → g name"
+    },
+    {
+      "id": "m-validate-resp",
+      "from": "api",
+      "to": "web",
+      "y": 550,
+      "label": "200 issues / importable_count",
+      "variant": "return"
+    },
+    {
+      "id": "m-render-report",
+      "from": "web",
+      "to": "user",
+      "y": 605,
+      "label": "渲染校验报告(待确认)"
+    },
+    {
+      "id": "m-confirm",
+      "from": "user",
+      "to": "web",
+      "y": 645,
+      "label": "点击「确认导入」"
+    },
+    {
+      "id": "m-commit-req",
+      "from": "web",
+      "to": "api",
+      "y": 690,
+      "label": "POST /import/commit",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m-commit-auth",
+      "from": "api",
+      "to": "auth",
+      "y": 730,
+      "label": "check ledger:import",
+      "variant": "security"
+    },
+    {
+      "id": "m-commit-auth-ok",
+      "from": "auth",
+      "to": "api",
+      "y": 765,
+      "label": "claims ok",
+      "variant": "return"
+    },
+    {
+      "id": "m-run-commit",
+      "from": "api",
+      "to": "commit",
+      "y": 805,
+      "label": "run_commit(template_id, file)"
+    },
+    {
+      "id": "m-revalidate",
+      "from": "commit",
+      "to": "val",
+      "y": 845,
+      "label": "validate_rows() 二次校验",
+      "variant": "emphasis",
+      "note": "复用 validate 同一套逻辑"
+    },
+    {
+      "id": "m-revalidate-resp",
+      "from": "val",
+      "to": "commit",
+      "y": 880,
+      "label": "report (服务端二次校验为准)",
+      "variant": "return"
+    },
+    {
+      "id": "m-insert-ledger",
+      "from": "commit",
+      "to": "db",
+      "y": 925,
+      "label": "INSERT Ledger xN (batch=200)",
+      "variant": "emphasis",
+      "note": "importable 行才落库,失败入 failed_items"
+    },
+    {
+      "id": "m-insert-log",
+      "from": "commit",
+      "to": "db",
+      "y": 1005,
+      "label": "INSERT SystemLog (action=import)",
+      "variant": "default",
+      "note": "details 含 batch_id / failed_items"
+    },
+    {
+      "id": "m-commit-ok",
+      "from": "db",
+      "to": "commit",
+      "y": 1045,
+      "label": "ok",
+      "variant": "return"
+    },
+    {
+      "id": "m-commit-result",
+      "from": "commit",
+      "to": "api",
+      "y": 1090,
+      "label": "ImportCommitResult"
+    },
+    {
+      "id": "m-commit-resp",
+      "from": "api",
+      "to": "web",
+      "y": 1135,
+      "label": "200 batch_id / success / failed",
+      "variant": "return"
+    },
+    {
+      "id": "m-render-result",
+      "from": "web",
+      "to": "user",
+      "y": 1180,
+      "label": "展示成功数 + 失败清单下载链接"
+    },
+    {
+      "id": "m-failures",
+      "from": "user",
+      "to": "web",
+      "y": 1230,
+      "label": "下载失败清单 xlsx (可选)",
+      "variant": "dashed",
+      "note": "GET /import/history/{batch_id}/failures"
+    }
+  ],
+  "activations": [
+    { "participant": "web", "from": 195, "to": 1230, "type": "frontend" },
+    { "participant": "api", "from": 235, "to": 1135, "type": "backend" },
+    { "participant": "auth", "from": 275, "to": 310, "type": "security" },
+    { "participant": "val", "from": 350, "to": 510, "type": "backend" },
+    { "participant": "db", "from": 395, "to": 430, "type": "database" },
+    { "participant": "auth", "from": 730, "to": 765, "type": "security" },
+    { "participant": "commit", "from": 805, "to": 1090, "type": "backend" },
+    { "participant": "val", "from": 845, "to": 880, "type": "backend" },
+    { "participant": "db", "from": 925, "to": 1045, "type": "database" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "预校验不落库",
+      "items": [
+        "前端用 multipart 上传,服务端在 validate 阶段仅解析 xlsx 并返回报告",
+        "校验链按 a 必填 → b 清洗 → c 类型 → d EHR → e 团队 → f 重复 → g name 顺序逐行跑",
+        "重复检测同时覆盖库内 existing_keys 与文件内 seen_keys"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "commit 与 validate 共用校验函数",
+      "items": [
+        "commit 端点不信任前端报告,服务端二次跑 validate_rows,以服务端结果为准",
+        "importable 行才写入 ledgers,其余入 failed_items,不阻断批次",
+        "按 200 行/批 db.commit(),失败行 rollback 单条处理"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "审计与可追溯",
+      "items": [
+        "SystemLog.action=import,resource_id=batch_id,details 含 filename / failed_items",
+        "前端可下载 /import/history/{batch_id}/failures xlsx 拿到失败明细",
+        "导入历史按 import_batch_id 聚合,联表模板与导入者避免 N+1"
+      ]
+    }
+  ]
+}
