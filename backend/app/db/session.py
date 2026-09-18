@@ -23,15 +23,21 @@ from app.core.config import settings
 # connect_args用于传递必要的Oracle特定参数（若有）
 connect_args = {}
 
+engine_kwargs = {
+    "pool_pre_ping": True,  # 连接前ping，确保连接有效（对Oracle很重要）
+    "pool_recycle": settings.DB_POOL_RECYCLE,  # 连接回收时间
+    "echo_pool": False,  # 是否打印连接池日志（调试时设为True）
+    "connect_args": connect_args if connect_args else {},  # Oracle特定连接参数
+}
+# pool_size/max_overflow/pool_timeout 仅 Oracle 模式有效（SQLite 在 SA 1.4 下不接受这些参数）
+if settings.DATABASE_TYPE == "oracle":
+    engine_kwargs["pool_size"] = settings.DB_POOL_SIZE
+    engine_kwargs["max_overflow"] = settings.DB_MAX_OVERFLOW
+    engine_kwargs["pool_timeout"] = settings.DB_POOL_TIMEOUT
+
 engine = create_engine(
     settings.SQLALCHEMY_DATABASE_URI,
-    pool_pre_ping=True,  # 连接前ping，确保连接有效（对Oracle很重要）
-    pool_size=settings.DB_POOL_SIZE,  # 连接池大小
-    max_overflow=settings.DB_MAX_OVERFLOW,  # 最大溢出连接数
-    pool_timeout=settings.DB_POOL_TIMEOUT,  # 获取连接超时时间
-    pool_recycle=settings.DB_POOL_RECYCLE,  # 连接回收时间
-    echo_pool=False,  # 是否打印连接池日志（调试时设为True）
-    connect_args=connect_args if connect_args else {},  # Oracle特定连接参数
+    **engine_kwargs,
 )
 
 if settings.DATABASE_TYPE == "oracle":
