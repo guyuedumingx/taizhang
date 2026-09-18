@@ -38,6 +38,7 @@ from app.portrait.models.profile import (
     ResumeInfo,
     RewardInfo,
 )
+from app.portrait.models.submission import ApprovalRecord, SubmissionRecord
 from app.portrait.models.user_metadata import PortraitUserMetadata
 
 __all__ = [
@@ -63,6 +64,9 @@ __all__ = [
     # 技能标签
     "SkillTagTemplate",
     "ProfileSkillTag",
+    # 提交 + 审批 (PRD §9.1)
+    "SubmissionRecord",
+    "ApprovalRecord",
     # 日志 + 家访 + 调组
     "OperationLog",
     "HomeVisitRecord",
