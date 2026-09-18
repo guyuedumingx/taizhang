@@ -49,4 +49,9 @@ frontend/.vite/
 # 后端临时文件
 backend/.pytest_cache/
 backend/.coverage
-backend/htmlcov/ 
+backend/htmlcov/
+
+# 数据库文件 (开发 SQLite + 备份)
+backend/*.db
+backend/*.db.bak.*
+backend/*.db-journal 
