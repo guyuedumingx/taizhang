@@ -1,3 +1,8 @@
+# 说明: 本文件仅供参考, 运行时不会被加载!
+# enforcer 策略实际存于数据库 casbin_rule 表; 台账基础权限见 app/db/init_db.py
+# 本文件中 portrait 段的策略由 init_portrait_permissions() 种子化到数据库
+# 修改策略请通过角色管理界面或 init_db.py, 改本文件不产生任何效果
+
 g, 8, user
 p, admin, *, *
 p, manager, ledger, view

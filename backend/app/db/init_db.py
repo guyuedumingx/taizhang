@@ -7,6 +7,10 @@ from app.core.security import get_password_hash
 from app.services.casbin_service import add_role_for_user, add_permission_for_role, get_enforcer_instance
 import os
 
+# 注册 portrait 业务表到 Base.metadata: 不 import 则 create_all() 不会建 portrait_* 表
+# (生产 Oracle 部署依赖 init_db.py 的 create_all, 此 import 缺失会导致 portrait 表缺表)
+import app.portrait.models  # noqa: F401
+
 logger = logging.getLogger(__name__)
 
 
@@ -67,6 +71,35 @@ def init_permissions():
             logger.info(f"Added permission: {role} - {resource}:{action}")
 
 
+# 初始化 portrait 权限策略 (与 app/core/policy.csv 的 portrait 段保持一致)
+# 背景: enforcer 只从 DB 加载策略, policy.csv 不会被运行时读取;
+#       策略必须经 add_permission_for_role 写入 casbin_rule 表才生效
+def init_portrait_permissions():
+    portrait_permissions = {
+        "admin": [
+            ("portrait_all", "*"),
+        ],
+        "leader": [
+            ("portrait_group", "read"),
+            ("portrait_group", "update"),
+            ("portrait_group", "create"),
+            ("portrait_group", "export"),
+            ("portrait_self", "read"),
+            ("portrait_self", "update"),
+        ],
+        "user": [
+            ("portrait_self", "read"),
+            ("portrait_self", "update"),
+            ("portrait_self", "create"),
+        ],
+    }
+    for role, perms in portrait_permissions.items():
+        for resource, action in perms:
+            added = add_permission_for_role(role, resource, action)
+            if added:
+                logger.info(f"Added portrait permission: {role} - {resource}:{action}")
+
+
 # 初始化角色
 def init_roles(db: Session):
     roles = [
@@ -114,7 +147,11 @@ def init_db(db: Session) -> None:
     """
     # Casbin 规则表初始化
     init_casbin_rules(db)
-    
+
+    # portrait 资源策略 (幂等, 已存在时 add_policy 返回 False)
+    init_portrait_permissions()
+
+
     # 超级管理员角色
     create_admin_role(db)
     

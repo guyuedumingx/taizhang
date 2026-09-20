@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    # 初始超级用户 (init_db.py 用; 留空则跳过创建, 不影响已有库)
+    FIRST_SUPERUSER: str = ""
+    FIRST_SUPERUSER_PASSWORD: str = ""
     # CORS配置
     CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:3000", "http://localhost:5173"]
 

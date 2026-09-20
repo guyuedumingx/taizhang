@@ -37,7 +37,7 @@ P3 阶段: portrait 4 套 Workflow 模板一次性初始化
 import argparse
 import os
 import sys
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 # Windows GBK 编码兼容 (Rule 12: 错误明细必须可见)
 sys.stdout.reconfigure(encoding="utf-8")
@@ -86,7 +86,7 @@ PORTRAIT_WORKFLOWS = [
 ]
 
 
-def get_admin_role_id(db) -> int | None:
+def get_admin_role_id(db) -> Optional[int]:
     """查 taizhang Role 表里 name='admin' 的 id. 找不到返回 None."""
     from app.models.role import Role
     admin = db.query(Role).filter(Role.name == "admin").first()
