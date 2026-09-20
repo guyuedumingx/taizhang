@@ -8,29 +8,24 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--txt);font-size:14px;}
 .layout{display:flex;min-height:100vh;}
-/* ===== 台账壳：侧边栏 ===== */
 .sider{width:200px;background:#fff;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--bdl);}
 .logo{height:64px;display:flex;align-items:center;padding:0 20px;font-size:17px;font-weight:bold;color:var(--pri);}
 .menu{flex:1;overflow-y:auto;padding-bottom:16px;}
-.mi{display:flex;align-items:center;gap:10px;padding:0 20px;height:44px;cursor:pointer;color:var(--txt);border-left:3px solid transparent;}
+.mi{display:flex;align-items:center;gap:10px;padding:0 20px;height:44px;cursor:pointer;border-left:3px solid transparent;}
 .mi:hover{background:#fafafa;}
 .mi.active{background:var(--pri-l);border-left-color:var(--pri);color:var(--pri);font-weight:500;}
-.mi .ico{width:16px;text-align:center;}
-.gtitle{display:flex;align-items:center;gap:10px;padding:0 20px;height:44px;cursor:pointer;color:var(--txt);}
-.gtitle .ico{width:16px;text-align:center;}
-.gtitle .arr{margin-left:auto;font-size:11px;color:var(--txt3);transition:transform .2s;}
-.group.open .arr{transform:rotate(90deg);}
-.sub{display:none;}
+.gtitle{padding:0 20px;height:44px;display:flex;align-items:center;cursor:pointer;}
+.gtitle b{font-weight:500;}
 .group.open .sub{display:block;}
-.si{display:flex;align-items:center;padding:0 20px 0 46px;height:40px;cursor:pointer;color:var(--txt2);font-size:13px;border-left:3px solid transparent;}
+.group .sub{display:none;}
+.sub{background:#fbfbfb;}
+.si{display:flex;align-items:center;gap:8px;padding:0 20px 0 46px;height:40px;cursor:pointer;color:var(--txt2);font-size:13px;border-left:3px solid transparent;}
 .si:hover{color:var(--pri);}
 .si.active{background:var(--pri-l);border-left-color:var(--pri);color:var(--pri);font-weight:500;}
-/* ===== 台账壳：顶栏 ===== */
 .main{flex:1;display:flex;flex-direction:column;min-width:0;}
 .header{height:64px;background:#fff;display:flex;align-items:center;justify-content:flex-end;padding:0 24px;border-bottom:1px solid var(--bdl);}
-.user{display:flex;align-items:center;gap:8px;color:var(--txt);}
+.user{display:flex;align-items:center;gap:8px;}
 .avatar{width:28px;height:28px;border-radius:50%;background:var(--pri-l);color:var(--pri);display:flex;align-items:center;justify-content:center;font-size:13px;}
-/* ===== 台账壳：面包屑+内容容器 ===== */
 .content{flex:1;padding:16px 24px;overflow-y:auto;}
 .crumb{color:var(--txt3);font-size:13px;margin-bottom:12px;}
 .crumb b{color:var(--txt);font-weight:500;}
@@ -39,38 +34,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hira
 .page.show{display:block;}
 h1.pt{font-size:18px;margin-bottom:6px;}
 .sub-title{color:var(--txt3);font-size:13px;margin-bottom:20px;}
-/* ===== 画像语言：彩色卡片门户（方案A独有） ===== */
 .portal-hero{margin-bottom:20px;}
 .portal-hero h1{font-size:22px;margin-bottom:4px;}
 .portal-hero p{color:var(--txt3);}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:860px;}
 .tile{background:#fff;border:1px solid var(--bdl);border-radius:8px;padding:32px 0;text-align:center;cursor:pointer;transition:box-shadow .2s,transform .2s;}
 .tile:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-2px);}
-.tile .t-ico{width:52px;height:52px;border-radius:12px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.tile .t-ico{width:52px;height:52px;border-radius:12px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;}
 .tile .t-name{font-size:15px;}
 .i-red{background:#FDEBEE;color:var(--pri);} .i-blue{background:#E8F1FD;color:#3B77D2;} .i-green{background:#E6F7EF;color:#27A768;}
 .i-orange{background:#FDF3E4;color:#E58A2E;} .i-purple{background:#F1EBFD;color:#7B4FD0;} .i-cyan{background:#E4F6F8;color:#2AA5B8;}
-/* ===== 画像语言：筛选栏 ===== */
 .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
 .fi{display:flex;align-items:center;gap:6px;border:1px solid #d9d9d9;border-radius:6px;padding:7px 12px;color:#bfbfbf;background:#fff;font-size:13px;min-width:110px;}
-.fi.sel{color:var(--txt);}
-.btn-pri{background:var(--pri);color:#fff;border:none;border-radius:6px;padding:8px 22px;cursor:pointer;font-size:14px;}
+.fi .ic{color:#bfbfbf;}
+.btn-pri{background:var(--pri);color:#fff;border:none;border-radius:6px;padding:8px 22px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;gap:6px;}
 .btn-pri:hover{background:var(--pri-h);}
-.btn-ghost{background:#fff;color:var(--txt);border:1px solid #d9d9d9;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;gap:6px;}
-/* ===== 画像语言：表格+徽章+彩色标签 ===== */
 table.tb{width:100%;border-collapse:collapse;}
-.tb th{background:#fafafa;text-align:left;padding:12px 14px;font-weight:500;color:var(--txt);border-bottom:1px solid var(--bdl);white-space:nowrap;}
+.tb th{background:#fafafa;text-align:left;padding:12px 14px;font-weight:500;border-bottom:1px solid var(--bdl);white-space:nowrap;}
 .tb td{padding:13px 14px;border-bottom:1px solid var(--bdl);}
 .tb tr:hover td{background:#fafafa;}
 .link{color:var(--pri);cursor:pointer;font-size:13px;}
 .badge{display:inline-flex;align-items:center;gap:4px;border:1px solid #d9d9d9;border-radius:20px;padding:2px 10px;font-size:12px;color:var(--txt2);background:#fff;}
 .badge.adm{border-color:var(--pri-l);background:var(--pri-l);color:var(--pri);}
 .tag{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;margin-right:6px;}
-.tg-green{background:#E6F7EF;color:#27A768;} .tg-purple{background:#F1EBFD;color:#7B4FD0;} .tg-blue{background:#E8F1FD;color:#3B77D2;} .tg-orange{background:#FDF3E4;color:#E58A2E;}
+.tg-green{background:#E6F7EF;color:#27A768;} .tg-purple{background:#F1EBFD;color:#7B4FD0;} .tg-blue{background:#E8F1FD;color:#3B77D2;}
 .pager{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:16px;color:var(--txt3);font-size:13px;}
 .pg{border:1px solid #d9d9d9;border-radius:4px;padding:3px 10px;background:#fff;cursor:pointer;}
 .pg.on{background:var(--pri);border-color:var(--pri);color:#fff;}
-/* ===== 画像语言：档案页卡片流 + 右侧悬浮导航 ===== */
 .cardflow{max-width:860px;}
 .pcard{background:#fff;border:1px solid var(--bdl);border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .pcard h3{font-size:15px;padding-bottom:8px;border-bottom:1px solid #eee;margin-bottom:14px;}
@@ -78,12 +68,11 @@ table.tb{width:100%;border-collapse:collapse;}
 .dgrid .lb{color:var(--txt3);}
 .btn-add{width:100%;border:1px dashed var(--pri);color:var(--pri);background:#fff;border-radius:6px;padding:8px;cursor:pointer;font-size:13px;margin-top:14px;}
 .btn-edit{background:var(--pri);color:#fff;border:none;border-radius:4px;padding:6px 18px;cursor:pointer;font-size:13px;margin-top:14px;}
-.anchor-nav{position:fixed;right:18px;top:40%;background:var(--pri);color:#fff;border-radius:6px;padding:8px 6px;writing-mode:vertical-lr;letter-spacing:2px;font-size:12px;cursor:pointer;box-shadow:0 2px 8px rgba(208,90,110,.4);}
-/* ===== 画像语言：能力分析 ===== */
-.info-bar{background:#E8F1FD;border:1px solid #C5DBF7;color:#3B77D2;border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:16px;}
+.anchor-nav{position:fixed;right:18px;top:40%;background:var(--pri);color:#fff;border-radius:6px;padding:10px 8px;writing-mode:vertical-lr;letter-spacing:2px;font-size:12px;cursor:pointer;box-shadow:0 2px 8px rgba(208,90,110,.4);}
+.info-bar{background:#E8F1FD;border:1px solid #C5DBF7;color:#3B77D2;border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:6px;}
 .warn-card{border:1px solid var(--bdl);border-radius:8px;padding:16px 20px;margin-bottom:16px;}
 .warn-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-.warn-head .l{font-weight:600;}
+.warn-head .l{font-weight:600;display:flex;align-items:center;gap:6px;}
 .warn-legend{display:flex;gap:18px;font-size:12px;}
 .warn-legend .sev{color:#E0434F;font-weight:600;} .warn-legend .mid{color:#E58A2E;font-weight:600;} .warn-legend .ok{color:#27A768;font-weight:600;}
 .warn-row{background:#fafafa;border-radius:6px;padding:10px 14px;margin-bottom:8px;font-size:13px;display:flex;gap:10px;align-items:center;}
@@ -100,32 +89,42 @@ table.tb{width:100%;border-collapse:collapse;}
 .legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--txt2);margin-top:10px;}
 .dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px;}
 .note{margin-top:24px;padding:12px 16px;background:var(--pri-l);border-radius:6px;color:var(--pri-a);font-size:13px;}
+
+.ic{width:15px;height:15px;fill:currentColor;vertical-align:-2px;flex-shrink:0;}
+.ic.sm{width:13px;height:13px;}
+.tile-ic{width:26px;height:26px;}
+.arr-ic{width:11px;height:11px;color:var(--txt3);margin-left:auto;}
+.gtitle{display:flex;align-items:center;gap:10px;}
+
 </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="i-dashboard" viewBox="64 64 896 896"><path d="M924.8 385.6a446.7 446.7 0 00-96-142.4 446.7 446.7 0 00-142.4-96C631.1 123.8 572.5 112 512 112s-119.1 11.8-174.4 35.2a446.7 446.7 0 00-142.4 96 446.7 446.7 0 00-96 142.4C75.8 440.9 64 499.5 64 560c0 132.7 58.3 257.7 159.9 343.1l1.7 1.4c5.8 4.8 13.1 7.5 20.6 7.5h531.7c7.5 0 14.8-2.7 20.6-7.5l1.7-1.4C901.7 817.7 960 692.7 960 560c0-60.5-11.9-119.1-35.2-174.4zM761.4 836H262.6A371.12 371.12 0 01140 560c0-99.4 38.7-192.8 109-263 70.3-70.3 163.7-109 263-109 99.4 0 192.8 38.7 263 109 70.3 70.3 109 163.7 109 263 0 105.6-44.5 205.5-122.6 276zM623.5 421.5a8.03 8.03 0 00-11.3 0L527.7 506c-18.7-5-39.4-.2-54.1 14.5a55.95 55.95 0 000 79.2 55.95 55.95 0 0079.2 0 55.87 55.87 0 0014.5-54.1l84.5-84.5c3.1-3.1 3.1-8.2 0-11.3l-28.3-28.3zM490 320h44c4.4 0 8-3.6 8-8v-80c0-4.4-3.6-8-8-8h-44c-4.4 0-8 3.6-8 8v80c0 4.4 3.6 8 8 8zm260 218v44c0 4.4 3.6 8 8 8h80c4.4 0 8-3.6 8-8v-44c0-4.4-3.6-8-8-8h-80c-4.4 0-8 3.6-8 8zm12.7-197.2l-31.1-31.1a8.03 8.03 0 00-11.3 0l-56.6 56.6a8.03 8.03 0 000 11.3l31.1 31.1c3.1 3.1 8.2 3.1 11.3 0l56.6-56.6c3.1-3.1 3.1-8.2 0-11.3zm-458.6-31.1a8.03 8.03 0 00-11.3 0l-31.1 31.1a8.03 8.03 0 000 11.3l56.6 56.6c3.1 3.1 8.2 3.1 11.3 0l31.1-31.1c3.1-3.1 3.1-8.2 0-11.3l-56.6-56.6zM262 530h-80c-4.4 0-8 3.6-8 8v44c0 4.4 3.6 8 8 8h80c4.4 0 8-3.6 8-8v-44c0-4.4-3.6-8-8-8z"/></symbol><symbol id="i-file" viewBox="64 64 896 896"><path d="M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0042 42h216v494z"/></symbol><symbol id="i-form" viewBox="64 64 896 896"><path d="M904 512h-56c-4.4 0-8 3.6-8 8v320H184V184h320c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V520c0-4.4-3.6-8-8-8z"/><path d="M355.9 534.9L354 653.8c-.1 8.9 7.1 16.2 16 16.2h.4l118-2.9c2-.1 4-.9 5.4-2.3l415.9-415c3.1-3.1 3.1-8.2 0-11.3L785.4 114.3c-1.6-1.6-3.6-2.3-5.7-2.3s-4.1.8-5.7 2.3l-415.8 415a8.3 8.3 0 00-2.3 5.6zm63.5 23.6L779.7 199l45.2 45.1-360.5 359.7-45.7 1.1.7-46.4z"/></symbol><symbol id="i-field-binary" viewBox="64 64 896 896"><path d="M600 395.4h91V649h79V267c0-4.4-3.6-8-8-8h-48.2c-3.7 0-7 2.6-7.7 6.3-2.6 12.1-6.9 22.3-12.9 30.9a86.14 86.14 0 01-26.3 24.4c-10.3 6.2-22 10.5-35 12.9-10.4 1.9-21 3-32 3.1a8 8 0 00-7.9 8v42.8c0 4.4 3.6 8 8 8zM871 702H567c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h304c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8zM443.9 312.7c-16.1-19-34.4-32.4-55.2-40.4-21.3-8.2-44.1-12.3-68.4-12.3-23.9 0-46.4 4.1-67.7 12.3-20.8 8-39 21.4-54.8 40.3-15.9 19.1-28.7 44.7-38.3 77-9.6 32.5-14.5 73-14.5 121.5 0 49.9 4.9 91.4 14.5 124.4 9.6 32.8 22.4 58.7 38.3 77.7 15.8 18.9 34 32.3 54.8 40.3 21.3 8.2 43.8 12.3 67.7 12.3 24.4 0 47.2-4.1 68.4-12.3 20.8-8 39.2-21.4 55.2-40.4 16.1-19 29-44.9 38.6-77.7 9.6-33 14.5-74.5 14.5-124.4 0-48.4-4.9-88.9-14.5-121.5-9.5-32.1-22.4-57.7-38.6-76.8zm-29.5 251.7c-1 21.4-4.2 42-9.5 61.9-5.5 20.7-14.5 38.5-27 53.4-13.6 16.3-33.2 24.3-57.6 24.3-24 0-43.2-8.1-56.7-24.4-12.2-14.8-21.1-32.6-26.6-53.3-5.3-19.9-8.5-40.6-9.5-61.9-1-20.8-1.5-38.5-1.5-53.2 0-8.8.1-19.4.4-31.8.2-12.7 1.1-25.8 2.6-39.2 1.5-13.6 4-27.1 7.6-40.5 3.7-13.8 8.8-26.3 15.4-37.4 6.9-11.6 15.8-21.1 26.7-28.3 11.4-7.6 25.3-11.3 41.5-11.3 16.1 0 30.1 3.7 41.7 11.2a87.94 87.94 0 0127.4 28.2c6.9 11.2 12.1 23.8 15.6 37.7 3.3 13.2 5.8 26.6 7.5 40.1 1.8 13.5 2.8 26.6 3 39.4.2 12.4.4 23 .4 31.8.1 14.8-.4 32.5-1.4 53.3z"/></symbol><symbol id="i-solution" viewBox="64 64 896 896"><path d="M688 264c0-4.4-3.6-8-8-8H296c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h384c4.4 0 8-3.6 8-8v-48zm-8 136H296c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h384c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8zM480 544H296c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8zm-48 308H208V148h560v344c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8V108c0-17.7-14.3-32-32-32H168c-17.7 0-32 14.3-32 32v784c0 17.7 14.3 32 32 32h264c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm356.8-74.4c29-26.3 47.2-64.3 47.2-106.6 0-79.5-64.5-144-144-144s-144 64.5-144 144c0 42.3 18.2 80.3 47.2 106.6-57 32.5-96.2 92.7-99.2 162.1-.2 4.5 3.5 8.3 8 8.3h48.1c4.2 0 7.7-3.3 8-7.6C564 871.2 621.7 816 692 816s128 55.2 131.9 124.4c.2 4.2 3.7 7.6 8 7.6H880c4.6 0 8.2-3.8 8-8.3-2.9-69.5-42.2-129.6-99.2-162.1zM692 591c44.2 0 80 35.8 80 80s-35.8 80-80 80-80-35.8-80-80 35.8-80 80-80z"/></symbol><symbol id="i-file-search" viewBox="64 64 896 896"><path d="M688 312v-48c0-4.4-3.6-8-8-8H296c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h384c4.4 0 8-3.6 8-8zm-392 88c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h184c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8H296zm144 452H208V148h560v344c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8V108c0-17.7-14.3-32-32-32H168c-17.7 0-32 14.3-32 32v784c0 17.7 14.3 32 32 32h272c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm445.7 51.5l-93.3-93.3C814.7 780.7 828 743.9 828 704c0-97.2-78.8-176-176-176s-176 78.8-176 176 78.8 176 176 176c35.8 0 69-10.7 96.8-29l94.7 94.7c1.6 1.6 3.6 2.3 5.6 2.3s4.1-.8 5.6-2.3l31-31a7.9 7.9 0 000-11.2zM652 816c-61.9 0-112-50.1-112-112s50.1-112 112-112 112 50.1 112 112-50.1 112-112 112z"/></symbol><symbol id="i-setting" viewBox="64 64 896 896"><path d="M924.8 625.7l-65.5-56c3.1-19 4.7-38.4 4.7-57.8s-1.6-38.8-4.7-57.8l65.5-56a32.03 32.03 0 009.3-35.2l-.9-2.6a443.74 443.74 0 00-79.7-137.9l-1.8-2.1a32.12 32.12 0 00-35.1-9.5l-81.3 28.9c-30-24.6-63.5-44-99.7-57.6l-15.7-85a32.05 32.05 0 00-25.8-25.7l-2.7-.5c-52.1-9.4-106.9-9.4-159 0l-2.7.5a32.05 32.05 0 00-25.8 25.7l-15.8 85.4a351.86 351.86 0 00-99 57.4l-81.9-29.1a32 32 0 00-35.1 9.5l-1.8 2.1a446.02 446.02 0 00-79.7 137.9l-.9 2.6c-4.5 12.5-.8 26.5 9.3 35.2l66.3 56.6c-3.1 18.8-4.6 38-4.6 57.1 0 19.2 1.5 38.4 4.6 57.1L99 625.5a32.03 32.03 0 00-9.3 35.2l.9 2.6c18.1 50.4 44.9 96.9 79.7 137.9l1.8 2.1a32.12 32.12 0 0035.1 9.5l81.9-29.1c29.8 24.5 63.1 43.9 99 57.4l15.8 85.4a32.05 32.05 0 0025.8 25.7l2.7.5a449.4 449.4 0 00159 0l2.7-.5a32.05 32.05 0 0025.8-25.7l15.7-85a350 350 0 0099.7-57.6l81.3 28.9a32 32 0 0035.1-9.5l1.8-2.1c34.8-41.1 61.6-87.5 79.7-137.9l.9-2.6c4.5-12.3.8-26.3-9.3-35zM788.3 465.9c2.5 15.1 3.8 30.6 3.8 46.1s-1.3 31-3.8 46.1l-6.6 40.1 74.7 63.9a370.03 370.03 0 01-42.6 73.6L721 702.8l-31.4 25.8c-23.9 19.6-50.5 35-79.3 45.8l-38.1 14.3-17.9 97a377.5 377.5 0 01-85 0l-17.9-97.2-37.8-14.5c-28.5-10.8-55-26.2-78.7-45.7l-31.4-25.9-93.4 33.2c-17-22.9-31.2-47.6-42.6-73.6l75.5-64.5-6.5-40c-2.4-14.9-3.7-30.3-3.7-45.5 0-15.3 1.2-30.6 3.7-45.5l6.5-40-75.5-64.5c11.3-26.1 25.6-50.7 42.6-73.6l93.4 33.2 31.4-25.9c23.7-19.5 50.2-34.9 78.7-45.7l37.9-14.3 17.9-97.2c28.1-3.2 56.8-3.2 85 0l17.9 97 38.1 14.3c28.7 10.8 55.4 26.2 79.3 45.8l31.4 25.8 92.8-32.9c17 22.9 31.2 47.6 42.6 73.6L781.8 426l6.5 39.9zM512 326c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm79.2 255.2A111.6 111.6 0 01512 614c-29.9 0-58-11.7-79.2-32.8A111.6 111.6 0 01400 502c0-29.9 11.7-58 32.8-79.2C454 401.6 482.1 390 512 390c29.9 0 58 11.6 79.2 32.8A111.6 111.6 0 01624 502c0 29.9-11.7 58-32.8 79.2z"/></symbol><symbol id="i-user" viewBox="64 64 896 896"><path d="M858.5 763.6a374 374 0 00-80.6-119.5 375.63 375.63 0 00-119.5-80.6c-.4-.2-.8-.3-1.2-.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-.4.2-.8.3-1.2.5-44.8 18.9-85 46-119.5 80.6a375.63 375.63 0 00-80.6 119.5A371.7 371.7 0 00136 901.8a8 8 0 008 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c.1 4.4 3.6 7.8 8 7.8h60a8 8 0 008-8.2c-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z"/></symbol><symbol id="i-safety" viewBox="0 0 1024 1024"><path d="M512 64L128 192v384c0 212.1 171.9 384 384 384s384-171.9 384-384V192L512 64zm312 512c0 172.3-139.7 312-312 312S200 748.3 200 576V246l312-110 312 110v330z"/><path d="M378.4 475.1a35.91 35.91 0 00-50.9 0 35.91 35.91 0 000 50.9l129.4 129.4 2.1 2.1a33.98 33.98 0 0048.1 0L730.6 434a33.98 33.98 0 000-48.1l-2.8-2.8a33.98 33.98 0 00-48.1 0L483 579.7 378.4 475.1z"/></symbol><symbol id="i-team" viewBox="64 64 896 896"><path d="M824.2 699.9a301.55 301.55 0 00-86.4-60.4C783.1 602.8 812 546.8 812 484c0-110.8-92.4-201.7-203.2-200-109.1 1.7-197 90.6-197 200 0 62.8 29 118.8 74.2 155.5a300.95 300.95 0 00-86.4 60.4C345 754.6 314 826.8 312 903.8a8 8 0 008 8.2h56c4.3 0 7.9-3.4 8-7.7 1.9-58 25.4-112.3 66.7-153.5A226.62 226.62 0 01612 684c60.9 0 118.2 23.7 161.3 66.8C814.5 792 838 846.3 840 904.3c.1 4.3 3.7 7.7 8 7.7h56a8 8 0 008-8.2c-2-77-33-149.2-87.8-203.9zM612 612c-34.2 0-66.4-13.3-90.5-37.5a126.86 126.86 0 01-37.5-91.8c.3-32.8 13.4-64.5 36.3-88 24-24.6 56.1-38.3 90.4-38.7 33.9-.3 66.8 12.9 91 36.6 24.8 24.3 38.4 56.8 38.4 91.4 0 34.2-13.3 66.3-37.5 90.5A127.3 127.3 0 01612 612zM361.5 510.4c-.9-8.7-1.4-17.5-1.4-26.4 0-15.9 1.5-31.4 4.3-46.5.7-3.6-1.2-7.3-4.5-8.8-13.6-6.1-26.1-14.5-36.9-25.1a127.54 127.54 0 01-38.7-95.4c.9-32.1 13.8-62.6 36.3-85.6 24.7-25.3 57.9-39.1 93.2-38.7 31.9.3 62.7 12.6 86 34.4 7.9 7.4 14.7 15.6 20.4 24.4 2 3.1 5.9 4.4 9.3 3.2 17.6-6.1 36.2-10.4 55.3-12.4 5.6-.6 8.8-6.6 6.3-11.6-32.5-64.3-98.9-108.7-175.7-109.9-110.9-1.7-203.3 89.2-203.3 199.9 0 62.8 28.9 118.8 74.2 155.5-31.8 14.7-61.1 35-86.5 60.4-54.8 54.7-85.8 126.9-87.8 204a8 8 0 008 8.2h56.1c4.3 0 7.9-3.4 8-7.7 1.9-58 25.4-112.3 66.7-153.5 29.4-29.4 65.4-49.8 104.7-59.7 3.9-1 6.5-4.7 6-8.7z"/></symbol><symbol id="i-idcard" viewBox="64 64 896 896"><path d="M928 160H96c-17.7 0-32 14.3-32 32v640c0 17.7 14.3 32 32 32h832c17.7 0 32-14.3 32-32V192c0-17.7-14.3-32-32-32zm-40 632H136V232h752v560zM610.3 476h123.4c1.3 0 2.3-3.6 2.3-8v-48c0-4.4-1-8-2.3-8H610.3c-1.3 0-2.3 3.6-2.3 8v48c0 4.4 1 8 2.3 8zm4.8 144h185.7c3.9 0 7.1-3.6 7.1-8v-48c0-4.4-3.2-8-7.1-8H615.1c-3.9 0-7.1 3.6-7.1 8v48c0 4.4 3.2 8 7.1 8zM224 673h43.9c4.2 0 7.6-3.3 7.9-7.5 3.8-50.5 46-90.5 97.2-90.5s93.4 40 97.2 90.5c.3 4.2 3.7 7.5 7.9 7.5H522a8 8 0 008-8.4c-2.8-53.3-32-99.7-74.6-126.1a111.8 111.8 0 0029.1-75.5c0-61.9-49.9-112-111.4-112s-111.4 50.1-111.4 112c0 29.1 11 55.5 29.1 75.5a158.09 158.09 0 00-74.6 126.1c-.4 4.6 3.2 8.4 7.8 8.4zm149-262c28.5 0 51.7 23.3 51.7 52s-23.2 52-51.7 52-51.7-23.3-51.7-52 23.2-52 51.7-52z"/></symbol><symbol id="i-home" viewBox="64 64 896 896"><path d="M946.5 505L534.6 93.4a31.93 31.93 0 00-45.2 0L77.5 505c-12 12-18.8 28.3-18.8 45.3 0 35.3 28.7 64 64 64h43.4V908c0 17.7 14.3 32 32 32H448V716h112v224h265.9c17.7 0 32-14.3 32-32V614.3h43.4c17 0 33.3-6.7 45.3-18.8 24.9-25 24.9-65.5-.1-90.5z"/></symbol><symbol id="i-tags" viewBox="64 64 896 896"><path d="M483.2 790.3L861.4 412c1.7-1.7 2.5-4 2.3-6.3l-25.5-301.4c-.7-7.8-6.8-13.9-14.6-14.6L522.2 64.3c-2.3-.2-4.7.6-6.3 2.3L137.7 444.8a8.03 8.03 0 000 11.3l334.2 334.2c3.1 3.2 8.2 3.2 11.3 0zm62.6-651.7l224.6 19 19 224.6L477.5 694 233.9 450.5l311.9-311.9zm60.16 186.23a48 48 0 1067.88-67.89 48 48 0 10-67.88 67.89zM889.7 539.8l-39.6-39.5a8.03 8.03 0 00-11.3 0l-362 361.3-237.6-237a8.03 8.03 0 00-11.3 0l-39.6 39.5a8.03 8.03 0 000 11.3l243.2 242.8 39.6 39.5c3.1 3.1 8.2 3.1 11.3 0l407.3-406.6c3.1-3.1 3.1-8.2 0-11.3z"/></symbol><symbol id="i-fund" viewBox="64 64 896 896"><path d="M926 164H94c-17.7 0-32 14.3-32 32v640c0 17.7 14.3 32 32 32h832c17.7 0 32-14.3 32-32V196c0-17.7-14.3-32-32-32zm-40 632H134V236h752v560zm-658.9-82.3c3.1 3.1 8.2 3.1 11.3 0l172.5-172.5 114.4 114.5c3.1 3.1 8.2 3.1 11.3 0l297-297.2c3.1-3.1 3.1-8.2 0-11.3l-36.8-36.8a8.03 8.03 0 00-11.3 0L531 565 416.6 450.5a8.03 8.03 0 00-11.3 0l-214.9 215a8.03 8.03 0 000 11.3l36.7 36.9z"/></symbol><symbol id="i-search" viewBox="64 64 896 896"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"/></symbol><symbol id="i-warning" viewBox="64 64 896 896"><path d="M464 720a48 48 0 1096 0 48 48 0 10-96 0zm16-304v184c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V416c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8zm475.7 440l-416-720c-6.2-10.7-16.9-16-27.7-16s-21.6 5.3-27.7 16l-416 720C56 877.4 71.4 904 96 904h832c24.6 0 40-26.6 27.7-48zm-783.5-27.9L512 239.9l339.8 588.2H172.2z"/></symbol><symbol id="i-info-circle" viewBox="64 64 896 896"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/><path d="M464 336a48 48 0 1096 0 48 48 0 10-96 0zm72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"/></symbol><symbol id="i-down" viewBox="64 64 896 896"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"/></symbol><symbol id="i-question-circle" viewBox="64 64 896 896"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/><path d="M623.6 316.7C593.6 290.4 554 276 512 276s-81.6 14.5-111.6 40.7C369.2 344 352 380.7 352 420v7.6c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V420c0-44.1 43.1-80 96-80s96 35.9 96 80c0 31.1-22 59.6-56.1 72.7-21.2 8.1-39.2 22.3-52.1 40.9-13.1 19-19.9 41.8-19.9 64.9V620c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8v-22.7a48.3 48.3 0 0130.9-44.8c59-22.7 97.1-74.7 97.1-132.5.1-39.3-17.1-76-48.3-103.3zM472 732a40 40 0 1080 0 40 40 0 10-80 0z"/></symbol><symbol id="i-swap" viewBox="64 64 896 896"><path d="M847.9 592H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h605.2L612.9 851c-4.1 5.2-.4 13 6.3 13h72.5c4.9 0 9.5-2.2 12.6-6.1l168.8-214.1c16.5-21 1.6-51.8-25.2-51.8zM872 356H266.8l144.3-183c4.1-5.2.4-13-6.3-13h-72.5c-4.9 0-9.5 2.2-12.6 6.1L150.9 380.2c-16.5 21-1.6 51.8 25.1 51.8h696c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"/></symbol></svg>
 <div class="layout">
   <div class="sider">
     <div class="logo">台账管理系统</div>
     <div class="menu" id="menu">
-      <div class="mi"><span class="ico">📊</span>仪表盘</div>
-      <div class="mi"><span class="ico">📄</span>台账管理</div>
-      <div class="mi"><span class="ico">🗂</span>模板管理</div>
-      <div class="mi"><span class="ico">🔀</span>工作流管理</div>
-      <div class="mi"><span class="ico">✅</span>审批任务</div>
-      <div class="mi"><span class="ico">📋</span>日志管理</div>
-      <div class="group open"><div class="gtitle"><span class="ico">🧑‍💼</span><b>数字画像</b><span class="arr">▶</span></div>
+      <div class="mi"><svg class="ic"><use href="#i-dashboard"/></svg>仪表盘</div>
+      <div class="mi"><svg class="ic"><use href="#i-file"/></svg>台账管理</div>
+      <div class="mi"><svg class="ic"><use href="#i-form"/></svg>模板管理</div>
+      <div class="mi"><svg class="ic"><use href="#i-field-binary"/></svg>工作流管理</div>
+      <div class="mi"><svg class="ic"><use href="#i-solution"/></svg>审批任务</div>
+      <div class="mi"><svg class="ic"><use href="#i-file-search"/></svg>日志管理</div>
+      <div class="group open"><div class="gtitle"><svg class="ic"><use href="#i-idcard"/></svg><b>数字画像</b><span class="arr"><svg class="ic arr-ic"><use href="#i-down"/></svg></span></div>
       <div class="sub">
-        <div class="si" data-page="portal">画像首页</div>
-        <div class="si" data-page="profile">我的档案</div>
-        <div class="si">家访记录</div>
+        <div class="si" data-page="portal"><svg class="ic sm"><use href="#i-dashboard"/></svg>画像首页</div>
+        <div class="si" data-page="profile"><svg class="ic sm"><use href="#i-idcard"/></svg>我的档案</div>
+        <div class="si"><svg class="ic sm"><use href="#i-home"/></svg>家访记录</div>
         <div class="si" style="padding-left:60px;color:var(--txt3);font-size:12px;">— 管理功能 —</div>
-        <div class="si" data-page="list">档案管理</div>
-        <div class="si">智能筛选</div>
-        <div class="si" data-page="analytics">能力分析</div>
-        <div class="si">组员调换</div>
-        <div class="si">技能标签</div>
+        <div class="si" data-page="list"><svg class="ic sm"><use href="#i-solution"/></svg>档案管理</div>
+        <div class="si"><svg class="ic sm"><use href="#i-search"/></svg>智能筛选</div>
+        <div class="si" data-page="analytics"><svg class="ic sm"><use href="#i-fund"/></svg>能力分析</div>
+        <div class="si"><svg class="ic sm"><use href="#i-swap"/></svg>组员调换</div>
+        <div class="si"><svg class="ic sm"><use href="#i-tags"/></svg>技能标签</div>
       </div></div>
-      <div class="gtitle" style="margin-top:2px;"><span class="ico">⚙️</span>系统管理<span class="arr">▶</span></div>
+      <div class="gtitle" style="margin-top:2px;"><svg class="ic"><use href="#i-setting"/></svg>系统管理<span class="arr"><svg class="ic arr-ic"><use href="#i-down"/></svg></span></div>
+      <div class="mi"><svg class="ic"><use href="#i-question-circle"/></svg>帮助</div>
+
     </div>
   </div>
   <div class="main">
@@ -133,21 +132,22 @@ table.tb{width:100%;border-collapse:collapse;}
     <div class="content">
       <div class="crumb" id="crumb">首页 / 数字画像 / <b>画像首页</b></div>
       <div class="container">
-
-        <!-- 方案A独有：画像门户首页 -->
+        
         <div class="page show" id="page-portal">
           <div class="portal-hero"><h1>数字画像工作台</h1><p>欢迎回来，张三 —— 点击卡片进入对应功能</p></div>
+          
           <div class="tiles">
-            <div class="tile" onclick="go('profile')"><div class="t-ico i-red">👤</div><div class="t-name">我的档案</div></div>
-            <div class="tile" onclick="go('list')"><div class="t-ico i-blue">📋</div><div class="t-name">档案管理</div></div>
-            <div class="tile"><div class="t-ico i-green">👥</div><div class="t-name">用户管理</div></div>
-            <div class="tile"><div class="t-ico i-orange">🏠</div><div class="t-name">家访记录</div></div>
-            <div class="tile"><div class="t-ico i-purple">🏷️</div><div class="t-name">技能标签</div></div>
-            <div class="tile" onclick="go('analytics')"><div class="t-ico i-cyan">📊</div><div class="t-name">能力分析</div></div>
+            <div class="tile" onclick="go('profile')"><div class="t-ico i-red"><svg class="ic tile-ic"><use href="#i-idcard"/></svg></div><div class="t-name">我的档案</div></div>
+            <div class="tile" onclick="go('list')"><div class="t-ico i-blue"><svg class="ic tile-ic"><use href="#i-solution"/></svg></div><div class="t-name">档案管理</div></div>
+            <div class="tile"><div class="t-ico i-green"><svg class="ic tile-ic"><use href="#i-team"/></svg></div><div class="t-name">用户管理</div></div>
+            <div class="tile"><div class="t-ico i-orange"><svg class="ic tile-ic"><use href="#i-home"/></svg></div><div class="t-name">家访记录</div></div>
+            <div class="tile"><div class="t-ico i-purple"><svg class="ic tile-ic"><use href="#i-tags"/></svg></div><div class="t-name">技能标签</div></div>
+            <div class="tile" onclick="go('analytics')"><div class="t-ico i-cyan"><svg class="ic tile-ic"><use href="#i-fund"/></svg></div><div class="t-name">能力分析</div></div>
           </div>
+
         </div>
 
-        <!-- 我的档案：卡片流 + 右侧悬浮导航 -->
+        
         <div class="page" id="page-profile">
           <div class="cardflow">
             <div class="pcard"><h3>基础信息</h3>
@@ -174,31 +174,35 @@ table.tb{width:100%;border-collapse:collapse;}
           <div class="anchor-nav">页面导航</div>
         </div>
 
-        <!-- 档案管理：筛选栏 + 徽章 + 彩色标签 -->
+
+        
         <div class="page" id="page-list">
           <h1 class="pt">档案管理</h1><div class="sub-title">查看和管理员工档案信息</div>
+          
           <div class="filters">
-            <div class="fi">🔍 EHR 号</div><div class="fi">🔍 姓名</div><div class="fi">▼ 组别</div>
-            <div class="fi">▼ 角色</div><div class="fi">▼ 标签包含</div><div class="fi">应急先锋队 ▾</div>
-            <button class="btn-pri">🔍 查询</button>
+            <div class="fi"><svg class="ic sm"><use href="#i-search"/></svg> EHR 号</div><div class="fi"><svg class="ic sm"><use href="#i-search"/></svg> 姓名</div>
+            <div class="fi">组别 <svg class="ic sm"><use href="#i-down"/></svg></div><div class="fi">角色 <svg class="ic sm"><use href="#i-down"/></svg></div>
+            <div class="fi">标签包含</div><div class="fi">应急先锋队 <svg class="ic sm"><use href="#i-down"/></svg></div>
+            <button class="btn-pri"><svg class="ic sm"><use href="#i-search"/></svg> 查询</button>
           </div>
+
           <table class="tb">
             <tr><th>EHR 号</th><th>姓名</th><th>组别</th><th>角色</th><th>标签</th><th>通勤时间</th><th>操作</th></tr>
-            <tr><td>0000001</td><td>系统管理员</td><td>管理组</td><td><span class="badge adm">🛡 管理员</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
-            <tr><td>1000001</td><td>张组长</td><td>测试一组</td><td><span class="badge">👥 组长</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
-            <tr><td>1000002</td><td>李员工</td><td>测试一组</td><td><span class="badge">👤 普通用户</span></td><td><span class="tag tg-green">Python</span><span class="tag tg-blue">数据分析</span></td><td>20分钟</td><td><span class="link">查看档案</span></td></tr>
-            <tr><td>1000003</td><td>王员工</td><td>测试一组</td><td><span class="badge">👤 普通用户</span></td><td><span class="tag tg-purple">舞蹈</span><span class="tag tg-green">主持</span></td><td>45分钟</td><td><span class="link">查看档案</span></td></tr>
-            <tr><td>1000004</td><td>赵员工</td><td>测试二组</td><td><span class="badge">👤 普通用户</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>0000001</td><td>系统管理员</td><td>管理组</td><td><span class="badge adm"><svg class="ic sm"><use href="#i-safety"/></svg> 管理员</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>1000001</td><td>张组长</td><td>测试一组</td><td><span class="badge"><svg class="ic sm"><use href="#i-team"/></svg> 组长</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>1000002</td><td>李员工</td><td>测试一组</td><td><span class="badge"><svg class="ic sm"><use href="#i-user"/></svg> 普通用户</span></td><td><span class="tag tg-green">Python</span><span class="tag tg-blue">数据分析</span></td><td>20分钟</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>1000003</td><td>王员工</td><td>测试一组</td><td><span class="badge"><svg class="ic sm"><use href="#i-user"/></svg> 普通用户</span></td><td><span class="tag tg-purple">舞蹈</span><span class="tag tg-green">主持</span></td><td>45分钟</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>1000004</td><td>赵员工</td><td>测试二组</td><td><span class="badge"><svg class="ic sm"><use href="#i-user"/></svg> 普通用户</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
           </table>
           <div class="pager">共 6 条 <span class="pg on">1</span><span class="pg">›</span></div>
         </div>
 
-        <!-- 能力分析：预警卡 + 图表 -->
+        
         <div class="page" id="page-analytics">
           <h1 class="pt">团队能力分析</h1><div class="sub-title">数据驱动的团队能力洞察与风险预警</div>
-          <div class="info-bar">ℹ 阈值规则：技能 =1 严重（红） / 2-3 轻度（黄） / 4+ 健康（绿）；应急先锋队 &lt;3 严重 / &lt;5 轻度 / ≥5 健康</div>
+          <div class="info-bar"><svg class="ic sm"><use href="#i-info-circle"/></svg> 阈值规则：技能 =1 严重（红） / 2-3 轻度（黄） / 4+ 健康（绿）；应急先锋队 &lt;3 严重 / &lt;5 轻度 / ≥5 健康</div>
           <div class="warn-card">
-            <div class="warn-head"><span class="l">⚠️ 风险预警</span>
+            <div class="warn-head"><span class="l"><svg class="ic sm"><use href="#i-warning"/></svg> 风险预警</span>
               <span class="warn-legend"><span>严重 <span class="sev">5</span></span><span>轻度 <span class="mid">0</span></span><span>健康 <span class="ok">0</span></span></span></div>
             <div class="warn-row"><span class="warn-tag">严重</span><span class="badge">关键技能</span>关键技能「Python」仅 1 人掌握</div>
             <div class="warn-row"><span class="warn-tag">严重</span><span class="badge">关键技能</span>关键技能「数据分析」仅 1 人掌握</div>
@@ -224,7 +228,7 @@ table.tb{width:100%;border-collapse:collapse;}
           </div>
         </div>
 
-        <div class="note">📌 方案 A demo：侧边栏"数字画像"分组 + 彩色卡片门户首页（本页）。点击左侧菜单或门户卡片切换页面体验。</div>
+        <div class="note">方案 A demo：侧边栏"数字画像"分组 + 彩色卡片门户首页（本页）。点击左侧菜单或门户卡片切换页面体验。</div>
       </div>
     </div>
   </div>
@@ -234,14 +238,12 @@ function go(p){
   document.querySelectorAll('.page').forEach(e=>e.classList.remove('show'));
   document.getElementById('page-'+p).classList.add('show');
   document.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));
-  document.querySelector('.si[data-page="'+p+'"]').classList.add('active');
-  const names={portal:'画像首页',profile:'我的档案',list:'档案管理',analytics:'能力分析'};
+  var el=document.querySelector('.si[data-page="'+p+'"]'); if(el)el.classList.add('active');
+  var names={portal:'画像首页',profile:'我的档案',list:'档案管理',analytics:'能力分析'};
   document.getElementById('crumb').innerHTML='首页 / 数字画像 / <b>'+names[p]+'</b>';
   document.querySelector('.content').scrollTop=0;
 }
-const g=document.querySelector('.group');if(g)g.classList.add('open');
 document.querySelectorAll('.si[data-page]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.page)));
-document.querySelector('.gtitle').addEventListener('click',()=>document.querySelector('.group')?.classList.toggle('open'));
 go('portal');
 </script>
 </body>
