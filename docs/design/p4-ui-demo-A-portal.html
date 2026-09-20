@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>方案A · 画像门户工作台 — P4 界面 Demo</title>
+<style>
+:root{--pri:#D05A6E;--pri-h:#BA4A5B;--pri-a:#A03D48;--pri-l:#F6E7EA;--txt:#333;--txt2:#666;--txt3:#8c8c8c;--bg:#f5f5f5;--bd:#e8e8e8;--bdl:#f0f0f0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--txt);font-size:14px;}
+.layout{display:flex;min-height:100vh;}
+/* ===== 台账壳：侧边栏 ===== */
+.sider{width:200px;background:#fff;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--bdl);}
+.logo{height:64px;display:flex;align-items:center;padding:0 20px;font-size:17px;font-weight:bold;color:var(--pri);}
+.menu{flex:1;overflow-y:auto;padding-bottom:16px;}
+.mi{display:flex;align-items:center;gap:10px;padding:0 20px;height:44px;cursor:pointer;color:var(--txt);border-left:3px solid transparent;}
+.mi:hover{background:#fafafa;}
+.mi.active{background:var(--pri-l);border-left-color:var(--pri);color:var(--pri);font-weight:500;}
+.mi .ico{width:16px;text-align:center;}
+.gtitle{display:flex;align-items:center;gap:10px;padding:0 20px;height:44px;cursor:pointer;color:var(--txt);}
+.gtitle .ico{width:16px;text-align:center;}
+.gtitle .arr{margin-left:auto;font-size:11px;color:var(--txt3);transition:transform .2s;}
+.group.open .arr{transform:rotate(90deg);}
+.sub{display:none;}
+.group.open .sub{display:block;}
+.si{display:flex;align-items:center;padding:0 20px 0 46px;height:40px;cursor:pointer;color:var(--txt2);font-size:13px;border-left:3px solid transparent;}
+.si:hover{color:var(--pri);}
+.si.active{background:var(--pri-l);border-left-color:var(--pri);color:var(--pri);font-weight:500;}
+/* ===== 台账壳：顶栏 ===== */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.header{height:64px;background:#fff;display:flex;align-items:center;justify-content:flex-end;padding:0 24px;border-bottom:1px solid var(--bdl);}
+.user{display:flex;align-items:center;gap:8px;color:var(--txt);}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--pri-l);color:var(--pri);display:flex;align-items:center;justify-content:center;font-size:13px;}
+/* ===== 台账壳：面包屑+内容容器 ===== */
+.content{flex:1;padding:16px 24px;overflow-y:auto;}
+.crumb{color:var(--txt3);font-size:13px;margin-bottom:12px;}
+.crumb b{color:var(--txt);font-weight:500;}
+.container{background:#fff;border-radius:8px;padding:24px;min-height:calc(100vh - 140px);}
+.page{display:none;}
+.page.show{display:block;}
+h1.pt{font-size:18px;margin-bottom:6px;}
+.sub-title{color:var(--txt3);font-size:13px;margin-bottom:20px;}
+/* ===== 画像语言：彩色卡片门户（方案A独有） ===== */
+.portal-hero{margin-bottom:20px;}
+.portal-hero h1{font-size:22px;margin-bottom:4px;}
+.portal-hero p{color:var(--txt3);}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:860px;}
+.tile{background:#fff;border:1px solid var(--bdl);border-radius:8px;padding:32px 0;text-align:center;cursor:pointer;transition:box-shadow .2s,transform .2s;}
+.tile:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-2px);}
+.tile .t-ico{width:52px;height:52px;border-radius:12px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.tile .t-name{font-size:15px;}
+.i-red{background:#FDEBEE;color:var(--pri);} .i-blue{background:#E8F1FD;color:#3B77D2;} .i-green{background:#E6F7EF;color:#27A768;}
+.i-orange{background:#FDF3E4;color:#E58A2E;} .i-purple{background:#F1EBFD;color:#7B4FD0;} .i-cyan{background:#E4F6F8;color:#2AA5B8;}
+/* ===== 画像语言：筛选栏 ===== */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.fi{display:flex;align-items:center;gap:6px;border:1px solid #d9d9d9;border-radius:6px;padding:7px 12px;color:#bfbfbf;background:#fff;font-size:13px;min-width:110px;}
+.fi.sel{color:var(--txt);}
+.btn-pri{background:var(--pri);color:#fff;border:none;border-radius:6px;padding:8px 22px;cursor:pointer;font-size:14px;}
+.btn-pri:hover{background:var(--pri-h);}
+.btn-ghost{background:#fff;color:var(--txt);border:1px solid #d9d9d9;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;gap:6px;}
+/* ===== 画像语言：表格+徽章+彩色标签 ===== */
+table.tb{width:100%;border-collapse:collapse;}
+.tb th{background:#fafafa;text-align:left;padding:12px 14px;font-weight:500;color:var(--txt);border-bottom:1px solid var(--bdl);white-space:nowrap;}
+.tb td{padding:13px 14px;border-bottom:1px solid var(--bdl);}
+.tb tr:hover td{background:#fafafa;}
+.link{color:var(--pri);cursor:pointer;font-size:13px;}
+.badge{display:inline-flex;align-items:center;gap:4px;border:1px solid #d9d9d9;border-radius:20px;padding:2px 10px;font-size:12px;color:var(--txt2);background:#fff;}
+.badge.adm{border-color:var(--pri-l);background:var(--pri-l);color:var(--pri);}
+.tag{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;margin-right:6px;}
+.tg-green{background:#E6F7EF;color:#27A768;} .tg-purple{background:#F1EBFD;color:#7B4FD0;} .tg-blue{background:#E8F1FD;color:#3B77D2;} .tg-orange{background:#FDF3E4;color:#E58A2E;}
+.pager{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:16px;color:var(--txt3);font-size:13px;}
+.pg{border:1px solid #d9d9d9;border-radius:4px;padding:3px 10px;background:#fff;cursor:pointer;}
+.pg.on{background:var(--pri);border-color:var(--pri);color:#fff;}
+/* ===== 画像语言：档案页卡片流 + 右侧悬浮导航 ===== */
+.cardflow{max-width:860px;}
+.pcard{background:#fff;border:1px solid var(--bdl);border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.pcard h3{font-size:15px;padding-bottom:8px;border-bottom:1px solid #eee;margin-bottom:14px;}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;font-size:13px;}
+.dgrid .lb{color:var(--txt3);}
+.btn-add{width:100%;border:1px dashed var(--pri);color:var(--pri);background:#fff;border-radius:6px;padding:8px;cursor:pointer;font-size:13px;margin-top:14px;}
+.btn-edit{background:var(--pri);color:#fff;border:none;border-radius:4px;padding:6px 18px;cursor:pointer;font-size:13px;margin-top:14px;}
+.anchor-nav{position:fixed;right:18px;top:40%;background:var(--pri);color:#fff;border-radius:6px;padding:8px 6px;writing-mode:vertical-lr;letter-spacing:2px;font-size:12px;cursor:pointer;box-shadow:0 2px 8px rgba(208,90,110,.4);}
+/* ===== 画像语言：能力分析 ===== */
+.info-bar{background:#E8F1FD;border:1px solid #C5DBF7;color:#3B77D2;border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:16px;}
+.warn-card{border:1px solid var(--bdl);border-radius:8px;padding:16px 20px;margin-bottom:16px;}
+.warn-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.warn-head .l{font-weight:600;}
+.warn-legend{display:flex;gap:18px;font-size:12px;}
+.warn-legend .sev{color:#E0434F;font-weight:600;} .warn-legend .mid{color:#E58A2E;font-weight:600;} .warn-legend .ok{color:#27A768;font-weight:600;}
+.warn-row{background:#fafafa;border-radius:6px;padding:10px 14px;margin-bottom:8px;font-size:13px;display:flex;gap:10px;align-items:center;}
+.warn-tag{color:#E0434F;border:1px solid #E0434F;border-radius:4px;padding:1px 8px;font-size:12px;flex-shrink:0;}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.chart-card{border:1px solid var(--bdl);border-radius:8px;padding:16px;}
+.chart-card h4{font-size:14px;padding-bottom:10px;border-bottom:1px solid var(--bdl);margin-bottom:14px;}
+.bars{display:flex;align-items:flex-end;gap:28px;height:150px;padding:0 10px;justify-content:center;}
+.bar-g{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.bar-g .bs{display:flex;gap:5px;align-items:flex-end;height:120px;}
+.bar{width:20px;border-radius:3px 3px 0 0;}
+.b-blue{background:#7EB8F0;} .b-red{background:var(--pri);}
+.bar-g .cap{font-size:12px;color:var(--txt2);}
+.legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--txt2);margin-top:10px;}
+.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px;}
+.note{margin-top:24px;padding:12px 16px;background:var(--pri-l);border-radius:6px;color:var(--pri-a);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sider">
+    <div class="logo">台账管理系统</div>
+    <div class="menu" id="menu">
+      <div class="mi"><span class="ico">📊</span>仪表盘</div>
+      <div class="mi"><span class="ico">📄</span>台账管理</div>
+      <div class="mi"><span class="ico">🗂</span>模板管理</div>
+      <div class="mi"><span class="ico">🔀</span>工作流管理</div>
+      <div class="mi"><span class="ico">✅</span>审批任务</div>
+      <div class="mi"><span class="ico">📋</span>日志管理</div>
+      <div class="group open"><div class="gtitle"><span class="ico">🧑‍💼</span><b>数字画像</b><span class="arr">▶</span></div>
+      <div class="sub">
+        <div class="si" data-page="portal">画像首页</div>
+        <div class="si" data-page="profile">我的档案</div>
+        <div class="si">家访记录</div>
+        <div class="si" style="padding-left:60px;color:var(--txt3);font-size:12px;">— 管理功能 —</div>
+        <div class="si" data-page="list">档案管理</div>
+        <div class="si">智能筛选</div>
+        <div class="si" data-page="analytics">能力分析</div>
+        <div class="si">组员调换</div>
+        <div class="si">技能标签</div>
+      </div></div>
+      <div class="gtitle" style="margin-top:2px;"><span class="ico">⚙️</span>系统管理<span class="arr">▶</span></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="header"><div class="user"><div class="avatar">张</div>张三 · 综合组</div></div>
+    <div class="content">
+      <div class="crumb" id="crumb">首页 / 数字画像 / <b>画像首页</b></div>
+      <div class="container">
+
+        <!-- 方案A独有：画像门户首页 -->
+        <div class="page show" id="page-portal">
+          <div class="portal-hero"><h1>数字画像工作台</h1><p>欢迎回来，张三 —— 点击卡片进入对应功能</p></div>
+          <div class="tiles">
+            <div class="tile" onclick="go('profile')"><div class="t-ico i-red">👤</div><div class="t-name">我的档案</div></div>
+            <div class="tile" onclick="go('list')"><div class="t-ico i-blue">📋</div><div class="t-name">档案管理</div></div>
+            <div class="tile"><div class="t-ico i-green">👥</div><div class="t-name">用户管理</div></div>
+            <div class="tile"><div class="t-ico i-orange">🏠</div><div class="t-name">家访记录</div></div>
+            <div class="tile"><div class="t-ico i-purple">🏷️</div><div class="t-name">技能标签</div></div>
+            <div class="tile" onclick="go('analytics')"><div class="t-ico i-cyan">📊</div><div class="t-name">能力分析</div></div>
+          </div>
+        </div>
+
+        <!-- 我的档案：卡片流 + 右侧悬浮导航 -->
+        <div class="page" id="page-profile">
+          <div class="cardflow">
+            <div class="pcard"><h3>基础信息</h3>
+              <div class="dgrid">
+                <div><span class="lb">姓名：</span>张三</div><div><span class="lb">EHR 号：</span>1000002</div>
+                <div><span class="lb">组别：</span>测试一组（只读）</div><div><span class="lb">性别：</span>男</div>
+                <div><span class="lb">出生日期：</span>1995-06</div><div><span class="lb">婚姻状况：</span>—</div>
+                <div><span class="lb">参加工作时间：</span>2018-07</div><div><span class="lb">籍贯：</span>—</div>
+              </div><button class="btn-edit">编 辑</button>
+            </div>
+            <div class="pcard"><h3>政治面貌</h3>
+              <div class="dgrid"><div><span class="lb">政治面貌：</span>中共党员</div><div><span class="lb">参加日期：</span>2016-06</div></div>
+            </div>
+            <div class="pcard"><h3>学历学位</h3><div class="dgrid"><div><span class="lb">学历：</span>硕士研究生</div><div><span class="lb">学位：</span>工学硕士</div><div><span class="lb">学校：</span>—</div><div><span class="lb">专业：</span>计算机技术</div></div></div>
+            <div class="pcard"><h3>技能标签</h3>
+              <span class="tag tg-green">Python</span><span class="tag tg-blue">数据分析</span><span class="tag tg-purple">主持</span>
+              <button class="btn-add">+ 新增标签</button>
+            </div>
+            <div class="pcard"><h3>发展意向</h3>
+              <div class="dgrid"><div><span class="lb">职业方向：</span>数据分析</div><div><span class="lb">学习需求：</span>机器学习（2-3 年）</div></div>
+              <button class="btn-add">+ 新增</button>
+            </div>
+          </div>
+          <div class="anchor-nav">页面导航</div>
+        </div>
+
+        <!-- 档案管理：筛选栏 + 徽章 + 彩色标签 -->
+        <div class="page" id="page-list">
+          <h1 class="pt">档案管理</h1><div class="sub-title">查看和管理员工档案信息</div>
+          <div class="filters">
+            <div class="fi">🔍 EHR 号</div><div class="fi">🔍 姓名</div><div class="fi">▼ 组别</div>
+            <div class="fi">▼ 角色</div><div class="fi">▼ 标签包含</div><div class="fi">应急先锋队 ▾</div>
+            <button class="btn-pri">🔍 查询</button>
+          </div>
+          <table class="tb">
+            <tr><th>EHR 号</th><th>姓名</th><th>组别</th><th>角色</th><th>标签</th><th>通勤时间</th><th>操作</th></tr>
+            <tr><td>0000001</td><td>系统管理员</td><td>管理组</td><td><span class="badge adm">🛡 管理员</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>1000001</td><td>张组长</td><td>测试一组</td><td><span class="badge">👥 组长</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>1000002</td><td>李员工</td><td>测试一组</td><td><span class="badge">👤 普通用户</span></td><td><span class="tag tg-green">Python</span><span class="tag tg-blue">数据分析</span></td><td>20分钟</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>1000003</td><td>王员工</td><td>测试一组</td><td><span class="badge">👤 普通用户</span></td><td><span class="tag tg-purple">舞蹈</span><span class="tag tg-green">主持</span></td><td>45分钟</td><td><span class="link">查看档案</span></td></tr>
+            <tr><td>1000004</td><td>赵员工</td><td>测试二组</td><td><span class="badge">👤 普通用户</span></td><td>—</td><td>—</td><td><span class="link">查看档案</span></td></tr>
+          </table>
+          <div class="pager">共 6 条 <span class="pg on">1</span><span class="pg">›</span></div>
+        </div>
+
+        <!-- 能力分析：预警卡 + 图表 -->
+        <div class="page" id="page-analytics">
+          <h1 class="pt">团队能力分析</h1><div class="sub-title">数据驱动的团队能力洞察与风险预警</div>
+          <div class="info-bar">ℹ 阈值规则：技能 =1 严重（红） / 2-3 轻度（黄） / 4+ 健康（绿）；应急先锋队 &lt;3 严重 / &lt;5 轻度 / ≥5 健康</div>
+          <div class="warn-card">
+            <div class="warn-head"><span class="l">⚠️ 风险预警</span>
+              <span class="warn-legend"><span>严重 <span class="sev">5</span></span><span>轻度 <span class="mid">0</span></span><span>健康 <span class="ok">0</span></span></span></div>
+            <div class="warn-row"><span class="warn-tag">严重</span><span class="badge">关键技能</span>关键技能「Python」仅 1 人掌握</div>
+            <div class="warn-row"><span class="warn-tag">严重</span><span class="badge">关键技能</span>关键技能「数据分析」仅 1 人掌握</div>
+            <div class="warn-row"><span class="warn-tag">严重</span><span class="badge">应急能力</span>应急先锋队仅 1 人，建议立即补充</div>
+          </div>
+          <div class="charts">
+            <div class="chart-card"><h4>组别人数与应急先锋队</h4>
+              <div class="bars">
+                <div class="bar-g"><div class="bs"><div class="bar b-blue" style="height:110px"></div><div class="bar b-red" style="height:36px"></div></div><div class="cap">测试一组</div></div>
+                <div class="bar-g"><div class="bs"><div class="bar b-blue" style="height:76px"></div><div class="bar b-red" style="height:0"></div></div><div class="cap">测试二组</div></div>
+                <div class="bar-g"><div class="bs"><div class="bar b-blue" style="height:40px"></div><div class="bar b-red" style="height:0"></div></div><div class="cap">管理组</div></div>
+              </div>
+              <div class="legend"><span><span class="dot b-blue"></span>总人数</span><span><span class="dot b-red"></span>应急先锋队</span></div>
+            </div>
+            <div class="chart-card"><h4>技能分布 TOP</h4>
+              <div class="bars">
+                <div class="bar-g"><div class="bs"><div class="bar b-red" style="height:110px"></div></div><div class="cap">Python</div></div>
+                <div class="bar-g"><div class="bs"><div class="bar b-red" style="height:80px"></div></div><div class="cap">数据分析</div></div>
+                <div class="bar-g"><div class="bs"><div class="bar b-red" style="height:56px"></div></div><div class="cap">主持</div></div>
+                <div class="bar-g"><div class="bs"><div class="bar b-red" style="height:40px"></div></div><div class="cap">舞蹈</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="note">📌 方案 A demo：侧边栏"数字画像"分组 + 彩色卡片门户首页（本页）。点击左侧菜单或门户卡片切换页面体验。</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function go(p){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('show'));
+  document.getElementById('page-'+p).classList.add('show');
+  document.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));
+  document.querySelector('.si[data-page="'+p+'"]').classList.add('active');
+  const names={portal:'画像首页',profile:'我的档案',list:'档案管理',analytics:'能力分析'};
+  document.getElementById('crumb').innerHTML='首页 / 数字画像 / <b>'+names[p]+'</b>';
+  document.querySelector('.content').scrollTop=0;
+}
+const g=document.querySelector('.group');if(g)g.classList.add('open');
+document.querySelectorAll('.si[data-page]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.page)));
+document.querySelector('.gtitle').addEventListener('click',()=>document.querySelector('.group')?.classList.toggle('open'));
+go('portal');
+</script>
+</body>
+</html>
