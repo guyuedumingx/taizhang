@@ -17,6 +17,12 @@ import {
   FieldBinaryOutlined,
   SolutionOutlined,
   ThunderboltOutlined,
+  IdcardOutlined,
+  HomeOutlined,
+  TagsOutlined,
+  FundOutlined,
+  SwapOutlined,
+  FilterOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -51,6 +57,10 @@ const AppLayout: React.FC = () => {
           // 系统管理子菜单
           setSelectedKeys([pathSegments[2]]);
           setOpenKeys(['admin']);
+        } else if (pathSegments[1] === 'portrait' && pathSegments.length >= 3) {
+          // 数字画像子菜单
+          setSelectedKeys([pathSegments[2] === 'profile' ? 'portrait-profile' : pathSegments[2]]);
+          setOpenKeys(['portrait']);
         } else {
           // 普通菜单
           setSelectedKeys([pathSegments[1]]);
@@ -150,7 +160,27 @@ const AppLayout: React.FC = () => {
               icon: <FileSearchOutlined />,
               label: <Link to="/dashboard/logs">日志管理</Link>,
             } : null,
-            
+
+            // 数字画像（方案B：菜单平铺；未完成项禁用占位，随 P4 批次逐个启用）
+            {
+              key: 'portrait',
+              icon: <IdcardOutlined />,
+              label: '数字画像',
+              children: [
+                {
+                  key: 'portrait-profile',
+                  icon: <IdcardOutlined />,
+                  label: <Link to="/dashboard/portrait/profile">我的档案</Link>,
+                },
+                { key: 'portrait-home-visits', icon: <HomeOutlined />, label: '家访记录', disabled: true },
+                { key: 'portrait-admin-profiles', icon: <SolutionOutlined />, label: '档案管理', disabled: true },
+                { key: 'portrait-scenarios', icon: <FilterOutlined />, label: '智能筛选', disabled: true },
+                { key: 'portrait-analytics', icon: <FundOutlined />, label: '能力分析', disabled: true },
+                { key: 'portrait-group-transfers', icon: <SwapOutlined />, label: '组员调换', disabled: true },
+                { key: 'portrait-skill-tags', icon: <TagsOutlined />, label: '技能标签', disabled: true },
+              ],
+            },
+
             // 系统管理
             (hasPermission(PERMISSIONS.USER_VIEW) || 
              hasPermission(PERMISSIONS.ROLE_VIEW) ||

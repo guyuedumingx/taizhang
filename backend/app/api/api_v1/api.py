@@ -17,6 +17,10 @@ api_router.include_router(logs.router, prefix="/logs", tags=["日志管理"])
 api_router.include_router(statistics.router, prefix="/statistics", tags=["统计分析"])
 api_router.include_router(auto_fill_configs.router, prefix="/auto-fill-configs", tags=["自动填充配置"])
 
+# 数字画像（P4 起逐步接入；模型与权限策略见 app/portrait/）
+from app.portrait.router_profile import router as portrait_profile_router  # noqa: E402
+api_router.include_router(portrait_profile_router, prefix="/portrait/profiles", tags=["数字画像-档案"])
+
 @api_router.get("/test-token", tags=["test"])
 def test_token():
     """测试接口，返回一个有效的访问令牌"""

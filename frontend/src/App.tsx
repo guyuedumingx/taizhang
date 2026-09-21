@@ -27,6 +27,7 @@ import TaskList from './pages/approval/TaskList';
 import LogList from './pages/log/LogList';
 import HelpPage from './pages/HelpPage';
 import UserProfile from './pages/UserProfile';
+import MyProfile from './pages/portrait/MyProfile';
 import PasswordExpiredModal from './components/PasswordExpiredModal';
 import './App.css';
 
@@ -119,6 +120,7 @@ function App() {
               <Route path="admin/auto-fill-configs" element={<AutoFillConfigManagement />} />
               <Route path="help" element={<HelpPage />} />
               <Route path="user-profile" element={<UserProfile />} />
+              <Route path="portrait/profile" element={<MyProfile />} />
             </Route>
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>

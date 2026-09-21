@@ -487,3 +487,161 @@ export interface AutoFillTriggerConfigUpdate {
   enabled?: boolean;
   description?: string | null;
 }
+// ===== 数字画像（portrait） =====
+
+export interface PortraitProfileBase {
+  gender?: string | null;
+  nation?: string | null;
+  birth_date?: string | null;
+  job_title?: string | null;
+  id_type?: string | null;
+  id_number?: string | null;
+  native_place?: string | null;
+  birth_place?: string | null;
+  household_place?: string | null;
+  work_start_date?: string | null;
+  hire_date?: string | null;
+  marital_status?: string | null;
+  is_emergency_staff?: boolean | null;
+}
+
+export interface PortraitPoliticalInfo {
+  id: number;
+  profile_id: number;
+  political_status?: string | null;
+  join_date?: string | null;
+  introducer?: string | null;
+}
+
+export interface PortraitEducationInfo {
+  id: number;
+  profile_id: number;
+  education_category?: string | null;
+  education_type?: string | null;
+  education_level?: string | null;
+  degree?: string | null;
+  school?: string | null;
+  major_name?: string | null;
+  duration_years?: string | null;
+  enrollment_date?: string | null;
+  graduation_date?: string | null;
+  completion_status?: string | null;
+  country?: string | null;
+}
+
+export interface PortraitFamilyInfo {
+  id: number;
+  profile_id: number;
+  name?: string | null;
+  gender?: string | null;
+  relation?: string | null;
+  birth_date?: string | null;
+  work_unit_and_title?: string | null;
+  political_status?: string | null;
+  employment_status?: string | null;
+}
+
+export interface PortraitResumeInfo {
+  id: number;
+  profile_id: number;
+  start_time?: string | null;
+  end_time?: string | null;
+  unit_and_title?: string | null;
+}
+
+export interface PortraitRewardInfo {
+  id: number;
+  profile_id: number;
+  reward_type?: string | null;
+  reward_time?: string | null;
+  reward_name?: string | null;
+  reward_reason?: string | null;
+}
+
+export interface PortraitQualificationInfo {
+  id: number;
+  profile_id: number;
+  qualification_name?: string | null;
+  obtain_time?: string | null;
+  valid_until?: string | null;
+}
+
+export interface PortraitAchievementInfo {
+  id: number;
+  profile_id: number;
+  achievement_name?: string | null;
+  obtain_time?: string | null;
+}
+
+export interface PortraitLanguageInfo {
+  id: number;
+  profile_id: number;
+  language?: string | null;
+  proficiency?: string | null;
+  cert_level_or_score?: string | null;
+}
+
+export interface PortraitContactInfo {
+  id: number;
+  profile_id: number;
+  mobile?: string | null;
+  office_phone?: string | null;
+  home_phone?: string | null;
+  home_address?: string | null;
+  email?: string | null;
+  commute_minutes?: number | null;
+}
+
+export interface PortraitSkillTag {
+  id: number;
+  profile_id: number;
+  tag_name: string;
+  template_id?: number | null;
+}
+
+export interface PortraitDevelopmentIntent {
+  id: number;
+  profile_id: number;
+  development_path?: string | null;
+  short_term_goal?: string | null;
+  mid_term_goal?: string | null;
+  core_abilities: string[];
+  learning_methods: string[];
+  learning_courses?: string | null;
+  rotation_interest?: string | null;
+  rotation_target?: string | null;
+  project_interests: string[];
+  other_comments?: string | null;
+}
+
+export interface PortraitProjectSummary {
+  id: number;
+  profile_id: number;
+  project_name: string;
+  start_time?: string | null;
+  end_time?: string | null;
+  role?: string | null;
+  description?: string | null;
+  tag_ids: number[];
+  tag_names: string[];
+}
+
+export interface PortraitProfileFull {
+  user_id: number;
+  ehr_no: string;
+  name: string;
+  group_name?: string | null;
+  base?: PortraitProfileBase | null;
+  political: PortraitPoliticalInfo[];
+  education: PortraitEducationInfo[];
+  family: PortraitFamilyInfo[];
+  resume: PortraitResumeInfo[];
+  reward: PortraitRewardInfo[];
+  qualification: PortraitQualificationInfo[];
+  achievement: PortraitAchievementInfo[];
+  language: PortraitLanguageInfo[];
+  contact?: PortraitContactInfo | null;
+  skill_tags: PortraitSkillTag[];
+  development_intent?: PortraitDevelopmentIntent | null;
+  project_summaries: PortraitProjectSummary[];
+}

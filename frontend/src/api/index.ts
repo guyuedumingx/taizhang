@@ -12,11 +12,12 @@ import * as UsersAPI from './users';
 import * as TeamsAPI from './teams';
 import * as RolesAPI from './roles';
 import * as TemplatesAPI from './templates';
+import * as PortraitProfilesAPI from './portraitProfiles';
 
 // 导出所有API模块
-export { 
+export {
   WorkflowsAPI,
-  WorkflowNodesAPI, 
+  WorkflowNodesAPI,
   WorkflowInstancesAPI,
   LedgersAPI,
   ApprovalsAPI,
@@ -24,7 +25,8 @@ export {
   UsersAPI,
   TeamsAPI,
   RolesAPI,
-  TemplatesAPI
+  TemplatesAPI,
+  PortraitProfilesAPI
 };
 
 // 创建一个内存存储，用于测试环境
