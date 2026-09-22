@@ -12,6 +12,7 @@ import * as UsersAPI from './users';
 import * as TeamsAPI from './teams';
 import * as RolesAPI from './roles';
 import * as TemplatesAPI from './templates';
+import * as PortraitAPI from './portrait';
 
 // 导出所有API模块
 export { 
@@ -24,7 +25,8 @@ export {
   UsersAPI,
   TeamsAPI,
   RolesAPI,
-  TemplatesAPI
+  TemplatesAPI,
+  PortraitAPI
 };
 
 // 创建一个内存存储，用于测试环境
@@ -162,6 +164,7 @@ export default {
   ledgers: LedgersAPI,
   approvals: ApprovalsAPI,
   logs: LogsAPI,
+  portrait: PortraitAPI,
   statistics: {
     overview: async (): Promise<OverviewResponse> => {
       const response = await api.get('/statistics/overview');

@@ -67,6 +67,18 @@ export const PERMISSIONS = {
   
   // 日志权限
   LOG_VIEW: 'log:view',
+
+  // 数字画像权限 (portrait P5 阶段新增)
+  // 注: 前端 hasPermission 是基于字符串, 但 portrait 走后端 /me/permissions 返回
+  //     真正的权限列表 (因为 portrait 不依赖 taizhang Casbin 角色分配)
+  //     此处常量仅为前端菜单/按钮标识用, 真正的权限校验在后端
+  PORTRAIT_SELF_READ: 'portrait_self:read',
+  PORTRAIT_SELF_UPDATE: 'portrait_self:update',
+  PORTRAIT_SELF_CREATE: 'portrait_self:create',
+  PORTRAIT_GROUP_READ: 'portrait_group:read',
+  PORTRAIT_GROUP_UPDATE: 'portrait_group:update',
+  PORTRAIT_GROUP_EXPORT: 'portrait_group:export',
+  PORTRAIT_ALL: 'portrait_all:*',
 };
 
 // 登录页面背景图

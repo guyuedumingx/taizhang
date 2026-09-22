@@ -26,6 +26,10 @@ import WorkflowDetail from './pages/workflow/WorkflowDetail';
 import TaskList from './pages/approval/TaskList';
 import LogList from './pages/log/LogList';
 import HelpPage from './pages/HelpPage';
+// 数字画像 P5 阶段新增
+import MyProfile from './pages/portrait/MyProfile';
+import MySubmissions from './pages/portrait/MySubmissions';
+import ApprovalInbox from './pages/portrait/ApprovalInbox';
 import UserProfile from './pages/UserProfile';
 import PasswordExpiredModal from './components/PasswordExpiredModal';
 import './App.css';
@@ -117,6 +121,10 @@ function App() {
               <Route path="admin/teams" element={<TeamManagement />} />
               <Route path="admin/teams/:id/members" element={<TeamMembers />} />
               <Route path="admin/auto-fill-configs" element={<AutoFillConfigManagement />} />
+              {/* 数字画像 P5 (3 页 MVP, 用户决策) */}
+              <Route path="portrait/profile" element={<MyProfile />} />
+              <Route path="portrait/submissions" element={<MySubmissions />} />
+              <Route path="portrait/approvals" element={<ApprovalInbox />} />
               <Route path="help" element={<HelpPage />} />
               <Route path="user-profile" element={<UserProfile />} />
             </Route>

@@ -17,6 +17,8 @@ import {
   FieldBinaryOutlined,
   SolutionOutlined,
   ThunderboltOutlined,
+  IdcardOutlined,
+  CheckSquareOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -187,7 +189,33 @@ const AppLayout: React.FC = () => {
                 } : null,
               ].filter(Boolean),
             } : null,
-            
+
+            // 数字画像 (P5 阶段新增, portrait 后端 MVP)
+            // 权限控制: 后端 /me/permissions 返回 is_admin/is_leader/is_user 决定可见子页
+            // 前端菜单始终展示 portrait 顶级, 子页用后端判断 (避免前端硬编码用户角色)
+            {
+              key: 'portrait',
+              icon: <IdcardOutlined />,
+              label: '数字画像',
+              children: [
+                {
+                  key: 'portrait-profile',
+                  icon: <UserOutlined />,
+                  label: <Link to="/dashboard/portrait/profile">我的档案</Link>,
+                },
+                {
+                  key: 'portrait-submissions',
+                  icon: <FileOutlined />,
+                  label: <Link to="/dashboard/portrait/submissions">我的提交</Link>,
+                },
+                {
+                  key: 'portrait-approvals',
+                  icon: <CheckSquareOutlined />,
+                  label: <Link to="/dashboard/portrait/approvals">待审批</Link>,
+                },
+              ],
+            },
+
             // 帮助
             {
               key: 'help',
