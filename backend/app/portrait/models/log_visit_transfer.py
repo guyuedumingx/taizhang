@@ -67,11 +67,18 @@ class HomeVisitRecord(Base):
 
     feedback = Column(Text, nullable=True)
 
+    # P6 家访审批流: 状态机字段 (集成指南 §5 雷区 6: portrait 独立 status String, 不复用台账 ApprovalStatus 枚举)
+    status = Column(String(20), nullable=False, default="draft", index=True)
+    current_approver_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    submitted_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+
     created_at = Column(DateTime, default=beijing_now)
     updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
 
     visited_user = relationship("User", foreign_keys=[visited_user_id])
     visitor_user = relationship("User", foreign_keys=[visitor_user_id])
+    current_approver = relationship("User", foreign_keys=[current_approver_id])
 
 
 class GroupTransferHistory(Base):

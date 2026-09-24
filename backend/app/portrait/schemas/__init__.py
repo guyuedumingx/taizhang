@@ -49,6 +49,16 @@ from app.portrait.schemas.submission import (
     SubmissionDetail,
     SubmissionUpdate,
 )
+from app.portrait.schemas.home_visit import (
+    HomeVisit,
+    HomeVisitApproveRequest,
+    HomeVisitCreate,
+    HomeVisitListItem,
+    HomeVisitListResponse,
+    HomeVisitRejectRequest,
+    HomeVisitSubmitRequest,
+    HomeVisitUpdate,
+)
 
 
 __all__ = [
@@ -98,4 +108,13 @@ __all__ = [
     "ApprovalActionRequest",
     "ApprovalActionResponse",
     "MySubmissionsQuery",
+    # home_visit (P6)
+    "HomeVisit",
+    "HomeVisitCreate",
+    "HomeVisitUpdate",
+    "HomeVisitSubmitRequest",
+    "HomeVisitApproveRequest",
+    "HomeVisitRejectRequest",
+    "HomeVisitListItem",
+    "HomeVisitListResponse",
 ]

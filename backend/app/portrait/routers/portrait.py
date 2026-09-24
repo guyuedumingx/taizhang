@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.api import deps
 from app.portrait.routers import approvals as approvals_router
+from app.portrait.routers import home_visits as home_visits_router
 from app.portrait.routers import profiles as profiles_router
 from app.portrait.routers import submissions as submissions_router
 
@@ -58,4 +59,7 @@ portrait_router.include_router(
 )
 portrait_router.include_router(
     approvals_router.router, prefix="/approvals", tags=["portrait.审批"]
+)
+portrait_router.include_router(
+    home_visits_router.router, prefix="/home-visits", tags=["portrait.家访"]
 )
