@@ -19,6 +19,7 @@ import {
   ThunderboltOutlined,
   IdcardOutlined,
   CheckSquareOutlined,
+  HomeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -212,6 +213,11 @@ const AppLayout: React.FC = () => {
                   key: 'portrait-approvals',
                   icon: <CheckSquareOutlined />,
                   label: <Link to="/dashboard/portrait/approvals">待审批</Link>,
+                },
+                {
+                  key: 'portrait-home-visits',
+                  icon: <HomeOutlined />,
+                  label: <Link to="/dashboard/portrait/home-visits">家访</Link>,
                 },
               ],
             },

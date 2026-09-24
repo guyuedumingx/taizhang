@@ -275,3 +275,139 @@ export async function transferSubmission(
   });
   return response.data;
 }
+
+
+// ============================================================================
+// P6 家访审批 API
+// ============================================================================
+export interface HomeVisitItem {
+  id: number;
+  visited_ehr_id: string;
+  visited_name: string;
+  visit_year: number;
+  visit_time: string;
+  visit_method: string;
+  is_visited: boolean;
+  status: string;
+  submitted_at: string | null;
+  completed_at: string | null;
+  visitor_name: string | null;
+  current_approver_name: string | null;
+  created_at: string;
+}
+
+export interface HomeVisitDetail extends HomeVisitItem {
+  visited_user_id: number;
+  visitor_user_id: number;
+  visit_address: string | null;
+  visitor_info: string | null;
+  visit_date: string | null;
+  position: string | null;
+  contact_phone: string | null;
+  address: string | null;
+  mobile: string | null;
+  home_phone: string | null;
+  family1_name: string | null;
+  family1_relation: string | null;
+  family1_contact: string | null;
+  family1_work_unit: string | null;
+  family2_name: string | null;
+  family2_relation: string | null;
+  family2_contact: string | null;
+  family2_work_unit: string | null;
+  feedback: string | null;
+  current_approver_id: number | null;
+  updated_at: string;
+}
+
+export interface HomeVisitListResponse {
+  total: number;
+  items: HomeVisitItem[];
+}
+
+export interface HomeVisitCreatePayload {
+  visited_ehr_id: string;
+  visit_year: number;
+  visit_time: string;
+  visit_method: '线上' | '线下';
+  visit_address?: string;
+  visitor_info?: string;
+  is_visited?: boolean;
+  visit_date?: string;
+  position?: string;
+  contact_phone?: string;
+  address?: string;
+  mobile?: string;
+  home_phone?: string;
+  family1_name?: string;
+  family1_relation?: string;
+  family1_contact?: string;
+  family1_work_unit?: string;
+  family2_name?: string;
+  family2_relation?: string;
+  family2_contact?: string;
+  family2_work_unit?: string;
+  feedback?: string;
+}
+
+export async function listHomeVisits(params?: {
+  status?: string;
+  visit_year?: number;
+  visited_ehr_id?: string;
+  skip?: number;
+  limit?: number;
+}): Promise<HomeVisitListResponse> {
+  const response = await api.get('/portrait/home-visits', { params });
+  return response.data;
+}
+
+export async function getHomeVisit(id: number): Promise<HomeVisitDetail> {
+  const response = await api.get(`/portrait/home-visits/${id}`);
+  return response.data;
+}
+
+export async function createHomeVisit(
+  payload: HomeVisitCreatePayload
+): Promise<HomeVisitDetail> {
+  const response = await api.post('/portrait/home-visits', payload);
+  return response.data;
+}
+
+export async function updateHomeVisit(
+  id: number,
+  payload: Partial<HomeVisitCreatePayload>
+): Promise<HomeVisitDetail> {
+  const response = await api.put(`/portrait/home-visits/${id}`, payload);
+  return response.data;
+}
+
+export async function submitHomeVisit(
+  id: number,
+  next_approver_id?: number
+): Promise<HomeVisitDetail> {
+  const response = await api.post(`/portrait/home-visits/${id}/submit`, {
+    next_approver_id,
+  });
+  return response.data;
+}
+
+export async function cancelHomeVisit(id: number): Promise<HomeVisitDetail> {
+  const response = await api.post(`/portrait/home-visits/${id}/cancel`);
+  return response.data;
+}
+
+export async function approveHomeVisit(
+  id: number,
+  comment?: string
+): Promise<HomeVisitDetail> {
+  const response = await api.post(`/portrait/home-visits/${id}/approve`, { comment });
+  return response.data;
+}
+
+export async function rejectHomeVisit(
+  id: number,
+  comment: string  // 必填, Rule 12
+): Promise<HomeVisitDetail> {
+  const response = await api.post(`/portrait/home-visits/${id}/reject`, { comment });
+  return response.data;
+}
