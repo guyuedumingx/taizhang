@@ -212,7 +212,7 @@ const AppLayout: React.FC = () => {
                 {
                   key: 'portrait-approvals',
                   icon: <CheckSquareOutlined />,
-                  label: <Link to="/dashboard/portrait/approvals">待审批</Link>,
+                  label: <Link to="/dashboard/portrait/approvals">审批工作台</Link>,
                 },
                 {
                   key: 'portrait-home-visits',

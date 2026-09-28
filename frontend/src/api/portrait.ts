@@ -121,6 +121,7 @@ export interface SubmissionRecord {
   updated_at: string;
   current_approver_name?: string | null;
   approval_count?: number;
+  synced_ledger_id?: number | null;  // P8: special_work 审批通过后联动到的 ledger id
 }
 
 export interface ApprovalRecord {
@@ -142,6 +143,13 @@ export interface ApprovalActionResponse {
   success: boolean;
   message: string;
   submission?: SubmissionRecord;
+}
+
+// 用于审批人下拉的简化 User (后端 /users 返回 items 含完整字段, 这里只取必要 3 项)
+export interface ApproverUser {
+  id: number;
+  name: string;
+  ehr_id: string;
 }
 
 // ============================================================================
@@ -248,6 +256,14 @@ export async function listMyPendingApprovals(params: {
   return response.data;
 }
 
+export async function listMyApprovalHistory(params: {
+  skip?: number;
+  limit?: number;
+} = {}): Promise<PaginatedResponse<SubmissionRecord>> {
+  const response = await api.get('/portrait/approvals/history', { params });
+  return response.data;
+}
+
 export async function approveSubmission(
   submissionId: number,
   comment?: string
@@ -274,6 +290,24 @@ export async function transferSubmission(
     comment,
   });
   return response.data;
+}
+
+// ============================================================================
+// 审批人下拉数据 (复用后端 /users 端点)
+// ============================================================================
+export async function listUsersForApprover(params: {
+  skip?: number;
+  limit?: number;
+} = {}): Promise<{ items: ApproverUser[]; total: number }> {
+  const response = await api.get('/users', { params: { skip: params.skip ?? 0, limit: params.limit ?? 200 } });
+  // 后端返回结构: { items: User[], total, page, size }, 这里收窄类型
+  const data = response.data as { items?: any[]; total?: number };
+  const items: ApproverUser[] = (data.items || []).map((u: any) => ({
+    id: u.id,
+    name: u.name,
+    ehr_id: u.ehr_id,
+  }));
+  return { items, total: data.total ?? items.length };
 }
 
 

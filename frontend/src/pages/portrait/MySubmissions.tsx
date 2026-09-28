@@ -1,10 +1,10 @@
 /**
- * 数字画像-我的提交 (P5 阶段, 批次 9)
+ * 数字画像-我的提交 (P5 阶段, 批次 9) + P7 (批次 12) B1 创建表单
  *
  * PRD §B3-B4: 我的提交列表 + 详情 (含审批流)
+ * PRD §B1: 提交专项工作 / §A2: 档案修改 / §A3: 亮点标签 (P7 一并支持)
  *
  * 集成指南 §5 雷区 7: 不绕过 Depends — 所有更新走 api
- * P5 MVP 不含 B1 创建表单 (用户决定), 仅展示 + 撤回
  */
 import React, { useEffect, useState } from 'react';
 import {
@@ -20,10 +20,17 @@ import {
   Popconfirm,
   message,
   Spin,
+  Form,
 } from 'antd';
-import { ReloadOutlined, EyeOutlined, RollbackOutlined } from '@ant-design/icons';
+import {
+  ReloadOutlined,
+  EyeOutlined,
+  RollbackOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import * as PortraitAPI from '../../api/portrait';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
+import CreateSubmissionModal from './CreateSubmissionModal';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -65,6 +72,78 @@ const MySubmissions: React.FC = () => {
   const [size, setSize] = useState(20);
   const [detailLoading, setDetailLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // P7 B1/A2/A3 创建表单 state
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createForm] = Form.useForm();
+  const [activeCreateTab, setActiveCreateTab] = useState<'special_work' | 'profile_edit' | 'skill_tag_edit'>('special_work');
+
+  const openCreate = () => {
+    createForm.resetFields();
+    setActiveCreateTab('special_work');
+    setCreateOpen(true);
+  };
+
+  const closeCreate = () => {
+    setCreateOpen(false);
+    createForm.resetFields();
+  };
+
+  const handleCreate = async () => {
+    try {
+      const values = await createForm.validateFields();
+      setCreating(true);
+      let payload: Record<string, any> = {};
+      let next_approver_id: number | undefined;
+
+      if (activeCreateTab === 'special_work') {
+        payload = {
+          project_name: values.project_name,
+          start_time: values.start_time?.format('YYYY-MM-DD'),
+          end_time: values.end_time?.format('YYYY-MM-DD'),
+          content: values.content,
+          hours: values.hours,
+          skill_tags: values.skill_tags || [],
+        };
+        next_approver_id = values.next_approver_id;
+        if (!next_approver_id) {
+          message.error('请选择审批人 (special_work 必填)');
+          setCreating(false);
+          return;
+        }
+      } else if (activeCreateTab === 'profile_edit') {
+        payload = {
+          field_name: values.field_name,
+          old_value: values.old_value || '',
+          new_value: values.new_value,
+        };
+        next_approver_id = values.next_approver_id;
+      } else if (activeCreateTab === 'skill_tag_edit') {
+        payload = {
+          tag_name: values.tag_name,
+          action: values.action,
+          sensitivity: values.sensitivity,
+          reason: values.reason,
+        };
+        next_approver_id = values.next_approver_id;
+      }
+
+      await PortraitAPI.createSubmission({
+        submission_type: activeCreateTab,
+        payload,
+        next_approver_id,
+      });
+      message.success('提交成功, 进入审批流');
+      closeCreate();
+      fetchList();
+    } catch (err: any) {
+      if (err?.errorFields) return;  // 表单校验失败
+      message.error(`提交失败: ${err?.response?.data?.detail || err.message}`);
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const fetchList = async () => {
     setLoading(true);
@@ -131,9 +210,18 @@ const MySubmissions: React.FC = () => {
       <Card
         title={<Title level={4} style={{ margin: 0 }}>我的提交</Title>}
         extra={
-          <Button icon={<ReloadOutlined />} onClick={fetchList} loading={loading}>
-            刷新
-          </Button>
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={openCreate}
+            >
+              新建提交
+            </Button>
+            <Button icon={<ReloadOutlined />} onClick={fetchList} loading={loading}>
+              刷新
+            </Button>
+          </Space>
         }
       >
         <Table
@@ -165,6 +253,17 @@ const MySubmissions: React.FC = () => {
               title: '提交时间',
               dataIndex: 'submitted_at',
               render: (v?: string) => v ? new Date(v).toLocaleString('zh-CN') : '-',
+            },
+            {
+              title: '联动',
+              dataIndex: 'synced_ledger_id',
+              width: 80,
+              render: (v?: number | null) =>
+                v ? (
+                  <Tag color="success">台账 #{v}</Tag>
+                ) : (
+                  <Text type="secondary" style={{ fontSize: 12 }}>-</Text>
+                ),
             },
             {
               title: '操作',
@@ -201,6 +300,17 @@ const MySubmissions: React.FC = () => {
           ]}
         />
       </Card>
+
+      {/* P7 创建提交 Modal (B1/A2/A3 三合一) */}
+      <CreateSubmissionModal
+        open={createOpen}
+        onCancel={closeCreate}
+        onOk={handleCreate}
+        confirming={creating}
+        activeTab={activeCreateTab}
+        setActiveTab={(k: any) => setActiveCreateTab(k)}
+        form={createForm}
+      />
     </div>
   );
 };
@@ -230,6 +340,16 @@ const DetailContent: React.FC<{ detail: PortraitAPI.SubmissionDetail }> = ({ det
         {detail.completed_at && (
           <Descriptions.Item label="完成时间">
             {new Date(detail.completed_at).toLocaleString('zh-CN')}
+          </Descriptions.Item>
+        )}
+        {detail.synced_ledger_id != null && (
+          <Descriptions.Item label="联动台账">
+            <a href={`/dashboard/ledgers/${detail.synced_ledger_id}`} target="_blank" rel="noreferrer">
+              #{detail.synced_ledger_id}
+            </a>
+            <Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
+              (special_work 审批通过自动联动生成)
+            </Text>
           </Descriptions.Item>
         )}
       </Descriptions>
