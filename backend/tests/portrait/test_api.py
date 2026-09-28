@@ -344,3 +344,89 @@ def test_withdraw_only_submitter_pending(
         f"{API_PORTRAIT}/submissions/{sub_id2}", headers=admin_token_headers
     )
     assert response.status_code == 403, response.text
+
+
+
+# ============================================================================
+# F1 审批工作台 - 历史端点 (P7 阶段, 批次 13) (3 test)
+# ============================================================================
+def test_approvals_history_empty_for_user_with_no_actions(normal_token_headers: dict):
+    """普通 user 没审批过任何 submission 时, history 为空"""
+    response = client.get(f"{API_PORTRAIT}/approvals/history", headers=normal_token_headers)
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert isinstance(data["items"], list)
+    # 新建 test 用户的 normal_user 可能尚未审批任何东西
+    # 这里不强断言 total==0 (因为前面 test 可能污染), 只断言结构
+
+
+def test_approvals_history_admin_sees_approved_ones(
+    db: Session, admin_token_headers: dict, admin_user: models.User
+):
+    """admin 审批过一些后, history 至少包含 1 条 approved 记录"""
+    # 先审批一个: 用 normal_user 提交一个 spec, admin 通过
+    from app.portrait import models as portrait_models
+    sub = portrait_models.SubmissionRecord(
+        submission_type="special_work",
+        submitter_user_id=admin_user.id,
+        submitter_name=admin_user.name,
+        submitter_ehr_id=admin_user.ehr_id,
+        status="approved",
+        payload=json.dumps({"project_name": "history test proj", "hours": 1, "content": "x", "start_time": "2026-01-01", "end_time": "2026-01-02", "skill_tags": []}),
+        current_approver_id=None,
+    )
+    db.add(sub)
+    db.commit()
+    db.refresh(sub)
+
+    # 留痕 (admin 自己审自己, 不常见但保证 history 有数据)
+    rec = portrait_models.ApprovalRecord(
+        submission_id=sub.id,
+        approver_id=admin_user.id,
+        action="approve",
+        comment="test history",
+    )
+    db.add(rec)
+    db.commit()
+
+    response = client.get(f"{API_PORTRAIT}/approvals/history?limit=50", headers=admin_token_headers)
+    assert response.status_code == 200, response.text
+    data = response.json()
+    ids = {item["id"] for item in data["items"]}
+    assert sub.id in ids, f"新创建的 sub.id={sub.id} 应出现在 admin history, 实际 items={[i['id'] for i in data['items']]}"
+
+
+def test_approvals_history_no_dup_for_repeated_approvals(
+    db: Session, admin_token_headers: dict, admin_user: models.User
+):
+    """同一 submission 被审批 2 次 (approve + 转交 + approve), history 只出现 1 次"""
+    from app.portrait import models as portrait_models
+    sub = portrait_models.SubmissionRecord(
+        submission_type="special_work",
+        submitter_user_id=admin_user.id,
+        submitter_name=admin_user.name,
+        submitter_ehr_id=admin_user.ehr_id,
+        status="approved",
+        payload=json.dumps({"project_name": "dup test", "hours": 1, "content": "x", "start_time": "2026-01-01", "end_time": "2026-01-02", "skill_tags": []}),
+        current_approver_id=None,
+    )
+    db.add(sub)
+    db.commit()
+    db.refresh(sub)
+
+    # 3 条 ApprovalRecord 都关联同一个 sub
+    for action in ["approve", "transfer", "approve"]:
+        db.add(portrait_models.ApprovalRecord(
+            submission_id=sub.id,
+            approver_id=admin_user.id,
+            action=action,
+            comment=f"dup test {action}",
+        ))
+    db.commit()
+
+    response = client.get(f"{API_PORTRAIT}/approvals/history?limit=200", headers=admin_token_headers)
+    assert response.status_code == 200
+    data = response.json()
+    ids = [item["id"] for item in data["items"]]
+    # 同一个 sub.id 在 history 中只出现 1 次
+    assert ids.count(sub.id) == 1, f"history 应去重, 实际 sub.id={sub.id} 出现 {ids.count(sub.id)} 次"

@@ -62,6 +62,9 @@ class SubmissionRecord(Base):
     workflow_instance_id = Column(Integer, ForeignKey("workflow_instances.id"), nullable=True, index=True)
     current_approver_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
+    # P8 联动: special_work 审批通过后自动创建的 ledger id (nullable, 非 special_work 永远 null)
+    synced_ledger_id = Column(Integer, ForeignKey("ledgers.id"), nullable=True, index=True)
+
     # 状态: pending / approved / rejected / cancelled / draft
     # 这里用 String 而不是导入 taizhang ApprovalStatus 枚举 (避免跨模块耦合)
     status = Column(String(20), default="pending", nullable=False, index=True)

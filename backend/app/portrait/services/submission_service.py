@@ -345,6 +345,25 @@ class SubmissionService:
             resource_type="submission",
             resource_id=str(submission.id),
         )
+
+        # P8 联动: special_work 审批通过 → 自动在台账系统创建对应 ledger
+        # 雷区 4 合规: submission commit 之后才联动, 失败抛 500 显性化 (Rule 12)
+        if submission.submission_type == "special_work":
+            try:
+                from app.portrait.services.integration_service import sync_special_work_to_ledger
+                new_ledger = sync_special_work_to_ledger(db, submission=submission)
+                if new_ledger is not None:
+                    db.commit()
+                    db.refresh(submission)
+            except HTTPException:
+                raise  # 已显性化, 继续抛出
+            except Exception as exc:
+                # 未预期的联动失败 (Rule 12 显性化): 抛 500 不静默
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"special_work 联动台账失败: {exc}",
+                ) from exc
+
         return submission
 
     @staticmethod
@@ -468,6 +487,57 @@ class SubmissionService:
                 portrait_models.SubmissionRecord.status == PENDING,
                 portrait_models.SubmissionRecord.current_approver_id == viewer.id,
             )
+            .count()
+        )
+
+    # ========================================================================
+    # 历史审批 (E3 - 我审批过的)
+    # ========================================================================
+    @staticmethod
+    def list_history_for_user(
+        db: Session, *, viewer: models.User, skip: int = 0, limit: int = 50
+    ) -> List[portrait_models.SubmissionRecord]:
+        """我审批过的 submission (作为审批人留痕, 去重 + 按时间倒序)
+
+        实现: 通过 ApprovalRecord.approver_id == viewer.id 查到所有 submission_id,
+              去重后查 SubmissionRecord, 按 completed_at 倒序 (审批结束时间最新在前).
+        """
+        # 1) 拿到我去操作过的所有 submission_id (去重)
+        from sqlalchemy import select
+        history_sub_ids = select(
+            portrait_models.ApprovalRecord.submission_id
+        ).where(
+            portrait_models.ApprovalRecord.approver_id == viewer.id
+        ).distinct()
+        # 2) 查 SubmissionRecord, 按 completed_at desc (NullSafe: pending 也会有, 排后)
+        query = (
+            db.query(portrait_models.SubmissionRecord)
+            .filter(portrait_models.SubmissionRecord.id.in_(history_sub_ids))
+        )
+        # 用 COALESCE 把 null completed_at 视为很早的时间, 让 null 排到后面
+        from sqlalchemy import func, case
+        null_safe_completed = case(
+            (portrait_models.SubmissionRecord.completed_at.is_(None), "1970-01-01"),
+            else_=portrait_models.SubmissionRecord.completed_at,
+        )
+        return (
+            query.order_by(null_safe_completed.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    @staticmethod
+    def count_history_for_user(db: Session, *, viewer: models.User) -> int:
+        from sqlalchemy import select
+        history_sub_ids = select(
+            portrait_models.ApprovalRecord.submission_id
+        ).where(
+            portrait_models.ApprovalRecord.approver_id == viewer.id
+        ).distinct()
+        return (
+            db.query(portrait_models.SubmissionRecord)
+            .filter(portrait_models.SubmissionRecord.id.in_(history_sub_ids))
             .count()
         )
 

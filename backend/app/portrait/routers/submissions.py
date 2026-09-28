@@ -43,6 +43,7 @@ def _serialize_submission(sub: portrait_models.SubmissionRecord) -> dict:
         "completed_at": sub.completed_at,
         "created_at": sub.created_at,
         "updated_at": sub.updated_at,
+        "synced_ledger_id": getattr(sub, "synced_ledger_id", None),  # P8 联动字段
     }
     return base
 

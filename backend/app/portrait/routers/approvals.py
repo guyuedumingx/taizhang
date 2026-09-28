@@ -37,6 +37,7 @@ def _serialize_submission(sub: portrait_models.SubmissionRecord) -> dict:
         "completed_at": sub.completed_at,
         "created_at": sub.created_at,
         "updated_at": sub.updated_at,
+        "synced_ledger_id": getattr(sub, "synced_ledger_id", None),  # P8 联动字段
     }
 
 
@@ -58,6 +59,24 @@ def list_pending(
     )
 
 
+@router.get("/history", response_model=PaginatedResponse[Submission], summary="E3 我审批过的历史")
+def list_history(
+    db: Session = Depends(deps.get_db),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> PaginatedResponse[Submission]:
+    """我审批过的 submission (作为审批人留痕, 去重 + 按 completed_at desc)"""
+    items = submission_service.list_history_for_user(
+        db, viewer=current_user, skip=skip, limit=limit
+    )
+    total = submission_service.count_history_for_user(db, viewer=current_user)
+    serialized = [_serialize_submission(s) for s in items]
+    return PaginatedResponse[Submission](
+        items=serialized, total=total, page=skip // limit + 1, size=limit
+    )
+
+
 @router.post(
     "/{submission_id}/approve",
     response_model=ApprovalActionResponse,
@@ -72,6 +91,9 @@ def approve(
     sub = submission_service.approve(
         db, submission_id=submission_id, viewer=current_user, comment=body.comment
     )
+    # P8: integration_service 可能在 service.approve 后写回 synced_ledger_id,
+    # 序列化前 refresh 确保拿到最新值
+    db.refresh(sub)
     return ApprovalActionResponse(
         success=True, message="已通过", submission=_serialize_submission(sub)
     )
