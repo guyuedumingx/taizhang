@@ -35,10 +35,7 @@ class Profile(Base):
     birth_date = Column(Date, nullable=True)
     job_title = Column(String(200), nullable=True)
     id_type = Column(String(50), nullable=True)
-    id_number = Column(String(50), nullable=True)
-    native_place = Column(String(200), nullable=True)
-    birth_place = Column(String(200), nullable=True)
-    household_place = Column(String(200), nullable=True)
+    # P0.1 隐私裁剪: 移除 id_number / native_place / birth_place / household_place
     work_start_date = Column(Date, nullable=True)
     hire_date = Column(Date, nullable=True)
     marital_status = Column(String(20), nullable=True)
@@ -190,10 +187,7 @@ class ContactInfo(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     profile_id = Column(Integer, ForeignKey("portrait_profiles.id"), unique=True, nullable=False)
-    mobile = Column(String(20), nullable=True)
-    office_phone = Column(String(20), nullable=True)
-    home_phone = Column(String(20), nullable=True)
-    home_address = Column(String(500), nullable=True)
+    # P0.1 隐私裁剪: 移除 mobile / office_phone / home_phone / home_address
     email = Column(String(100), nullable=True)
     commute_minutes = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=beijing_now)

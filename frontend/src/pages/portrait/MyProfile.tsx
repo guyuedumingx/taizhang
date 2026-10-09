@@ -50,9 +50,6 @@ const MyProfile: React.FC = () => {
         nation: data.nation,
         birth_date: data.birth_date,
         job_title: data.job_title,
-        native_place: data.native_place,
-        birth_place: data.birth_place,
-        household_place: data.household_place,
         work_start_date: data.work_start_date,
         hire_date: data.hire_date,
         marital_status: data.marital_status,
@@ -172,21 +169,6 @@ const MyProfile: React.FC = () => {
                     <Col span={12}>
                       <Form.Item label="职务" name="job_title">
                         <Input placeholder="例如 主任 / 副主任" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item label="籍贯" name="native_place">
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item label="出生地" name="birth_place">
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item label="户籍地" name="household_place">
-                        <Input />
                       </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -338,20 +320,11 @@ const MyProfile: React.FC = () => {
               label: '联系方式',
               children: (
                 <Form form={contactForm} layout="vertical" style={{ maxWidth: 720 }}>
-                  <Form.Item label="手机号" name="mobile" rules={[{ pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确' }]}>
-                    <Input placeholder="11 位手机号" />
-                  </Form.Item>
-                  <Form.Item label="邮箱" name="email" rules={[{ type: 'email', message: '邮箱格式不正确' }]}>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label="现住址" name="address">
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label="紧急联系人" name="emergency_contact">
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label="紧急联系人电话" name="emergency_phone">
-                    <Input />
+                  <Text type="secondary">
+                    注: P0.1 隐私裁剪后, 联系方式仅保留邮箱 (手机/座机/家庭电话/家庭住址/紧急联系人均不展示不编辑)
+                  </Text>
+                  <Form.Item label="邮箱" name="email" rules={[{ type: 'email', message: '邮箱格式不正确' }]} style={{ marginTop: 16 }}>
+                    <Input placeholder="例如 name@example.com" />
                   </Form.Item>
                   <Form.Item>
                     <Button

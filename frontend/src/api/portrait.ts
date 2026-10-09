@@ -34,10 +34,7 @@ export interface ProfileBase {
   birth_date?: string | null;
   job_title?: string | null;
   id_type?: string | null;
-  id_number?: string | null;
-  native_place?: string | null;
-  birth_place?: string | null;
-  household_place?: string | null;
+  // P0.1 隐私裁剪: 移除 id_number / native_place / birth_place / household_place
   work_start_date?: string | null;
   hire_date?: string | null;
   marital_status?: string | null;
@@ -81,11 +78,9 @@ export interface FamilyInfo {
 export interface ContactInfo {
   id?: number;
   profile_id?: number;
-  mobile?: string | null;
+  // P0.1 隐私裁剪: 移除 mobile / address / emergency_contact / emergency_phone
   email?: string | null;
-  address?: string | null;
-  emergency_contact?: string | null;
-  emergency_phone?: string | null;
+  commute_minutes?: number | null;
 }
 
 export interface ProfileFull extends ProfileBase {

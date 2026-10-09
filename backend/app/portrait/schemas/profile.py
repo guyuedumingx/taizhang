@@ -18,10 +18,7 @@ class ProfileBase(BaseModel):
     birth_date: Optional[date] = None
     job_title: Optional[str] = None
     id_type: Optional[str] = None
-    id_number: Optional[str] = None
-    native_place: Optional[str] = None
-    birth_place: Optional[str] = None
-    household_place: Optional[str] = None
+    # P0.1 隐私裁剪: 移除 id_number / native_place / birth_place / household_place
     work_start_date: Optional[date] = None
     hire_date: Optional[date] = None
     marital_status: Optional[str] = None
@@ -39,9 +36,7 @@ class ProfileUpdate(BaseModel):
     nation: Optional[str] = None
     birth_date: Optional[date] = None
     job_title: Optional[str] = None
-    native_place: Optional[str] = None
-    birth_place: Optional[str] = None
-    household_place: Optional[str] = None
+    # P0.1 隐私裁剪: 移除 native_place / birth_place / household_place
     work_start_date: Optional[date] = None
     hire_date: Optional[date] = None
     marital_status: Optional[str] = None
@@ -257,10 +252,7 @@ class LanguageInfo(LanguageInfoBase):
 
 
 class ContactInfoBase(BaseModel):
-    mobile: Optional[str] = None
-    office_phone: Optional[str] = None
-    home_phone: Optional[str] = None
-    home_address: Optional[str] = None
+    # P0.1 隐私裁剪: 移除 mobile / office_phone / home_phone / home_address
     email: Optional[str] = None
     commute_minutes: Optional[int] = None
 
