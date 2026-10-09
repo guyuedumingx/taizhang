@@ -56,3 +56,6 @@ backend/*.db
 backend/*.db.bak.*
 backend/*.db-journal
 backend/uploads/
+
+# 本地测试残留
+test.txt
