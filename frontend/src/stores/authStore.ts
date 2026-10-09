@@ -18,6 +18,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   passwordExpired: boolean;
+  isFirstLogin: boolean; // PRD §3.2: 首次登录强制改密
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   hasPermission: (permission: string) => boolean;
@@ -33,7 +34,8 @@ export const useAuthStore = create<AuthState>()(
       token: localStorage.getItem('auth-storage') ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token : null,
       isAuthenticated: !!localStorage.getItem('auth-storage') && !!JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.token,
       passwordExpired: false,
-      
+      isFirstLogin: false,
+
       login: async (username: string, password: string) => {
         try {
           const response = await fetch('/api/v1/auth/login', {
@@ -46,21 +48,18 @@ export const useAuthStore = create<AuthState>()(
               password,
             }),
           });
-          
+
           if (!response.ok) {
             throw new Error('登录失败');
           }
-          
+
           const data = await response.json();
-          
-          
-          
+
           set({
             user: {
               id: data.user_id,
               username: data.username,
               name: data.name,
-              // role: data.roles[0] || 'user',
               roles: data.roles,
               permissions: data.permissions || [],
               teamId: data.team_id,
@@ -68,45 +67,46 @@ export const useAuthStore = create<AuthState>()(
             token: data.access_token,
             isAuthenticated: true,
             passwordExpired: data.password_expired || false,
+            isFirstLogin: data.is_first_login || false,  // PRD §3.2
           });
-          
+
           message.success('登录成功');
           return true;
         } catch (error) {
-          // 显示错误消息
           console.error('登录失败:', error);
           message.error('登录失败，请检查用户名和密码');
           return false;
         }
       },
-      
+
       logout: () => {
         // 清除本地存储
         localStorage.removeItem('auth-storage');
-        
+
         // 重置状态
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           passwordExpired: false,
+          isFirstLogin: false,
         });
       },
-      
+
       hasPermission: (permission: string) => {
         const { user } = get();
         if (!user) return false;
-        
+
         // 超级管理员拥有所有权限
         if (user.roles?.includes('admin')) return true;
-        
+
         // 检查用户权限列表
         return user.permissions?.includes(permission) || user.permissions?.includes('*:*') || false;
       },
-      
+
       checkPasswordExpired: async () => {
         if (!get().token) return false;
-        
+
         try {
           const data = await api.auth.checkPasswordExpired();
           set({ passwordExpired: data.password_expired });
@@ -116,13 +116,14 @@ export const useAuthStore = create<AuthState>()(
           return false;
         }
       },
-      
+
       changePassword: async (currentPassword, newPassword) => {
         if (!get().token) return false;
-        
+
         try {
           await api.auth.changePassword(currentPassword, newPassword);
-          set({ passwordExpired: false });
+          // PRD §3.2: 改密成功 -> 清除 passwordExpired 和 isFirstLogin 标志
+          set({ passwordExpired: false, isFirstLogin: false });
           message.success('密码修改成功');
           return true;
         } catch (error) {
@@ -131,10 +132,10 @@ export const useAuthStore = create<AuthState>()(
           return false;
         }
       },
-      
+
       updatePermissions: async () => {
         if (!get().token) return;
-        
+
         try {
           const permissions = await api.users.getUserPermissions();
           set(state => ({
@@ -150,11 +151,12 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ 
-        user: state.user, 
-        token: state.token, 
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
         isAuthenticated: state.isAuthenticated,
-        passwordExpired: state.passwordExpired
+        passwordExpired: state.passwordExpired,
+        isFirstLogin: state.isFirstLogin,
       }),
     }
   )

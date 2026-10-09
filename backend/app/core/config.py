@@ -9,9 +9,16 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
-    # 60 minutes * 24 hours * 8 days = 8 days
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    # JWT 签名密钥；生产环境必须通过环境变量或 .env 显式覆盖
+    # pydantic-settings v2 字段读取优先级：环境变量 > .env > 字段默认值
+    # 此处使用固定的开发默认值，避免 uvicorn --reload 重启时密钥漂移导致用户被踢出登录
+    SECRET_KEY: str = "DEV-ONLY-DO-NOT-USE-IN-PRODUCTION-CHANGE-VIA-ENV-VAR-SECRET_KEY"
+    # JWT 过期时间: PRD §17.3 要求 60 分钟
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    # 首次登录强制改密开关 (PRD §3.2: 默认管理员首次必须改密)
+    FORCE_FIRST_LOGIN_PASSWORD_CHANGE: bool = True
+    # EHR 号格式: 恰好 7 位数字 (PRD §3.2 + §17.3)
+    EHR_REGEX: str = r"^\d{7}$"
     # CORS配置
     CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:3000", "http://localhost:5173"]
 

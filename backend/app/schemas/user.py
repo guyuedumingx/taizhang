@@ -1,13 +1,15 @@
 from typing import Optional, List
 from datetime import datetime, timedelta
 
-from pydantic import BaseModel, validator, constr
+from pydantic import BaseModel, validator
+
+from app.core.ehr_validator import EhrIdStr
 
 
 # 共享属性
 class UserBase(BaseModel):
     username: Optional[str] = None
-    ehr_id: Optional[str] = None
+    ehr_id: Optional[EhrIdStr] = None  # PRD §3.2: 恰好 7 位数字
     name: Optional[str] = None
     department: Optional[str] = None
     is_active: Optional[bool] = True
@@ -18,16 +20,10 @@ class UserBase(BaseModel):
 # 创建用户时的属性
 class UserCreate(UserBase):
     username: str
-    ehr_id: constr(min_length=7, max_length=7, pattern=r'^\d{7}$')
+    ehr_id: EhrIdStr  # 创建时必填, 自动校验 7 位数字
     password: str
     name: str
     roles: Optional[List[str]] = None
-    
-    @validator('ehr_id')
-    def ehr_id_must_be_7_digits(cls, v):
-        if not v.isdigit() or len(v) != 7:
-            raise ValueError('EHR号必须是7位数字')
-        return v
 
 
 # 更新用户时的属性
@@ -51,6 +47,7 @@ class User(UserInDBBase):
     roles: Optional[List[str]] = []
     password_expired: Optional[bool] = False
     hashed_password: Optional[str] = None  # 添加此字段用于测试
+    is_first_login: Optional[bool] = None  # PRD §3.2: 首次登录标志
 
     @validator('password_expired', always=True)
     def check_password_expired(cls, v, values):
@@ -59,7 +56,7 @@ class User(UserInDBBase):
             three_months_ago = datetime.now() - timedelta(days=90)
             return values['last_password_change'] < three_months_ago
         return False
-    
+
     class Config:
         orm_mode = True
         from_attributes = True

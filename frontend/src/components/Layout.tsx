@@ -20,9 +20,13 @@ import {
   IdcardOutlined,
   CheckSquareOutlined,
   HomeOutlined,
+  UploadOutlined,
+  GlobalOutlined,
+  FireOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useIdleLogout } from '../hooks/useIdleLogout'; // PRD §17.3
 import { PERMISSIONS } from '../config';
 
 const { Header, Sider, Content } = Layout;
@@ -35,6 +39,9 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
   const { user, logout, hasPermission } = useAuthStore();
   const { token } = theme.useToken();
+
+  // PRD §17.3: 60 分钟无操作自动登出
+  useIdleLogout({ idleMs: 60 * 60 * 1000 });
 
   // 当路由变化时，更新选中的菜单项
   useEffect(() => {
@@ -219,6 +226,24 @@ const AppLayout: React.FC = () => {
                   icon: <HomeOutlined />,
                   label: <Link to="/dashboard/portrait/home-visits">家访</Link>,
                 },
+                // 出入境台账 F5-F9 (阶段 C 新增, 全员可见, 写操作后端校验 admin)
+                {
+                  key: 'portrait-entry-exit',
+                  icon: <GlobalOutlined />,
+                  label: <Link to="/dashboard/portrait/entry-exit">出入境台账</Link>,
+                },
+                // 消防演练 F2-F4 (阶段 D 新增, 全员可见, 写操作后端校验 admin)
+                {
+                  key: 'portrait-drills',
+                  icon: <FireOutlined />,
+                  label: <Link to="/dashboard/portrait/drills">消防演练</Link>,
+                },
+                // 批量导入 D1 (管理员专属, 阶段 B 新增)
+                hasPermission(PERMISSIONS.USER_VIEW) ? {
+                  key: 'portrait-bulk-import',
+                  icon: <UploadOutlined />,
+                  label: <Link to="/dashboard/portrait/bulk-import">批量导入</Link>,
+                } : null,
               ],
             },
 

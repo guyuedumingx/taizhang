@@ -91,7 +91,7 @@ def init_admin_user(db: Session):
         admin_user = models.User(
             username="admin",
             ehr_id="0000001",
-            hashed_password=get_password_hash("admin123"),
+            hashed_password=get_password_hash("1234567"),  # PRD §3.2 默认管理员密码
             name="系统管理员",
             department="系统",
             is_active=True,

@@ -4,11 +4,11 @@ import { LockOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../stores/authStore';
 
 const PasswordExpiredModal: React.FC = () => {
-  const { passwordExpired, changePassword, checkPasswordExpired, isAuthenticated, token } = useAuthStore();
+  const { passwordExpired, isFirstLogin, changePassword, checkPasswordExpired, isAuthenticated, token } = useAuthStore();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  
+
   useEffect(() => {
     // 登录后检查密码是否过期
     const checkPassword = async () => {
@@ -16,27 +16,28 @@ const PasswordExpiredModal: React.FC = () => {
       const expired = await checkPasswordExpired();
       setVisible(expired);
     };
-    
+
     checkPassword();
   }, [checkPasswordExpired, isAuthenticated, token]);
-  
+
   useEffect(() => {
-    setVisible(passwordExpired);
-  }, [passwordExpired]);
-  
+    // PRD §3.2: passwordExpired 或 isFirstLogin 任一为 true 都强制弹窗
+    setVisible(passwordExpired || isFirstLogin);
+  }, [passwordExpired, isFirstLogin]);
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      
+
       // 检查两次输入的密码是否一致
       if (values.newPassword !== values.confirmPassword) {
         message.error('两次输入的密码不一致');
         return;
       }
-      
+
       setLoading(true);
       const success = await changePassword(values.currentPassword, values.newPassword);
-      
+
       if (success) {
         setVisible(false);
         form.resetFields();
@@ -47,10 +48,17 @@ const PasswordExpiredModal: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
+  // PRD §3.2: 首次登录时去掉"当前密码"项, 因为可能没有"旧密码"概念
+  const isFirstLoginMode = isFirstLogin && !passwordExpired;
+  const modalTitle = isFirstLoginMode ? '首次登录 - 请修改密码' : '密码已过期';
+  const promptText = isFirstLoginMode
+    ? '检测到您是首次登录, 为了账号安全, 请立即设置新密码。'
+    : '您的密码已超过90天未修改, 为了账号安全, 请立即修改密码。';
+
   return (
     <Modal
-      title="密码已过期"
+      title={modalTitle}
       open={visible}
       closable={false}
       maskClosable={false}
@@ -61,28 +69,31 @@ const PasswordExpiredModal: React.FC = () => {
         </Button>
       ]}
     >
-      <p>您的密码已超过90天未修改，为了账号安全，请立即修改密码。</p>
-      
+      <p>{promptText}</p>
+
       <Form form={form} layout="vertical">
-        <Form.Item
-          name="currentPassword"
-          label="当前密码"
-          rules={[{ required: true, message: '请输入当前密码' }]}
-        >
-          <Input.Password prefix={<LockOutlined />} placeholder="请输入当前密码" />
-        </Form.Item>
-        
+        {!isFirstLoginMode && (
+          <Form.Item
+            name="currentPassword"
+            label="当前密码"
+            rules={[{ required: true, message: '请输入当前密码' }]}
+          >
+            <Input.Password prefix={<LockOutlined />} placeholder="请输入当前密码" />
+          </Form.Item>
+        )}
+
         <Form.Item
           name="newPassword"
           label="新密码"
           rules={[
             { required: true, message: '请输入新密码' },
-            { min: 8, message: '密码长度不能少于8个字符' }
+            { min: 6, message: '密码至少6位数字' },
+            { pattern: /^\d+$/, message: '密码必须是数字' },
           ]}
         >
-          <Input.Password prefix={<LockOutlined />} placeholder="请输入新密码" />
+          <Input.Password prefix={<LockOutlined />} placeholder="请输入6位数字密码" />
         </Form.Item>
-        
+
         <Form.Item
           name="confirmPassword"
           label="确认新密码"

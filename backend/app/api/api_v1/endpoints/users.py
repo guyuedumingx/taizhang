@@ -8,6 +8,7 @@ from datetime import datetime
 
 from app import models, schemas
 from app.api import deps
+from app.core.ehr_validator import validate_ehr_format
 from app.core.security import get_password_hash
 from app.services.casbin_service import add_role_for_user, remove_role_for_user, get_roles_for_user, get_permissions_for_role
 from app.services.user_service import UserService as user_service
@@ -172,9 +173,21 @@ def import_users(
         # 处理每一行数据
         for index, row in df.iterrows():
             try:
+                # PRD §3.2 + §17.3: 批量导入统一校验 EHR 格式 (恰好 7 位数字)
+                ehr_value = str(row["ehr_id"])
+                try:
+                    validate_ehr_format(ehr_value)
+                except ValueError as e:
+                    failed_users.append({
+                        "row": index + 2,
+                        "username": row["username"] if "username" in row else "未知",
+                        "reason": f"EHR号格式错误: {e}",
+                    })
+                    continue
+
                 # 检查用户名和EHR号是否已存在
                 user_by_username = db.query(models.User).filter(models.User.username == row["username"]).first()
-                user_by_ehr_id = db.query(models.User).filter(models.User.ehr_id == row["ehr_id"]).first()
+                user_by_ehr_id = db.query(models.User).filter(models.User.ehr_id == ehr_value).first()
                 
                 if user_by_username:
                     failed_users.append({
@@ -195,7 +208,7 @@ def import_users(
                 # 创建用户
                 user = models.User(
                     username=row["username"],
-                    ehr_id=row["ehr_id"],
+                    ehr_id=ehr_value,
                     hashed_password=get_password_hash(row["password"]),
                     name=row["name"],
                     department=row.get("department", ""),
