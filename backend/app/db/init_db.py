@@ -114,7 +114,12 @@ def init_db(db: Session) -> None:
     """
     # Casbin 规则表初始化
     init_casbin_rules(db)
-    
+
+    # 三角色 (admin/manager/user) 的权限 policy seed
+    # 缺这一环会让普通用户的 enforce() 恒 False (阶段 E 补强)
+    # casbin add_policy 重复添加由 adapter 去重, 幂等安全
+    init_permissions()
+
     # 超级管理员角色
     create_admin_role(db)
     
