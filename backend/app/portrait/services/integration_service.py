@@ -12,6 +12,7 @@ portrait 与台账系统的联动 service (P8)
   - 走 service 层调用, 不绕过任何依赖
 """
 import json
+from datetime import datetime
 from typing import Optional
 
 from fastapi import HTTPException
@@ -20,6 +21,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.crud.crud_ledger import ledger
 from app.crud.crud_template import template
+from app.models.workflow import ApprovalStatus
 from app.portrait import models as portrait_models
 from app.schemas.ledger import LedgerCreate
 from app.schemas.template import TemplateCreate
@@ -29,6 +31,10 @@ from app.utils.logger import log_info
 # 专用模板的固定标识 (全局唯一)
 SPECIAL_WORK_TEMPLATE_NAME = "数字画像-专项工作"
 SPECIAL_WORK_TEMPLATE_DEPT = "数字画像"
+# 专用 workflow 的固定标识 (阶段 F: Workflow 真绑)
+# 注意: 必须 ≥2 节点, 否则 crud.workflow_instance.create_with_nodes line 68 的
+# `instance_nodes[1].id` 会 IndexError (隐藏假设: 至少 1 个开始 + 1 个审批)
+SPECIAL_WORK_WORKFLOW_NAME = "数字画像-专项工作流程"
 
 
 def _find_or_create_special_work_template(
@@ -64,6 +70,73 @@ def _find_or_create_special_work_template(
         resource_id=str(new_tmpl.id),
     )
     return new_tmpl
+
+
+def _find_or_create_special_work_workflow(
+    db: Session, *, creator: models.User
+) -> models.Workflow:
+    """查找或创建"数字画像-专项工作"专用 workflow (阶段 F)
+
+    形状: 2 节点 (开始 + 终审). ≥2 节点是硬约束 — 看 crud_workflow_instance.create_with_nodes
+    line 68 (`instance_nodes[1].id`). 违反就 IndexError, 这是现有 bug, 这里仅规避.
+    phase F 词面语义是"submission 写入 workflow_instance_id", 不要求真实跑审批流,
+    所以节点定义仅满足"能建出 workflow_instance"即可, 不预设审批人 (后续阶段再扩展).
+
+    第一次联动时自动建 workflow + nodes, 后续直接复用 (P8 + F 模式同 template).
+    """
+    existing = db.query(models.Workflow).filter(
+        models.Workflow.name == SPECIAL_WORK_WORKFLOW_NAME
+    ).first()
+    if existing:
+        # 节点可能为空 (e.g. 历史脏数据), 缺失时补齐 2 节点兜底
+        node_rows = (
+            db.query(models.WorkflowNode)
+            .filter(models.WorkflowNode.workflow_id == existing.id)
+            .order_by(models.WorkflowNode.order_index)
+            .all()
+        )
+        if not node_rows:
+            _add_special_work_nodes(db, workflow_id=existing.id)
+        return existing
+
+    new_wf = models.Workflow(
+        name=SPECIAL_WORK_WORKFLOW_NAME,
+        description="由 portrait special_work 审批通过自动生成的工作流 (P8+阶段F)",
+        is_active=True,
+        created_by=creator.id,
+    )
+    db.add(new_wf)
+    db.flush()  # 获取 id
+    _add_special_work_nodes(db, workflow_id=new_wf.id)
+
+    # 注: log_info 用独立 SessionLocal, 在 SQLite 上与未 commit 的事务并发写 system_logs
+    # 会触发 'database is locked'. 由 caller (sync_special_work_to_ledger) 整体打日志更稳.
+    return new_wf
+
+
+def _add_special_work_nodes(db: Session, *, workflow_id: int) -> None:
+    """补建 workflow 的 2 节点 (开始 + 终审). 仅内部 helper, 不暴露给外部."""
+    start_node = models.WorkflowNode(
+        workflow_id=workflow_id,
+        name="开始",
+        description="special_work 联动进入点 (自动)",
+        node_type="start",
+        order_index=1,
+        is_final=False,
+        multi_approve_type="any",
+    )
+    end_node = models.WorkflowNode(
+        workflow_id=workflow_id,
+        name="终审",
+        description="special_work 联动终审节点 (审批时已过, 自动置为 approved)",
+        node_type="approval",
+        order_index=2,
+        is_final=True,
+        multi_approve_type="any",
+    )
+    db.add(start_node)
+    db.add(end_node)
+    db.flush()
 
 
 def sync_special_work_to_ledger(
@@ -179,4 +252,62 @@ def sync_special_work_to_ledger(
         resource_type="ledger",
         resource_id=str(new_ledger.id),
     )
+
+    # 9) 阶段 F: 联动 WorkflowInstance, 回填 submission.workflow_instance_id
+    # 业务现状: ledger_id NOT NULL+UNIQUE (models/workflow.py line 84), 必须先有 ledger.
+    # 因此 submission 创建时无法绑 (那时还没 ledger); 在审批通过 + 建 ledger 之后建.
+    # 状态语义: special_work 已审批通过 → workflow_instance 直接 completed
+    # (不走流程审批, 仅作为与台账 ledger 的 1:1 壳, 满足"真绑"语义要求).
+    # 关于为何手写而非用 crud_workflow_instance.create_with_nodes:
+    #   - 该 helper 假设 workflow ≥2 节点 (line 68 instance_nodes[1].id),
+    #     单节点工作流会 IndexError. 我们这里有 2 节点, 可绕过; 但 helper 内部
+    #     还硬编码 db.commit(), 与 caller 的统一 commit 冲突, 易引入事务分叉.
+    #   - 阶段 F 词面要求仅"submission 写入 workflow_instance_id", 不强求运行审批流,
+    #     手写最简实现 + 单 commit 更安全.
+    try:
+        wf = _find_or_create_special_work_workflow(db, creator=submitter)
+        new_wf_inst = models.WorkflowInstance(
+            workflow_id=wf.id,
+            ledger_id=new_ledger.id,
+            created_by=submitter.id,
+            status="completed",  # special_work 审批已通过 → 直接 completed
+            completed_at=datetime.now(),
+            current_node_id=None,
+        )
+        db.add(new_wf_inst)
+        db.flush()
+
+        # 把 workflow 的所有节点对应建 instance_nodes (instance 视角已全部 approved)
+        wf_nodes = (
+            db.query(models.WorkflowNode)
+            .filter(models.WorkflowNode.workflow_id == wf.id)
+            .order_by(models.WorkflowNode.order_index)
+            .all()
+        )
+        for wfn in wf_nodes:
+            db_inst_node = models.WorkflowInstanceNode(
+                workflow_instance_id=new_wf_inst.id,
+                workflow_node_id=wfn.id,
+                status=ApprovalStatus.APPROVED,
+                approver_id=submitter.id,
+                completed_at=datetime.now(),
+            )
+            db.add(db_inst_node)
+
+        # 10) 回填 submission.workflow_instance_id (本方法返回后由 caller commit)
+        submission.workflow_instance_id = new_wf_inst.id
+
+        # 注: log_info 用独立 SessionLocal, 在 SQLite 上与未 commit 的事务并发写 system_logs
+        # 会触发 'database is locked'. 由 caller (submission_service.approve) 统一打日志更稳.
+    except HTTPException:
+        raise  # 上面已显性化, 透传
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                f"联动失败: special_work #{submission.id} 创建 workflow_instance "
+                f"时未预期异常: {exc}"
+            ),
+        ) from exc
+
     return new_ledger
