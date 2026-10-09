@@ -38,6 +38,9 @@ from app.portrait.models.profile import (
     ResumeInfo,
     RewardInfo,
 )
+from app.portrait.models.training import TrainingRecord
+from app.portrait.models.entry_exit import EntryExitRecord
+from app.portrait.models.drill import DrillParticipant, DrillRecord
 from app.portrait.models.submission import ApprovalRecord, SubmissionRecord
 from app.portrait.models.user_metadata import PortraitUserMetadata
 
@@ -71,4 +74,7 @@ __all__ = [
     "OperationLog",
     "HomeVisitRecord",
     "GroupTransferHistory",
+    # 消防演练 (PRD §10.2 F2-F4)
+    "DrillRecord",
+    "DrillParticipant",
 ]

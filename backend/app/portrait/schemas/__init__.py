@@ -59,6 +59,31 @@ from app.portrait.schemas.home_visit import (
     HomeVisitSubmitRequest,
     HomeVisitUpdate,
 )
+from app.portrait.schemas.training import (
+    TrainingImportRow,
+    TrainingImportSummary,
+    TrainingRecord,
+    TrainingRecordCreate,
+    TrainingRecordUpdate,
+)
+from app.portrait.schemas.entry_exit import (
+    EntryExitCreate,
+    EntryExitImportRow,
+    EntryExitImportSummary,
+    EntryExitListResponse,
+    EntryExitRecord,
+    EntryExitStatistics,
+    EntryExitUpdate,
+)
+from app.portrait.schemas.drill import (
+    DrillCreate,
+    DrillDetail,
+    DrillImportRow,
+    DrillImportSummary,
+    DrillMatrix,
+    DrillRecord,
+    DrillUpdate,
+)
 
 
 __all__ = [
@@ -117,4 +142,26 @@ __all__ = [
     "HomeVisitRejectRequest",
     "HomeVisitListItem",
     "HomeVisitListResponse",
+    # training (PRD §10.3 占位)
+    "TrainingRecord",
+    "TrainingRecordCreate",
+    "TrainingRecordUpdate",
+    "TrainingImportRow",
+    "TrainingImportSummary",
+    # entry_exit (PRD §10.1 F5-F9)
+    "EntryExitRecord",
+    "EntryExitCreate",
+    "EntryExitUpdate",
+    "EntryExitListResponse",
+    "EntryExitStatistics",
+    "EntryExitImportRow",
+    "EntryExitImportSummary",
+    # drill (PRD §10.2 F2-F4)
+    "DrillRecord",
+    "DrillCreate",
+    "DrillUpdate",
+    "DrillDetail",
+    "DrillMatrix",
+    "DrillImportRow",
+    "DrillImportSummary",
 ]

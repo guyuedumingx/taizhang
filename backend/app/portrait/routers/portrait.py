@@ -10,9 +10,14 @@ from sqlalchemy.orm import Session
 from app import models
 from app.api import deps
 from app.portrait.routers import approvals as approvals_router
+from app.portrait.routers import drill as drill_router
+from app.portrait.routers import entry_exit as entry_exit_router
+from app.portrait.routers import files as files_router
 from app.portrait.routers import home_visits as home_visits_router
 from app.portrait.routers import profiles as profiles_router
 from app.portrait.routers import submissions as submissions_router
+from app.portrait.routers import templates as templates_router
+from app.portrait.routers import training as training_router
 
 
 portrait_router = APIRouter()
@@ -62,4 +67,20 @@ portrait_router.include_router(
 )
 portrait_router.include_router(
     home_visits_router.router, prefix="/home-visits", tags=["portrait.家访"]
+)
+portrait_router.include_router(
+    training_router.router, prefix="/training", tags=["portrait.培训"]
+)
+portrait_router.include_router(
+    drill_router.router, prefix="/drills", tags=["portrait.消防演练"]
+)
+portrait_router.include_router(
+    templates_router.router, prefix="/templates", tags=["portrait.模板"]
+)
+portrait_router.include_router(
+    entry_exit_router.router, prefix="/entry-exit", tags=["portrait.出入境"]
+)
+# C1 (PRD §7.1) — 扫描件上传/删除
+portrait_router.include_router(
+    files_router.router, prefix="/files", tags=["portrait.文件"]
 )
