@@ -32,6 +32,9 @@ import MySubmissions from './pages/portrait/MySubmissions';
 import ApprovalInbox from './pages/portrait/ApprovalInbox';
 // 数字画像 P6 阶段新增 (家访审批)
 import HomeVisits from './pages/portrait/HomeVisits';
+import BulkImportPage from './pages/portrait/BulkImportPage';
+import EntryExitPage from './pages/portrait/EntryExitPage';
+import DrillPage from './pages/portrait/DrillsPage';
 import UserProfile from './pages/UserProfile';
 import PasswordExpiredModal from './components/PasswordExpiredModal';
 import './App.css';
@@ -128,6 +131,9 @@ function App() {
               <Route path="portrait/submissions" element={<MySubmissions />} />
               <Route path="portrait/approvals" element={<ApprovalInbox />} />
               <Route path="portrait/home-visits" element={<HomeVisits />} />
+              <Route path="portrait/bulk-import" element={<BulkImportPage />} />
+              <Route path="portrait/entry-exit" element={<EntryExitPage />} />
+              <Route path="portrait/drills" element={<DrillPage />} />
               <Route path="help" element={<HelpPage />} />
               <Route path="user-profile" element={<UserProfile />} />
             </Route>

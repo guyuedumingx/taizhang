@@ -299,7 +299,8 @@ export async function listUsersForApprover(params: {
   skip?: number;
   limit?: number;
 } = {}): Promise<{ items: ApproverUser[]; total: number }> {
-  const response = await api.get('/users', { params: { skip: params.skip ?? 0, limit: params.limit ?? 200 } });
+  // 注意: 用 /users/ 带尾斜杠避免 FastAPI 307 redirect 时丢失 Authorization header
+  const response = await api.get('/users/', { params: { skip: params.skip ?? 0, limit: params.limit ?? 200 } });
   // 后端返回结构: { items: User[], total, page, size }, 这里收窄类型
   const data = response.data as { items?: any[]; total?: number };
   const items: ApproverUser[] = (data.items || []).map((u: any) => ({
@@ -443,5 +444,256 @@ export async function rejectHomeVisit(
   comment: string  // 必填, Rule 12
 ): Promise<HomeVisitDetail> {
   const response = await api.post(`/portrait/home-visits/${id}/reject`, { comment });
+  return response.data;
+}
+
+// ============================================================================
+// 培训记录 (PRD §10.3 占位, 批次 16)
+// ============================================================================
+export interface TrainingRecord {
+  id: number;
+  ehr_id: string;
+  training_name: string;
+  training_at: string;
+  training_type: string;
+  institution: string;
+  certificate_no?: string | null;
+  valid_until?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TrainingImportSummary {
+  success_count: number;
+  failed_count: number;
+  failed_rows: Array<{
+    row_number: number;
+    ehr_id: string;
+    reason: string;
+  }>;
+}
+
+/** D2 我的培训记录 */
+export async function getMyTraining(): Promise<TrainingRecord[]> {
+  const response = await api.get('/portrait/training/me');
+  return response.data;
+}
+
+/** D2 跨人查看培训记录 */
+export async function getTrainingByEhr(ehr: string): Promise<TrainingRecord[]> {
+  const response = await api.get(`/portrait/training/by-ehr/${ehr}`);
+  return response.data;
+}
+
+// ============================================================================
+// 出入境台账 (PRD §10.1 F5-F9, 阶段 C)
+// ============================================================================
+export interface EntryExitRecord {
+  id: number;
+  ehr_id: string;
+  name: string;
+  team_name: string;
+  position: string;
+  certificate_no: string;
+  outbound_reason: string;
+  destination: string;
+  apply_depart_at: string;
+  apply_return_at: string;
+  certificate_type: string;
+  apply_type: string;
+  team_approver: string;
+  actual_depart_at?: string | null;
+  actual_return_at?: string | null;
+  year: number;
+  group_name?: string | null;
+  remark?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EntryExitStatistics {
+  total_count: number;
+  current_year_count: number;
+  distinct_certificate_count: number;
+  not_returned_count: number;
+}
+
+export interface EntryExitListResponse {
+  items: EntryExitRecord[];
+  total: number;
+  page: number;
+  size: number;
+  statistics?: EntryExitStatistics;
+}
+
+export interface EntryExitCreate {
+  ehr_id: string;
+  name: string;
+  team_name: string;
+  position: string;
+  certificate_no: string;
+  outbound_reason: string;
+  destination: string;
+  apply_depart_at: string;
+  apply_return_at: string;
+  certificate_type: string;
+  apply_type: string;
+  team_approver: string;
+  actual_depart_at?: string | null;
+  actual_return_at?: string | null;
+  year: number;
+  group_name?: string | null;
+  remark?: string | null;
+}
+
+/** F5 出入境台账列表 */
+export async function getEntryExitRecords(params: {
+  skip?: number;
+  limit?: number;
+  ehr_id?: string;
+  name?: string;
+  team_name?: string;
+  year?: number;
+  stats?: boolean;
+}): Promise<EntryExitListResponse> {
+  const response = await api.get('/portrait/entry-exit', { params });
+  return response.data;
+}
+
+/** F6 新增出入境记录 */
+export async function createEntryExit(data: EntryExitCreate): Promise<EntryExitRecord> {
+  const response = await api.post('/portrait/entry-exit', data);
+  return response.data;
+}
+
+/** F7 查看出入境记录 */
+export async function getEntryExit(recordId: number): Promise<EntryExitRecord> {
+  const response = await api.get(`/portrait/entry-exit/${recordId}`);
+  return response.data;
+}
+
+/** F8 编辑出入境记录 */
+export async function updateEntryExit(recordId: number, data: Partial<EntryExitCreate>): Promise<EntryExitRecord> {
+  const response = await api.put(`/portrait/entry-exit/${recordId}`, data);
+  return response.data;
+}
+
+/** F8 删除出入境记录 */
+export async function deleteEntryExit(recordId: number): Promise<void> {
+  const response = await api.delete(`/portrait/entry-exit/${recordId}`);
+  return response.data;
+}
+
+/** F9 出入境批量导入 */
+export async function importEntryExit(file: File): Promise<{ success_count: number; failed_count: number; failed_rows: Array<{ row_number: number; ehr_id: string; reason: string }> }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/portrait/entry-exit/import', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+}
+
+// ============================================================================
+// 消防演练 (PRD §10.2 F2-F4, 阶段 D)
+// ============================================================================
+export interface DrillRecord {
+  id: number;
+  activity_date: string;
+  drill_type: string;
+  location: string;
+  duration_minutes?: number | null;
+  participant_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DrillParticipant {
+  id: number;
+  drill_id: number;
+  ehr_id: string;
+  name: string;
+  participated: boolean;
+}
+
+export interface DrillDetail extends DrillRecord {
+  participants: DrillParticipant[];
+}
+
+export interface DrillCreate {
+  activity_date: string;
+  drill_type: string;
+  location: string;
+  duration_minutes?: number | null;
+  participant_ehr_ids: string[];
+}
+
+/** 矩阵单元格/行/整体 (F4) */
+export interface MatrixCell { participated: boolean; value: string; }
+export interface MatrixRow {
+  user_id: number;
+  ehr_id: string;
+  name: string;
+  team_name: string;
+  position: string;
+  cells: MatrixCell[];
+  participated_count: number;
+}
+export interface DrillMatrix {
+  columns: Array<{ drill_id: number; activity_date: string; drill_type: string; location: string }>;
+  rows: MatrixRow[];
+  total_drills: number;
+  total_participants: number;
+}
+
+export interface DrillImportSummary {
+  success_count: number;
+  failed_count: number;
+  failed_rows: Array<{ row_number: number; ehr_id: string; reason: string }>;
+}
+
+export interface DrillListResponse {
+  items: DrillRecord[];
+  total: number;
+  page: number;
+  size: number;
+}
+
+export async function getDrillRecords(params: {
+  skip?: number;
+  limit?: number;
+  drill_type?: string;
+  team_name?: string;
+}): Promise<DrillListResponse> {
+  const response = await api.get('/portrait/drills', { params });
+  return response.data;
+}
+
+export async function getDrillMatrix(): Promise<DrillMatrix> {
+  const response = await api.get('/portrait/drills/matrix');
+  return response.data;
+}
+
+export async function createDrill(data: DrillCreate): Promise<DrillRecord> {
+  const response = await api.post('/portrait/drills', data);
+  return response.data;
+}
+
+export async function getDrillDetail(drillId: number): Promise<DrillDetail> {
+  const response = await api.get(`/portrait/drills/${drillId}`);
+  return response.data;
+}
+
+export async function deleteDrill(drillId: number): Promise<void> {
+  const response = await api.delete(`/portrait/drills/${drillId}`);
+  return response.data;
+}
+
+export async function importDrill(file: File): Promise<DrillImportSummary> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/portrait/drills/import', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return response.data;
 }

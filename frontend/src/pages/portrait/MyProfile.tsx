@@ -19,6 +19,8 @@ import {
   Typography,
   Space,
   Divider,
+  Table,
+  Empty,
 } from 'antd';
 import { SaveOutlined, ReloadOutlined } from '@ant-design/icons';
 import * as PortraitAPI from '../../api/portrait';
@@ -30,6 +32,8 @@ const MyProfile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<PortraitAPI.ProfileFull | null>(null);
+  const [training, setTraining] = useState<PortraitAPI.TrainingRecord[]>([]);
+  const [trainingLoading, setTrainingLoading] = useState(false);
   const [baseForm] = Form.useForm();
   const [politicalForm] = Form.useForm();
   const [educationForm] = Form.useForm();
@@ -64,8 +68,21 @@ const MyProfile: React.FC = () => {
     }
   };
 
+  const fetchTraining = async () => {
+    setTrainingLoading(true);
+    try {
+      const data = await PortraitAPI.getMyTraining();
+      setTraining(data);
+    } catch (err: any) {
+      message.error(`加载培训记录失败: ${err?.response?.data?.detail || err.message}`);
+    } finally {
+      setTrainingLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchAll();
+    fetchTraining();
   }, []);
 
   const handleSaveBase = async () => {
@@ -349,6 +366,47 @@ const MyProfile: React.FC = () => {
                     </Button>
                   </Form.Item>
                 </Form>
+              ),
+            },
+            {
+              key: 'training',
+              label: '培训记录',
+              children: (
+                <Spin spinning={trainingLoading}>
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <Text type="secondary">
+                      个人培训历史 (PRD §10.3 D2 占位, 按培训时间倒序)
+                    </Text>
+                    {training.length === 0 ? (
+                      <Empty description="暂无培训记录" />
+                    ) : (
+                      <Table
+                        rowKey="id"
+                        size="small"
+                        dataSource={training}
+                        pagination={{ pageSize: 10 }}
+                        columns={[
+                          {
+                            title: '培训时间',
+                            dataIndex: 'training_at',
+                            width: 180,
+                            render: (v: string) => v?.slice(0, 19).replace('T', ' '),
+                          },
+                          { title: '培训名', dataIndex: 'training_name', width: 200 },
+                          { title: '类型', dataIndex: 'training_type', width: 100 },
+                          { title: '培训机构', dataIndex: 'institution' },
+                          { title: '证书编号', dataIndex: 'certificate_no', width: 120 },
+                          {
+                            title: '有效期',
+                            dataIndex: 'valid_until',
+                            width: 110,
+                            render: (v: string | null) => v || '—',
+                          },
+                        ]}
+                      />
+                    )}
+                  </Space>
+                </Spin>
               ),
             },
           ]}
