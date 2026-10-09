@@ -11,6 +11,13 @@ from app.portrait.schemas.profile import (
     ContactInfo,
     ContactInfoCreate,
     ContactInfoUpdate,
+    # P0.2: A4 兴趣 + A5 获奖
+    InterestInfo,
+    InterestInfoCreate,
+    InterestInfoUpdate,
+    AwardInfo,
+    AwardInfoCreate,
+    AwardInfoUpdate,
     EducationInfo,
     EducationInfoCreate,
     EducationInfoUpdate,
@@ -123,6 +130,13 @@ __all__ = [
     "ContactInfo",
     "ContactInfoCreate",
     "ContactInfoUpdate",
+    # P0.2: A4 兴趣 + A5 获奖
+    "InterestInfo",
+    "InterestInfoCreate",
+    "InterestInfoUpdate",
+    "AwardInfo",
+    "AwardInfoCreate",
+    "AwardInfoUpdate",
     # submission
     "Submission",
     "SubmissionCreate",

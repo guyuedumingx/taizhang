@@ -51,6 +51,9 @@ class Profile(Base):
     qualification = relationship("QualificationInfo", back_populates="profile", order_by="QualificationInfo.obtain_time")
     achievement = relationship("AchievementInfo", back_populates="profile", order_by="AchievementInfo.obtain_time")
     language = relationship("LanguageInfo", back_populates="profile")
+    # P0.2 新增: A4 兴趣 + A5 获奖
+    interests = relationship("InterestInfo", back_populates="profile", order_by="InterestInfo.created_at")
+    awards = relationship("AwardInfo", back_populates="profile", order_by="AwardInfo.award_time.desc()")
     contact = relationship("ContactInfo", back_populates="profile", uselist=False)
     skill_tags = relationship("ProfileSkillTag", back_populates="profile")
     development_intent = relationship("DevelopmentIntent", back_populates="profile", uselist=False, cascade="all, delete-orphan")
@@ -193,3 +196,38 @@ class ContactInfo(Base):
     created_at = Column(DateTime, default=beijing_now)
     updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
     profile = relationship("Profile", back_populates="contact")
+
+
+# ============================================================================
+# P0.2 新增: A4 兴趣爱好 (PRD §5.4) + A5 获奖信息 (PRD §5.5)
+# ============================================================================
+class InterestInfo(Base):
+    """兴趣爱好子表 (1:N, 与技能标签分离) - PRD §5.4"""
+    __tablename__ = "portrait_interest_info"
+    __table_args__ = PORTRAIT_TABLE_KWARGS
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    profile_id = Column(Integer, ForeignKey("portrait_profiles.id"), nullable=False)
+    interest_name = Column(String(100), nullable=False)
+    # 熟练度枚举: 入门/熟练/精通 (Pydantic 层校验)
+    proficiency = Column(String(20), nullable=False, default="入门")
+    created_at = Column(DateTime, default=beijing_now)
+    updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
+    profile = relationship("Profile", back_populates="interests")
+
+
+class AwardInfo(Base):
+    """获奖信息子表 (1:N, 按获奖时间倒序) - PRD §5.5"""
+    __tablename__ = "portrait_award_info"
+    __table_args__ = PORTRAIT_TABLE_KWARGS
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    profile_id = Column(Integer, ForeignKey("portrait_profiles.id"), nullable=False)
+    award_name = Column(String(200), nullable=False)
+    awarding_organization = Column(String(200), nullable=True)
+    award_time = Column(Date, nullable=True)
+    # 级别枚举: 国家级/省部级/行级 (Pydantic 层校验)
+    level = Column(String(20), nullable=True)
+    created_at = Column(DateTime, default=beijing_now)
+    updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
+    profile = relationship("Profile", back_populates="awards")

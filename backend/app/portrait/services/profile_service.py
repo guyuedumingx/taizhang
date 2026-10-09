@@ -81,6 +81,9 @@ class ProfileService:
                 selectinload(portrait_models.Profile.qualification),
                 selectinload(portrait_models.Profile.achievement),
                 selectinload(portrait_models.Profile.language),
+                # P0.2 新增: A4 兴趣 + A5 获奖
+                selectinload(portrait_models.Profile.interests),
+                selectinload(portrait_models.Profile.awards),
                 selectinload(portrait_models.Profile.contact),
                 selectinload(portrait_models.Profile.skill_tags),
             )
@@ -257,6 +260,33 @@ class ProfileService:
         profile = _get_or_create_profile(db, viewer)
         return ProfileService._upsert_single_subtable(
             db, profile=profile, model_cls=portrait_models.ContactInfo, data=data
+        )
+
+    # ========================================================================
+    # P0.2 新增: A4 兴趣 + A5 获奖 (与上面 _upsert_single_subtable 同模式)
+    # ========================================================================
+    @staticmethod
+    def update_my_interest(
+        db: Session,
+        *,
+        viewer: models.User,
+        data: profile_schema.InterestInfoUpdate,
+    ):
+        profile = _get_or_create_profile(db, viewer)
+        return ProfileService._upsert_single_subtable(
+            db, profile=profile, model_cls=portrait_models.InterestInfo, data=data
+        )
+
+    @staticmethod
+    def update_my_award(
+        db: Session,
+        *,
+        viewer: models.User,
+        data: profile_schema.AwardInfoUpdate,
+    ):
+        profile = _get_or_create_profile(db, viewer)
+        return ProfileService._upsert_single_subtable(
+            db, profile=profile, model_cls=portrait_models.AwardInfo, data=data
         )
 
 

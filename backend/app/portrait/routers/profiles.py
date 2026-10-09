@@ -22,6 +22,11 @@ from app.portrait.schemas import (
     FamilyInfoUpdate,
     ContactInfo,
     ContactInfoUpdate,
+    # P0.2 新增: A4 兴趣 + A5 获奖
+    InterestInfo,
+    InterestInfoUpdate,
+    AwardInfo,
+    AwardInfoUpdate,
     Profile,
     ProfileFull,
     ProfileUpdate,
@@ -139,3 +144,24 @@ def update_my_contact(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> ContactInfo:
     return profile_service.update_my_contact(db, viewer=current_user, data=data)
+
+
+# P0.2 新增: A4 兴趣 + A5 获奖
+@router.put("/me/interest", response_model=InterestInfo, summary="A4 编辑兴趣爱好")
+def update_my_interest(
+    data: InterestInfoUpdate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> InterestInfo:
+    """A4 兴趣爱好: 兴趣名 + 熟练度 (入门/熟练/精通)"""
+    return profile_service.update_my_interest(db, viewer=current_user, data=data)
+
+
+@router.put("/me/award", response_model=AwardInfo, summary="A5 编辑获奖信息")
+def update_my_award(
+    data: AwardInfoUpdate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> AwardInfo:
+    """A5 获奖信息: 奖项名 + 颁奖机构 + 获奖时间 + 级别 (国家级/省部级/行级)"""
+    return profile_service.update_my_award(db, viewer=current_user, data=data)

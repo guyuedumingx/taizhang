@@ -83,6 +83,24 @@ export interface ContactInfo {
   commute_minutes?: number | null;
 }
 
+// P0.2 新增: A4 兴趣 (PRD §5.4)
+export interface InterestInfo {
+  id?: number;
+  profile_id?: number;
+  interest_name: string;
+  proficiency: '入门' | '熟练' | '精通';
+}
+
+// P0.2 新增: A5 获奖 (PRD §5.5)
+export interface AwardInfo {
+  id?: number;
+  profile_id?: number;
+  award_name: string;
+  awarding_organization?: string | null;
+  award_time?: string | null;
+  level?: '国家级' | '省部级' | '行级' | null;
+}
+
 export interface ProfileFull extends ProfileBase {
   user_name?: string | null;
   ehr_id?: string | null;
@@ -91,6 +109,9 @@ export interface ProfileFull extends ProfileBase {
   education?: EducationInfo | null;
   family?: FamilyInfo | null;
   contact?: ContactInfo | null;
+  // P0.2 新增
+  interests?: InterestInfo[] | null;
+  awards?: AwardInfo[] | null;
 }
 
 export interface PaginatedResponse<T> {
@@ -205,6 +226,18 @@ export async function updateMyFamily(data: Partial<FamilyInfo>): Promise<FamilyI
 
 export async function updateMyContact(data: Partial<ContactInfo>): Promise<ContactInfo> {
   const response = await api.put('/portrait/profiles/me/contact', data);
+  return response.data;
+}
+
+// P0.2: A4 兴趣爱好
+export async function updateMyInterest(data: Partial<InterestInfo>): Promise<InterestInfo> {
+  const response = await api.put('/portrait/profiles/me/interest', data);
+  return response.data;
+}
+
+// P0.2: A5 获奖信息
+export async function updateMyAward(data: Partial<AwardInfo>): Promise<AwardInfo> {
+  const response = await api.put('/portrait/profiles/me/award', data);
   return response.data;
 }
 

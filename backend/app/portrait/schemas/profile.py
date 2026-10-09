@@ -257,6 +257,59 @@ class ContactInfoBase(BaseModel):
     commute_minutes: Optional[int] = None
 
 
+# ============================================================================
+# P0.2 新增: A4 兴趣爱好 (PRD §5.4) + A5 获奖信息 (PRD §5.5)
+# ============================================================================
+class InterestInfoBase(BaseModel):
+    interest_name: str
+    # 熟练度枚举: 入门/熟练/精通
+    proficiency: str = "入门"
+
+
+class InterestInfoCreate(InterestInfoBase):
+    pass
+
+
+class InterestInfoUpdate(InterestInfoBase):
+    interest_name: Optional[str] = None
+    proficiency: Optional[str] = None
+
+
+class InterestInfo(InterestInfoBase):
+    id: int
+    profile_id: int
+
+    class Config:
+        from_attributes = True
+
+
+class AwardInfoBase(BaseModel):
+    award_name: str
+    awarding_organization: Optional[str] = None
+    award_time: Optional[date] = None
+    # 级别枚举: 国家级/省部级/行级
+    level: Optional[str] = None
+
+
+class AwardInfoCreate(AwardInfoBase):
+    pass
+
+
+class AwardInfoUpdate(AwardInfoBase):
+    award_name: Optional[str] = None
+    awarding_organization: Optional[str] = None
+    award_time: Optional[date] = None
+    level: Optional[str] = None
+
+
+class AwardInfo(AwardInfoBase):
+    id: int
+    profile_id: int
+
+    class Config:
+        from_attributes = True
+
+
 class ContactInfoCreate(ContactInfoBase):
     pass
 
@@ -277,7 +330,7 @@ class ContactInfo(ContactInfoBase):
 # 组合响应: Profile + 9 子表 (前端 A1 个人档案首页用)
 # ============================================================================
 class ProfileFull(Profile):
-    """完整 Profile + 9 子表 (A1 个人档案首页 / B4 详情页用)"""
+    """完整 Profile + 11 子表 (A1 个人档案首页 / B4 详情页用, P0.2 加 2 子表)"""
     political: List[PoliticalInfo] = []
     education: List[EducationInfo] = []
     family: List[FamilyInfo] = []
@@ -286,6 +339,9 @@ class ProfileFull(Profile):
     qualification: List[QualificationInfo] = []
     achievement: List[AchievementInfo] = []
     language: List[LanguageInfo] = []
+    # P0.2 新增: A4 兴趣 + A5 获奖
+    interests: List[InterestInfo] = []
+    awards: List[AwardInfo] = []
     contact: Optional[ContactInfo] = None
     skill_tag_names: List[str] = []  # 来自 ProfileSkillTag
 
