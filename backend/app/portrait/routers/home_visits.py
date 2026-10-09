@@ -39,8 +39,13 @@ router = APIRouter()
 
 
 def _serialize(record: portrait_models.HomeVisitRecord, db: Session) -> dict:
-    """HomeVisitRecord ORM -> dict (含 visited_user / visitor_user / current_approver 字段)
+    """HomeVisitRecord ORM -> dict (含 visited_user / visitor_user / current_approver / co_visitor 字段)
     Rule 8: 复用 ORM + 显式字段映射
+
+    C1 (PRD §7.1) 新增字段:
+      - co_visitor_user_id / co_visitor_name (第二家访人)
+      - scan_file_path / scan_file_url (扫描件)
+      - team_name (固定"审核处理团队")
     """
     visited = (
         db.query(models.User).filter(models.User.id == record.visited_user_id).first()
@@ -52,6 +57,11 @@ def _serialize(record: portrait_models.HomeVisitRecord, db: Session) -> dict:
     if record.current_approver_id:
         current_approver = (
             db.query(models.User).filter(models.User.id == record.current_approver_id).first()
+        )
+    co_visitor = None
+    if record.co_visitor_user_id:
+        co_visitor = (
+            db.query(models.User).filter(models.User.id == record.co_visitor_user_id).first()
         )
 
     return {
@@ -87,6 +97,14 @@ def _serialize(record: portrait_models.HomeVisitRecord, db: Session) -> dict:
         "current_approver_name": current_approver.name if current_approver else None,
         "submitted_at": record.submitted_at,
         "completed_at": record.completed_at,
+        # C1 新增 (PRD §7.1)
+        "co_visitor_user_id": record.co_visitor_user_id,
+        "co_visitor_name": co_visitor.name if co_visitor else None,
+        "scan_file_path": record.scan_file_path,
+        "scan_file_url": (
+            f"/uploads/portrait/{record.scan_file_path}" if record.scan_file_path else None
+        ),
+        "team_name": record.team_name,
         "created_at": record.created_at,
         "updated_at": record.updated_at,
     }
@@ -135,6 +153,12 @@ def list_home_visits(
             approver = (
                 db.query(models.User).filter(models.User.id == r.current_approver_id).first()
             )
+        # C1: 第二家访人反查 (列表只显示 name)
+        co_visitor = None
+        if r.co_visitor_user_id:
+            co_visitor = (
+                db.query(models.User).filter(models.User.id == r.co_visitor_user_id).first()
+            )
         from app.portrait.schemas.home_visit import HomeVisitListItem
         list_items.append(
             HomeVisitListItem(
@@ -150,6 +174,10 @@ def list_home_visits(
                 completed_at=r.completed_at,
                 visitor_name=visitor.name if visitor else None,
                 current_approver_name=approver.name if approver else None,
+                # C1 新增
+                co_visitor_name=co_visitor.name if co_visitor else None,
+                team_name=r.team_name,
+                has_scan=bool(r.scan_file_path),
                 created_at=r.created_at,
             )
         )

@@ -97,6 +97,11 @@ class HomeVisitService:
         """创建家访草稿 (status=draft, 需后续 submit 提交审批)
 
         权限: 仅 leader (有 team_id 且非 admin) 可创建
+
+        C1 (PRD §7.1) 新增校验:
+          - co_visitor_user_id (如传): 必须存在 / active / 同组 / 不等于 visitor / 不等于 visited
+          - team_name (如传): 必须 == "审核处理团队"; 不传则后端兜底默认填
+          - scan_file_path: 直接写入 (上传校验在 file_storage_service, 此处不再校验)
         """
         if visitor.is_superuser:
             raise HTTPException(status_code=403, detail="管理员不可创建家访 (业务规则: 谁做家访谁签字)")
@@ -116,6 +121,50 @@ class HomeVisitService:
         # 组长只能对本组成员家访
         if visited.team_id != visitor.team_id:
             raise HTTPException(status_code=403, detail="仅可对本组成员进行家访")
+
+        # C1: 第二家访人校验 (如果传了)
+        co_visitor_id = data.co_visitor_user_id
+        if co_visitor_id is not None:
+            co_visitor = (
+                db.query(models.User)
+                .filter(models.User.id == co_visitor_id)
+                .first()
+            )
+            if not co_visitor:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"第二家访人 user_id={co_visitor_id} 不存在",
+                )
+            if not co_visitor.is_active:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"第二家访人 {co_visitor.ehr_id} 已停用, 不可家访",
+                )
+            if co_visitor.team_id != visitor.team_id:
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"第二家访人 {co_visitor.ehr_id} 与您非同组 (Rule 7 单一模式)",
+                )
+            if co_visitor.id == visitor.id:
+                raise HTTPException(
+                    status_code=400,
+                    detail="第二家访人不能是您本人 (您已是第一家访人)",
+                )
+            if co_visitor.id == visited.id:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"第二家访人不能是被家访人 {visited.ehr_id} 本人",
+                )
+
+        # C1: team_name 校验 (固定值 + 后端兜底)
+        team_name_final: Optional[str] = data.team_name
+        if team_name_final is not None and team_name_final != "审核处理团队":
+            raise HTTPException(
+                status_code=400,
+                detail=f'team_name 必须为 "审核处理团队" (Rule 12 业务规则), 收到: {team_name_final!r}',
+            )
+        if team_name_final is None:
+            team_name_final = "审核处理团队"  # 后端兜底, 即使前端 disabled 绕过也确保写入
 
         record = portrait_models.HomeVisitRecord(
             visited_user_id=visited.id,
@@ -141,6 +190,10 @@ class HomeVisitService:
             family2_contact=data.family2_contact,
             family2_work_unit=data.family2_work_unit,
             feedback=data.feedback,
+            # C1 新增
+            co_visitor_user_id=co_visitor_id,
+            scan_file_path=data.scan_file_path,
+            team_name=team_name_final,
             status=DRAFT,
             current_approver_id=None,
             submitted_at=None,
@@ -152,7 +205,12 @@ class HomeVisitService:
         log_info(
             module="portrait",
             action="home_visit.create_draft",
-            message=f"组长 {visitor.id} 创建家访草稿 #{record.id} 被家访人 {visited.ehr_id}",
+            message=(
+                f"组长 {visitor.id} 创建家访草稿 #{record.id} 被家访人 {visited.ehr_id}"
+                + (f" 第二家访人 {co_visitor_id}" if co_visitor_id else "")
+                + (f" 扫描件 {data.scan_file_path}" if data.scan_file_path else "")
+                + f" team={team_name_final}"
+            ),
             user_id=visitor.id,
             resource_type="home_visit",
             resource_id=str(record.id),

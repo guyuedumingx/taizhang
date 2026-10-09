@@ -1,10 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.api.api_v1.api import api_router
 from app.core.config import settings
+from app.portrait.services.file_storage_service import UPLOAD_ROOT
 import logging
 import os
 import sys
+from pathlib import Path
 from logging.handlers import RotatingFileHandler
 
 # 配置日志
@@ -68,6 +71,14 @@ app.add_middleware(
 
 # 包含API路由
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# C1 (PRD §7.1) — portrait 扫描件静态文件挂载
+UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
+app.mount(
+    "/uploads/portrait",
+    StaticFiles(directory=str(UPLOAD_ROOT)),
+    name="portrait_uploads",
+)
 
 @app.get("/")
 async def root():

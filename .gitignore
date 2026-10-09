@@ -54,4 +54,5 @@ backend/htmlcov/
 # 数据库文件 (开发 SQLite + 备份)
 backend/*.db
 backend/*.db.bak.*
-backend/*.db-journal 
+backend/*.db-journal
+backend/uploads/

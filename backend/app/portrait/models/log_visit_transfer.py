@@ -33,7 +33,13 @@ class OperationLog(Base):
 
 
 class HomeVisitRecord(Base):
-    """家访记录 - 组长对组员家访, 团队名称固定为「审核处理团队」"""
+    """家访记录 - 组长对组员家访, 团队名称固定为「审核处理团队」
+
+    PRD §7.1 (C1 阶段) 扩展字段:
+      - co_visitor_user_id: 第二家访人 (双人员家访, 必填但 nullable 给旧数据兼容)
+      - scan_file_path: 扫描件相对路径 (uploads/portrait/home_visits/{year}/{uuid}.{ext})
+      - team_name: 固定 "审核处理团队", 后端兜底写
+    """
     __tablename__ = "portrait_home_visit_records"
     __table_args__ = PORTRAIT_TABLE_KWARGS
 
@@ -73,12 +79,18 @@ class HomeVisitRecord(Base):
     submitted_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
 
+    # C1 阶段新增 (PRD §7.1) — 双人员家访 + 扫描件 + 团队名称
+    co_visitor_user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    scan_file_path = Column(String(500), nullable=True)
+    team_name = Column(String(100), nullable=True)
+
     created_at = Column(DateTime, default=beijing_now)
     updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
 
     visited_user = relationship("User", foreign_keys=[visited_user_id])
     visitor_user = relationship("User", foreign_keys=[visitor_user_id])
     current_approver = relationship("User", foreign_keys=[current_approver_id])
+    co_visitor = relationship("User", foreign_keys=[co_visitor_user_id])
 
 
 class GroupTransferHistory(Base):

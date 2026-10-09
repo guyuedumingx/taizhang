@@ -302,3 +302,182 @@ def test_cancel_home_visit_submitter_only(
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["status"] == "cancelled"
+
+
+# ============================================================================
+# C1 (PRD §7.1) — 双人员家访 + 扫描件 + 团队名称 校验
+# ============================================================================
+
+def _create_co_visitor(db: Session, team_id: int) -> models.User:
+    """创建 leader 组内的另一成员 (作为第二家访人)"""
+    import random
+    while True:
+        ehr_id = str(random.randint(4000000, 4999999))
+        existing = db.query(models.User).filter(models.User.ehr_id == ehr_id).first()
+        if not existing:
+            break
+    co = models.User(
+        username=f"test_co_{ehr_id}",
+        ehr_id=ehr_id,
+        name="第二家访人",
+        hashed_password="$2b$12$dummy",
+        is_active=True,
+        is_superuser=False,
+        team_id=team_id,
+        department="测试部门",
+    )
+    db.add(co)
+    db.commit()
+    db.refresh(co)
+    return co
+
+
+def _create_outside_team_user(db: Session) -> models.User:
+    """创建一个外组的 user (用于跨组拦截)"""
+    other_team = models.Team(name="外组", department="外部门")
+    db.add(other_team)
+    db.commit()
+    db.refresh(other_team)
+    import random
+    while True:
+        ehr_id = str(random.randint(5000000, 5999999))
+        existing = db.query(models.User).filter(models.User.ehr_id == ehr_id).first()
+        if not existing:
+            break
+    u = models.User(
+        username=f"test_outside_{ehr_id}",
+        ehr_id=ehr_id,
+        name="外组成员",
+        hashed_password="$2b$12$dummy",
+        is_active=True,
+        is_superuser=False,
+        team_id=other_team.id,
+        department="外部门",
+    )
+    db.add(u)
+    db.commit()
+    db.refresh(u)
+    return u
+
+
+def test_create_home_visit_with_co_visitor_and_scan(
+    leader_token_headers: dict,
+    leader_user: models.User,
+    db: Session,
+):
+    """C1: leader 创建含 co_visitor + scan_file_path + team_name 的草稿, 全部成功, team_name 默认 '审核处理团队'."""
+    member = _create_normal_member(db, leader_user.team_id)
+    co = _create_co_visitor(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+    payload["co_visitor_user_id"] = co.id
+    payload["scan_file_path"] = "home_visits/2026/abc123def.pdf"
+    payload["team_name"] = "审核处理团队"
+
+    response = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload, headers=leader_token_headers
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["co_visitor_user_id"] == co.id
+    assert data["co_visitor_name"] == co.name
+    assert data["scan_file_path"] == "home_visits/2026/abc123def.pdf"
+    assert data["scan_file_url"] == "/uploads/portrait/home_visits/2026/abc123def.pdf"
+    assert data["team_name"] == "审核处理团队"
+    assert data["status"] == "draft"
+
+
+def test_create_home_visit_team_name_filled_when_missing(
+    leader_token_headers: dict,
+    leader_user: models.User,
+    db: Session,
+):
+    """C1: 前端即使 disabled 绕过不传 team_name, 后端兜底填 '审核处理团队'."""
+    member = _create_normal_member(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+    payload.pop("team_name", None)  # 不传
+    # 注: 现有 payload 字典里本就没 team_name, 模拟前端 disabled
+
+    response = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload, headers=leader_token_headers
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["team_name"] == "审核处理团队"  # 后端兜底
+
+
+def test_create_home_visit_co_visitor_must_be_same_team(
+    leader_token_headers: dict,
+    leader_user: models.User,
+    db: Session,
+):
+    """C1: 第二家访人跨组 → 403."""
+    co_outside = _create_outside_team_user(db)
+    member = _create_normal_member(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+    payload["co_visitor_user_id"] = co_outside.id
+
+    response = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload, headers=leader_token_headers
+    )
+    assert response.status_code == 403, response.text
+    assert "非同组" in response.json()["detail"]
+
+
+def test_create_home_visit_co_visitor_cannot_be_self_or_visited(
+    leader_token_headers: dict,
+    leader_user: models.User,
+    db: Session,
+):
+    """C1: 第二家访人 = 本人 → 400; = 被访人 → 400."""
+    member = _create_normal_member(db, leader_user.team_id)
+
+    # case 1: 第二家访人 = leader 本人
+    payload1 = _create_visit_payload(member.ehr_id)
+    payload1["co_visitor_user_id"] = leader_user.id
+    response1 = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload1, headers=leader_token_headers
+    )
+    assert response1.status_code == 400, response1.text
+    assert "您本人" in response1.json()["detail"]
+
+    # case 2: 第二家访人 = 被家访人
+    payload2 = _create_visit_payload(member.ehr_id)
+    payload2["co_visitor_user_id"] = member.id
+    response2 = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload2, headers=leader_token_headers
+    )
+    assert response2.status_code == 400, response2.text
+    assert "被家访人" in response2.json()["detail"]
+
+
+def test_create_home_visit_co_visitor_nonexistent(
+    leader_token_headers: dict,
+    leader_user: models.User,
+    db: Session,
+):
+    """C1: 第二家访人不存在 → 404."""
+    member = _create_normal_member(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+    payload["co_visitor_user_id"] = 999999999
+
+    response = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload, headers=leader_token_headers
+    )
+    assert response.status_code == 404, response.text
+
+
+def test_create_home_visit_team_name_invalid(
+    leader_token_headers: dict,
+    leader_user: models.User,
+    db: Session,
+):
+    """C1: team_name != '审核处理团队' → 400."""
+    member = _create_normal_member(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+    payload["team_name"] = "别的团队"
+
+    response = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload, headers=leader_token_headers
+    )
+    assert response.status_code == 400, response.text
+    assert "审核处理团队" in response.json()["detail"]

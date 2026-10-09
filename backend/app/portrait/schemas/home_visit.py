@@ -37,6 +37,10 @@ class HomeVisitBase(BaseModel):
     family2_contact: Optional[str] = None
     family2_work_unit: Optional[str] = None
     feedback: Optional[str] = None
+    # C1 (PRD §7.1) 新增 — 双人员家访 + 扫描件 + 团队名称
+    co_visitor_user_id: Optional[int] = Field(None, description="第二家访人 user_id (双人员家访)")
+    scan_file_path: Optional[str] = Field(None, description="扫描件相对路径 uploads/portrait/home_visits/...")
+    team_name: Optional[str] = Field(None, description='固定 "审核处理团队", 后端兜底默认填入')
 
 
 class HomeVisitCreate(HomeVisitBase):
@@ -67,6 +71,10 @@ class HomeVisitUpdate(BaseModel):
     family2_contact: Optional[str] = None
     family2_work_unit: Optional[str] = None
     feedback: Optional[str] = None
+    # C1 新增 — 草稿编辑可改
+    co_visitor_user_id: Optional[int] = None
+    scan_file_path: Optional[str] = None
+    team_name: Optional[str] = None
 
 
 # ============================================================================
@@ -108,6 +116,13 @@ class HomeVisit(HomeVisitBase):
     submitted_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
 
+    # C1 新增 — 双人员家访第二人 (反查 name)
+    co_visitor_user_id: Optional[int] = None
+    co_visitor_name: Optional[str] = None
+    scan_file_path: Optional[str] = None
+    scan_file_url: Optional[str] = None  # 由 router 层拼装 /uploads/portrait/...
+    team_name: Optional[str] = None
+
     created_at: datetime
     updated_at: datetime
 
@@ -129,6 +144,10 @@ class HomeVisitListItem(BaseModel):
     completed_at: Optional[datetime] = None
     visitor_name: Optional[str] = None
     current_approver_name: Optional[str] = None
+    # C1 新增 (列表也透出关键 3 字段)
+    co_visitor_name: Optional[str] = None
+    team_name: Optional[str] = None
+    has_scan: bool = False  # 列表只显示是否有扫描件 (不暴露 path)
     created_at: datetime
 
     class Config:
