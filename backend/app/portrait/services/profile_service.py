@@ -84,6 +84,8 @@ class ProfileService:
                 # P0.2 新增: A4 兴趣 + A5 获奖
                 selectinload(portrait_models.Profile.interests),
                 selectinload(portrait_models.Profile.awards),
+                # P0.7: B2 活动申报落子表
+                selectinload(portrait_models.Profile.activities),
                 selectinload(portrait_models.Profile.contact),
                 selectinload(portrait_models.Profile.skill_tags),
             )

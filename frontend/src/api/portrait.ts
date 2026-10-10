@@ -101,6 +101,22 @@ export interface AwardInfo {
   level?: '国家级' | '省部级' | '行级' | null;
 }
 
+// P0.7 新增: B2 活动申报落子表 (PRD §6.2 v2.1, 审批通过后落入)
+export interface ActivityRecord {
+  id?: number;
+  profile_id?: number;
+  activity_name: string;
+  activity_time: string;  // YYYY-MM-DD
+  activity_type: '运动会' | '文艺' | '志愿' | '培训' | '其他';
+  organizer: string;
+  award_or_participation?: string | null;
+  content?: string | null;
+  hours?: number | null;
+  source_submission_id?: number | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface ProfileFull extends ProfileBase {
   user_name?: string | null;
   ehr_id?: string | null;
@@ -112,6 +128,8 @@ export interface ProfileFull extends ProfileBase {
   // P0.2 新增
   interests?: InterestInfo[] | null;
   awards?: AwardInfo[] | null;
+  // P0.7 新增
+  activities?: ActivityRecord[] | null;
 }
 
 export interface PaginatedResponse<T> {

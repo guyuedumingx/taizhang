@@ -54,6 +54,8 @@ class Profile(Base):
     # P0.2 新增: A4 兴趣 + A5 获奖
     interests = relationship("InterestInfo", back_populates="profile", order_by="InterestInfo.created_at")
     awards = relationship("AwardInfo", back_populates="profile", order_by="AwardInfo.award_time.desc()")
+    # P0.7: B2 活动申报通过后落入
+    activities = relationship("ActivityRecord", back_populates="profile", order_by="ActivityRecord.activity_time.desc()")
     contact = relationship("ContactInfo", back_populates="profile", uselist=False)
     skill_tags = relationship("ProfileSkillTag", back_populates="profile")
     development_intent = relationship("DevelopmentIntent", back_populates="profile", uselist=False, cascade="all, delete-orphan")
@@ -231,3 +233,33 @@ class AwardInfo(Base):
     created_at = Column(DateTime, default=beijing_now)
     updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
     profile = relationship("Profile", back_populates="awards")
+
+
+# ============================================================================
+# P0.7: B2 活动申报审批通过后落子表 (PRD §6.2)
+# ============================================================================
+class ActivityRecord(Base):
+    """活动记录子表 (1:N, 按活动时间倒序) - PRD §6.2 v2.1
+
+    审批通过 activity_claim submission 后, 由 approve_submission 钩子创建
+    字段对齐 B2 表单必填+选填
+    """
+    __tablename__ = "portrait_activity_record"
+    __table_args__ = PORTRAIT_TABLE_KWARGS
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    profile_id = Column(Integer, ForeignKey("portrait_profiles.id"), nullable=False)
+    activity_name = Column(String(200), nullable=False)
+    activity_time = Column(Date, nullable=False)
+    # 类型枚举: 运动会/文艺/志愿/培训/其他
+    activity_type = Column(String(20), nullable=False)
+    organizer = Column(String(200), nullable=False)
+    # 选填: 获奖或参与情况
+    award_or_participation = Column(String(200), nullable=True)
+    content = Column(Text, nullable=True)
+    hours = Column(Integer, nullable=True)
+    # 审批来源 (B2 submission_id), 留痕
+    source_submission_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=beijing_now)
+    updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
+    profile = relationship("Profile", back_populates="activities")

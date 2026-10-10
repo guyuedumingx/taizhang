@@ -310,6 +310,30 @@ class AwardInfo(AwardInfoBase):
         from_attributes = True
 
 
+# ============================================================================
+# P0.7: B2 活动申报落子表 schema (PRD §6.2)
+# ============================================================================
+class ActivityRecordBase(BaseModel):
+    activity_name: str
+    activity_time: date
+    activity_type: str  # 运动会/文艺/志愿/培训/其他
+    organizer: str
+    award_or_participation: Optional[str] = None
+    content: Optional[str] = None
+    hours: Optional[int] = None
+    source_submission_id: Optional[int] = None
+
+
+class ActivityRecord(ActivityRecordBase):
+    id: int
+    profile_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class ContactInfoCreate(ContactInfoBase):
     pass
 
@@ -342,6 +366,8 @@ class ProfileFull(Profile):
     # P0.2 新增: A4 兴趣 + A5 获奖
     interests: List[InterestInfo] = []
     awards: List[AwardInfo] = []
+    # P0.7: B2 活动申报通过后落子表
+    activities: List[ActivityRecord] = []
     contact: Optional[ContactInfo] = None
     skill_tag_names: List[str] = []  # 来自 ProfileSkillTag
 

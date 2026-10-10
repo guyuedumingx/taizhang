@@ -28,6 +28,7 @@ from app.portrait.models.log_visit_transfer import (
 )
 from app.portrait.models.profile import (
     AchievementInfo,
+    ActivityRecord,  # P0.7 B2 落子表
     AwardInfo,  # P0.2 A5
     ContactInfo,
     EducationInfo,
@@ -65,6 +66,8 @@ __all__ = [
     # P0.2: A4 兴趣 + A5 获奖
     "InterestInfo",
     "AwardInfo",
+    # P0.7: B2 活动申报审批通过后落子表
+    "ActivityRecord",
     # 发展意向 + 项目
     "DevelopmentIntent",
     "ProjectSummary",

@@ -504,6 +504,55 @@ const MyProfile: React.FC = () => {
                 </Space>
               ),
             },
+            // P0.7: B2 活动申报落子表 (只读, 通过审批后由后端写入)
+            {
+              key: 'activities',
+              label: '活动记录',
+              children: (
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Text type="secondary">
+                    活动申报审批通过后落入此处 (PRD §6.2 v2.1, 按活动时间倒序)。新增申报请到 B2 提交页。
+                  </Text>
+                  {(profile?.activities?.length ?? 0) === 0 ? (
+                    <Empty description="暂无活动记录" />
+                  ) : (
+                    <Table
+                      rowKey="id"
+                      size="small"
+                      dataSource={profile!.activities || []}
+                      pagination={{ pageSize: 10 }}
+                      columns={[
+                        { title: '活动名', dataIndex: 'activity_name', width: 240 },
+                        { title: '类型', dataIndex: 'activity_type', width: 80 },
+                        { title: '主办方', dataIndex: 'organizer', width: 180 },
+                        {
+                          title: '获奖/参与',
+                          dataIndex: 'award_or_participation',
+                          width: 120,
+                          render: (v: string | null) => v || '—',
+                        },
+                        {
+                          title: '时长(h)',
+                          dataIndex: 'hours',
+                          width: 80,
+                          render: (v: number | null) => v ?? '—',
+                        },
+                        {
+                          title: '活动时间',
+                          dataIndex: 'activity_time',
+                          width: 110,
+                        },
+                        {
+                          title: '内容',
+                          dataIndex: 'content',
+                          ellipsis: true,
+                        },
+                      ]}
+                    />
+                  )}
+                </Space>
+              ),
+            },
             {
               key: 'training',
               label: '培训记录',

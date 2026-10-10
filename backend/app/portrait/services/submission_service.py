@@ -378,6 +378,36 @@ class SubmissionService:
                     detail=f"special_work 联动台账失败: {exc}",
                 ) from exc
 
+        # P0.7 联动: activity_claim 审批通过 → 落入 portrait_activity_record
+        if submission.submission_type == "activity_claim":
+            try:
+                from app.portrait.services.activity_sync_service import sync_activity_claim_to_record
+                new_activity = sync_activity_claim_to_record(db, submission=submission)
+                if new_activity is not None:
+                    # 先 commit 主事务, 再 log (避开 SQLite 单文件下 system_logs 与主 session 抢锁)
+                    db.commit()
+                    db.refresh(submission)
+                    # log 失败不阻塞主流程 (Rule 12: 显性化但非阻塞)
+                    try:
+                        log_info(
+                            module="portrait",
+                            action="activity_claim.sync",
+                            message=f"活动 #{new_activity.id} 落入 profile {new_activity.profile_id} (来自 submission #{submission.id})",
+                            user_id=viewer.id,
+                            resource_type="activity_record",
+                            resource_id=str(new_activity.id),
+                        )
+                    except Exception as log_exc:
+                        import sys
+                        print(f"[P0.7] activity_claim.sync log 失败 (非阻塞): {log_exc}", file=sys.stderr)
+            except HTTPException:
+                raise
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"activity_claim 落子表失败: {exc}",
+                ) from exc
+
         return submission
 
     @staticmethod

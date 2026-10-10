@@ -18,6 +18,8 @@ from app.portrait.schemas.profile import (
     AwardInfo,
     AwardInfoCreate,
     AwardInfoUpdate,
+    # P0.7: B2 活动申报落子表
+    ActivityRecord,
     EducationInfo,
     EducationInfoCreate,
     EducationInfoUpdate,
@@ -137,6 +139,8 @@ __all__ = [
     "AwardInfo",
     "AwardInfoCreate",
     "AwardInfoUpdate",
+    # P0.7: B2 活动申报落子表
+    "ActivityRecord",
     # submission
     "Submission",
     "SubmissionCreate",
