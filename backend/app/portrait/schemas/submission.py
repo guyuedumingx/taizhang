@@ -116,7 +116,7 @@ class MySubmissionsQuery(BaseModel):
         None, pattern="^(draft|pending|approved|rejected|cancelled)$"
     )
     submission_type: Optional[str] = Field(
-        None, pattern="^(special_work|profile_edit|skill_tag_edit)$"
+        None, pattern="^(special_work|profile_edit|skill_tag_edit|activity_claim)$"
     )
     skip: int = 0
     limit: int = 50

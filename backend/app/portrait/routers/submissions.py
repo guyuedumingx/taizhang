@@ -66,7 +66,7 @@ def list_my_submissions(
         None, alias="status", pattern="^(draft|pending|approved|rejected|cancelled)$"
     ),
     submission_type: Optional[str] = Query(
-        None, pattern="^(special_work|profile_edit|skill_tag_edit)$"
+        None, pattern="^(special_work|profile_edit|skill_tag_edit|activity_claim)$"
     ),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
