@@ -143,10 +143,12 @@ def delete_entry_exit(
 
 
 # 模板列定义, 与 routers/templates.py entry_exit 模板保持一致
+# v2.1 用户决定: 列名全部以实际业务表(图 3)为准
+# 18 列 = 图 3 17 列原序 + EHR号(系统必需, 追加末尾)
 _ENTRY_EXIT_COLS = [
-    "姓名", "团队", "职务", "证照号", "出境原因", "目的地",
-    "申请离境", "申请返回", "证照类别", "申请类型", "团队审批人",
-    "实际出境", "实际返回", "年份", "组别", "备注", "EHR号",
+    "序号", "姓名", "团队", "职务", "证照号码", "出境原因", "目的地",
+    "申请离境日期", "申请返回日期", "申请证照类别", "申请类型", "团队审批人",
+    "实际出境日期", "实际返回日期", "出境年份", "组别", "备注", "EHR号",
 ]
 
 
@@ -198,7 +200,7 @@ async def import_entry_exit(
         for idx, row in df.iterrows():
             row_number = int(idx) + 2
             try:
-                raw_year = row["年份"]
+                raw_year = row["出境年份"]
                 year = int(raw_year)
                 if not (2000 <= year <= 2100):
                     raise ValueError(f"年份 {year} 超出范围")
@@ -209,16 +211,16 @@ async def import_entry_exit(
                         name=str(row["姓名"]).strip(),
                         team_name=str(row["团队"]).strip(),
                         position=str(row["职务"]).strip(),
-                        certificate_no=str(row["证照号"]).strip(),
+                        certificate_no=str(row["证照号码"]).strip(),
                         outbound_reason=str(row["出境原因"]).strip(),
                         destination=str(row["目的地"]).strip(),
-                        apply_depart_at=_parse_dt(row["申请离境"]),
-                        apply_return_at=_parse_dt(row["申请返回"]),
-                        certificate_type=str(row["证照类别"]).strip(),
+                        apply_depart_at=_parse_dt(row["申请离境日期"]),
+                        apply_return_at=_parse_dt(row["申请返回日期"]),
+                        certificate_type=str(row["申请证照类别"]).strip(),
                         apply_type=str(row["申请类型"]).strip(),
                         team_approver=str(row["团队审批人"]).strip(),
-                        actual_depart_at=_parse_dt(row.get("实际出境")),
-                        actual_return_at=_parse_dt(row.get("实际返回")),
+                        actual_depart_at=_parse_dt(row.get("实际出境日期")),
+                        actual_return_at=_parse_dt(row.get("实际返回日期")),
                         year=year,
                         group_name=str(row.get("组别")).strip() if not pd.isna(row.get("组别")) else None,
                         remark=str(row.get("备注")).strip() if not pd.isna(row.get("备注")) else None,
