@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field
 # SubmissionRecord
 # ============================================================================
 class SubmissionBase(BaseModel):
-    submission_type: str = Field(..., pattern="^(special_work|profile_edit|skill_tag_edit)$")
+    submission_type: str = Field(..., pattern="^(special_work|profile_edit|skill_tag_edit|activity_claim)$")
     payload: Any = Field(..., description="业务数据 (dict 或 JSON 字符串, 按 submission_type 分发字段)")
 
 

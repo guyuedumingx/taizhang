@@ -123,7 +123,7 @@ export interface PaginatedResponse<T> {
 
 export interface SubmissionRecord {
   id: number;
-  submission_type: 'special_work' | 'profile_edit' | 'skill_tag_edit';
+  submission_type: 'special_work' | 'profile_edit' | 'skill_tag_edit' | 'activity_claim';
   submitter_user_id: number;
   submitter_name: string;
   submitter_ehr_id: string;
@@ -245,7 +245,7 @@ export async function updateMyAward(data: Partial<AwardInfo>): Promise<AwardInfo
 // Submission (4 端点)
 // ============================================================================
 export async function createSubmission(data: {
-  submission_type: 'special_work' | 'profile_edit' | 'skill_tag_edit';
+  submission_type: 'special_work' | 'profile_edit' | 'skill_tag_edit' | 'activity_claim';
   payload: any;
   next_approver_id?: number;
 }): Promise<SubmissionRecord> {

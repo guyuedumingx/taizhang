@@ -30,7 +30,7 @@ from app.portrait.schemas import submission as sub_schema
 from app.utils.logger import log_info
 
 
-VALID_TYPES = {"special_work", "profile_edit", "skill_tag_edit"}
+VALID_TYPES = {"special_work", "profile_edit", "skill_tag_edit", "activity_claim"}
 PENDING = "pending"
 APPROVED = "approved"
 REJECTED = "rejected"
@@ -58,6 +58,19 @@ def _validate_payload(submission_type: str, payload: dict) -> None:
                 raise HTTPException(status_code=400, detail=f"skill_tag_edit 缺少字段: {f}")
         if payload["action"] not in ("add", "delete"):
             raise HTTPException(status_code=400, detail="skill_tag_edit.action 必须是 add/delete")
+    elif submission_type == "activity_claim":
+        # P0.3 B2 活动申报 (PRD §6.2 v2.1): 事后记录 + 跟踪加分
+        # 必填: 活动名/时间/类型/主办方; 选填: 获奖/内容/时长/佐证
+        required = ["activity_name", "activity_time", "activity_type", "organizer"]
+        for f in required:
+            if f not in payload or payload[f] in (None, ""):
+                raise HTTPException(status_code=400, detail=f"activity_claim 缺少字段: {f}")
+        allowed_types = {"运动会", "文艺", "志愿", "培训", "其他"}
+        if payload["activity_type"] not in allowed_types:
+            raise HTTPException(
+                status_code=400,
+                detail=f"activity_claim.activity_type 必须是 {allowed_types} 之一",
+            )
 
 
 def _resolve_next_approver(
@@ -67,6 +80,7 @@ def _resolve_next_approver(
     - special_work  : submitter 指定 (next_approver_id 必填)
     - profile_edit  : admin role 第一个用户
     - skill_tag_edit: admin role 第一个用户
+    - activity_claim: admin role 第一个用户 (P0.3 B2 v2.1)
     """
     if submission_type == "special_work":
         if not specified_id:
@@ -80,7 +94,7 @@ def _resolve_next_approver(
             raise HTTPException(status_code=400, detail=f"审批人 {approver.ehr_id} 已停用")
         return specified_id
 
-    # profile_edit / skill_tag_edit: 默认 admin 角色
+    # profile_edit / skill_tag_edit / activity_claim: 默认 admin 角色
     # taizhang 用 Casbin 管角色绑定, 不在 user.role 字段. 用 is_superuser 找第一个 admin
     admin_user = (
         db.query(models.User)
