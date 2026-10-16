@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 class EntryExitBase(BaseModel):
     """17 列字段 (PRD §10.1.2)"""
+    seq: Optional[int] = Field(None, description="序号 (PRD 附录 B.3: 可选, 不填则自动生成)")
     name: str = Field(..., max_length=64, description="姓名")
     team_name: str = Field(..., max_length=128, description="团队")
     position: str = Field(..., max_length=64, description="职务")
@@ -93,6 +94,7 @@ class EntryExitStatistics(BaseModel):
 class EntryExitImportRow(BaseModel):
     """批量导入 Excel 行 (F9, 内部用)"""
     row_number: int
+    seq: Optional[int] = None  # 序号 (用户填则用, 未填则按 row_number 自动生成)
     ehr_id: str
     name: str
     team_name: str

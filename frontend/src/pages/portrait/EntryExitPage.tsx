@@ -12,7 +12,6 @@ import {
   Table,
   Button,
   Input,
-  Select,
   Space,
   Statistic,
   Row,
@@ -36,7 +35,6 @@ import {
   ReloadOutlined,
   DownloadOutlined,
   InboxOutlined,
-  UploadOutlined,
 } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd';
 import dayjs from 'dayjs';
@@ -45,15 +43,7 @@ import BreadcrumbNav from '../../components/common/BreadcrumbNav';
 import { useAuthStore } from '../../stores/authStore';
 import { api } from '../../api';
 
-const { RangePicker } = DatePicker;
 const { Title, Text } = Typography;
-const { Dragger } = Upload;
-
-interface ImportResult {
-  success_count: number;
-  failed_count: number;
-  failed_rows: Array<{ row_number: number; ehr_id: string; reason: string }>;
-}
 
 type DrawerMode =
   | { type: 'create' }
@@ -71,8 +61,6 @@ const EntryExitPage: React.FC = () => {
   const [drawer, setDrawer] = useState<DrawerMode | null>(null);
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
-  const [importModal, setImportModal] = useState(false);
-  const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [importing, setImporting] = useState(false);
 
   // is_admin 从登录态判断 (与后端 /me/permissions 一致)
@@ -188,13 +176,15 @@ const EntryExitPage: React.FC = () => {
     showUploadList: false,
     beforeUpload: async (file: UploadFile) => {
       setImporting(true);
-      setImportResult(null);
       try {
         const result = await PortraitAPI.importEntryExit(file as unknown as File);
-        setImportResult(result);
         if (result.failed_count === 0) message.success(`导入成功: ${result.success_count} 条`);
         else if (result.success_count === 0) message.error(`导入失败: ${result.failed_count} 条全部失败`);
         else message.warning(`部分成功: ${result.success_count} 条, 失败 ${result.failed_count} 条`);
+        if (result.failed_count > 0) {
+          // Rule 12: 失败显性化 (与 DrillsPage 导入保持同一惯例)
+          console.table(result.failed_rows.map((f) => ({ 行号: f.row_number, EHR: f.ehr_id, 原因: f.reason })));
+        }
         fetchList();
       } catch (err: any) {
         message.error(`导入失败: ${err?.response?.data?.detail || err.message}`);

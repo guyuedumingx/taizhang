@@ -41,7 +41,7 @@ def list_drills(
     drill_type: Optional[str] = Query(None),
     team_name: Optional[str] = Query(None),
 ):
-    items, total = drill_service.drill_service.list_records(
+    items, total = drill_service.list_records(
         db, viewer=current_user, skip=skip, limit=limit,
         drill_type=drill_type, team_name=team_name,
     )
@@ -57,8 +57,10 @@ def list_drills(
 def drill_matrix(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
+    year: Optional[int] = Query(None, description="按演练年份筛选列 (activity_date 的年)"),
+    team_name: Optional[str] = Query(None, description="按团队筛选行"),
 ):
-    return drill_service.drill_service.matrix(db, viewer=current_user)
+    return drill_service.matrix(db, viewer=current_user, year=year, team_name=team_name)
 
 
 @router.post("", response_model=drill_schema.DrillRecord, status_code=201, summary="F2 演练登记")
@@ -68,7 +70,7 @@ def create_drill(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     _require_admin(current_user)
-    return _serialize(drill_service.drill_service.create(db, data=data))
+    return _serialize(drill_service.create(db, data=data))
 
 
 @router.get("/{drill_id}", response_model=drill_schema.DrillDetail, summary="查看演练详情")
@@ -77,7 +79,7 @@ def get_drill(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
-    record = drill_service.drill_service.get_detail(db, viewer=current_user, drill_id=drill_id)
+    record = drill_service.get_detail(db, viewer=current_user, drill_id=drill_id)
     payload = _serialize(record)
     payload["participants"] = [
         {
@@ -99,7 +101,7 @@ def delete_drill(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     _require_admin(current_user)
-    drill_service.drill_service.delete(db, drill_id=drill_id)
+    drill_service.delete(db, drill_id=drill_id)
 
 
 _DRILL_COLS = ["活动日期", "演练类型", "地点", "EHR号", "姓名", "是否参与"]
@@ -158,7 +160,7 @@ async def import_drills(
                     "reason": f"行解析失败: {type(exc).__name__}: {exc}",
                 })
 
-        summary = drill_service.drill_service.import_rows(db, rows=rows)
+        summary = drill_service.import_rows(db, rows=rows)
         summary.failed_rows.extend(parse_failures)
         summary.failed_count = len(summary.failed_rows)
         return summary

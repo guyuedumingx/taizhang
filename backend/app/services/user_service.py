@@ -77,8 +77,19 @@ class UserService:
         return user
 
     @staticmethod
-    def update_user(db: Session, user_id: int, user_in: schemas.UserUpdate) -> schemas.User:
-        """更新用户信息"""
+    def update_user(
+        db: Session,
+        user_id: int,
+        user_in: schemas.UserUpdate,
+        *,
+        operator_user_id: Optional[int] = None,
+    ) -> schemas.User:
+        """更新用户信息
+
+        operator_user_id: 变更组别时用于写调换历史 (PRD §11.4 G7)。
+        组别真的变了但没传操作人 → 400 (不静默跳过, Rule 12)。
+        关键字专用参数, 保证现有位置参数调用零改动。
+        """
         user = db.query(models.User).filter(models.User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="用户不存在")
@@ -118,6 +129,18 @@ class UserService:
             # 添加新角色
             add_role_for_user(str(user.id), role)
         
+        # G7 组员调换历史: 必须在 setattr 之前 —— record_transfer 从 user.team_id 现读原组。
+        # 局部 import: 核心 service 层不依赖 portrait 扩展层 (避免循环导入 + 保持分层)
+        if "team_id" in update_data:
+            from app.portrait.services.group_transfer_service import record_transfer
+
+            record_transfer(
+                db,
+                user=user,
+                to_team_id=update_data["team_id"],
+                operator_user_id=operator_user_id,
+            )
+
         # 更新用户数据
         for key, value in update_data.items():
             setattr(user, key, value)

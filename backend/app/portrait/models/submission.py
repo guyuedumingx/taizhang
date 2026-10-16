@@ -4,7 +4,6 @@ portrait 动态表单提交 + 审批节点
 集成指南 §3 阶段 3 + PRD §9.1: portrait 3 类动态表单提交走审批流
   - 专项工作  (special_work)   PRD §6.1, 审批人下拉指定
   - 档案修改 (profile_edit)   PRD §12.1, 管理员审批
-  - 亮点修改 (skill_tag_edit) PRD §12.2, 管理员审批 (高敏感必走)
 
 家访单独走 portrait_home_visit_records (已建), 走独立 Workflow 实例,
 与本 submission 表解耦, 由家访服务自行绑定 workflow_instance_id.
@@ -39,7 +38,6 @@ class SubmissionRecord(Base):
     submission_type 区分:
       - special_work  : 专项工作 (PRD §6.1, 审批人下拉指定)
       - profile_edit  : 档案字段修改 (PRD §12.1, 管理员审批)
-      - skill_tag_edit: 亮点标签修改 (PRD §12.2, 管理员审批, 高敏感必走)
 
     workflow_instance_id 关联 taizhang workflow_instances (审批流)
     """
@@ -72,7 +70,6 @@ class SubmissionRecord(Base):
     # 业务数据 (JSON 字符串, 各 type 自定义字段)
     #   special_work  : project_name, start_time, end_time, content, hours, skill_tags
     #   profile_edit  : field_name, old_value, new_value
-    #   skill_tag_edit: tag_name, action (add/delete), sensitivity (normal/sensitive)
     payload = Column(Text, nullable=False)
 
     # 时间

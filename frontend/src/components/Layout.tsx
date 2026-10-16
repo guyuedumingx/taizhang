@@ -23,6 +23,7 @@ import {
   UploadOutlined,
   GlobalOutlined,
   FireOutlined,
+  SwapOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -237,6 +238,12 @@ const AppLayout: React.FC = () => {
                   key: 'portrait-drills',
                   icon: <FireOutlined />,
                   label: <Link to="/dashboard/portrait/drills">消防演练</Link>,
+                },
+                // G7 组员调换历史 (Week 3 P0.5, 全员可见, 可见范围后端按 team_id 判定)
+                {
+                  key: 'portrait-group-transfers',
+                  icon: <SwapOutlined />,
+                  label: <Link to="/dashboard/portrait/group-transfers">组员调换历史</Link>,
                 },
                 // 批量导入 D1 (管理员专属, 阶段 B 新增)
                 hasPermission(PERMISSIONS.USER_VIEW) ? {

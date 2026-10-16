@@ -4,7 +4,6 @@ portrait Submission + Approval schema
 3 类提交 (PRD §9.1):
   - special_work  : 专项工作 (审批人下拉指定)
   - profile_edit  : 档案字段修改 (admin 审批)
-  - skill_tag_edit: 亮点标签修改 (admin 审批, 高敏感必走)
 
 注: 家访走独立表 portrait_home_visit_records, 审批流绑 workflow_instance_id,
     不在 submission 表范围 (PRD §9.1 §C)
@@ -21,7 +20,7 @@ from pydantic import BaseModel, Field
 # SubmissionRecord
 # ============================================================================
 class SubmissionBase(BaseModel):
-    submission_type: str = Field(..., pattern="^(special_work|profile_edit|skill_tag_edit|activity_claim)$")
+    submission_type: str = Field(..., pattern="^(special_work|profile_edit|activity_claim)$")
     payload: Any = Field(..., description="业务数据 (dict 或 JSON 字符串, 按 submission_type 分发字段)")
 
 
@@ -38,6 +37,12 @@ class SubmissionUpdate(BaseModel):
 
 
 class SubmissionInDBBase(SubmissionBase):
+    # 覆盖父类的白名单 pattern: 响应侧必须容忍历史数据。
+    # skill_tag_edit 于 2026-10-14 下线 (PRD §1.3), 但库里仍有存量提交;
+    # 若沿用 SubmissionBase 的 pattern, 任何返回该记录的列表接口都会抛
+    # ValidationError 变成 500。创建侧 (SubmissionBase) 仍严格拦新建。
+    submission_type: str = Field(..., description="提交类型 (响应侧不做白名单校验, 含历史已下线类型)")
+
     id: int
     submitter_user_id: int
     submitter_name: str
@@ -116,7 +121,7 @@ class MySubmissionsQuery(BaseModel):
         None, pattern="^(draft|pending|approved|rejected|cancelled)$"
     )
     submission_type: Optional[str] = Field(
-        None, pattern="^(special_work|profile_edit|skill_tag_edit|activity_claim)$"
+        None, pattern="^(special_work|profile_edit|activity_claim)$"
     )
     skip: int = 0
     limit: int = 50

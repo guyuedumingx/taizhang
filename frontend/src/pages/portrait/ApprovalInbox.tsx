@@ -42,7 +42,8 @@ const { TextArea } = Input;
 const TYPE_LABEL: Record<string, string> = {
   special_work: '专项工作',
   profile_edit: '档案修改',
-  skill_tag_edit: '亮点标签',
+  // 历史类型: A3 亮点标签已于 2026-10-14 下线, 仅用于显示存量提交
+  skill_tag_edit: '亮点标签（功能已下线）',
 };
 
 const STATUS_COLOR: Record<string, string> = {

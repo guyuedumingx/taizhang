@@ -105,17 +105,17 @@ def download_training_template():
 # 出入境台账模板 (17 列, 模块 2.1 实现时启用)
 # ============================================================================
 _ENTRY_EXIT_HEADERS = [
-    "序号", "姓名", "团队", "职务", "证照号码", "出境原因", "目的地",
+    "序号", "EHR号", "姓名", "团队", "职务", "证照号码", "出境原因", "目的地",
     "申请离境日期", "申请返回日期", "申请证照类别", "申请类型", "团队审批人",
-    "实际出境日期", "实际返回日期", "出境年份", "组别", "备注", "EHR号",
+    "实际出境日期", "实际返回日期", "出境年份", "组别", "备注",
 ]
 _ENTRY_EXIT_SAMPLE = [
-    1, "张三", "审核处理团队", "高级审核员", "E12345678",
+    1, "0000001", "张三", "审核处理团队", "高级审核员", "E12345678",
     "公务出差", "中国香港",
     "2026-04-01 09:00:00", "2026-04-05 18:00:00",
     "护照", "公务", "李四",
     "", "",
-    2026, "审核一组", "示例备注", "0000001",
+    2026, "审核一组", "示例备注",
 ]
 
 
@@ -162,4 +162,47 @@ def download_drill_template():
         BytesIO(xlsx_bytes),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": 'attachment; filename="drill_import_template.xlsx"'},
+    )
+
+
+# ============================================================================
+# 家访明细模板 (F11, PRD 附录 B.4 的 14 列)
+# ============================================================================
+_HOME_VISIT_HEADERS = [
+    "所属团队", "被家访人EHR号", "被家访人姓名", "岗位", "联系电话",
+    "家访年度", "家访时间", "家访方式", "家访地址", "家访人员及岗位",
+    "是否已家访", "备注", "序号", "家访记录表扫描件",
+]
+_HOME_VISIT_SAMPLE = [
+    "审核处理团队", "0000001", "张三", "高级审核员", "13800000000",
+    2026, "2026-05-12 14:30:00", "线下", "北京市西城区某某路 1 号",
+    "1.李四，高级主管", "是", "本月例行家访", 1, "已提交",
+]
+
+# 导入端点必填列 (与 home_visits.py 的 _HOME_VISIT_REQUIRED_COLS 保持一致)
+_HOME_VISIT_REQUIRED = [
+    "所属团队", "被家访人EHR号", "被家访人姓名", "家访年度",
+    "家访时间", "家访方式", "是否已家访", "家访记录表扫描件",
+]
+
+
+@router.get("/excel/home-visit", summary="下载家访明细 Excel 模板 (F11)")
+def download_home_visit_template():
+    """PRD 附录 B.4 家访明细表 14 列 - F11 批量导入模板
+
+    「家访人员及岗位」列填了也会被忽略: 导入时一律按导入人(组长)重建, 保证
+    visitor_info 里的签字人和实际家访人一致。列留着是为了跟业务实际表样对齐。
+    """
+    if not _OPENPYXL_AVAILABLE:
+        raise HTTPException(status_code=500, detail="openpyxl 未安装")
+
+    xlsx_bytes = _build_workbook(
+        headers=_HOME_VISIT_HEADERS,
+        sample_row=_HOME_VISIT_SAMPLE,
+        sheet_name="家访明细",
+    )
+    return StreamingResponse(
+        BytesIO(xlsx_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="home_visit_import_template.xlsx"'},
     )

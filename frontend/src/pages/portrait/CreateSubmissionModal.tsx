@@ -1,5 +1,8 @@
 /**
- * P7 创建提交 Modal (B1 专项工作 + A2 档案修改 + A3 亮点标签 三合一)
+ * P7 创建提交 Modal (B1 专项工作 + B2 活动报名 + A2 档案修改 + A3 亮点标签 四合一)
+ *
+ * Week 2 P0.5: 加 B2 活动报名 (activity_claim)
+ * 集成指南 §5 雷区 7: 不绕过 Depends
  */
 import React from 'react';
 import {
@@ -10,6 +13,8 @@ import {
   Select,
   DatePicker,
   InputNumber,
+  Switch,
+  message,
 } from 'antd';
 import * as PortraitAPI from '../../api/portrait';
 
@@ -17,20 +22,32 @@ const { TextArea } = Input;
 
 const TAB_ITEMS = [
   { key: 'special_work', label: '专项工作 (B1)' },
+  { key: 'activity_claim', label: '活动报名 (B2)' },
   { key: 'profile_edit', label: '档案修改 (A2)' },
-  { key: 'skill_tag_edit', label: '亮点标签 (A3)' },
 ];
 
-// 审批人下拉 (从 /users 拉取活跃用户)
+// 审批人下拉
+// 数据源: GET /users/members (员工通讯录最小集, 任意登录用户可访问)
+// 不能用 /users/: 那个端点需要 user:view 权限, 普通员工拿不到 → 下拉恒空 →
+// next_approver_id 必填 → B1/B2 整个提交不了。参见 api/users.ts 的接口注释。
 const ApproverSelect: React.FC<{ value?: number; onChange?: (v: number) => void; disabled?: boolean }> = ({ value, onChange, disabled }) => {
   const [users, setUsers] = React.useState<{ id: number; name: string; ehr_id: string }[]>([]);
   React.useEffect(() => {
     (async () => {
       try {
-        const data = await PortraitAPI.listUsersForApprover({ limit: 200 });
-        setUsers(data.items || []);
-      } catch {
-        // 失败时静默
+        const { getUserMembers } = await import('../../api/users');
+        const members = await getUserMembers({ limit: 1000 });
+        setUsers(
+          (members || []).map((u) => ({
+            id: u.id,
+            name: u.name || u.username || `#${u.id}`,
+            ehr_id: u.ehr_id || '-',
+          })),
+        );
+      } catch (err: any) {
+        // Rule 12: 失败必须显性化。之前这里是 catch {} 静默吞掉, 导致下拉恒为空
+        // 却无任何提示, B1/B2 对普通员工整体不可用且难以定位。
+        message.error(`审批人列表加载失败: ${err?.response?.data?.detail || err.message}`);
       }
     })();
   }, []);
@@ -90,9 +107,6 @@ const SPECIAL_WORK_FIELDS = (
     >
       <InputNumber min={1} max={10000} style={{ width: '100%' }} />
     </Form.Item>
-    <Form.Item name="skill_tags" label="关联技能标签 (可空)">
-      <Select mode="tags" placeholder="输入标签后回车" tokenSeparators={[',', '，']} />
-    </Form.Item>
     <Form.Item
       name="next_approver_id"
       label="审批人 (必选)"
@@ -131,47 +145,66 @@ const PROFILE_EDIT_FIELDS = (
   </>
 );
 
-const SKILL_TAG_EDIT_FIELDS = (
+// B2 活动报名 (PRD §6.2) — 复用 submission (activity_claim type), 跟 B1 同构
+// 字段: 活动名/活动时间/活动类型/主办方/报名原因/可参加排练
+const ACTIVITY_CLAIM_FIELDS = (
   <>
     <Form.Item
-      name="tag_name"
-      label="标签名"
-      rules={[{ required: true, message: '请填写标签名' }]}
+      name="activity_name"
+      label="活动名"
+      rules={[{ required: true, message: '请填写活动名' }, { max: 200 }]}
     >
-      <Input placeholder="例: Python / 演讲" maxLength={50} />
+      <Input placeholder="例: 2026 春节文艺汇演 / 总行运动会" maxLength={200} />
     </Form.Item>
     <Form.Item
-      name="action"
-      label="操作"
-      rules={[{ required: true, message: '请选择操作' }]}
+      name="activity_type"
+      label="活动类型"
+      rules={[{ required: true, message: '请选择活动类型' }]}
     >
       <Select
         options={[
-          { value: 'add', label: '新增' },
-          { value: 'delete', label: '删除' },
+          { value: '运动会', label: '运动会' },
+          { value: '文艺', label: '文艺' },
+          { value: '志愿', label: '志愿' },
+          { value: '培训', label: '培训' },
+          { value: '其他', label: '其他' },
         ]}
-        placeholder="新增 / 删除"
+        placeholder="选择活动类型"
       />
     </Form.Item>
     <Form.Item
-      name="sensitivity"
-      label="敏感度"
-      rules={[{ required: true, message: '请选择敏感度' }]}
+      name="activity_time"
+      label="活动时间"
+      rules={[{ required: true, message: '请选择活动时间' }]}
     >
-      <Select
-        options={[
-          { value: 'low', label: '低 (一般技能)' },
-          { value: 'medium', label: '中 (重要能力)' },
-          { value: 'high', label: '高 (敏感标签)' },
-        ]}
-      />
+      <DatePicker style={{ width: '100%' }} />
     </Form.Item>
-    <Form.Item name="reason" label="申请理由 (选填)">
-      <TextArea rows={2} maxLength={500} />
+    <Form.Item
+      name="organizer"
+      label="主办方"
+      rules={[{ required: true, message: '请填写主办方' }, { max: 200 }]}
+    >
+      <Input placeholder="例: 总行工会 / 中国金融体育协会" maxLength={200} />
+    </Form.Item>
+    <Form.Item
+      name="reason"
+      label="报名原因"
+      rules={[{ required: true, message: '请填写报名原因' }, { max: 1000 }]}
+    >
+      <TextArea rows={3} maxLength={1000} showCount placeholder="为什么想参加" />
+    </Form.Item>
+    <Form.Item
+      name="can_rehearse"
+      label="是否可参加排练"
+      valuePropName="checked"
+      initialValue={true}
+    >
+      <Switch checkedChildren="可" unCheckedChildren="否" />
     </Form.Item>
     <Form.Item
       name="next_approver_id"
-      label="审批人 (默认 admin)"
+      label="审批人 (本组组长 / 管理员)"
+      rules={[{ required: true, message: '请选择审批人' }]}
     >
       <ApproverSelect />
     </Form.Item>
@@ -180,8 +213,8 @@ const SKILL_TAG_EDIT_FIELDS = (
 
 const TAB_FIELDS: Record<string, React.ReactNode> = {
   special_work: SPECIAL_WORK_FIELDS,
+  activity_claim: ACTIVITY_CLAIM_FIELDS,
   profile_edit: PROFILE_EDIT_FIELDS,
-  skill_tag_edit: SKILL_TAG_EDIT_FIELDS,
 };
 
 export interface CreateSubmissionModalProps {

@@ -17,6 +17,7 @@ class EntryExitRecord(Base):
     __table_args__ = PORTRAIT_TABLE_KWARGS
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    seq = Column(Integer, nullable=True)  # 序号 (PRD 附录 B.3: 导入时自动生成, 也可手动填)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     ehr_id = Column(String(7), nullable=False, index=True)  # 冗余, 方便查询/导出
 

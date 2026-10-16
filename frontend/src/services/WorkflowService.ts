@@ -34,10 +34,12 @@ export class WorkflowService {
     return await templatesAPI.default.roles.getRoles();
   }
 
-  // 获取用户列表
+  // 获取审批人候选列表
+  // 走 /users/members 而非 /users/ : 后者需要 user:view 权限 (仅 admin/manager),
+  // 而综合岗/组长有 ledger:submit 但没有 user:view, 用旧的会导致提台账 403。
   static async getUsers() {
     try {
-      return await templatesAPI.default.users.getUsers();
+      return await templatesAPI.default.users.getUserMembers({ limit: 1000 });
     } catch (error) {
       console.error('获取用户列表失败:', error);
       throw error;

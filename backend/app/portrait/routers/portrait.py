@@ -13,6 +13,8 @@ from app.portrait.routers import approvals as approvals_router
 from app.portrait.routers import drill as drill_router
 from app.portrait.routers import entry_exit as entry_exit_router
 from app.portrait.routers import files as files_router
+# Week 3 P0.5: G7 组员调换历史 (PRD §11.4)
+from app.portrait.routers import group_transfer as group_transfer_router
 from app.portrait.routers import home_visits as home_visits_router
 from app.portrait.routers import profiles as profiles_router
 from app.portrait.routers import submissions as submissions_router
@@ -83,4 +85,10 @@ portrait_router.include_router(
 # C1 (PRD §7.1) — 扫描件上传/删除
 portrait_router.include_router(
     files_router.router, prefix="/files", tags=["portrait.文件"]
+)
+# Week 3 P0.5: G7 组员调换历史 (PRD §11.4) — 只读 + admin 删除
+portrait_router.include_router(
+    group_transfer_router.router,
+    prefix="/group-transfers",
+    tags=["portrait.组员调换"],
 )

@@ -41,6 +41,11 @@ class HomeVisitBase(BaseModel):
     co_visitor_user_id: Optional[int] = Field(None, description="第二家访人 user_id (双人员家访)")
     scan_file_path: Optional[str] = Field(None, description="扫描件相对路径 uploads/portrait/home_visits/...")
     team_name: Optional[str] = Field(None, description='固定 "审核处理团队", 后端兜底默认填入')
+    # PRD 附录 B.4 第 14 列「家访记录表扫描件」: 已提交 / 未提交。
+    # 与 scan_file_path 是两件事 —— 后者说明传了文件, 前者说明业务上这张记录表交没交。
+    scan_status: Optional[str] = Field(
+        None, pattern="^(已提交|未提交)$", description="扫描件提交状态 (B.4 第 14 列)"
+    )
 
 
 class HomeVisitCreate(HomeVisitBase):
@@ -75,6 +80,7 @@ class HomeVisitUpdate(BaseModel):
     co_visitor_user_id: Optional[int] = None
     scan_file_path: Optional[str] = None
     team_name: Optional[str] = None
+    scan_status: Optional[str] = Field(None, pattern="^(已提交|未提交)$")
 
 
 # ============================================================================
@@ -158,3 +164,73 @@ class HomeVisitListResponse(BaseModel):
     """列表响应 (含 total)"""
     total: int
     items: list[HomeVisitListItem]
+
+
+# ============================================================================
+# F11 批量导入 (PRD 附录 B.4 的 14 列)
+# ============================================================================
+class HomeVisitImportRow(BaseModel):
+    """批量导入 Excel 一行。
+
+    对应 B.4 的 14 列, 其中 3 列不在本模型里:
+      - 第 10 列「家访人员及岗位」: 导入场景下**故意不解析**。该列是签字内容,
+        Excel 里的文本无法保证与 users.department 一致, 照抄会让 visitor_info
+        里的家访人和实际签字人对不上 (业务规则"谁做家访谁签字")。后端一律用
+        home_visit_service._build_visitor_info() 按导入人重建。
+      - 第 13 列「序号」: 展示用, 无业务含义。
+      - 第 1 列「所属团队」: 由后端强制写死 "审核处理团队", 导入时校验 Excel 值
+        是否等于它, 不等则该行失败。
+    """
+    row_number: int
+    visited_ehr_id: str
+    visited_full_name: str
+    visited_job_title: Optional[str] = None
+    visited_phone: Optional[str] = None
+    visit_year: int
+    visit_time: datetime
+    visit_method: str = Field(..., pattern="^(线上|线下)$")
+    visit_address: Optional[str] = None
+    is_visited: bool = False
+    remarks: Optional[str] = None
+    scan_status: Optional[str] = Field(None, pattern="^(已提交|未提交)$")
+
+
+class HomeVisitImportSummary(BaseModel):
+    """批量导入结果 (Rule 12: 失败必须显性化)"""
+    success_count: int
+    failed_count: int
+    failed_rows: list[dict]
+
+
+# ============================================================================
+# F12 家访年度矩阵 (PRD 附录 B.2)
+# ============================================================================
+class HomeVisitMatrixCell(BaseModel):
+    """单元格: 填该年**具体家访日期** (B.2 第 4-7 列), 空白表示未家访。
+
+    B.2 与 §7.2 在这里有冲突 —— §7.2 写"仅绿色", B.2 写"填具体日期"。
+    两者不冲突: 日期是数据, 绿色是它的呈现, 由前端决定着色。这里只给数据。
+    """
+    visit_date: Optional[str] = None      # "2026-05-12"
+    count: int = 0                        # 该年家访次数
+    value: str = ""                       # 展示文本: 首次日期 + "+N" (该年被访多次)
+
+
+class HomeVisitMatrixRow(BaseModel):
+    """矩阵行 = 一名员工 (B.2: 序号 / 姓名 / EHR / 各年日期 / 家访年度汇总 / 分组)"""
+    seq: int
+    user_id: int
+    ehr_id: str
+    name: str
+    team_name: str
+    cells: list[HomeVisitMatrixCell] = []
+    # 家访年度汇总 (B.2 第 8 列): "2023年/2026年", 从未家访为空
+    visited_years: str = ""
+
+
+class HomeVisitMatrix(BaseModel):
+    """F12 矩阵响应: 列 = 年份, 行 = 员工"""
+    columns: list[dict]          # [{"year": 2023}, ...]
+    rows: list[HomeVisitMatrixRow]
+    total_years: int
+    total_visited_users: int     # 被家访过至少一次的人数

@@ -26,6 +26,11 @@ def read_users(
     """
     获取用户列表
     """
+    # 权限: 与本文件其余端点一致 (read_user / create_user / update_user 都做了这层校验)。
+    # 此处原先漏检, 导致任意登录员工可拉取全行用户 + 密码哈希。
+    if not deps.check_permissions("user", "view", current_user):
+        raise HTTPException(status_code=403, detail="没有足够的权限")
+
     users = db.query(models.User).offset(skip).limit(limit).all()
     total = db.query(models.User).count()
     
@@ -59,6 +64,30 @@ def create_user(
     user = user_service.create_user(db, user_in=user_in)
     
     return user
+
+
+@router.get("/members", response_model=List[schemas.UserMember], summary="员工通讯录最小集")
+def read_user_members(
+    db: Session = Depends(deps.get_db),
+    skip: int = 0,
+    limit: int = 1000,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    员工通讯录 (最小字段集)
+
+    供家访登记、工作流审批人选择等业务选择器使用 —— 这些流程需要"挑一个人",
+    但不需要组织架构与权限信息。刻意不返回 department / roles / is_superuser,
+    避免业务下拉框成为全行组织架构和管理员名单的泄露面。
+
+    team_id 是例外, 有意保留: 家访登记用它把"被家访人"下拉限定在本团队,
+    而不是列出全行 1494 人。团队归属是员工自己能看到的公开信息。
+
+    注意: 本端点必须声明在下方 `@router.get("/{user_id}")` 之前,
+    否则 "members" 会被当成 int 类型的 user_id 而 422。
+    """
+    users = db.query(models.User).offset(skip).limit(limit).all()
+    return users
 
 
 @router.get("/{user_id}", response_model=schemas.User)
@@ -100,7 +129,10 @@ def update_user(
         raise HTTPException(status_code=403, detail="没有足够的权限")
     
     # 使用用户服务更新用户
-    return user_service.update_user(db, user_id=user_id, user_in=user_in)
+    # operator_user_id 供 G7 组员调换历史记录操作人 (PRD §11.4)
+    return user_service.update_user(
+        db, user_id=user_id, user_in=user_in, operator_user_id=current_user.id
+    )
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Divider, List, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { WorkflowNodeCreate, User, Role } from '../../types';
+import { WorkflowNodeCreate, UserMember, Role } from '../../types';
 import WorkflowNodeComponent from './WorkflowNodeComponent';
 
 const { Title } = Typography;
@@ -9,7 +9,7 @@ const { Title } = Typography;
 interface WorkflowNodeListProps {
   nodes: WorkflowNodeCreate[];
   roles: Role[];
-  users: User[];
+  users: UserMember[];
   onAddNode: () => void;
   onDeleteNode: (index: number) => void;
   onMoveNode: (index: number, direction: 'up' | 'down') => void;

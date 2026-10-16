@@ -1,11 +1,20 @@
 import { api } from './index';
-import { User, UserCreate, UserUpdate } from '../types';
+import { User, UserCreate, UserMember, UserUpdate } from '../types';
 import { QueryParams, buildQueryParams } from './util';
 
-// 获取用户列表
+// 获取用户列表 (需要 user:view 权限, 仅 admin/manager)
 export async function getUsers(params?: QueryParams): Promise<User[]> {
   const query = buildQueryParams(params);
   const response = await api.get(`/users/${query}`);
+  return response.data;
+}
+
+// 员工通讯录最小集 (任意登录用户可用, 但只返回 id/username/name/ehr_id)
+// 业务选择器 (家访被家访人、工作流审批人) 统一走这个接口, 不要用 getUsers。
+// 注意: 本接口返回的是**数组**, 不是 getUsers 那种分页对象。
+export async function getUserMembers(params?: QueryParams): Promise<UserMember[]> {
+  const query = buildQueryParams(params);
+  const response = await api.get(`/users/members${query}`);
   return response.data;
 }
 

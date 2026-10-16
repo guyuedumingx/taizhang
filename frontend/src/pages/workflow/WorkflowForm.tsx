@@ -3,7 +3,7 @@ import { Form, Input, Button, Card, Typography, Switch, message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
-import { WorkflowNodeCreate, User, Role } from '../../types';
+import { WorkflowNodeCreate, UserMember, Role } from '../../types';
 import WorkflowNodeList from '../../components/workflow/WorkflowNodeList';
 import { WorkflowService } from '../../services/WorkflowService';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
@@ -24,7 +24,7 @@ const WorkflowForm: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserMember[]>([]);
   const [nodes, setNodes] = useState<WorkflowNodeCreate[]>([]);
   const isEdit = !!id;
 

@@ -37,7 +37,9 @@ const { Title, Text, Paragraph } = Typography;
 const TYPE_LABEL: Record<string, string> = {
   special_work: '专项工作',
   profile_edit: '档案修改',
-  skill_tag_edit: '亮点标签',
+  // 历史类型: A3 亮点标签已于 2026-10-14 下线, 不再可新建。
+  // 保留文案仅为让存量提交正常显示 (部分渲染点没有 || v 兜底)。
+  skill_tag_edit: '亮点标签（功能已下线）',
 };
 
 const STATUS_COLOR: Record<string, string> = {
@@ -77,7 +79,7 @@ const MySubmissions: React.FC = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createForm] = Form.useForm();
-  const [activeCreateTab, setActiveCreateTab] = useState<'special_work' | 'profile_edit' | 'skill_tag_edit'>('special_work');
+  const [activeCreateTab, setActiveCreateTab] = useState<'special_work' | 'activity_claim' | 'profile_edit'>('special_work');
 
   const openCreate = () => {
     createForm.resetFields();
@@ -104,11 +106,26 @@ const MySubmissions: React.FC = () => {
           end_time: values.end_time?.format('YYYY-MM-DD'),
           content: values.content,
           hours: values.hours,
-          skill_tags: values.skill_tags || [],
         };
         next_approver_id = values.next_approver_id;
         if (!next_approver_id) {
           message.error('请选择审批人 (special_work 必填)');
+          setCreating(false);
+          return;
+        }
+      } else if (activeCreateTab === 'activity_claim') {
+        // B2 活动报名 (PRD §6.2) — 复用 submission (activity_claim type)
+        payload = {
+          activity_name: values.activity_name,
+          activity_type: values.activity_type,
+          activity_time: values.activity_time?.format('YYYY-MM-DD'),
+          organizer: values.organizer,
+          reason: values.reason,
+          can_rehearse: values.can_rehearse ?? true,
+        };
+        next_approver_id = values.next_approver_id;
+        if (!next_approver_id) {
+          message.error('请选择审批人 (activity_claim 必填)');
           setCreating(false);
           return;
         }
@@ -117,14 +134,6 @@ const MySubmissions: React.FC = () => {
           field_name: values.field_name,
           old_value: values.old_value || '',
           new_value: values.new_value,
-        };
-        next_approver_id = values.next_approver_id;
-      } else if (activeCreateTab === 'skill_tag_edit') {
-        payload = {
-          tag_name: values.tag_name,
-          action: values.action,
-          sensitivity: values.sensitivity,
-          reason: values.reason,
         };
         next_approver_id = values.next_approver_id;
       }

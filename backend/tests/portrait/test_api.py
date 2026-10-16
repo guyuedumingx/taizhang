@@ -11,6 +11,7 @@ portrait 后端 MVP 测试 (P5 阶段, 批次 8)
 不依赖 workflow_instance 等未定义 fixture.
 """
 import json
+from datetime import datetime
 
 import pytest
 from fastapi.testclient import TestClient
@@ -194,28 +195,6 @@ def test_create_submission_special_work(
     assert data["current_approver_id"] == admin_user.id
 
 
-def test_create_submission_skill_tag_edit_admin(
-    normal_token_headers: dict, admin_user: models.User
-):
-    """创建 skill_tag_edit 提交, 不指定 next_approver_id 时自动找 admin"""
-    payload = {
-        "submission_type": "skill_tag_edit",
-        "payload": {
-            "tag_name": "测试亮点",
-            "action": "add",
-            "sensitivity": "low",
-        },
-    }
-    response = client.post(
-        f"{API_PORTRAIT}/submissions", headers=normal_token_headers, json=payload
-    )
-    assert response.status_code == 201, response.text
-    data = response.json()
-    assert data["submission_type"] == "skill_tag_edit"
-    # 自动找到 admin (第一个 is_superuser=True)
-    assert data["current_approver_id"] == admin_user.id
-
-
 def test_create_submission_invalid_payload_400(normal_token_headers: dict):
     """payload 缺字段 → 400 (集成指南 Rule 12 显性化)"""
     payload = {
@@ -374,6 +353,9 @@ def test_approvals_history_admin_sees_approved_ones(
         status="approved",
         payload=json.dumps({"project_name": "history test proj", "hours": 1, "content": "x", "start_time": "2026-01-01", "end_time": "2026-01-02", "skill_tags": []}),
         current_approver_id=None,
+        # 必须设 completed_at: history 按 completed_at desc 排序, NULL 会排到最后,
+        # 在 dev DB 有几百条记录时被 limit 窗口挤出, 导致断言误报"看不到"
+        completed_at=datetime.now(),
     )
     db.add(sub)
     db.commit()
@@ -409,6 +391,8 @@ def test_approvals_history_no_dup_for_repeated_approvals(
         status="approved",
         payload=json.dumps({"project_name": "dup test", "hours": 1, "content": "x", "start_time": "2026-01-01", "end_time": "2026-01-02", "skill_tags": []}),
         current_approver_id=None,
+        # 同上: history 按 completed_at desc 排序, 必须设值否则被 limit 窗口挤出
+        completed_at=datetime.now(),
     )
     db.add(sub)
     db.commit()
@@ -430,3 +414,83 @@ def test_approvals_history_no_dup_for_repeated_approvals(
     ids = [item["id"] for item in data["items"]]
     # 同一个 sub.id 在 history 中只出现 1 次
     assert ids.count(sub.id) == 1, f"history 应去重, 实际 sub.id={sub.id} 出现 {ids.count(sub.id)} 次"
+
+
+# ============================================================================
+# skill_tag_edit 下线回归 (2026-10-14, PRD §1.3)
+# ============================================================================
+def test_skill_tag_edit_cannot_be_created_new(
+    normal_token_headers: dict, admin_user: models.User
+):
+    """新建 skill_tag_edit → 422 (提交类型已于 2026-10-14 下线)
+
+    Rule 9: 验证有意义的属性 —— 不只是"报错", 而是错误来自 schema 白名单
+    本身, 且错误信息里能看出允许的类型集合。
+    """
+    payload = {
+        "submission_type": "skill_tag_edit",
+        "payload": {"tag_name": "回归测试", "action": "add", "sensitivity": "low"},
+    }
+    response = client.post(
+        f"{API_PORTRAIT}/submissions", headers=normal_token_headers, json=payload
+    )
+    assert response.status_code == 422, response.text
+    errs = response.json()["detail"]
+    assert any(e.get("loc") == ["body", "submission_type"] for e in errs), errs
+    # 白名单里不应再出现 skill_tag_edit
+    pattern = next(e["ctx"]["pattern"] for e in errs if "pattern" in e.get("ctx", {}))
+    assert "skill_tag_edit" not in pattern, pattern
+
+
+def test_legacy_skill_tag_edit_row_does_not_break_listing(
+    db: Session, admin_token_headers: dict, admin_user: models.User
+):
+    """存量 skill_tag_edit 提交仍能被列表接口正常序列化 (不能 500)
+
+    背景: A3 下线时若把 Submission 响应模型的 submission_type 白名单一并收紧,
+    Pydantic 响应校验会拒绝库里的历史行, 导致 /approvals/pending 抛
+    ValidationError 500。创建侧拦新建, 响应侧必须容忍历史数据。
+    """
+    from app.portrait import models as portrait_models
+
+    sub = portrait_models.SubmissionRecord(
+        submission_type="skill_tag_edit",  # 已下线但库里有存量行
+        submitter_user_id=admin_user.id,
+        submitter_name=admin_user.name,
+        submitter_ehr_id=admin_user.ehr_id,
+        status="approved",  # 终态, 避免影响审批待办统计
+        payload=json.dumps({"tag_name": "历史行", "action": "add", "sensitivity": "low"}),
+        current_approver_id=None,
+        completed_at=datetime.now(),
+    )
+    db.add(sub)
+    db.commit()
+    db.refresh(sub)
+
+    # history 是按 ApprovalRecord.approver_id 关联的 (list_history_for_user),
+    # 光有 SubmissionRecord 不会进列表, 必须补一条审批留痕。
+    db.add(
+        portrait_models.ApprovalRecord(
+            submission_id=sub.id,
+            approver_id=admin_user.id,
+            action="approve",
+            comment="历史 skill_tag_edit 回归用",
+        )
+    )
+    db.commit()
+
+    response = client.get(
+        f"{API_PORTRAIT}/approvals/history?limit=200", headers=admin_token_headers
+    )
+    assert response.status_code == 200, response.text
+    items = response.json()["items"]
+    matched = [i for i in items if i["id"] == sub.id]
+    assert len(matched) == 1, f"存量 skill_tag_edit 应能正常返回, 实际匹配 {len(matched)} 条"
+    # 响应里原样带回类型, 供前端显示"功能已下线"文案
+    assert matched[0]["submission_type"] == "skill_tag_edit"
+
+    db.query(portrait_models.ApprovalRecord).filter(
+        portrait_models.ApprovalRecord.submission_id == sub.id
+    ).delete()
+    db.delete(sub)
+    db.commit()

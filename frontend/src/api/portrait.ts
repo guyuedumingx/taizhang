@@ -130,6 +130,12 @@ export interface ProfileFull extends ProfileBase {
   awards?: AwardInfo[] | null;
   // P0.7 新增
   activities?: ActivityRecord[] | null;
+  // Week 2 P0.5: A1 12 卡片 - 5 张 1:N 子表 + 技能标签
+  resume?: ResumeInfo[] | null;
+  reward?: RewardInfo[] | null;
+  qualification?: QualificationInfo[] | null;
+  achievement?: AchievementInfo[] | null;
+  language?: LanguageInfo[] | null;
 }
 
 export interface PaginatedResponse<T> {
@@ -141,7 +147,7 @@ export interface PaginatedResponse<T> {
 
 export interface SubmissionRecord {
   id: number;
-  submission_type: 'special_work' | 'profile_edit' | 'skill_tag_edit' | 'activity_claim';
+  submission_type: 'special_work' | 'profile_edit' | 'activity_claim';
   submitter_user_id: number;
   submitter_name: string;
   submitter_ehr_id: string;
@@ -263,7 +269,7 @@ export async function updateMyAward(data: Partial<AwardInfo>): Promise<AwardInfo
 // Submission (4 端点)
 // ============================================================================
 export async function createSubmission(data: {
-  submission_type: 'special_work' | 'profile_edit' | 'skill_tag_edit' | 'activity_claim';
+  submission_type: 'special_work' | 'profile_edit' | 'activity_claim';
   payload: any;
   next_approver_id?: number;
 }): Promise<SubmissionRecord> {
@@ -374,6 +380,10 @@ export interface HomeVisitItem {
   completed_at: string | null;
   visitor_name: string | null;
   current_approver_name: string | null;
+  // C1 (PRD §7.1)
+  co_visitor_name: string | null;
+  team_name: string | null;
+  has_scan: boolean;
   created_at: string;
 }
 
@@ -399,6 +409,139 @@ export interface HomeVisitDetail extends HomeVisitItem {
   feedback: string | null;
   current_approver_id: number | null;
   updated_at: string;
+  // C1 (PRD §7.1) 新增字段
+  co_visitor_user_id: number | null;
+  scan_file_path: string | null;
+  scan_file_url: string | null;
+  // PRD 附录 B.4 第 14 列「家访记录表扫描件」: 已提交 / 未提交
+  scan_status: string | null;
+}
+
+// ============================================================================
+// F11 批量导入 / F12 年度矩阵 / 批量导出 Excel
+// ============================================================================
+export interface HomeVisitImportRowFailure {
+  row_number: number;
+  ehr_id: string;
+  reason: string;
+}
+
+export interface HomeVisitImportSummary {
+  success_count: number;
+  failed_count: number;
+  failed_rows: HomeVisitImportRowFailure[];
+}
+
+/** F12 单元格: 填该年具体家访日期 (§7.2 的"绿色"由前端按 value 是否为空决定) */
+export interface HomeVisitMatrixCell {
+  visit_date: string | null;
+  count: number;
+  value: string;
+}
+
+export interface HomeVisitMatrixRow {
+  seq: number;
+  user_id: number;
+  ehr_id: string;
+  name: string;
+  team_name: string;
+  cells: HomeVisitMatrixCell[];
+  /** 家访年度汇总 (B.2 第 8 列), 例 "2023年/2026年" */
+  visited_years: string;
+}
+
+export interface HomeVisitMatrix {
+  columns: Array<{ year: number }>;
+  rows: HomeVisitMatrixRow[];
+  total_years: number;
+  total_visited_users: number;
+}
+
+export interface HomeVisitImportFileResponse {
+  blob: Blob;
+  filename: string;
+}
+
+/**
+ * 下载 blob 文件并触发浏览器保存。
+ * 单独抽出来是因为家访明细表的中文文件名走 RFC 5987 (filename*=UTF-8''...),
+ * 不能靠 <a download="中文名"> —— 各浏览器行为不一致, 且 axios 拿不到真实文件名。
+ */
+export async function downloadBlob(
+  url: string,
+  params: Record<string, unknown>,
+  fallbackName: string,
+  mime: string,
+): Promise<HomeVisitImportFileResponse> {
+  const response = await api.get(url, { params, responseType: 'blob' });
+  // 从 Content-Disposition 里取后端给的文件名 (取不到就用 fallback)
+  let filename = fallbackName;
+  const cd = response.headers?.['content-disposition'];
+  if (cd) {
+    const star = /filename\*=UTF-8''([^;]+)/i.exec(cd);
+    const plain = /filename="?([^";]+)"?/i.exec(cd);
+    if (star) {
+      try {
+        filename = decodeURIComponent(star[1]);
+      } catch {
+        /* 文件名没转义好就用 fallback, 不能因下载失败整个报错 */
+      }
+    } else if (plain) {
+      filename = plain[1];
+    }
+  }
+  const blob = new Blob([response.data], { type: mime });
+  const objectUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = objectUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(objectUrl);
+  return { blob, filename };
+}
+
+const XLSX_MIME =
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+export function downloadHomeVisitTemplate(): Promise<HomeVisitImportFileResponse> {
+  return downloadBlob(
+    '/portrait/templates/excel/home-visit',
+    {},
+    '家访明细_导入模板.xlsx',
+    XLSX_MIME
+  );
+}
+
+export function exportHomeVisitsExcel(params?: {
+  status?: string;
+  visit_year?: number;
+  visited_ehr_id?: string;
+}): Promise<HomeVisitImportFileResponse> {
+  return downloadBlob(
+    '/portrait/home-visits/export',
+    params || {},
+    '家访明细表.xlsx',
+    XLSX_MIME
+  );
+}
+
+export async function importHomeVisits(file: File): Promise<HomeVisitImportSummary> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/portrait/home-visits/import', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+}
+
+export async function getHomeVisitMatrix(params?: {
+  team_name?: string;
+  include_pending?: boolean;
+}): Promise<HomeVisitMatrix> {
+  const response = await api.get('/portrait/home-visits/matrix', { params });
+  return response.data;
 }
 
 export interface HomeVisitListResponse {
@@ -429,6 +572,12 @@ export interface HomeVisitCreatePayload {
   family2_contact?: string;
   family2_work_unit?: string;
   feedback?: string;
+  // C1 (PRD §7.1) 新增字段
+  co_visitor_user_id?: number | null;
+  scan_file_path?: string | null;
+  team_name?: string | null;
+  // PRD 附录 B.4 第 14 列「家访记录表扫描件」: 已提交 / 未提交
+  scan_status?: '已提交' | '未提交' | null;
 }
 
 export async function listHomeVisits(params?: {
@@ -491,6 +640,126 @@ export async function rejectHomeVisit(
 ): Promise<HomeVisitDetail> {
   const response = await api.post(`/portrait/home-visits/${id}/reject`, { comment });
   return response.data;
+}
+
+// ============================================================================
+// A1 12 卡片 (PRD §5.1) - 5 张 1:N 子表 + 技能标签 (Week 2 P0.5)
+// ============================================================================
+export interface ResumeInfo {
+  id?: number;
+  profile_id?: number;
+  start_time?: string | null;
+  end_time?: string | null;
+  unit_and_title?: string | null;
+}
+export interface RewardInfo {
+  id?: number;
+  profile_id?: number;
+  reward_type?: string | null;
+  reward_time?: string | null;
+  reward_name?: string | null;
+  reward_reason?: string | null;
+}
+export interface QualificationInfo {
+  id?: number;
+  profile_id?: number;
+  qualification_name?: string | null;
+  obtain_time?: string | null;
+  valid_until?: string | null;
+}
+export interface AchievementInfo {
+  id?: number;
+  profile_id?: number;
+  achievement_name?: string | null;
+  obtain_time?: string | null;
+}
+export interface LanguageInfo {
+  id?: number;
+  profile_id?: number;
+  language?: string | null;
+  proficiency?: string | null;
+  cert_level_or_score?: string | null;
+}
+// 简历
+export const addResume = (data: Partial<ResumeInfo>) =>
+  api.post<ResumeInfo>('/portrait/profiles/me/resume', data).then((r) => r.data);
+export const updateResume = (id: number, data: Partial<ResumeInfo>) =>
+  api.put<ResumeInfo>(`/portrait/profiles/me/resume/${id}`, data).then((r) => r.data);
+export const deleteResume = (id: number) =>
+  api.delete(`/portrait/profiles/me/resume/${id}`).then((r) => r.data);
+
+// 奖惩
+export const addReward = (data: Partial<RewardInfo>) =>
+  api.post<RewardInfo>('/portrait/profiles/me/reward', data).then((r) => r.data);
+export const updateReward = (id: number, data: Partial<RewardInfo>) =>
+  api.put<RewardInfo>(`/portrait/profiles/me/reward/${id}`, data).then((r) => r.data);
+export const deleteReward = (id: number) =>
+  api.delete(`/portrait/profiles/me/reward/${id}`).then((r) => r.data);
+
+// 资格
+export const addQualification = (data: Partial<QualificationInfo>) =>
+  api.post<QualificationInfo>('/portrait/profiles/me/qualification', data).then((r) => r.data);
+export const updateQualification = (id: number, data: Partial<QualificationInfo>) =>
+  api.put<QualificationInfo>(`/portrait/profiles/me/qualification/${id}`, data).then((r) => r.data);
+export const deleteQualification = (id: number) =>
+  api.delete(`/portrait/profiles/me/qualification/${id}`).then((r) => r.data);
+
+// 成果
+export const addAchievement = (data: Partial<AchievementInfo>) =>
+  api.post<AchievementInfo>('/portrait/profiles/me/achievement', data).then((r) => r.data);
+export const updateAchievement = (id: number, data: Partial<AchievementInfo>) =>
+  api.put<AchievementInfo>(`/portrait/profiles/me/achievement/${id}`, data).then((r) => r.data);
+export const deleteAchievement = (id: number) =>
+  api.delete(`/portrait/profiles/me/achievement/${id}`).then((r) => r.data);
+
+// 语言
+export const addLanguage = (data: Partial<LanguageInfo>) =>
+  api.post<LanguageInfo>('/portrait/profiles/me/language', data).then((r) => r.data);
+export const updateLanguage = (id: number, data: Partial<LanguageInfo>) =>
+  api.put<LanguageInfo>(`/portrait/profiles/me/language/${id}`, data).then((r) => r.data);
+export const deleteLanguage = (id: number) =>
+  api.delete(`/portrait/profiles/me/language/${id}`).then((r) => r.data);
+
+// ============================================================================
+// A11 应急先锋队标识 (Week 3 P0.4) — 仅 admin 直改
+// ============================================================================
+export const setEmergencyStaff = (
+  targetUserId: number,
+  data: { is_emergency_staff: boolean; reason?: string }
+) =>
+  api
+    .put<ProfileFull>(`/portrait/profiles/admin/users/${targetUserId}/emergency-staff`, data)
+    .then((r) => r.data);
+
+// ============================================================================
+// C1 (PRD §7.1) — 扫描件上传/删除
+// ============================================================================
+export interface UploadScanResponse {
+  file_path: string;       // 相对路径 (e.g. "home_visits/2026/abc123.pdf")
+  file_url: string;        // 静态 URL (e.g. "/uploads/portrait/home_visits/2026/abc123.pdf")
+  file_size: number;       // 字节
+  original_name: string;   // 原始文件名
+}
+
+/**
+ * 上传家访扫描件 (PDF/JPG/PNG, ≤5MB, 仅 leader/admin)
+ * 返回的 file_path 应传给 createHomeVisit 的 scan_file_path 字段
+ */
+export async function uploadHomeVisitScanFile(file: File): Promise<UploadScanResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/portrait/files/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+}
+
+/**
+ * 删除已上传的扫描件 (按 file_path)
+ * 防路径遍历: 后端拒绝 ".." 和绝对路径
+ */
+export async function deleteHomeVisitScanFile(filePath: string): Promise<void> {
+  await api.delete(`/portrait/files/${filePath}`);
 }
 
 // ============================================================================
@@ -715,8 +984,15 @@ export async function getDrillRecords(params: {
   return response.data;
 }
 
-export async function getDrillMatrix(): Promise<DrillMatrix> {
-  const response = await api.get('/portrait/drills/matrix');
+export interface DrillMatrixParams {
+  /** 按演练年份筛选列 */
+  year?: number | null;
+  /** 按团队筛选行 */
+  team_name?: string | null;
+}
+
+export async function getDrillMatrix(params: DrillMatrixParams = {}): Promise<DrillMatrix> {
+  const response = await api.get('/portrait/drills/matrix', { params });
   return response.data;
 }
 
@@ -741,5 +1017,55 @@ export async function importDrill(file: File): Promise<DrillImportSummary> {
   const response = await api.post('/portrait/drills/import', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+  return response.data;
+}
+
+// ============================================================
+// G7 组员调换历史 (Week 3 P0.5, PRD §11.4)
+// 只读 + 可删除 —— 没有新增/编辑接口, 记录由调组自动产生
+// ============================================================
+export interface GroupTransferRecord {
+  id: number;
+  user_id: number;
+  user_name: string | null;
+  ehr_no: string;
+  from_group: string | null;
+  to_group: string;
+  from_team_id: number | null;
+  to_team_id: number | null;
+  transfer_date: string;
+  leave_date: string | null;
+  /** leave_date is None → 该员工目前仍在这一组 */
+  is_current: boolean;
+  operator_ehr_no: string;
+  operator_name: string;
+  reason: string | null;
+  remark: string | null;
+  created_at: string;
+}
+
+export interface GroupTransferListResponse {
+  items: GroupTransferRecord[];
+  total: number;
+  page: number;
+  size: number;
+}
+
+/** G7 调换历史列表: admin 全员 / 组长本组相关 */
+export async function getGroupTransferRecords(params: {
+  skip?: number;
+  limit?: number;
+  ehr_id?: string;
+  name?: string;
+  year?: number;
+  is_current?: boolean;
+}): Promise<GroupTransferListResponse> {
+  const response = await api.get('/portrait/group-transfers', { params });
+  return response.data;
+}
+
+/** G7 删除一条**已关闭**的记录 (仅 admin 纠错; 开区间记录后端会拒绝) */
+export async function deleteGroupTransferRecord(recordId: number): Promise<void> {
+  const response = await api.delete(`/portrait/group-transfers/${recordId}`);
   return response.data;
 }

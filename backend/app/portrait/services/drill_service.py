@@ -1,7 +1,7 @@
 """
 portrait 消防演练 service (PRD §10.2 F2-F4)
 """
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
 from fastapi import HTTPException
@@ -23,6 +23,57 @@ def _resolve_user(db: Session, ehr_id: str) -> models.User:
     if not user:
         raise HTTPException(status_code=404, detail=f"用户 {ehr_id} 不存在")
     return user
+
+
+def _visible_drill_ids_subq(db: Session, viewer: models.User):
+    """
+    PRD §13 消防演练(看): 员工仅自己 / 组长本组 / 管理员全员。
+    返回"可见 drill_id"的子查询; admin 返回 None 表示**不过滤**。
+
+    此前 list_records / get_detail / matrix 三个函数虽然都声明了 viewer 参数,
+    但函数体一次都没用过它 —— 三处都是全表直查, 任意登录员工可见全部演练
+    记录与参与人。判定语义与 profile_service._can_view_profile 一致
+    (admin → 全员; 同 team_id → 本组; 本人 → 自己)。
+    """
+    if viewer.is_superuser:
+        return None
+    part = portrait_models.DrillParticipant
+    if viewer.team_id:
+        # 组长: 本组任一员工作为参与者参与过的演练
+        team_user_ids = (
+            db.query(models.User.id)
+            .filter(models.User.team_id == viewer.team_id)
+            .subquery()
+        )
+        return db.query(part.drill_id).filter(part.user_id.in_(team_user_ids))
+    # 普通员工: 自己参与过的演练
+    return db.query(part.drill_id).filter(part.user_id == viewer.id)
+
+
+def _row_team_name(u: Optional[models.User]) -> str:
+    """矩阵行的团队名取值口径。抽成函数是为了让筛选与渲染用同一套规则。"""
+    if u is None:
+        return "未分组"
+    if u.team is not None:
+        return u.team.name or "未分组"
+    return u.department or "未分组"
+
+
+def _matrix_row_scope(db: Session, viewer: models.User) -> list[models.User]:
+    """矩阵行集范围 (PRD §13 + 附录 B.1「全员 × 全部活动」)。
+
+    "全员"不是全行 —— 必须按查看者权限收口, 否则 admin 之外的人会看到全公司
+    1494 人的演练参与情况 (ehr_id + 姓名 + 每场是否参加), 这是彻底的越权。
+
+    admin → 全行在职; 组长 → 本组在职; 普通员工 → 仅自己。
+    停用账号 (is_active=False) 排除: 已停用的人恒为"未参加", 只会污染考核口径。
+    """
+    q = db.query(models.User).filter(models.User.is_active.is_(True))
+    if viewer.is_superuser:
+        return q.all()
+    if viewer.team_id:
+        return q.filter(models.User.team_id == viewer.team_id).all()
+    return q.filter(models.User.id == viewer.id).all()
 
 
 class DrillService:
@@ -79,6 +130,9 @@ class DrillService:
         team_name: Optional[str] = None,
     ):
         query = db.query(portrait_models.DrillRecord)
+        visible = _visible_drill_ids_subq(db, viewer)
+        if visible is not None:
+            query = query.filter(portrait_models.DrillRecord.id.in_(visible))
         if drill_type:
             query = query.filter(portrait_models.DrillRecord.drill_type == drill_type)
 
@@ -116,11 +170,14 @@ class DrillService:
         viewer: models.User,
         drill_id: int,
     ) -> portrait_models.DrillRecord:
-        record = (
-            db.query(portrait_models.DrillRecord)
-            .filter(portrait_models.DrillRecord.id == drill_id)
-            .first()
+        query = db.query(portrait_models.DrillRecord).filter(
+            portrait_models.DrillRecord.id == drill_id
         )
+        visible = _visible_drill_ids_subq(db, viewer)
+        if visible is not None:
+            query = query.filter(portrait_models.DrillRecord.id.in_(visible))
+        # 不可见时走 404 而非 403: 不泄露"该演练是否存在"
+        record = query.first()
         if not record:
             raise HTTPException(status_code=404, detail="演练记录不存在")
         count = (
@@ -153,13 +210,36 @@ class DrillService:
 
     # --------------------------------------------------------------------- F4 矩阵
     @staticmethod
-    def matrix(db: Session, *, viewer: models.User) -> drill_schema.DrillMatrix:
+    def matrix(
+        db: Session,
+        *,
+        viewer: models.User,
+        year: Optional[int] = None,
+        team_name: Optional[str] = None,
+    ) -> drill_schema.DrillMatrix:
         """矩阵 (F4): 行=员工, 列=每场活动, 单元格=参与状态, 紫色高亮列.
-        行 = 参与过任意一场演练的员工; 单元格按列顺序对应每场活动.
+
+        行集 = **基准全员**(PRD 附录 B.1「全员 × 全部活动」), 每人一行, 从未
+        参加过的一行全是"未参与"。此前行集是从参与记录反推的, 零参加者根本不
+        出现在表里 —— 而 §10.2.3 说这张表的用途正是"一眼看到谁参与度低", 最该
+        被盯住的那批人反而被隐藏了。(2026-10-14 用户决定改为全员基准行)
+
+        ⚠️ "全员"是相对**该查看者有权看的人**: admin=全行在职, 组长=本组,
+        普通员工=仅自己。详见 _matrix_row_scope()。
         """
-        drills = db.query(portrait_models.DrillRecord).order_by(
-            portrait_models.DrillRecord.activity_date.asc()
-        ).all()
+        query = db.query(portrait_models.DrillRecord)
+        visible = _visible_drill_ids_subq(db, viewer)
+        if visible is not None:
+            query = query.filter(portrait_models.DrillRecord.id.in_(visible))
+        if year is not None:
+            # activity_date 是 Date 列; SQLite 无 strftime 的 ORM 封装, 用范围比较更稳
+            start = date(year, 1, 1)
+            end = date(year, 12, 31)
+            query = query.filter(
+                portrait_models.DrillRecord.activity_date >= start,
+                portrait_models.DrillRecord.activity_date <= end,
+            )
+        drills = query.order_by(portrait_models.DrillRecord.activity_date.asc()).all()
         drill_ids = [d.id for d in drills]
 
         # participation: {drill_id: {ehr_id: participated}}
@@ -173,16 +253,20 @@ class DrillService:
             for p in participants:
                 participation.setdefault(p.drill_id, {})[p.ehr_id] = p.participated
 
-        # 涉及员工: 按 ehr_id 去重, 再查询 User 取团队信息
-        ehr_set: set[str] = set()
-        for did in drill_ids:
-            ehr_set.update(participation[did].keys())
-        users = (
-            db.query(models.User)
-            .filter(models.User.ehr_id.in_(ehr_set))
-            .all()
-        ) if ehr_set else []
+        # 行集 = 基准全员 (不再从参与记录反推)。范围按 §13 收口到该查看者有权看的人:
+        # admin 全行在职 / 组长本组 / 普通员工仅自己。停用账号不计入 —— 已离职的人
+        # 记为"未参加"没有意义, 只会污染考核口径。
+        users = _matrix_row_scope(db, viewer)
         user_by_ehr = {u.ehr_id: u for u in users}
+        ehr_set = set(user_by_ehr.keys())
+
+        # 团队筛选: 与下方 rows 里 team_name 的取值口径保持一致 (team.name 优先,
+        # 回落 department, 再回落 "未分组"), 否则筛不出东西。
+        if team_name:
+            ehr_set = {
+                e for e in ehr_set
+                if _row_team_name(user_by_ehr.get(e)) == team_name
+            }
 
         rows = []
         for ehr_id in sorted(ehr_set):
@@ -201,8 +285,8 @@ class DrillService:
                 user_id=u.id if u else 0,
                 ehr_id=ehr_id,
                 name=u.name if u else ehr_id,
-                team_name=(u.team.name if u and u.team else (u.department if u else "")) or "未分组",
-                position=u.department if u else "",
+                team_name=_row_team_name(u),
+                position=(u.department or "") if u else "",
                 cells=cells,
                 participated_count=participated_count,
             ))
@@ -219,7 +303,9 @@ class DrillService:
             ],
             rows=rows,
             total_drills=len(drills),
-            total_participants=len(ehr_set),
+            # rows 现在是"基准全员", 参与人数需单独统计, 否则该字段会变成
+            # "矩阵里有多少行" (= 全员数), 前端"涉及 N 名员工"就会误导。
+            total_participants=sum(1 for r in rows if r.participated_count > 0),
         )
 
     # --------------------------------------------------------------------- F3 批量导入

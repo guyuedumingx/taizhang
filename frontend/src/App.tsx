@@ -35,6 +35,8 @@ import HomeVisits from './pages/portrait/HomeVisits';
 import BulkImportPage from './pages/portrait/BulkImportPage';
 import EntryExitPage from './pages/portrait/EntryExitPage';
 import DrillPage from './pages/portrait/DrillsPage';
+// G7 组员调换历史 (Week 3 P0.5, PRD §11.4)
+import GroupTransferHistoryPage from './pages/portrait/GroupTransferHistoryPage';
 import UserProfile from './pages/UserProfile';
 import PasswordExpiredModal from './components/PasswordExpiredModal';
 import './App.css';
@@ -134,6 +136,7 @@ function App() {
               <Route path="portrait/bulk-import" element={<BulkImportPage />} />
               <Route path="portrait/entry-exit" element={<EntryExitPage />} />
               <Route path="portrait/drills" element={<DrillPage />} />
+              <Route path="portrait/group-transfers" element={<GroupTransferHistoryPage />} />
               <Route path="help" element={<HelpPage />} />
               <Route path="user-profile" element={<UserProfile />} />
             </Route>

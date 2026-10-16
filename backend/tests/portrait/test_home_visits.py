@@ -172,6 +172,58 @@ def test_create_home_visit_admin_rejected(admin_token_headers: dict):
 # ============================================================================
 # 提交审批 (submit) (2 test)
 # ============================================================================
+def test_create_draft_builds_visitor_info(
+    db: Session,
+    leader_user: models.User,
+):
+    """回归: visitor_info 必须被拼装 (PRD 附录 B.4 第 10 列)。
+
+    此前该字段由前端提交, 但 CreateHomeVisitModal 里没有任何 name="visitor_info"
+    的表单项 → allValues.visitor_info 恒为 undefined → DB 列恒为 NULL。
+    改由后端 _build_visitor_info 拼: 1.<姓名>，<岗位> / 2.<姓名>，<岗位>
+    """
+    from app.portrait.services import home_visit_service
+
+    member = _create_normal_member(db, leader_user.team_id)
+    co_member = _create_normal_member(db, leader_user.team_id)
+
+    payload = _create_visit_payload(member.ehr_id)
+    payload["visit_year"] = 2026
+    payload["co_visitor_user_id"] = co_member.id
+    payload_obj = HomeVisitCreate(**payload)
+    record = home_visit_service.create_draft(
+        db, visitor=leader_user, data=payload_obj
+    )
+
+    info = record.visitor_info or ""
+    lines = info.split("\n")
+    assert len(lines) == 2, f"应有两行访人信息, 实际: {info!r}"
+    # 第 1 行 = 主访人 (当前登录的 leader)
+    assert lines[0].startswith(f"1.{leader_user.name}，"), info
+    # 第 2 行 = 第二家访人
+    assert lines[1].startswith(f"2.{co_member.name}，"), info
+
+
+def test_create_draft_visitor_info_single_visitor(
+    db: Session,
+    leader_user: models.User,
+):
+    """未选第二家访人时只拼一行, 且不因变量未定义而抛 NameError"""
+    from app.portrait.services import home_visit_service
+
+    member = _create_normal_member(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+    payload["visit_year"] = 2026
+    payload_obj = HomeVisitCreate(**payload)
+    record = home_visit_service.create_draft(
+        db, visitor=leader_user, data=payload_obj
+    )
+
+    info = record.visitor_info or ""
+    assert "\n" not in info, f"单人时不应有第二行: {info!r}"
+    assert info.startswith(f"1.{leader_user.name}，"), info
+
+
 def test_submit_home_visit_visitor_only(
     db: Session,
     leader_token_headers: dict,
@@ -481,3 +533,105 @@ def test_create_home_visit_team_name_invalid(
     )
     assert response.status_code == 400, response.text
     assert "审核处理团队" in response.json()["detail"]
+
+
+# ============================================================================
+# Week 3 P0.3: PUT 草稿编辑测试 (3 test)
+# ============================================================================
+def test_update_home_visit_draft_success(
+    leader_token_headers: dict,
+    leader_user: models.User,
+    db: Session,
+):
+    """leader 改自己的 draft → 200 + 字段更新 + 状态仍为 draft"""
+    member = _create_normal_member(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+
+    # leader 创建
+    r = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload, headers=leader_token_headers
+    )
+    assert r.status_code == 200, r.text
+    item_id = r.json()["id"]
+
+    # leader 改自己草稿 (只改 2 个字段, 其他保留)
+    r = client.put(
+        f"{API_PORTRAIT}/home-visits/{item_id}",
+        json={"visit_address": "新地址", "feedback": "修改后的反馈"},
+        headers=leader_token_headers,
+    )
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert data["visit_address"] == "新地址"
+    assert data["feedback"] == "修改后的反馈"
+    assert data["status"] == "draft"  # 改完仍是 draft
+
+    # 清理
+    client.delete(
+        f"{API_PORTRAIT}/home-visits/{item_id}", headers=leader_token_headers
+    )
+
+
+def test_update_home_visit_non_draft_rejected(
+    leader_token_headers: dict,
+    leader_user: models.User,
+    db: Session,
+):
+    """leader 改 pending 状态 → 400"""
+    member = _create_normal_member(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+
+    # 创建
+    r = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload, headers=leader_token_headers
+    )
+    item_id = r.json()["id"]
+
+    # 提交 → pending
+    r = client.post(
+        f"{API_PORTRAIT}/home-visits/{item_id}/submit",
+        json={},
+        headers=leader_token_headers,
+    )
+    assert r.status_code == 200, r.text
+    assert r.json()["status"] == "pending"
+
+    # 试图改 pending → 400
+    r = client.put(
+        f"{API_PORTRAIT}/home-visits/{item_id}",
+        json={"feedback": "改不动"},
+        headers=leader_token_headers,
+    )
+    assert r.status_code == 400, r.text
+    assert "draft" in r.json()["detail"]
+
+
+def test_update_home_visit_other_user_rejected(
+    leader_token_headers: dict,
+    normal_token_headers: dict,
+    leader_user: models.User,
+    normal_user: models.User,
+    db: Session,
+):
+    """leader 创建, normal (非创建人) 试图改 → 403"""
+    member = _create_normal_member(db, leader_user.team_id)
+    payload = _create_visit_payload(member.ehr_id)
+
+    # leader A 创建
+    r = client.post(
+        f"{API_PORTRAIT}/home-visits", json=payload, headers=leader_token_headers
+    )
+    item_id = r.json()["id"]
+
+    # normal (非创建人) 试图改
+    r = client.put(
+        f"{API_PORTRAIT}/home-visits/{item_id}",
+        json={"feedback": "篡改"},
+        headers=normal_token_headers,
+    )
+    assert r.status_code == 403, r.text
+
+    # 清理
+    client.delete(
+        f"{API_PORTRAIT}/home-visits/{item_id}", headers=leader_token_headers
+    )

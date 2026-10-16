@@ -221,7 +221,14 @@ class TeamService:
         # 检查用户是否已经在团队中
         if user.team_id == team_id:
             raise HTTPException(status_code=400, detail="用户已经在团队中")
-        
+
+        # G7 组员调换历史: 在改 team_id 之前调用, record_transfer 从 user.team_id 现读原组。
+        # 放在上面那个 400 之后 —— 同组重复加入不应该留下历史记录。
+        # 局部 import: 核心 service 层不依赖 portrait 扩展层
+        from app.portrait.services.group_transfer_service import record_transfer
+
+        record_transfer(db, user=user, to_team_id=team_id, operator_user_id=current_user_id)
+
         # 添加用户到团队
         user.team_id = team_id
         db.add(user)
@@ -248,7 +255,13 @@ class TeamService:
         # 检查用户是否在团队中
         if user.team_id != team_id:
             raise HTTPException(status_code=400, detail="用户不在团队中")
-        
+
+        # G7 组员调换历史: to_team_id=None → 记录 to_group="未分组"
+        # 局部 import: 核心 service 层不依赖 portrait 扩展层
+        from app.portrait.services.group_transfer_service import record_transfer
+
+        record_transfer(db, user=user, to_team_id=None, operator_user_id=current_user_id)
+
         # 从团队中移除用户
         user.team_id = None
         db.add(user)

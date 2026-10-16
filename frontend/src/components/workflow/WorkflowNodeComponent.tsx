@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Select, Button, Space, Typography, Radio, message } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined } from '@ant-design/icons';
-import { WorkflowNodeCreate, User, Role } from '../../types';
+import { WorkflowNodeCreate, UserMember, Role } from '../../types';
 import ApproverSelector from './ApproverSelector';
 
 const { Option } = Select;
@@ -28,7 +28,7 @@ interface WorkflowNodeComponentProps {
   node: WorkflowNodeCreate;
   index: number;
   roles: Role[];
-  users: User[];
+  users: UserMember[];
   totalNodes: number;
   onDelete: (index: number) => void;
   onMove: (index: number, direction: 'up' | 'down') => void;

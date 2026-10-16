@@ -42,11 +42,13 @@ const TEMPLATES = {
   'entry-exit': {
     label: '出入境台账',
     headers: [
-      '姓名', '团队', '职务', '证照号', '出境原因', '目的地',
-      '申请离境', '申请返回', '证照类别', '申请类型', '团队审批人',
-      '实际出境', '实际返回', '年份', '组别', '备注', 'EHR号',
+      '序号', 'EHR号', '姓名', '团队', '职务', '证照号码', '出境原因', '目的地',
+      '申请离境日期', '申请返回日期', '申请证照类别', '申请类型', '团队审批人',
+      '实际出境日期', '实际返回日期', '出境年份', '组别', '备注',
     ],
-    description: 'PRD §10.1 F9 出入境批量导入 (17 列)',
+    description: 'PRD §10.1 F9 出入境批量导入 (18 列, 序号可留空自动生成)',
+    // PRD 附录 B.3: 序号为可选列, 缺失时按 Excel 行序自动生成
+    optionalCols: ['序号'] as const,
     apiPath: '/portrait/templates/excel/entry-exit',
     importPath: '/portrait/entry-exit/import',
     enabled: true,
@@ -55,6 +57,7 @@ const TEMPLATES = {
     label: '消防演练',
     headers: ['活动日期', '演练类型', '地点', 'EHR号', '姓名', '是否参与'],
     description: 'PRD §10.2 F3 消防演练批量导入 (6 列)',
+    optionalCols: ['是否参与'] as const,
     apiPath: '/portrait/templates/excel/drill',
     importPath: '/portrait/drills/import',
     enabled: true,
@@ -63,6 +66,7 @@ const TEMPLATES = {
     label: '培训记录',
     headers: ['EHR号', '培训名', '培训时间', '培训类型', '培训机构', '证书编号', '有效期'],
     description: 'PRD §10.3 培训批量导入 (5 必填 + 2 选填)',
+    optionalCols: ['证书编号', '有效期'] as const,
     apiPath: '/portrait/templates/excel/training',
     importPath: '/portrait/training/import',
     enabled: true,
@@ -175,7 +179,9 @@ const ImportTab: React.FC<{ template: typeof TEMPLATES[TemplateKey] }> = ({ temp
           dataSource={template.headers.map((h, idx) => ({
             idx: idx + 1,
             name: h,
-            required: idx < 5 || template.headers.slice(0, 5).includes(h),
+            // 必填 = 不在 optionalCols 里。
+            // 出入境"序号"必须可选 (PRD 附录 B.3: 导入时自动生成)。
+            required: !(template.optionalCols as readonly string[]).includes(h),
           }))}
           columns={[
             { title: '#', dataIndex: 'idx', width: 50 },

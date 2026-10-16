@@ -39,7 +39,6 @@ def _create_special_work_for_admin(
                 "end_time": "2026-02-28",
                 "content": "P8 联动测试内容",
                 "hours": 16,
-                "skill_tags": ["Python", "联动"],
             },
             "next_approver_id": admin_user.id,
         },
@@ -141,7 +140,6 @@ def test_special_work_ledger_data_contains_payload_and_source(
     # payload 字段保留
     assert data["project_name"] == "数据完整性测试"
     assert data["hours"] == 16
-    assert data["skill_tags"] == ["Python", "联动"]
     assert data["start_time"] == "2026-02-01"
 
 

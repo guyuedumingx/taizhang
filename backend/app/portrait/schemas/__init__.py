@@ -23,6 +23,7 @@ from app.portrait.schemas.profile import (
     EducationInfo,
     EducationInfoCreate,
     EducationInfoUpdate,
+    EmergencyStaffUpdate,
     FamilyInfo,
     FamilyInfoCreate,
     FamilyInfoUpdate,
@@ -46,6 +47,7 @@ from app.portrait.schemas.profile import (
     RewardInfo,
     RewardInfoCreate,
     RewardInfoUpdate,
+
 )
 from app.portrait.schemas.submission import (
     ApprovalActionRequest,
@@ -62,8 +64,13 @@ from app.portrait.schemas.home_visit import (
     HomeVisit,
     HomeVisitApproveRequest,
     HomeVisitCreate,
+    HomeVisitImportRow,
+    HomeVisitImportSummary,
     HomeVisitListItem,
     HomeVisitListResponse,
+    HomeVisitMatrix,
+    HomeVisitMatrixCell,
+    HomeVisitMatrixRow,
     HomeVisitRejectRequest,
     HomeVisitSubmitRequest,
     HomeVisitUpdate,
@@ -93,6 +100,12 @@ from app.portrait.schemas.drill import (
     DrillRecord,
     DrillUpdate,
 )
+# Week 3 P0.5: G7 组员调换历史 (只读 + 可删除, 无 Create/Update)
+from app.portrait.schemas.group_transfer import (
+    GroupTransferBase,
+    GroupTransferListResponse,
+    GroupTransferRecord,
+)
 
 
 __all__ = [
@@ -111,6 +124,7 @@ __all__ = [
     "EducationInfo",
     "EducationInfoCreate",
     "EducationInfoUpdate",
+    "EmergencyStaffUpdate",
     "FamilyInfo",
     "FamilyInfoCreate",
     "FamilyInfoUpdate",
@@ -132,6 +146,10 @@ __all__ = [
     "ContactInfo",
     "ContactInfoCreate",
     "ContactInfoUpdate",
+    # A3 技能标签 (Week 2 P0.5)
+
+
+
     # P0.2: A4 兴趣 + A5 获奖
     "InterestInfo",
     "InterestInfoCreate",
@@ -182,4 +200,8 @@ __all__ = [
     "DrillMatrix",
     "DrillImportRow",
     "DrillImportSummary",
+    # Week 3 P0.5: G7 组员调换历史 (PRD §11.4)
+    "GroupTransferBase",
+    "GroupTransferRecord",
+    "GroupTransferListResponse",
 ]

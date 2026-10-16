@@ -54,7 +54,7 @@ def create_submission(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
-    """创建并提交 (3 类: special_work / profile_edit / skill_tag_edit)"""
+    """创建并提交 (3 类: special_work / profile_edit / activity_claim)"""
     sub = submission_service.create_submission(db, submitter=current_user, data=data)
     return _serialize_submission(sub)
 
@@ -66,7 +66,7 @@ def list_my_submissions(
         None, alias="status", pattern="^(draft|pending|approved|rejected|cancelled)$"
     ),
     submission_type: Optional[str] = Query(
-        None, pattern="^(special_work|profile_edit|skill_tag_edit|activity_claim)$"
+        None, pattern="^(special_work|profile_edit|activity_claim)$"
     ),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),

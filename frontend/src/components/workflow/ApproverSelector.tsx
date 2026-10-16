@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Select, Typography, Spin, Empty } from 'antd';
-import { User } from '../../types';
+import { User, UserMember } from '../../types';
 import { WorkflowService } from '../../services/WorkflowService';
 
 const { Text } = Typography;
@@ -14,7 +14,7 @@ interface ApproverSelectorProps {
   mode?: 'single' | 'multiple';
   required?: boolean;
   label?: string;
-  allUsers?: User[] | { items: User[]; total: number }; // 支持数组或分页对象
+  allUsers?: UserMember[] | { items: UserMember[]; total: number }; // 支持数组或分页对象
   disabled?: boolean;
 }
 
@@ -30,7 +30,11 @@ const ApproverSelector: React.FC<ApproverSelectorProps> = ({
   disabled = false
 }) => {
   const [loading, setLoading] = useState(false);
-  const [approvers, setApprovers] = useState<User[]>([]);
+  // 收敛到 UserMember[]: 两个数据源都能赋值 ——
+  //   1) processUserOptions() 来自 /users/members 最小接口 (UserMember[])
+  //   2) WorkflowService.getNodeApprovers() 返回完整 User[]
+  // User 的字段是 UserMember 的超集, 因此 User[] 可赋给 UserMember[]。
+  const [approvers, setApprovers] = useState<UserMember[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [localValue, setLocalValue] = useState<number | number[] | undefined>(value);
 

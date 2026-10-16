@@ -354,9 +354,10 @@ class ContactInfo(ContactInfoBase):
 # 组合响应: Profile + 9 子表 (前端 A1 个人档案首页用)
 # ============================================================================
 class ProfileFull(Profile):
-    """完整 Profile + 11 子表 (A1 个人档案首页 / B4 详情页用, P0.2 加 2 子表)"""
+    """完整 Profile + 12 子表 (A1 个人档案首页 / B4 详情页用, P0.2 加 2 子表)"""
     political: List[PoliticalInfo] = []
     education: List[EducationInfo] = []
+    # Week 2 P0.5: A3 技能标签完整对象 (含 id, 供前端按 id 删除)
     family: List[FamilyInfo] = []
     resume: List[ResumeInfo] = []
     reward: List[RewardInfo] = []
@@ -369,7 +370,6 @@ class ProfileFull(Profile):
     # P0.7: B2 活动申报通过后落子表
     activities: List[ActivityRecord] = []
     contact: Optional[ContactInfo] = None
-    skill_tag_names: List[str] = []  # 来自 ProfileSkillTag
 
 
 # ============================================================================
@@ -381,3 +381,12 @@ class ProfileListQuery(BaseModel):
     team_id: Optional[int] = None
     skip: int = 0
     limit: int = 50
+
+
+# ============================================================================
+# A11 应急先锋队标识 (Week 3 P0.4) — admin 直改, 不走 profile_edit 审批
+# ============================================================================
+class EmergencyStaffUpdate(BaseModel):
+    """admin 设置/取消应急先锋队标识"""
+    is_emergency_staff: bool
+    reason: Optional[str] = None  # 变更原因 (写操作日志)

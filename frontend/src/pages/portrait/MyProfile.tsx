@@ -26,7 +26,10 @@ import {
 } from 'antd';
 import { SaveOutlined, ReloadOutlined } from '@ant-design/icons';
 import * as PortraitAPI from '../../api/portrait';
+import { useAuthStore } from '../../stores/authStore';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
+import SubTableCard from './SubTableCard';
+import EmergencyStaffCard from './EmergencyStaffCard';
 
 const { Title, Text } = Typography;
 
@@ -48,6 +51,9 @@ const MyProfile: React.FC = () => {
   const [awardModalOpen, setAwardModalOpen] = useState(false);
   const [editingInterest, setEditingInterest] = useState<PortraitAPI.InterestInfo | null>(null);
   const [editingAward, setEditingAward] = useState<PortraitAPI.AwardInfo | null>(null);
+
+  // Week 3 P0.4: A11 应急先锋队卡片需要当前用户 id
+  const currentUserId = useAuthStore.getState().user?.id ?? 0;
 
   const fetchAll = async () => {
     setLoading(true);
@@ -592,6 +598,169 @@ const MyProfile: React.FC = () => {
                     )}
                   </Space>
                 </Spin>
+              ),
+            },
+            // ========== Week 2 P0.5: A1 12 卡片 - 5 张 1:N 子表 (PRD §5.1) ==========
+            {
+              key: 'resume',
+              label: '简历',
+              children: (
+                <SubTableCard
+                  title="简历条目"
+                  dataSource={profile?.resume || []}
+                  columns={[
+                    { title: '开始时间', dataIndex: 'start_time', width: 110 },
+                    { title: '结束时间', dataIndex: 'end_time', width: 110 },
+                    { title: '单位与职务', dataIndex: 'unit_and_title' },
+                  ]}
+                  addFields={[
+                    { name: 'start_time', label: '开始时间', type: 'date' },
+                    { name: 'end_time', label: '结束时间', type: 'date' },
+                    { name: 'unit_and_title', label: '单位与职务', type: 'text', required: true },
+                  ]}
+                  onAdd={PortraitAPI.addResume}
+                  onUpdate={PortraitAPI.updateResume}
+                  onDelete={PortraitAPI.deleteResume}
+                  onChanged={fetchAll}
+                />
+              ),
+            },
+            {
+              key: 'reward',
+              label: '奖惩',
+              children: (
+                <SubTableCard
+                  title="奖惩条目"
+                  dataSource={profile?.reward || []}
+                  columns={[
+                    {
+                      title: '类型',
+                      dataIndex: 'reward_type',
+                      width: 100,
+                      render: (v: string | null) => v || '—',
+                    },
+                    { title: '时间', dataIndex: 'reward_time', width: 110 },
+                    { title: '名称', dataIndex: 'reward_name' },
+                    {
+                      title: '原因',
+                      dataIndex: 'reward_reason',
+                      ellipsis: true,
+                    },
+                  ]}
+                  addFields={[
+                    {
+                      name: 'reward_type',
+                      label: '类型',
+                      type: 'select',
+                      required: true,
+                      options: [
+                        { value: '奖励', label: '奖励' },
+                        { value: '惩罚', label: '惩罚' },
+                        { value: '表扬', label: '表扬' },
+                        { value: '批评', label: '批评' },
+                      ],
+                    },
+                    { name: 'reward_time', label: '时间', type: 'date' },
+                    { name: 'reward_name', label: '名称', type: 'text', required: true },
+                    { name: 'reward_reason', label: '原因', type: 'text' },
+                  ]}
+                  onAdd={PortraitAPI.addReward}
+                  onUpdate={PortraitAPI.updateReward}
+                  onDelete={PortraitAPI.deleteReward}
+                  onChanged={fetchAll}
+                />
+              ),
+            },
+            {
+              key: 'qualification',
+              label: '资格',
+              children: (
+                <SubTableCard
+                  title="资格证书"
+                  dataSource={profile?.qualification || []}
+                  columns={[
+                    { title: '证书名', dataIndex: 'qualification_name' },
+                    { title: '获得时间', dataIndex: 'obtain_time', width: 110 },
+                    { title: '有效期', dataIndex: 'valid_until', width: 110 },
+                  ]}
+                  addFields={[
+                    { name: 'qualification_name', label: '证书名', type: 'text', required: true },
+                    { name: 'obtain_time', label: '获得时间', type: 'date' },
+                    { name: 'valid_until', label: '有效期', type: 'date' },
+                  ]}
+                  onAdd={PortraitAPI.addQualification}
+                  onUpdate={PortraitAPI.updateQualification}
+                  onDelete={PortraitAPI.deleteQualification}
+                  onChanged={fetchAll}
+                />
+              ),
+            },
+            {
+              key: 'achievement',
+              label: '成果',
+              children: (
+                <SubTableCard
+                  title="工作成果"
+                  dataSource={profile?.achievement || []}
+                  columns={[
+                    { title: '成果', dataIndex: 'achievement_name', ellipsis: true },
+                    { title: '获得时间', dataIndex: 'obtain_time', width: 110 },
+                  ]}
+                  addFields={[
+                    { name: 'achievement_name', label: '成果', type: 'text', required: true },
+                    { name: 'obtain_time', label: '获得时间', type: 'date' },
+                  ]}
+                  onAdd={PortraitAPI.addAchievement}
+                  onUpdate={PortraitAPI.updateAchievement}
+                  onDelete={PortraitAPI.deleteAchievement}
+                  onChanged={fetchAll}
+                />
+              ),
+            },
+            {
+              key: 'language',
+              label: '语言',
+              children: (
+                <SubTableCard
+                  title="语言能力"
+                  dataSource={profile?.language || []}
+                  columns={[
+                    { title: '语言', dataIndex: 'language', width: 100 },
+                    { title: '熟练度', dataIndex: 'proficiency', width: 100 },
+                    { title: '证书/分数', dataIndex: 'cert_level_or_score' },
+                  ]}
+                  addFields={[
+                    { name: 'language', label: '语言', type: 'text', required: true },
+                    {
+                      name: 'proficiency',
+                      label: '熟练度',
+                      type: 'select',
+                      required: true,
+                      options: [
+                        { value: '入门', label: '入门' },
+                        { value: '熟练', label: '熟练' },
+                        { value: '精通', label: '精通' },
+                      ],
+                    },
+                    { name: 'cert_level_or_score', label: '证书/分数', type: 'text' },
+                  ]}
+                  onAdd={PortraitAPI.addLanguage}
+                  onUpdate={PortraitAPI.updateLanguage}
+                  onDelete={PortraitAPI.deleteLanguage}
+                  onChanged={fetchAll}
+                />
+              ),
+            },
+            // Week 3 P0.4: A11 应急先锋队 (纯标识, 仅 admin 可改)
+            {
+              key: 'emergency_staff',
+              label: '应急先锋队',
+              children: (
+                <EmergencyStaffCard
+                  currentUserId={currentUserId}
+                  isEmergencyStaff={profile?.is_emergency_staff ?? false}
+                  onChanged={fetchAll}
+                />
               ),
             },
           ]}

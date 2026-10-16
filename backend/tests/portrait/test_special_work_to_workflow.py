@@ -48,7 +48,6 @@ def _submit_and_approve_special_work(
                 "end_time": "2026-03-30",
                 "content": "阶段 F workflow 联动测试",
                 "hours": 24,
-                "skill_tags": ["Workflow"],
             },
             "next_approver_id": admin_user.id,
         },

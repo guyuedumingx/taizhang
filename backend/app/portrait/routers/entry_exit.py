@@ -27,6 +27,7 @@ router = APIRouter()
 def _serialize(record) -> dict:
     return {
         "id": record.id,
+        "seq": record.seq,
         "ehr_id": record.ehr_id,
         "name": record.name,
         "team_name": record.team_name,
@@ -144,12 +145,15 @@ def delete_entry_exit(
 
 # 模板列定义, 与 routers/templates.py entry_exit 模板保持一致
 # v2.1 用户决定: 列名全部以实际业务表(图 3)为准
-# 18 列 = 图 3 17 列原序 + EHR号(系统必需, 追加末尾)
+# 18 列 = 图 3 17 列原序 + EHR号(系统必需)
+# PRD 附录 B.3 实施要点: EHR号移至第 2 位 (序号后); 序号为可选列 (未填则自动生成)
 _ENTRY_EXIT_COLS = [
-    "序号", "姓名", "团队", "职务", "证照号码", "出境原因", "目的地",
+    "序号", "EHR号", "姓名", "团队", "职务", "证照号码", "出境原因", "目的地",
     "申请离境日期", "申请返回日期", "申请证照类别", "申请类型", "团队审批人",
-    "实际出境日期", "实际返回日期", "出境年份", "组别", "备注", "EHR号",
+    "实际出境日期", "实际返回日期", "出境年份", "组别", "备注",
 ]
+# 可选列: 缺失时不报错 (PRD 附录 B.3: 序号导入时自动生成, 业务表里也可手动填)
+_ENTRY_EXIT_OPTIONAL_COLS = {"序号"}
 
 
 @router.post(
@@ -184,6 +188,8 @@ async def import_entry_exit(
             df = pd.read_excel(buffer)
 
         for col in _ENTRY_EXIT_COLS:
+            if col in _ENTRY_EXIT_OPTIONAL_COLS:
+                continue  # 可选列 (序号): 缺失时自动生成, 不报错
             if col not in df.columns:
                 raise HTTPException(status_code=400, detail=f"缺少必填列: {col}")
 
@@ -197,6 +203,7 @@ async def import_entry_exit(
 
         valid_rows = []
         parse_failures = []
+        has_seq_col = "序号" in df.columns
         for idx, row in df.iterrows():
             row_number = int(idx) + 2
             try:
@@ -204,9 +211,17 @@ async def import_entry_exit(
                 year = int(raw_year)
                 if not (2000 <= year <= 2100):
                     raise ValueError(f"年份 {year} 超出范围")
+                # 序号: 用户填则用; 未填列或空值则按 Excel 行序自动生成 (PRD 附录 B.3)
+                if has_seq_col and not (
+                    isinstance(row["序号"], float) and __import__("math").isnan(row["序号"])
+                ) and str(row["序号"]).strip() not in ("", "nan", "None"):
+                    seq = int(row["序号"])
+                else:
+                    seq = row_number - 1  # 第 1 行数据 -> 序号 1
                 valid_rows.append(
                     entry_exit_schema.EntryExitImportRow(
                         row_number=row_number,
+                        seq=seq,
                         ehr_id=str(row["EHR号"]).strip(),
                         name=str(row["姓名"]).strip(),
                         team_name=str(row["团队"]).strip(),

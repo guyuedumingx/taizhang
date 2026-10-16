@@ -46,8 +46,10 @@ class UserInDBBase(UserBase):
 class User(UserInDBBase):
     roles: Optional[List[str]] = []
     password_expired: Optional[bool] = False
-    hashed_password: Optional[str] = None  # 添加此字段用于测试
     is_first_login: Optional[bool] = None  # PRD §3.2: 首次登录标志
+    # 安全: hashed_password 绝不能出现在对外响应 schema 里。
+    # 它曾被放在此处, 导致 GET /api/v1/users/ 向任意登录用户吐出全行 1494 人的
+    # 密码哈希 (PBKDF2) + username, 可离线定向爆破。内部需要时用下面的 UserInDB。
 
     @validator('password_expired', always=True)
     def check_password_expired(cls, v, values):
@@ -59,6 +61,22 @@ class User(UserInDBBase):
 
     class Config:
         orm_mode = True
+        from_attributes = True
+
+
+# 员工通讯录最小集: 供家访登记 / 工作流审批人选择这类业务选择器使用。
+# 与 User 的区别是**不暴露** department / roles / is_superuser / team_id,
+# 避免任意登录员工通过业务页面的下拉框拿到全行组织架构与管理员名单。
+class UserMember(BaseModel):
+    id: int
+    username: Optional[str] = None
+    name: Optional[str] = None
+    ehr_id: Optional[EhrIdStr] = None
+    # team_id 保留: 家访登记用它把"被家访人"下拉框限定在本团队,
+    # 而不是列出全行 1494 人。团队归属是员工自己能看到的公开信息。
+    team_id: Optional[int] = None
+
+    class Config:
         from_attributes = True
 
 

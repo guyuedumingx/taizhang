@@ -83,6 +83,11 @@ class HomeVisitRecord(Base):
     co_visitor_user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     scan_file_path = Column(String(500), nullable=True)
     team_name = Column(String(100), nullable=True)
+    # 扫描件提交状态 (PRD 附录 B.4 第 14 列, 值域 "已提交"/"未提交")。
+    # scan_file_path 只能说明"传了文件", 说明不了"业务上有没有交这张记录表" ——
+    # B.4 要的是后者, 且 F11 批量导入模板按 14 列走, 缺这列模板就对不上。
+    # nullable: 存量记录无此值, 不做回填 (导入/新建时兜底写 "未提交")。
+    scan_status = Column(String(20), nullable=True)
 
     created_at = Column(DateTime, default=beijing_now)
     updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
@@ -103,6 +108,11 @@ class GroupTransferHistory(Base):
     ehr_no = Column(String(50), nullable=False, index=True)
     from_group = Column(String(100), nullable=True)
     to_group = Column(String(100), nullable=False)
+    # 授权用 ID, 组名只用于展示 (Week 3 P0.5 加列: teams 表允许重名, 按名字过滤会让
+    # 同名组的组长互相看到对方的记录。开发库里 26 个「外组」就是活生生的例子)
+    # 均为 nullable: 未分组/退组时为 NULL
+    from_team_id = Column(Integer, ForeignKey("teams.id"), nullable=True, index=True)
+    to_team_id = Column(Integer, ForeignKey("teams.id"), nullable=True, index=True)
     transfer_date = Column(DateTime, nullable=False)
     leave_date = Column(DateTime, nullable=True, index=True)
     operator_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)

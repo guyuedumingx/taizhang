@@ -4,7 +4,7 @@
  * F2 演练登记 / F3 批量导入 / F4 参与矩阵 (紫色高亮列 #9370DB)
  * 权限: 写操作仅 admin; 其余只读.
  */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   Card,
   Table,
@@ -42,9 +42,12 @@ import { useAuthStore } from '../../stores/authStore';
 import { api } from '../../api';
 
 const { Text, Title } = Typography;
-const { Dragger } = Upload;
 
 const PURPLE = '#9370DB';  // PRD F4 矩阵参与高亮色
+
+type DrawerMode =
+  | { type: 'create' }
+  | { type: 'view'; record: PortraitAPI.DrillDetail };
 
 const DrillPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('list');
@@ -56,7 +59,12 @@ const DrillPage: React.FC = () => {
   const [drillType, setDrillType] = useState<string | undefined>();
   const [matrix, setMatrix] = useState<PortraitAPI.DrillMatrix | null>(null);
   const [matrixLoading, setMatrixLoading] = useState(false);
-  const [drawer, setDrawer] = useState<'create' | { type: 'view'; record: PortraitAPI.DrillDetail } | null>(null);
+  // F4 矩阵筛选 (2026-10-14 用户决定): 行集维持"仅参与者", 靠筛选器聚焦。
+  // year 筛列(哪几场活动) → 选中某场即可看出谁没来; teamName 筛行(哪一组人)。
+  const [matrixYear, setMatrixYear] = useState<number | undefined>();
+  const [matrixTeam, setMatrixTeam] = useState<string | undefined>();
+  const [matrixAll, setMatrixAll] = useState<PortraitAPI.DrillMatrix | null>(null);
+  const [drawer, setDrawer] = useState<DrawerMode | null>(null);
   const [detail, setDetail] = useState<PortraitAPI.DrillDetail | null>(null);
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
@@ -86,11 +94,24 @@ const DrillPage: React.FC = () => {
   const fetchMatrix = useCallback(async () => {
     setMatrixLoading(true);
     try {
-      setMatrix(await PortraitAPI.getDrillMatrix());
+      setMatrix(await PortraitAPI.getDrillMatrix({
+        year: matrixYear ?? null,
+        team_name: matrixTeam ?? null,
+      }));
     } catch (err: any) {
       message.error(`加载演练矩阵失败: ${err?.response?.data?.detail || err.message}`);
     } finally {
       setMatrixLoading(false);
+    }
+  }, [matrixYear, matrixTeam]);
+
+  // 未筛选的全量矩阵, 仅用于推导筛选下拉的候选项。
+  // 不能从 matrix 本身推导 —— 一旦按年份筛选, 其他年份的列就不在了, 下拉会只剩一个选项。
+  const fetchMatrixAll = useCallback(async () => {
+    try {
+      setMatrixAll(await PortraitAPI.getDrillMatrix());
+    } catch {
+      // 静默: 筛选项缺失不影响主表格
     }
   }, []);
 
@@ -104,12 +125,29 @@ const DrillPage: React.FC = () => {
 
   useEffect(() => { fetchList(); }, [fetchList]);
   useEffect(() => { if (activeTab === 'matrix') fetchMatrix(); }, [activeTab, fetchMatrix]);
+  useEffect(() => { if (activeTab === 'matrix') fetchMatrixAll(); }, [activeTab, fetchMatrixAll]);
   useEffect(() => { if (isAdmin) fetchUsers(); }, [isAdmin, fetchUsers]);
+
+  // 筛选项: 从未筛选的全量矩阵推导, 倒序 (最近的年份在前)
+  const matrixYearOptions = useMemo(() => {
+    const years = new Set<number>();
+    (matrixAll?.columns || []).forEach((c) => {
+      const y = Number(String(c.activity_date).slice(0, 4));
+      if (Number.isFinite(y) && y > 0) years.add(y);
+    });
+    return Array.from(years).sort((a, b) => b - a);
+  }, [matrixAll]);
+
+  const matrixTeamOptions = useMemo(() => {
+    const teams = new Set<string>();
+    (matrixAll?.rows || []).forEach((r) => { if (r.team_name) teams.add(r.team_name); });
+    return Array.from(teams).sort();
+  }, [matrixAll]);
 
   const openCreate = () => {
     form.resetFields();
     form.setFieldsValue({ activity_date: dayjs() });
-    setDrawer('create');
+    setDrawer({ type: 'create' });
   };
 
   const openView = async (id: number) => {
@@ -315,8 +353,34 @@ const DrillPage: React.FC = () => {
               label: <span><PartitionOutlined /> 参与矩阵 (F4)</span>,
               children: (
                 <>
-                  <Space style={{ marginBottom: 12 }}>
+                  <Space style={{ marginBottom: 12 }} wrap>
                     <Text type="secondary">行=参与员工, 列=每场演练, <span style={{ background: PURPLE, color: '#fff', padding: '0 6px', borderRadius: 3 }}>紫色</span>=已参与</Text>
+                    <Select
+                      allowClear
+                      placeholder="全部年份"
+                      style={{ width: 120 }}
+                      value={matrixYear}
+                      onChange={setMatrixYear}
+                      options={matrixYearOptions.map((y) => ({ label: `${y} 年`, value: y }))}
+                    />
+                    <Select
+                      allowClear
+                      showSearch
+                      placeholder="全部团队"
+                      style={{ width: 180 }}
+                      optionFilterProp="label"
+                      value={matrixTeam}
+                      onChange={setMatrixTeam}
+                      options={matrixTeamOptions.map((t) => ({ label: t, value: t }))}
+                    />
+                    {(matrixYear || matrixTeam) && (
+                      <Button
+                        size="small"
+                        onClick={() => { setMatrixYear(undefined); setMatrixTeam(undefined); }}
+                      >
+                        清除筛选
+                      </Button>
+                    )}
                   </Space>
                   <Table
                     rowKey="ehr_id"
@@ -350,7 +414,7 @@ const DrillPage: React.FC = () => {
       <Drawer
         title="演练登记 (F2)"
         width={480}
-        open={drawer === 'create'}
+        open={drawer?.type === 'create'}
         onClose={() => setDrawer(null)}
         extra={<Button type="primary" loading={saving} onClick={handleSave}>保存</Button>}
       >

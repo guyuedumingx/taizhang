@@ -14,7 +14,11 @@ portrait Submission 状态机 service (核心)
 业务效果 (approval 通过时触发):
   - special_work   : 暂不写业务表 (P5+ 才接 ProjectSummary)
   - profile_edit   : 暂不应用 field 改动 (P5+ 接入)
-  - skill_tag_edit : 暂不写 skill_tags (P5+ 接入)
+  - activity_claim : 写 ActivityRecord 落子表 (P0.7)
+
+2026-10-14: skill_tag_edit (A3 亮点标签) 提交类型整体下线, 见 PRD §1.3。
+存量 skill_tag_edit 提交仍可正常审批/驳回 (approve/reject 不校验类型白名单),
+但前端已不再提供新建入口。
 
 集成指南 §5 雷区 12 (Rule 12): 错误显性化, 失败抛 HTTPException 不吞掉
 """
@@ -30,7 +34,7 @@ from app.portrait.schemas import submission as sub_schema
 from app.utils.logger import log_info
 
 
-VALID_TYPES = {"special_work", "profile_edit", "skill_tag_edit", "activity_claim"}
+VALID_TYPES = {"special_work", "profile_edit", "activity_claim"}
 PENDING = "pending"
 APPROVED = "approved"
 REJECTED = "rejected"
@@ -51,13 +55,6 @@ def _validate_payload(submission_type: str, payload: dict) -> None:
         for f in required:
             if f not in payload or payload[f] in (None, ""):
                 raise HTTPException(status_code=400, detail=f"profile_edit 缺少字段: {f}")
-    elif submission_type == "skill_tag_edit":
-        required = ["tag_name", "action", "sensitivity"]
-        for f in required:
-            if f not in payload or payload[f] in (None, ""):
-                raise HTTPException(status_code=400, detail=f"skill_tag_edit 缺少字段: {f}")
-        if payload["action"] not in ("add", "delete"):
-            raise HTTPException(status_code=400, detail="skill_tag_edit.action 必须是 add/delete")
     elif submission_type == "activity_claim":
         # P0.3 B2 活动申报 (PRD §6.2 v2.1): 事后记录 + 跟踪加分
         # 必填: 活动名/时间/类型/主办方; 选填: 获奖/内容/时长/佐证
@@ -79,7 +76,6 @@ def _resolve_next_approver(
     """计算下一审批人
     - special_work  : submitter 指定 (next_approver_id 必填)
     - profile_edit  : admin role 第一个用户
-    - skill_tag_edit: admin role 第一个用户
     - activity_claim: admin role 第一个用户 (P0.3 B2 v2.1)
     """
     if submission_type == "special_work":
@@ -94,7 +90,7 @@ def _resolve_next_approver(
             raise HTTPException(status_code=400, detail=f"审批人 {approver.ehr_id} 已停用")
         return specified_id
 
-    # profile_edit / skill_tag_edit / activity_claim: 默认 admin 角色
+    # profile_edit / activity_claim: 默认 admin 角色
     # taizhang 用 Casbin 管角色绑定, 不在 user.role 字段. 用 is_superuser 找第一个 admin
     admin_user = (
         db.query(models.User)

@@ -13,6 +13,17 @@ export interface User {
   last_password_change?: string | null;
 }
 
+// 员工通讯录最小集 (后端 GET /api/v1/users/members)
+// 刻意不含 department / roles / is_superuser / team_id —— 业务选择器不需要,
+// 且不应让任意登录员工通过下拉框拿到全行组织架构与管理员名单。
+export interface UserMember {
+  id: number;
+  username: string | null;
+  name: string | null;
+  ehr_id: string | null;
+  team_id: number | null;
+}
+
 export interface UserCreate {
   username: string;
   ehr_id: string;
