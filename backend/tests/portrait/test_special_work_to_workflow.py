@@ -1,8 +1,19 @@
 """
 阶段 F: Workflow 真绑 (special_work → workflow_instance)
 
+⚠️ 2026-10-16 决策 3 之后, **生产路径已不走这条链路**:
+   special_work 审批通过改为落 portrait_project_summary (画像自有表),
+   不再写台账 ledgers / 不再伪造 WorkflowInstance 壳。
+   (画像单独部署时台账的 ledgers 表不存在, 旧链路必断。)
+
+   本文件保留, 覆盖的是 integration_service.sync_special_work_to_ledger
+   本身的行为 —— 该函数目前**已无生产调用点**, 仅供旧数据追溯与将来彻底
+   解耦台账时核对用。因此这里的 helper **直接调该 service**, 不再走审批接口
+   (走接口会经过 approve(), 而 approve() 已改道, 那样测的就不是这个函数了)。
+   新落点的测试见 tests/portrait/test_special_work_project_summary.py。
+
 覆盖 (5 test):
-  - special_work approve 后 submission.workflow_instance_id 不为 None 且
+  - sync_special_work_to_ledger 后 submission.workflow_instance_id 不为 None 且
     工作流实例的 ledger_id == synced_ledger_id (外键自洽)
   - 该 workflow_instance.status == 'completed' (因 portrait 视角已审批通过)
   - workflow_instance 至少有 2 个 instance_node, 且全 approved
@@ -31,12 +42,17 @@ API_PORTRAIT = f"{settings.API_V1_STR}/portrait"
 
 
 def _submit_and_approve_special_work(
+    db: Session,
     normal_token_headers: dict,
     admin_token_headers: dict,
     admin_user: models.User,
     project_name: str = "Workflow绑定测试",
 ) -> int:
-    """helper: 提交并 admin 审批通过一条 special_work, 返回 submission_id"""
+    """helper: 提交一条 special_work, 再**直接调** sync_special_work_to_ledger
+
+    不走 /approvals/{id}/approve —— 决策 3 后 approve() 已改道落项目总结表,
+    不再触发台账联动, 走接口等于测不到本文件要覆盖的函数。
+    """
     resp = client.post(
         f"{API_PORTRAIT}/submissions",
         headers=normal_token_headers,
@@ -55,12 +71,17 @@ def _submit_and_approve_special_work(
     assert resp.status_code == 201, resp.text
     sub_id = resp.json()["id"]
 
-    approve = client.post(
-        f"{API_PORTRAIT}/approvals/{sub_id}/approve",
-        headers=admin_token_headers,
-        json={"comment": "阶段 F approve"},
+    # 模拟"审批通过后触发联动"这一步: 直接调 service
+    from app.portrait.services.integration_service import sync_special_work_to_ledger
+
+    sub = (
+        db.query(portrait_models.SubmissionRecord)
+        .filter(portrait_models.SubmissionRecord.id == sub_id)
+        .first()
     )
-    assert approve.status_code == 200, approve.text
+    assert sub is not None, f"刚提交的 submission #{sub_id} 查不到"
+    sync_special_work_to_ledger(db, submission=sub)
+    db.commit()
     return sub_id
 
 
@@ -93,7 +114,7 @@ def test_special_work_binds_workflow_instance(
 ):
     """special_work approve 后 submission.workflow_instance_id 不为 None;
     关联的 WorkflowInstance.ledger_id == submission.synced_ledger_id (外键自洽)."""
-    sub_id = _submit_and_approve_special_work(normal_token_headers, admin_token_headers, admin_user)
+    sub_id = _submit_and_approve_special_work(db, normal_token_headers, admin_token_headers, admin_user)
 
     db.expire_all()
     sub = db.query(portrait_models.SubmissionRecord).filter(
@@ -123,7 +144,7 @@ def test_special_work_workflow_instance_completed(
     db: Session, admin_token_headers: dict, normal_token_headers: dict, admin_user: models.User
 ):
     """workflow_instance.status == 'completed' (special_work 已审批通过 → 直接 completed)"""
-    sub_id = _submit_and_approve_special_work(normal_token_headers, admin_token_headers, admin_user)
+    sub_id = _submit_and_approve_special_work(db, normal_token_headers, admin_token_headers, admin_user)
 
     db.expire_all()
     sub = db.query(portrait_models.SubmissionRecord).filter(
@@ -144,7 +165,7 @@ def test_special_work_workflow_instance_nodes_all_approved(
     db: Session, admin_token_headers: dict, normal_token_headers: dict, admin_user: models.User
 ):
     """workflow 至少 2 个 instance_node, 全 approved (因 special_work 审批已通过)"""
-    sub_id = _submit_and_approve_special_work(normal_token_headers, admin_token_headers, admin_user)
+    sub_id = _submit_and_approve_special_work(db, normal_token_headers, admin_token_headers, admin_user)
 
     db.expire_all()
     sub = db.query(portrait_models.SubmissionRecord).filter(
@@ -176,7 +197,7 @@ def test_special_work_workflow_reused_across_submissions(
 
     # 第一次联动
     sub1_id = _submit_and_approve_special_work(
-        normal_token_headers, admin_token_headers, admin_user, project_name="复用测试 1"
+        db, normal_token_headers, admin_token_headers, admin_user, project_name="复用测试 1"
     )
 
     db.expire_all()
@@ -190,7 +211,7 @@ def test_special_work_workflow_reused_across_submissions(
 
     # 第二次联动
     sub2_id = _submit_and_approve_special_work(
-        normal_token_headers, admin_token_headers, admin_user, project_name="复用测试 2"
+        db, normal_token_headers, admin_token_headers, admin_user, project_name="复用测试 2"
     )
 
     db.expire_all()

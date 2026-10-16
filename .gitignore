@@ -56,6 +56,10 @@ backend/*.db
 backend/*.db.bak.*
 backend/*.db-journal
 backend/uploads/
+# 仓库根目录的同名库: backend/*.db 盖不住, 必须单列, 否则一条 git add -A
+# 就可能把员工数据传上远程 (根目录已有过一次 0 字节的同名文件)
+/*.db
+/*.db-journal
 
 # 本地测试残留
 test.txt

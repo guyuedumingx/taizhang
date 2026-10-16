@@ -356,13 +356,17 @@ class SubmissionService:
             resource_id=str(submission.id),
         )
 
-        # P8 联动: special_work 审批通过 → 自动在台账系统创建对应 ledger
+        # 决策 3 (2026-10-16): special_work 审批通过 → 落画像自有表
+        # portrait_project_summary, 不再写台账 ledgers。
+        # 原因: 画像将来单独部署, 台账的 ledgers 表不存在, 旧链路必断。
         # 雷区 4 合规: submission commit 之后才联动, 失败抛 500 显性化 (Rule 12)
         if submission.submission_type == "special_work":
             try:
-                from app.portrait.services.integration_service import sync_special_work_to_ledger
-                new_ledger = sync_special_work_to_ledger(db, submission=submission)
-                if new_ledger is not None:
+                from app.portrait.services.special_work_sync_service import (
+                    sync_special_work_to_project_summary,
+                )
+                new_summary = sync_special_work_to_project_summary(db, submission=submission)
+                if new_summary is not None:
                     db.commit()
                     db.refresh(submission)
             except HTTPException:
@@ -371,7 +375,7 @@ class SubmissionService:
                 # 未预期的联动失败 (Rule 12 显性化): 抛 500 不静默
                 raise HTTPException(
                     status_code=500,
-                    detail=f"special_work 联动台账失败: {exc}",
+                    detail=f"special_work 落项目总结失败: {exc}",
                 ) from exc
 
         # P0.7 联动: activity_claim 审批通过 → 落入 portrait_activity_record

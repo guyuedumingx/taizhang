@@ -58,6 +58,15 @@ class ProjectSummary(Base):
     end_time = Column(Date, nullable=True)
     role = Column(String(100), nullable=True)
     description = Column(Text, nullable=True)
+    # 预估工时: B1 提交表单收集了该字段, 决策 3 的 5 个字段未列, 但丢数据不可接受
+    # (塞进 role 列 = 静默损坏, Rule 12), 故单独建列。
+    # 类型对齐 ActivityRecord.hours (profile.py:260), 两处同为工时语义。
+    hours = Column(Integer, nullable=True)
+    # 完成情况 (2026-10-16 决策 3): 审批通过落专项记录时写入
+    completion_status = Column(String(50), nullable=True, default="已完成")
+    # 来源 submission (与 ActivityRecord.source_submission_id 同构):
+    # 支撑可追溯 + 防重复落表; 取代旧的 synced_ledger_id
+    source_submission_id = Column(Integer, ForeignKey("portrait_submission_records.id"), nullable=True, index=True)
     created_at = Column(DateTime, default=beijing_now)
     updated_at = Column(DateTime, default=beijing_now, onupdate=beijing_now)
 
