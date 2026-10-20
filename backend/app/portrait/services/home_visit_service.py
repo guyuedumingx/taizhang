@@ -35,7 +35,6 @@ APPROVED = "approved"
 REJECTED = "rejected"
 CANCELLED = "cancelled"
 DRAFT = "draft"
-TERMINAL_STATUSES = {APPROVED, REJECTED, CANCELLED}
 
 # 单次导出行数上限。触顶时显式报错而不是静默截断 —— 用户必须知道导的是不是全部。
 _EXPORT_MAX_ROWS = 5000
@@ -65,22 +64,6 @@ def _resolve_next_approver(db: Session, *, specified_id: Optional[int]) -> int:
             detail="找不到 is_superuser=True 的 admin 用户处理审批, 请先 init_db",
         )
     return admin_user.id
-
-
-def _can_view_record(viewer: models.User, record: portrait_models.HomeVisitRecord) -> bool:
-    """判定 viewer 能否查看记录 (admin / 同组 leader / 被家访人本人)"""
-    if viewer.is_superuser:
-        return True
-    if viewer.team_id is None:
-        return False
-    visited_user = (
-        viewer.__class__.query.get(record.visited_user_id)
-        if False  # noqa: 走显式 query 避免 lazy load
-        else None
-    )
-    # 简化 — 这里直接读 visited_user_id 对应 user.team_id
-    # 实际权限判定在 router 层用 SQL 查; service 层不读 db 再次, 仅校验当前 viewer
-    return False  # placeholder, 实际由 router 层 _ensure_can_view 调用 SQL 判断
 
 
 def _build_visitor_info(
@@ -273,7 +256,7 @@ class HomeVisitService:
 
         record.status = PENDING
         record.current_approver_id = _resolve_next_approver(db, specified_id=next_approver_id)
-        record.submitted_at = __import__("datetime").datetime.now()
+        record.submitted_at = datetime.now()
 
         log_info(
             module="portrait",
@@ -310,7 +293,7 @@ class HomeVisitService:
 
         record.status = CANCELLED
         record.current_approver_id = None
-        record.completed_at = __import__("datetime").datetime.now()
+        record.completed_at = datetime.now()
 
         log_info(
             module="portrait",
@@ -356,7 +339,7 @@ class HomeVisitService:
 
         record.status = APPROVED
         record.current_approver_id = None
-        record.completed_at = __import__("datetime").datetime.now()
+        record.completed_at = datetime.now()
 
         log_info(
             module="portrait",
@@ -389,7 +372,7 @@ class HomeVisitService:
 
         record.status = REJECTED
         record.current_approver_id = None
-        record.completed_at = __import__("datetime").datetime.now()
+        record.completed_at = datetime.now()
 
         log_info(
             module="portrait",

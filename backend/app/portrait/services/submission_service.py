@@ -23,6 +23,7 @@ portrait Submission 状态机 service (核心)
 集成指南 §5 雷区 12 (Rule 12): 错误显性化, 失败抛 HTTPException 不吞掉
 """
 import json
+from datetime import datetime
 from typing import List, Optional
 
 from fastapi import HTTPException
@@ -40,7 +41,6 @@ APPROVED = "approved"
 REJECTED = "rejected"
 CANCELLED = "cancelled"
 DRAFT = "draft"
-TERMINAL_STATUSES = {APPROVED, REJECTED, CANCELLED}
 
 
 def _validate_payload(submission_type: str, payload: dict) -> None:
@@ -157,7 +157,7 @@ class SubmissionService:
             current_approver_id=next_approver_id,
             status=PENDING,
             payload=json.dumps(data.payload, ensure_ascii=False),
-            submitted_at=__import__("datetime").datetime.now(),
+            submitted_at=datetime.now(),
         )
         db.add(submission)
         db.flush()
@@ -285,7 +285,7 @@ class SubmissionService:
             )
 
         submission.status = CANCELLED
-        submission.completed_at = __import__("datetime").datetime.now()
+        submission.completed_at = datetime.now()
 
         cancel_record = portrait_models.ApprovalRecord(
             submission_id=submission.id,
@@ -334,7 +334,7 @@ class SubmissionService:
         SubmissionService._ensure_can_act(submission, viewer)
 
         submission.status = APPROVED
-        submission.completed_at = __import__("datetime").datetime.now()
+        submission.completed_at = datetime.now()
         submission.current_approver_id = None
 
         record = portrait_models.ApprovalRecord(
@@ -431,7 +431,7 @@ class SubmissionService:
         SubmissionService._ensure_can_act(submission, viewer)
 
         submission.status = REJECTED
-        submission.completed_at = __import__("datetime").datetime.now()
+        submission.completed_at = datetime.now()
         submission.current_approver_id = None
 
         record = portrait_models.ApprovalRecord(

@@ -10,6 +10,7 @@ portrait /entry-exit 路由 (PRD §10.1 F5-F9)
   POST   /entry-exit/import          F9 批量导入 (Excel, 仅 admin)
 """
 import io
+import math
 from datetime import datetime
 from typing import Optional
 
@@ -194,7 +195,7 @@ async def import_entry_exit(
                 raise HTTPException(status_code=400, detail=f"缺少必填列: {col}")
 
         def _parse_dt(value) -> Optional[datetime]:
-            if value is None or (isinstance(value, float) and __import__("math").isnan(value)):
+            if value is None or (isinstance(value, float) and math.isnan(value)):
                 return None
             try:
                 return pd.to_datetime(value).to_pydatetime()
@@ -213,7 +214,7 @@ async def import_entry_exit(
                     raise ValueError(f"年份 {year} 超出范围")
                 # 序号: 用户填则用; 未填列或空值则按 Excel 行序自动生成 (PRD 附录 B.3)
                 if has_seq_col and not (
-                    isinstance(row["序号"], float) and __import__("math").isnan(row["序号"])
+                    isinstance(row["序号"], float) and math.isnan(row["序号"])
                 ) and str(row["序号"]).strip() not in ("", "nan", "None"):
                     seq = int(row["序号"])
                 else:

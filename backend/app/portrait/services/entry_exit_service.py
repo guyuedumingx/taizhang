@@ -113,26 +113,6 @@ class EntryExitService:
         values = data.model_dump(exclude_unset=True)
         for field, value in values.items():
             setattr(record, field, value)
-        # 更新后重新校验申请/实际时间顺序
-        merged = entry_exit_schema.EntryExitBase(
-            name=record.name,
-            team_name=record.team_name,
-            position=record.position,
-            certificate_no=record.certificate_no,
-            outbound_reason=record.outbound_reason,
-            destination=record.destination,
-            apply_depart_at=record.apply_depart_at,
-            apply_return_at=record.apply_return_at,
-            certificate_type=record.certificate_type,
-            apply_type=record.apply_type,
-            team_approver=record.team_approver,
-            actual_depart_at=record.actual_depart_at,
-            actual_return_at=record.actual_return_at,
-            year=record.year,
-            group_name=record.group_name,
-            remark=record.remark,
-        )
-        del merged
         db.commit()
         db.refresh(record)
         return record

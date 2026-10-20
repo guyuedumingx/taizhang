@@ -49,7 +49,7 @@ def my_permissions(
         "is_user": True,
         "permissions": {
             "portrait_all": ["*"] if is_admin else [],
-            "portrait_self": ["read", "update", "create"] if True else [],
+            "portrait_self": ["read", "update", "create"],
             "portrait_group": (
                 ["read", "update", "create", "export"] if has_team else []
             ),
