@@ -22,6 +22,7 @@
 | `migrate_group_transfer_team_ids.py` | backend/ | ✅ | SessionLocal | 组转移历史 team_id 回填 |
 | `migrate_home_visit_scan_status.py` | app/db/ | ✅ | engine（settings） | 家访扫描状态列 |
 | `migrate_project_summary_completion.py` | app/db/ | ✅ | engine（settings） | 项目总结完成状态列 |
+| `app/db/migrate_workflow_subject.py` | app/db/ | ✅（已实测回填+幂等） | engine（settings） | **Phase 2 必跑**：workflow_instances 加 subject 双键+回填台账存量+唯一索引；家访表加 workflow_instance_id 列 |
 
 ## 二、新环境从零部署
 
@@ -50,7 +51,8 @@ migrate_portrait_p1.py → migrate_portrait_c1.py → migrate_portrait_p6.py →
 migrate_portrait_p8.py → migrate_portrait_skill_tag_created_at.py →
 migrate_portrait_entry_exit_seq.py → migrate_portrait_privacy_remove.py →
 migrate_portrait_activity_record.py → migrate_portrait_v21_subtables.py →
-migrate_group_transfer_team_ids.py →（app/db/ 下两个）→ migrate_pbkdf2_hash.py
+migrate_group_transfer_team_ids.py →（app/db/ 下两个）→ migrate_pbkdf2_hash.py →
+python -m app.db.migrate_workflow_subject   # Phase 2 (审批引擎泛化) 最后跑
 ```
 
 全部支持 `--dry-run`，先 dry-run 看输出再真跑。

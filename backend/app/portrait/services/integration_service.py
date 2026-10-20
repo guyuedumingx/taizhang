@@ -253,61 +253,9 @@ def sync_special_work_to_ledger(
         resource_id=str(new_ledger.id),
     )
 
-    # 9) 阶段 F: 联动 WorkflowInstance, 回填 submission.workflow_instance_id
-    # 业务现状: ledger_id NOT NULL+UNIQUE (models/workflow.py line 84), 必须先有 ledger.
-    # 因此 submission 创建时无法绑 (那时还没 ledger); 在审批通过 + 建 ledger 之后建.
-    # 状态语义: special_work 已审批通过 → workflow_instance 直接 completed
-    # (不走流程审批, 仅作为与台账 ledger 的 1:1 壳, 满足"真绑"语义要求).
-    # 关于为何手写而非用 crud_workflow_instance.create_with_nodes:
-    #   - 该 helper 假设 workflow ≥2 节点 (line 68 instance_nodes[1].id),
-    #     单节点工作流会 IndexError. 我们这里有 2 节点, 可绕过; 但 helper 内部
-    #     还硬编码 db.commit(), 与 caller 的统一 commit 冲突, 易引入事务分叉.
-    #   - 阶段 F 词面要求仅"submission 写入 workflow_instance_id", 不强求运行审批流,
-    #     手写最简实现 + 单 commit 更安全.
-    try:
-        wf = _find_or_create_special_work_workflow(db, creator=submitter)
-        new_wf_inst = models.WorkflowInstance(
-            workflow_id=wf.id,
-            ledger_id=new_ledger.id,
-            created_by=submitter.id,
-            status="completed",  # special_work 审批已通过 → 直接 completed
-            completed_at=datetime.now(),
-            current_node_id=None,
-        )
-        db.add(new_wf_inst)
-        db.flush()
-
-        # 把 workflow 的所有节点对应建 instance_nodes (instance 视角已全部 approved)
-        wf_nodes = (
-            db.query(models.WorkflowNode)
-            .filter(models.WorkflowNode.workflow_id == wf.id)
-            .order_by(models.WorkflowNode.order_index)
-            .all()
-        )
-        for wfn in wf_nodes:
-            db_inst_node = models.WorkflowInstanceNode(
-                workflow_instance_id=new_wf_inst.id,
-                workflow_node_id=wfn.id,
-                status=ApprovalStatus.APPROVED,
-                approver_id=submitter.id,
-                completed_at=datetime.now(),
-            )
-            db.add(db_inst_node)
-
-        # 10) 回填 submission.workflow_instance_id (本方法返回后由 caller commit)
-        submission.workflow_instance_id = new_wf_inst.id
-
-        # 注: log_info 用独立 SessionLocal, 在 SQLite 上与未 commit 的事务并发写 system_logs
-        # 会触发 'database is locked'. 由 caller (submission_service.approve) 统一打日志更稳.
-    except HTTPException:
-        raise  # 上面已显性化, 透传
-    except Exception as exc:
-        raise HTTPException(
-            status_code=500,
-            detail=(
-                f"联动失败: special_work #{submission.id} 创建 workflow_instance "
-                f"时未预期异常: {exc}"
-            ),
-        ) from exc
-
+    # 9) 阶段 F (2026-10-20 Phase 2 重构): 假实例机制已拆除。
+    # 此前这里在"审批通过+建台账之后"手工造一个直接 completed 的壳 WorkflowInstance
+    # 回填 submission.workflow_instance_id —— 满足字面"真绑"但不跑流程。
+    # 现在 submission 在创建时即绑定真实实例 (workflow_bridge.start_submission_workflow),
+    # 审批推进/终态全部由引擎管理, 本函数不再碰 WorkflowInstance。
     return new_ledger

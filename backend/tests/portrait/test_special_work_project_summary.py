@@ -200,9 +200,18 @@ def test_does_not_write_ledger(db: Session, submitter, submitter_headers, admin_
     assert sub.synced_ledger_id is None, (
         f"仍写了台账 ledger #{sub.synced_ledger_id}, 画像单独部署时台账表不存在"
     )
-    assert sub.workflow_instance_id is None, (
-        f"仍绑了台账 WorkflowInstance #{sub.workflow_instance_id}, 这是伪造的壳实例"
-    )
+    # Phase 2 (2026-10-20): 旧守卫是"不绑任何实例" (防假实例时代的壳污染)。
+    # 现在提交即绑**真实**画像实例 —— 守卫改为: 绑定的实例必须是
+    # portrait_submission 主体且不指向台账。
+    if sub.workflow_instance_id is not None:
+        from app import models as taizhang_models
+        inst = db.query(taizhang_models.WorkflowInstance).filter(
+            taizhang_models.WorkflowInstance.id == sub.workflow_instance_id
+        ).first()
+        assert inst is not None and inst.subject_type == "portrait_submission", (
+            f"绑定的实例 #{sub.workflow_instance_id} 不是画像主体实例"
+        )
+        assert inst.ledger_id is None, "画像实例不应指向台账 ledger"
 
 
 def test_source_submission_id_links_back(db: Session, submitter, submitter_headers, admin_user, admin_headers):

@@ -47,6 +47,9 @@ class HomeVisitRecord(Base):
     visited_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     visitor_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
+    # Phase 2: 真实绑定台账 Workflow 引擎。draft 阶段为 NULL, submit 时创建实例回填。
+    workflow_instance_id = Column(Integer, ForeignKey("workflow_instances.id"), nullable=True, index=True)
+
     visit_year = Column(Integer, nullable=False)
     visit_time = Column(DateTime, nullable=False)
     visit_method = Column(String(20), nullable=False)

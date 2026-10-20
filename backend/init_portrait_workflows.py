@@ -75,6 +75,15 @@ PORTRAIT_WORKFLOWS = [
         ],
     ),
     (
+        "portrait_activity_claim",
+        "数字画像·活动申报审批 (PRD §6.2 B2, 事后记录+跟踪加分, 管理员审批)",
+        [
+            ("提交", "start", 1, False, "any", None),
+            ("审批", "approval", 2, False, "any", "admin"),
+            ("完成", "end", 3, True, "any", None),
+        ],
+    ),
+    (
         "portrait_skill_tag_edit",
         "数字画像·亮点标签修改审批 (员工提交高敏感标签, 管理员审批)",
         [

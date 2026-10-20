@@ -2,7 +2,9 @@
 portrait Submission 状态机 service (核心)
 
 集成指南 §3 阶段 4 + PRD §9.1:
-  3 类提交 + 审批工作台, 自建状态机 (不依赖台账 WorkflowInstance, 因其 ledger_id NOT NULL+UNIQUE)
+  3 类提交 + 审批工作台
+  Phase 2: 状态推进委托台账 Workflow 引擎 (workflow_bridge), 本文件保留
+  画像权限语义 + 审批留痕 (ApprovalRecord) + 业务联动 (决策 3)
 
 状态机:
   draft ──submit──> pending ──approve──> approved
@@ -33,6 +35,7 @@ from app import models
 from app.portrait import models as portrait_models
 from app.portrait.schemas import submission as sub_schema
 from app.utils.logger import log_info
+from app.portrait.services import workflow_bridge
 
 
 VALID_TYPES = {"special_work", "profile_edit", "activity_claim"}
@@ -174,6 +177,13 @@ class SubmissionService:
         db.commit()
         db.refresh(submission)
 
+        # Phase 2: 创建真实 WorkflowInstance 并绑定 (此前 workflow_instance_id
+        # 恒为 None, 模型 docstring 里"复用 taizhang Workflow 引擎"只是愿景)
+        workflow_bridge.start_submission_workflow(
+            db, submission=submission, approver_id=next_approver_id
+        )
+        db.refresh(submission)
+
         log_info(
             module="portrait",
             action="submission.create",
@@ -284,6 +294,9 @@ class SubmissionService:
                 status_code=400, detail=f"当前状态 {submission.status} 不可撤回, 仅 pending 可撤回"
             )
 
+        if submission.workflow_instance_id:
+            workflow_bridge.cancel(db, instance_id=submission.workflow_instance_id)
+
         submission.status = CANCELLED
         submission.completed_at = datetime.now()
 
@@ -333,9 +346,16 @@ class SubmissionService:
             raise HTTPException(status_code=404, detail=f"提交 {submission_id} 不存在")
         SubmissionService._ensure_can_act(submission, viewer)
 
-        submission.status = APPROVED
-        submission.completed_at = datetime.now()
-        submission.current_approver_id = None
+        # Phase 2: 委托引擎推进 (存量无实例的 pending 提交先补建)
+        instance = workflow_bridge.ensure_submission_instance(
+            db, submission, approver_id=submission.current_approver_id or viewer.id
+        )
+        result, _instance = workflow_bridge.approve(
+            db, instance_id=instance.id, user_id=viewer.id, comment=comment
+        )
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("message", "审批失败"))
+        db.refresh(submission)  # 镜像由 bridge/回调同步
 
         record = portrait_models.ApprovalRecord(
             submission_id=submission.id,
@@ -430,9 +450,15 @@ class SubmissionService:
             raise HTTPException(status_code=404, detail=f"提交 {submission_id} 不存在")
         SubmissionService._ensure_can_act(submission, viewer)
 
-        submission.status = REJECTED
-        submission.completed_at = datetime.now()
-        submission.current_approver_id = None
+        instance = workflow_bridge.ensure_submission_instance(
+            db, submission, approver_id=submission.current_approver_id or viewer.id
+        )
+        result, _instance = workflow_bridge.reject(
+            db, instance_id=instance.id, user_id=viewer.id, comment=comment
+        )
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("message", "驳回失败"))
+        db.refresh(submission)
 
         record = portrait_models.ApprovalRecord(
             submission_id=submission.id,
@@ -482,6 +508,10 @@ class SubmissionService:
         SubmissionService._ensure_can_act(submission, viewer)
 
         submission.current_approver_id = transferred_to_id
+        if submission.workflow_instance_id:
+            workflow_bridge.reassign_approver(
+                db, instance_id=submission.workflow_instance_id, new_approver_id=transferred_to_id
+            )
 
         record = portrait_models.ApprovalRecord(
             submission_id=submission.id,

@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.portrait import models as portrait_models
 from app.utils.logger import log_info
+from app.portrait.services import workflow_bridge
 
 
 PENDING = "pending"
@@ -257,6 +258,13 @@ class HomeVisitService:
         record.status = PENDING
         record.current_approver_id = _resolve_next_approver(db, specified_id=next_approver_id)
         record.submitted_at = datetime.now()
+        db.flush()
+
+        # Phase 2: 提交审批时创建真实 WorkflowInstance (此前模型 docstring 声称
+        # "家访由服务自行绑定 workflow_instance_id" 但从未兑现, 列都不存在)
+        workflow_bridge.start_home_visit_workflow(
+            db, record=record, approver_id=record.current_approver_id
+        )
 
         log_info(
             module="portrait",
@@ -290,6 +298,9 @@ class HomeVisitService:
             raise HTTPException(
                 status_code=400, detail=f"当前状态 {record.status} 不可撤回, 仅 pending 可撤回"
             )
+
+        if record.workflow_instance_id:
+            workflow_bridge.cancel(db, instance_id=record.workflow_instance_id)
 
         record.status = CANCELLED
         record.current_approver_id = None
@@ -337,9 +348,18 @@ class HomeVisitService:
             raise HTTPException(status_code=404, detail=f"家访 {visit_id} 不存在")
         HomeVisitService._ensure_can_act(record, viewer)
 
-        record.status = APPROVED
-        record.current_approver_id = None
-        record.completed_at = datetime.now()
+        if record.workflow_instance_id:
+            result, _inst = workflow_bridge.approve(
+                db, instance_id=record.workflow_instance_id, user_id=viewer.id, comment=comment
+            )
+            if not result.get("success"):
+                raise HTTPException(status_code=400, detail=result.get("message", "审批失败"))
+            db.refresh(record)
+        else:
+            # 存量无实例的 pending 记录 (Phase 2 之前的数据): 直改镜像
+            record.status = APPROVED
+            record.current_approver_id = None
+            record.completed_at = datetime.now()
 
         log_info(
             module="portrait",
@@ -370,9 +390,17 @@ class HomeVisitService:
             raise HTTPException(status_code=404, detail=f"家访 {visit_id} 不存在")
         HomeVisitService._ensure_can_act(record, viewer)
 
-        record.status = REJECTED
-        record.current_approver_id = None
-        record.completed_at = datetime.now()
+        if record.workflow_instance_id:
+            result, _inst = workflow_bridge.reject(
+                db, instance_id=record.workflow_instance_id, user_id=viewer.id, comment=comment
+            )
+            if not result.get("success"):
+                raise HTTPException(status_code=400, detail=result.get("message", "驳回失败"))
+            db.refresh(record)
+        else:
+            record.status = REJECTED
+            record.current_approver_id = None
+            record.completed_at = datetime.now()
 
         log_info(
             module="portrait",
