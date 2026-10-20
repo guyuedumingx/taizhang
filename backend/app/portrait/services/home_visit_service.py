@@ -472,7 +472,7 @@ class HomeVisitService:
         visited_ehr_id: Optional[str] = None,
         skip: int = 0,
         limit: int = 50,
-    ) -> List[portrait_models.HomeVisitRecord]:
+    ) -> tuple[List[portrait_models.HomeVisitRecord], int]:
         query = HomeVisitService._apply_list_filters(
             db,
             viewer=viewer,
@@ -480,12 +480,16 @@ class HomeVisitService:
             visit_year=visit_year,
             visited_ehr_id=visited_ehr_id,
         )
-        return (
+        # Phase 0 (评审 P1-1): 返回 (items, total)。此前路由用 len(本页 items) 当
+        # total, 前端翻页信息全错 (total 恒等于本页条数)。
+        total = query.count()
+        items = (
             query.order_by(portrait_models.HomeVisitRecord.visit_time.desc())
             .offset(skip)
             .limit(limit)
             .all()
         )
+        return items, total
 
     @staticmethod
     def list_for_export(
@@ -577,23 +581,27 @@ class HomeVisitService:
         """
         # 可见记录 (先按权限和状态收口, 决定哪些年份/日期进矩阵)
         status_scope = [APPROVED, PENDING] if include_pending else [APPROVED]
-        records = (
-            db.query(portrait_models.HomeVisitRecord)
-            .filter(portrait_models.HomeVisitRecord.status.in_(status_scope))
-            .all()
+        records_q = db.query(portrait_models.HomeVisitRecord).filter(
+            portrait_models.HomeVisitRecord.status.in_(status_scope)
         )
         if not viewer.is_superuser:
             if viewer.team_id is not None:
+                # Phase 0 (评审 P0-6): 原写法把 Subquery 对象直接用于 Python `in`,
+                # 组长 (team_id 非空) 访问矩阵必然 TypeError → 500。
+                # 正确姿势是 .in_() 下推进 SQL (drill_service._visible_drill_ids_subq 同款)。
                 team_user_ids = (
                     db.query(models.User.id)
                     .filter(models.User.team_id == viewer.team_id)
                     .subquery()
                 )
-                records = [
-                    r for r in records if r.visited_user_id in team_user_ids
-                ]
+                records_q = records_q.filter(
+                    portrait_models.HomeVisitRecord.visited_user_id.in_(team_user_ids)
+                )
             else:
-                records = [r for r in records if r.visited_user_id == viewer.id]
+                records_q = records_q.filter(
+                    portrait_models.HomeVisitRecord.visited_user_id == viewer.id
+                )
+        records = records_q.all()
 
         # 行集 = 基准全员 (与 drill_service._matrix_row_scope 同口径, 不重复实现)
         q = db.query(models.User).filter(models.User.is_active.is_(True))

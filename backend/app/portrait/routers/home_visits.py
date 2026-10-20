@@ -145,7 +145,7 @@ def list_home_visits(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """列表 (admin 全, leader 本组, user 自己被家访)"""
-    items = home_visit_service.list_visits(
+    items, total = home_visit_service.list_visits(
         db,
         viewer=current_user,
         status_filter=status_filter,
@@ -193,7 +193,8 @@ def list_home_visits(
             )
         )
 
-    return HomeVisitListResponse(total=len(list_items), items=list_items)
+    # Phase 0 (评审 P1-1): total 用查询基数, 不再用 len(本页 items)
+    return HomeVisitListResponse(total=total, items=list_items)
 
 
 # ============================================================================

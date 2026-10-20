@@ -175,14 +175,19 @@ class EntryExitService:
             try:
                 user = EntryExitService._resolve_user(db, row.ehr_id)
                 entry = entry_exit_schema.EntryExitCreate(**row.model_dump(exclude={"row_number"}))
-                db.add(portrait_models.EntryExitRecord(
-                    user_id=user.id,
-                    ehr_id=user.ehr_id,
-                    **entry.model_dump(exclude={"ehr_id"}),
-                ))
+                # Phase 0 (评审 P0-7): 原实现 except 里 db.rollback() —— 第 N 行失败
+                # 会把此前所有未 commit 的成功行一起回滚, 而 success 已计数:
+                # 数据静默丢失 + 返回报告虚报成功。改为行级 savepoint (begin_nested),
+                # 失败只回滚本行, flush 在保存点内让约束违规在正确的行上暴露。
+                with db.begin_nested():
+                    db.add(portrait_models.EntryExitRecord(
+                        user_id=user.id,
+                        ehr_id=user.ehr_id,
+                        **entry.model_dump(exclude={"ehr_id"}),
+                    ))
+                    db.flush()
                 success += 1
             except Exception as exc:
-                db.rollback()
                 failed.append({
                     "row_number": row.row_number,
                     "ehr_id": row.ehr_id,
