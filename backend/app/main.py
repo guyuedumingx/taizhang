@@ -88,6 +88,19 @@ async def root():
 @app.on_event("startup")
 async def startup_event():
     logging.info("服务启动")
+    # Phase 0 (评审 P1-2): SECRET_KEY 启动守卫。
+    # 默认密钥公开在仓库里, 生产 (Oracle) 下若忘记设置 SECRET_KEY 环境变量,
+    # 任何人可离线伪造任意 JWT —— 直接拒绝启动; 开发 SQLite 库仅告警放行
+    # (保留固定默认值是有意的: 避免 --reload 重启时密钥漂移踢掉开发者的登录态)。
+    if settings.is_using_dev_default_secret_key:
+        if settings.DATABASE_TYPE == "oracle":
+            raise RuntimeError(
+                "生产环境 (DATABASE_TYPE=oracle) 禁止使用仓库内公开的开发默认 SECRET_KEY, "
+                "请通过环境变量或 .env 设置 SECRET_KEY 后再启动"
+            )
+        logging.warning(
+            "SECRET_KEY 使用开发默认值 —— 仅限本地开发。上线前必须通过环境变量覆盖!"
+        )
 
 @app.on_event("shutdown")
 async def shutdown_event():

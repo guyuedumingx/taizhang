@@ -5,9 +5,14 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+from app.core.config import settings
 from app.core.ehr_validator import validate_ehr_format
+from app.core.login_throttle import login_throttle
 from app.core.security import create_access_token, verify_password, get_password_hash
 from app.services.casbin_service import get_roles_for_user, get_permissions_for_role, add_role_for_user
+
+# 密码最长有效期 (天)。PRD §17.3: 90 天未改密视为过期。
+PASSWORD_MAX_AGE_DAYS = 90
 
 
 def _get_is_first_login(db: Session, user_id: int) -> bool:
@@ -44,6 +49,24 @@ def _set_is_first_login(db: Session, user_id: int, value: bool) -> None:
     db.commit()
 
 
+def get_password_change_requirement(db: Session, user: models.User) -> Optional[str]:
+    """服务端强制改密判定 (重构方案 Phase 0: 评审 P0-1)。
+
+    返回 None 表示不需要改密; 否则返回原因码, 由调用方转成 403:
+      - "PASSWORD_CHANGE_REQUIRED": 首次登录未改密 (开关可控)
+      - "PASSWORD_EXPIRED": 密码超过 90 天未修改 (PRD §17.3)
+
+    之前该判定只在登录响应里带标志、由前端弹窗执行, 携合法 JWT 直接调
+    API 即可绕过 —— 现在由 deps.get_current_user 在每个请求上强制。
+    """
+    if settings.FORCE_FIRST_LOGIN_PASSWORD_CHANGE and _get_is_first_login(db, user.id):
+        return "PASSWORD_CHANGE_REQUIRED"
+    if user.last_password_change:
+        if datetime.now() - user.last_password_change > timedelta(days=PASSWORD_MAX_AGE_DAYS):
+            return "PASSWORD_EXPIRED"
+    return None
+
+
 class AuthService:
     """认证服务类，处理用户认证相关的业务逻辑"""
 
@@ -56,14 +79,21 @@ class AuthService:
         except ValueError as e:
             raise HTTPException(status_code=401, detail=f"EHR号格式错误: {e}")
 
+        # Phase 0 P0-2: 失败锁定检查 (在验密之前, 锁定期内不再消耗密码验证)
+        login_throttle.check(ehr_id)
+
         # 使用EHR号查找用户
         user = db.query(models.User).filter(models.User.ehr_id == ehr_id).first()
         if not user:
+            login_throttle.record_failure(ehr_id)
             raise HTTPException(status_code=401, detail="EHR号或密码错误")
         if not verify_password(password, user.hashed_password):
+            login_throttle.record_failure(ehr_id)
             raise HTTPException(status_code=401, detail="EHR号或密码错误")
         if not user.is_active:
             raise HTTPException(status_code=401, detail="用户已被禁用")
+
+        login_throttle.record_success(ehr_id)
 
         # 获取用户角色
         roles = get_roles_for_user(str(user.id))

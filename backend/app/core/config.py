@@ -1,7 +1,7 @@
 import json
 import os
 import secrets
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, ClassVar, Dict, List, Optional, Union
 
 from pydantic import AnyHttpUrl, validator
 from pydantic_settings import BaseSettings
@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     # JWT 过期时间: PRD §17.3 要求 60 分钟
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     # 首次登录强制改密开关 (PRD §3.2: 默认管理员首次必须改密)
+    # Phase 0 起由 deps.get_current_user 服务端强制, 此开关真正生效
     FORCE_FIRST_LOGIN_PASSWORD_CHANGE: bool = True
     # EHR 号格式: 恰好 7 位数字 (PRD §3.2 + §17.3)
     EHR_REGEX: str = r"^\d{7}$"
@@ -81,6 +82,14 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
         env_file = ".env"
+
+    # 已知开发默认密钥 (Phase 0: 评审 P1-2)。启动守卫见 app/main.py startup_event:
+    # Oracle (生产) 下用默认密钥直接拒绝启动; SQLite 开发库下仅告警。
+    DEV_DEFAULT_SECRET_KEY: ClassVar[str] = "DEV-ONLY-DO-NOT-USE-IN-PRODUCTION-CHANGE-VIA-ENV-VAR-SECRET_KEY"
+
+    @property
+    def is_using_dev_default_secret_key(self) -> bool:
+        return self.SECRET_KEY == self.DEV_DEFAULT_SECRET_KEY
 
 
 settings = Settings() 

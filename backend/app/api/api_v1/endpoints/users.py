@@ -127,7 +127,13 @@ def update_user(
     # 检查权限
     if not deps.check_permissions("user", "edit", current_user) and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="没有足够的权限")
-    
+
+    # Phase 0 (评审 P0-3): 无 user:edit 权限的自助更新走白名单 schema。
+    # UserUpdate 继承了 is_superuser/is_active/team_id 并带 password/roles,
+    # 之前任意登录用户 PUT /users/{自己的id} {"is_superuser": true} 即可自我提权。
+    if not deps.check_permissions("user", "edit", current_user):
+        user_in = schemas.UserSelfUpdate(**user_in.dict(exclude_unset=True))
+
     # 使用用户服务更新用户
     # operator_user_id 供 G7 组员调换历史记录操作人 (PRD §11.4)
     return user_service.update_user(

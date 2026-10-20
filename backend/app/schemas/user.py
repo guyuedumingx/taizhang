@@ -32,6 +32,17 @@ class UserUpdate(UserBase):
     roles: Optional[list[str]] = None
 
 
+# 自助更新白名单 (Phase 0: 评审 P0-3)。
+# PUT /users/{自己的id} 无需 user:edit 权限, 此前直接复用 UserUpdate —— 继承了
+# is_superuser / is_active / team_id, 还带 password / roles, 任意登录用户可
+# {"is_superuser": true} 自我提权。自助通道只允许改这三个字段; 敏感字段与
+# 改密 (走 /auth/change-password, 验旧密码) 一律不在此列。
+class UserSelfUpdate(BaseModel):
+    username: Optional[str] = None
+    name: Optional[str] = None
+    department: Optional[str] = None
+
+
 # 数据库中的用户
 class UserInDBBase(UserBase):
     id: int
