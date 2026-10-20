@@ -155,7 +155,10 @@ class WorkflowInstanceNodeUpdate(BaseModel):
 # 工作流实例基础模型
 class WorkflowInstanceBase(BaseModel):
     workflow_id: int
-    ledger_id: int
+    ledger_id: Optional[int] = None  # Phase 2: 台账路径兼容列, 画像实例为 NULL
+    # Phase 2: 实例与业务对象的泛化绑定 (台账='ledger', 画像见 portrait 侧)
+    subject_type: str = "ledger"
+    subject_id: Optional[int] = None
     status: str = 'active'
     current_node_id: Optional[int] = None
 

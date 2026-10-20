@@ -21,52 +21,102 @@ class CRUDWorkflowInstance(CRUDBase[WorkflowInstance, WorkflowInstanceCreate, Wo
     def create_with_nodes(
         self, db: Session, *, workflow_id: int, ledger_id: int, created_by: int, next_approver_id: Optional[int] = None
     ) -> WorkflowInstance:
-        """创建工作流实例及其节点"""
-        # 首先创建工作流实例
+        """创建工作流实例及其节点（台账路径, Phase 2 起同步写 subject 双键）"""
+        return self.create_for_subject(
+            db,
+            workflow_id=workflow_id,
+            created_by=created_by,
+            subject_type="ledger",
+            subject_id=ledger_id,
+            ledger_id=ledger_id,
+            start_node_approver_id=next_approver_id,
+        )
+
+    def create_for_subject(
+        self,
+        db: Session,
+        *,
+        workflow_id: int,
+        created_by: int,
+        subject_type: str,
+        subject_id: int,
+        ledger_id: Optional[int] = None,
+        approval_node_approver_id: Optional[int] = None,
+        start_node_approver_id: Optional[int] = None,
+    ) -> WorkflowInstance:
+        """Phase 2: 泛化创建 —— 任意业务对象 (subject_type + subject_id) 绑定实例。
+
+        与台账历史行为的两点差异:
+          - 审批人落点: approval_node_approver_id 直接落在**第一个 approval
+            节点**上 (画像单步审批的语义: 提交时指定的审批人);
+            台账 create_with_nodes 的 next_approver_id 落在 order_index==1
+            的开始节点上, 属历史行为, 通过 start_node_approver_id 保持兼容。
+          - current_node: 指向第一个 approval 节点而非盲取 instance_nodes[1]
+            (create_with_nodes 旧实现硬编码 [1], 是"模板必须 ≥2 节点"这个
+            隐藏约束的来源)。
+        """
         db_obj = WorkflowInstance(
             workflow_id=workflow_id,
             ledger_id=ledger_id,
+            subject_type=subject_type,
+            subject_id=subject_id,
             created_by=created_by,
             status="active",
         )
         db.add(db_obj)
         db.flush()  # 获取实例ID
-        
-        # 获取工作流的所有节点
+
         workflow_nodes = db.query(WorkflowNode).filter(
             WorkflowNode.workflow_id == workflow_id
         ).order_by(WorkflowNode.order_index).all()
-        
-        # 创建实例节点
+
         instance_nodes = []
+        current_set = False
         for node in workflow_nodes:
+            is_approval = node.node_type == 'approval'
             db_node = WorkflowInstanceNode(
                 workflow_instance_id=db_obj.id,
                 workflow_node_id=node.id,
-                status= ApprovalStatus.PENDING if node.node_type == 'approval' else ApprovalStatus.APPROVED
+                status=ApprovalStatus.PENDING if is_approval else ApprovalStatus.APPROVED
             )
-            
-            # 如果是第一个节点(开始节点)，设置为当前节点
-            if node.order_index == 1:
-                if node.approver_role_id:
-                    # 根据角色找审批人，这里简化为取该角色的第一个用户
+
+            # 台账历史行为: 开始节点(order_index==1)上按角色/指定设审批人
+            if node.order_index == 1 and start_node_approver_id is not None:
+                db_node.approver_id = start_node_approver_id
+            elif node.order_index == 1 and node.approver_role_id:
+                role_user = db.query(User).join(User.roles).filter(
+                    Role.id == node.approver_role_id
+                ).first()
+                if role_user:
+                    db_node.approver_id = role_user.id
+
+            # 画像语义: 审批人直接落在第一个 approval 节点并设为当前节点
+            if is_approval and not current_set:
+                if approval_node_approver_id is not None:
+                    db_node.approver_id = approval_node_approver_id
+                elif node.approver_role_id:
                     role_user = db.query(User).join(User.roles).filter(
                         Role.id == node.approver_role_id
                     ).first()
                     if role_user:
                         db_node.approver_id = role_user.id
-                if next_approver_id:
-                    db_node.approver_id = next_approver_id
-            
+                db_obj.current_node_id = None  # flush 后再回填 id
+                current_set = True
+
             db.add(db_node)
             instance_nodes.append(db_node)
-        
+
         db.flush()
-        
-        # 设置当前节点为第一个节点
-        if instance_nodes:
-            db_obj.current_node_id = instance_nodes[1].id
-        
+
+        # current_node 指向第一个 approval 节点 (语义: 流程真正等人操作的地方)
+        if current_set:
+            db_obj.current_node_id = instance_nodes[
+                next(i for i, n in enumerate(instance_nodes)
+                     if n.status == ApprovalStatus.PENDING)
+            ].id
+        elif instance_nodes:
+            db_obj.current_node_id = instance_nodes[0].id
+
         db.commit()
         db.refresh(db_obj)
         return db_obj

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, Text, JSON, Enum, Table
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, Text, JSON, Enum, Table, UniqueConstraint
 from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
@@ -76,13 +76,24 @@ class WorkflowNode(Base):
 # 工作流实例模型
 class WorkflowInstance(Base):
     __tablename__ = "workflow_instances"
+    # Phase 2 (重构方案): 实例与业务对象的绑定泛化为 subject_type + subject_id。
+    # 此前 ledger_id NOT NULL + UNIQUE 把引擎焊死在台账上, 画像只好自建两套
+    # 审批状态机。现在: 台账实例 subject_type='ledger' (ledger_id 仍同步写,
+    # 台账读写路径零改动), 画像实例 subject_type='portrait_submission' /
+    # 'portrait_home_visit' (ledger_id 为 NULL —— SQLite UNIQUE 允许多个 NULL,
+    # 存量库的旧唯一索引无需重建)。
+    __table_args__ = (
+        UniqueConstraint("subject_type", "subject_id", name="uq_workflow_instance_subject"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     workflow_id = Column(Integer, ForeignKey("workflows.id"), nullable=False)
     #TODO 去掉外键约束
     # ledger_id = Column(Integer, ForeignKey("ledgers.id"), nullable=False, unique=True)  # 确保一对一关系
-    ledger_id = Column(Integer, nullable=False, unique=True)  # 确保一对一关系
-    status = Column(String, default="active")  # active, completed, cancelled
+    ledger_id = Column(Integer, nullable=True, index=True)  # 台账路径兼容列; 画像实例为 NULL
+    subject_type = Column(String(50), nullable=False, default="ledger", index=True)
+    subject_id = Column(Integer, nullable=True)
+    status = Column(String, default="active")  # active, completed, cancelled, rejected
     current_node_id = Column(Integer, nullable=True)  # 移除外键约束，避免循环引用
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -94,19 +105,6 @@ class WorkflowInstance(Base):
     # ledger = relationship("Ledger", back_populates="workflow_instance", uselist=False)  # 确保一对一关系
     creator = relationship("User", foreign_keys=[created_by])
     instance_nodes = relationship("WorkflowInstanceNode", back_populates="workflow_instance", cascade="all, delete-orphan")
-    
-    # 使用属性方法获取当前节点，避免循环引用
-    @property
-    def current_node(self):
-        if self.current_node_id is None:
-            return None
-        from sqlalchemy.orm import Session
-        from sqlalchemy import create_engine
-        from app.core.config import settings
-        
-        engine = create_engine(settings.SQLALCHEMY_DATABASE_URI)
-        with Session(engine) as session:
-            return session.query(WorkflowInstanceNode).filter(WorkflowInstanceNode.id == self.current_node_id).first()
 
     def __repr__(self):
         return f"<WorkflowInstance {self.id}>"
