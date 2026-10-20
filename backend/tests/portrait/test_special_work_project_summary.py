@@ -15,16 +15,11 @@ import random
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from sqlalchemy.pool import StaticPool
 
 from app import models
-from app.api import deps
 from app.core.config import settings
 from app.core.security import create_access_token
-from app.db import session as session_mod
-from app.db.session import Base
 from app.main import app
 from app.portrait import models as pmodels  # noqa: F401 触发 ORM 注册
 
@@ -33,44 +28,11 @@ API_PORTRAIT = f"{settings.API_V1_STR}/portrait"
 
 
 # ----------------------------------------------------------------- 隔离数据库
-_TEST_ENGINE = create_engine(
-    "sqlite://",
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-Base.metadata.create_all(bind=_TEST_ENGINE)
+# 重构方案 Phase 1.1: 原自带内存库隔离 shim 已拆除 —— 根 tests/conftest.py 已推广
+# 同款隔离 (并额外换掉 logger.py 的按值绑定), 用户固件改 function 级匹配根 db 固件。
 
 
-@pytest.fixture(scope="session", autouse=True)
-def _isolated_db():
-    """把 get_db 真正用到的 SessionLocal 换掉。
-
-    必须换两个模块里的那个名字 (app.db.session.SessionLocal 和
-    app.api.deps.SessionLocal), 只 override deps.get_db 穿不到
-    get_current_user 子依赖 —— 见审计 §6.6.1, 踩过一次。
-    """
-    original_core = session_mod.SessionLocal
-    original_deps = deps.SessionLocal
-    factory = lambda: Session(bind=_TEST_ENGINE)
-    session_mod.SessionLocal = factory
-    deps.SessionLocal = factory
-    try:
-        yield _TEST_ENGINE
-    finally:
-        session_mod.SessionLocal = original_core
-        deps.SessionLocal = original_deps
-
-
-@pytest.fixture(scope="session")
-def db(_isolated_db):
-    s = Session(bind=_TEST_ENGINE)
-    try:
-        yield s
-    finally:
-        s.close()
-
-
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def admin_user(db: Session) -> models.User:
     user = models.User(
         username="admin_sw",
@@ -86,12 +48,12 @@ def admin_user(db: Session) -> models.User:
     return user
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def admin_headers(admin_user: models.User) -> dict:
     return {"Authorization": f"Bearer {create_access_token({'sub': str(admin_user.id)})}"}
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def staff_user(db: Session) -> models.User:
     user = models.User(
         username="staff_sw",
@@ -107,7 +69,7 @@ def staff_user(db: Session) -> models.User:
     return user
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def staff_headers(staff_user: models.User) -> dict:
     return {"Authorization": f"Bearer {create_access_token({'sub': str(staff_user.id)})}"}
 

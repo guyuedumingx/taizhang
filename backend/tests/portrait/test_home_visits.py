@@ -83,6 +83,12 @@ def _create_normal_member(db: Session, team_id: int) -> models.User:
     return member
 
 
+@pytest.fixture(scope="function", autouse=True)
+def _ensure_admin_approver(admin_user: models.User):  # noqa: ARG001
+    """隔离空库无种子超管; 家访 submit 的审批人解析取第一个 superuser, 必须先有 (Phase 1.1)"""
+    assert admin_user.is_superuser
+
+
 @pytest.fixture(scope="function")
 def leader_user(db: Session) -> models.User:
     return _create_leader(db)

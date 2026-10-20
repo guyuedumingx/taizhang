@@ -20,15 +20,11 @@ import random
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from sqlalchemy.pool import StaticPool
 
 from app import models
-from app.api import deps
 from app.core.config import settings
 from app.core.security import create_access_token
-from app.db import session as session_mod
 from app.db.session import Base
 from app.main import app
 from app.portrait import models as pmodels  # noqa: F401 触发 ORM 注册
@@ -40,56 +36,16 @@ XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
 # --------------------------------------------------------------------- 隔离数据库
-# 内存库 + StaticPool: 必须静态池, 否则每次新连接会拿到一个全新的空库
-_TEST_ENGINE = create_engine(
-    "sqlite://",
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-Base.metadata.create_all(bind=_TEST_ENGINE)
+# 重构方案 Phase 1.1: 本文件原来自带内存库隔离 shim (换 session_mod/deps 两处
+# SessionLocal)。根 tests/conftest.py 已推广同款隔离 (并额外换掉 logger.py 的
+# 按值绑定, 修掉了本文件此前打日志时写穿到真实库的隐患), 模块级 shim 随之拆除,
+# 用户固件改为 function 级以匹配根 db 固件 —— 每个用例拿全新空库, ehr 唯一约束
+# 天然满足, 无需再为"同一会话只能建一次"做 session 级缓存。
 
 
-@pytest.fixture(scope="session", autouse=True)
-def _isolated_db():
-    """把 ``get_db`` 用到的 ``SessionLocal`` 工厂全部指向内存库。
-
-    必须换**两个**模块里的那个名字:
-      - ``app.db.session.SessionLocal`` —— 真实 ``get_db`` 函数体里的那个
-      - ``app.api.deps.SessionLocal``    —— ``deps.py:12`` 又 import 了一份
-
-    为什么不用 ``app.dependency_overrides[deps.get_db]``: 实测它能改掉路由参数
-    ``db`` 拿到的 session, 但**没有**改掉 ``get_current_user`` 子依赖里那次调用 ——
-    于是请求里的 current_user 来自开发库、而 router 的 db 来自内存库, 两者身份
-    对不上, 断言全红。踩过一次就记在这里, 不要再改回去。
-    """
-    original_core = session_mod.SessionLocal
-    original_deps = deps.SessionLocal
-    factory = lambda: Session(bind=_TEST_ENGINE)
-    session_mod.SessionLocal = factory
-    deps.SessionLocal = factory
-    try:
-        yield _TEST_ENGINE
-    finally:
-        session_mod.SessionLocal = original_core
-        deps.SessionLocal = original_deps
-
-
-@pytest.fixture(scope="session")
-def db(_isolated_db):
-    """遮蔽根 conftest 的同名固件: 本文件的 ORM 断言读的是同一个内存库。"""
-    s = Session(bind=_TEST_ENGINE)
-    try:
-        yield s
-    finally:
-        s.close()
-
-
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def admin_user(db: Session) -> models.User:
-    """内存库里的管理员 (与根 conftest 同名遮蔽, 避免去开发库找人)
-
-    session 级: ehr_id 唯一, 同一个会话里只能建一次。
-    """
+    """管理员 (走根 conftest 的隔离内存库)"""
     user = models.User(
         username="admin_f11",
         ehr_id="1000001",
@@ -105,12 +61,12 @@ def admin_user(db: Session) -> models.User:
     return user
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def admin_token_headers(admin_user: models.User) -> dict:
     return {"Authorization": f"Bearer {create_access_token({'sub': str(admin_user.id)})}"}
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def normal_user(db: Session) -> models.User:
     """普通员工 = team_id 为 None (本项目里 team_id 非空即组长, 见审计 §1.1)"""
     user = models.User(
@@ -128,7 +84,7 @@ def normal_user(db: Session) -> models.User:
     return user
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def normal_token_headers(normal_user: models.User) -> dict:
     return {"Authorization": f"Bearer {create_access_token({'sub': str(normal_user.id)})}"}
 
@@ -140,7 +96,7 @@ def _random_ehr(db: Session) -> str:
             return ehr
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def team(db: Session):
     t = models.Team(name="F11测试组", department="测试部门")
     db.add(t)

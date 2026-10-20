@@ -320,7 +320,7 @@ def test_add_and_remove_team_writes_records(db, purge):
 # ============================================================================
 # C. 权限与端点
 # ============================================================================
-def test_duplicate_team_names_do_not_leak(db, purge):
+def test_duplicate_team_names_do_not_leak(db, purge, admin_user):
     """**安全回归**: 两个同名组, A 组组长看不到 B 组的记录。
 
     这是选 team_id 而不是组名做授权的全部理由 —— 开发库里就有 26 个都叫
@@ -355,7 +355,7 @@ def test_duplicate_team_names_do_not_leak(db, purge):
     assert body["items"] == []
 
     # admin 看得到 (1 条)
-    admin = db.query(models.User).filter(models.User.is_superuser == True).first()
+    admin = admin_user  # 重构 Phase 1.1: 隔离空库无种子超管, 改用根 conftest 固件
     r = client.get(API, headers=_token(admin))
     assert r.status_code == 200, r.text
     assert r.json()["total"] == 1, "admin 应看到全部"
@@ -470,19 +470,19 @@ def test_user_without_team_gets_403(db, purge):
     assert r.status_code == 403, r.text
 
 
-def test_no_create_endpoint(db, purge):
+def test_no_create_endpoint(db, purge, admin_user):
     """POST → 405 (把「记录只由调组自动产生」锁成断言)"""
     from fastapi.testclient import TestClient
     from app.main import app
 
     client = TestClient(app)
-    admin = db.query(models.User).filter(models.User.is_superuser == True).first()
+    admin = admin_user  # 重构 Phase 1.1: 隔离空库无种子超管, 改用根 conftest 固件
 
     r = client.post(API, json={}, headers=_token(admin))
     assert r.status_code == 405, r.text
 
 
-def test_admin_cannot_delete_open_interval_record(db, purge):
+def test_admin_cannot_delete_open_interval_record(db, purge, admin_user):
     """admin 删「当前在组」记录 → 400 且记录仍在"""
     purge()
     from fastapi.testclient import TestClient
@@ -496,7 +496,7 @@ def test_admin_cannot_delete_open_interval_record(db, purge):
     user.team_id = team_b.id
     db.commit()
     rec = _records(db, user)[0]
-    admin = db.query(models.User).filter(models.User.is_superuser == True).first()
+    admin = admin_user  # 重构 Phase 1.1: 隔离空库无种子超管, 改用根 conftest 固件
 
     r = client.delete(f"{API}/{rec.id}", headers=_token(admin))
     assert r.status_code == 400, r.text
@@ -504,7 +504,7 @@ def test_admin_cannot_delete_open_interval_record(db, purge):
     assert _records(db, user), "记录必须还在"
 
 
-def test_admin_can_delete_closed_record_and_leader_cannot(db, purge):
+def test_admin_can_delete_closed_record_and_leader_cannot(db, purge, admin_user):
     """已关闭记录: admin 能删 (204), 组长调 DELETE → 403 且记录仍在"""
     purge()
     from fastapi.testclient import TestClient
@@ -528,7 +528,7 @@ def test_admin_can_delete_closed_record_and_leader_cannot(db, purge):
     assert r.status_code == 403, r.text
     assert _records(db, user), "组长无权删除, 记录必须还在"
 
-    admin = db.query(models.User).filter(models.User.is_superuser == True).first()
+    admin = admin_user  # 重构 Phase 1.1: 隔离空库无种子超管, 改用根 conftest 固件
     r = client.delete(f"{API}/{closed.id}", headers=_token(admin))
     assert r.status_code == 204, r.text
     remaining = _records(db, user)
