@@ -1,5 +1,6 @@
 from typing import List, Optional, Any, Dict
 from datetime import datetime, timedelta
+from app.services import domain_events
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 import pandas as pd
@@ -129,15 +130,12 @@ class UserService:
             # 添加新角色
             add_role_for_user(str(user.id), role)
         
-        # G7 组员调换历史: 必须在 setattr 之前 —— record_transfer 从 user.team_id 现读原组。
-        # 局部 import: 核心 service 层不依赖 portrait 扩展层 (避免循环导入 + 保持分层)
+        # G7 组员调换历史: 必须在 setattr 之前 (处理器从 user.team_id 现读原组)。
+        # Phase 4: 局部 import 反向依赖已改为中性事件 (portrait 侧自注册处理器)
         if "team_id" in update_data:
-            from app.portrait.services.group_transfer_service import record_transfer
-
-            record_transfer(
-                db,
-                user=user,
-                to_team_id=update_data["team_id"],
+            domain_events.dispatch(
+                domain_events.EVENT_USER_TEAM_CHANGED,
+                db, user=user, to_team_id=update_data["team_id"],
                 operator_user_id=operator_user_id,
             )
 

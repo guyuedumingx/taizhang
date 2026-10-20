@@ -12,6 +12,10 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     name = Column(String)
     department = Column(String)
+    # Phase 4: 首次登录标志归位核心用户表 (此前存在画像扩展表的
+    # PortraitUserMetadata 里, 导致核心 auth 反向依赖扩展模块)。
+    # 存量数据由 app/db/migrate_workflow_subject 之后的迁移脚本回填。
+    is_first_login = Column(Boolean, nullable=True, default=False)
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)

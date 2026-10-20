@@ -14,6 +14,7 @@ import math
 from datetime import datetime
 from typing import Optional
 
+from app.portrait.routers._import_common import read_import_dataframe, require_columns
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.orm import Session
 
@@ -168,31 +169,10 @@ async def import_entry_exit(
 ):
     """F9 批量导入 (17 列 Excel, 仅 admin)"""
     _require_admin(current_user)
-    if file.content_type not in [
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "text/csv",
-    ]:
-        raise HTTPException(status_code=400, detail="只支持 Excel 或 CSV 文件")
+    df, pd = await read_import_dataframe(file)
 
     try:
-        import pandas as pd
-    except ImportError:
-        raise HTTPException(status_code=500, detail="pandas 未安装, 无法解析 Excel")
-
-    try:
-        contents = await file.read()
-        buffer = io.BytesIO(contents)
-        if file.content_type == "text/csv":
-            df = pd.read_csv(buffer)
-        else:
-            df = pd.read_excel(buffer)
-
-        for col in _ENTRY_EXIT_COLS:
-            if col in _ENTRY_EXIT_OPTIONAL_COLS:
-                continue  # 可选列 (序号): 缺失时自动生成, 不报错
-            if col not in df.columns:
-                raise HTTPException(status_code=400, detail=f"缺少必填列: {col}")
+        require_columns(df, _ENTRY_EXIT_COLS, optional=_ENTRY_EXIT_OPTIONAL_COLS)
 
         def _parse_dt(value) -> Optional[datetime]:
             if value is None or (isinstance(value, float) and math.isnan(value)):

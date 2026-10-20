@@ -296,39 +296,29 @@ class ProfileService:
     # Week 2 P0.5 (PRD §5.1 A1 12 卡片): 5 张 1:N 子表 + 技能标签
     # 1:N 模式: POST 新建 / PUT 修改 / DELETE 删除
     # ========================================================================
+    # ========================================================================
+    # 1:N 子表泛型三件套 (Phase 3 服务层消重: 原 resume/reward/qualification/achievement/
+    # language 五套 add/update/delete 逐字雷同, 仅模型类与文案不同)
+    # ========================================================================
     @staticmethod
-    def add_resume(
-        db: Session,
-        *,
-        viewer: models.User,
-        data: profile_schema.ResumeInfoCreate,
-    ):
+    def _add_subtable_item(db: Session, *, viewer, model_cls, data):
         profile = _get_or_create_profile(db, viewer)
-        obj = portrait_models.ResumeInfo(profile_id=profile.id, **data.model_dump())
+        obj = model_cls(profile_id=profile.id, **data.model_dump())
         db.add(obj)
         db.commit()
         db.refresh(obj)
         return obj
 
     @staticmethod
-    def update_resume(
-        db: Session,
-        *,
-        viewer: models.User,
-        item_id: int,
-        data: profile_schema.ResumeInfoUpdate,
-    ):
+    def _update_subtable_item(db: Session, *, viewer, model_cls, item_id: int, data, label: str):
         profile = _get_or_create_profile(db, viewer)
         obj = (
-            db.query(portrait_models.ResumeInfo)
-            .filter(
-                portrait_models.ResumeInfo.id == item_id,
-                portrait_models.ResumeInfo.profile_id == profile.id,
-            )
+            db.query(model_cls)
+            .filter(model_cls.id == item_id, model_cls.profile_id == profile.id)
             .first()
         )
         if not obj:
-            raise HTTPException(404, f"简历 {item_id} 不存在")
+            raise HTTPException(404, f"{label} {item_id} 不存在")
         for k, v in data.model_dump(exclude_unset=True).items():
             setattr(obj, k, v)
         db.commit()
@@ -336,249 +326,79 @@ class ProfileService:
         return obj
 
     @staticmethod
-    def delete_resume(db: Session, *, viewer: models.User, item_id: int):
+    def _delete_subtable_item(db: Session, *, viewer, model_cls, item_id: int, label: str):
         profile = _get_or_create_profile(db, viewer)
         obj = (
-            db.query(portrait_models.ResumeInfo)
-            .filter(
-                portrait_models.ResumeInfo.id == item_id,
-                portrait_models.ResumeInfo.profile_id == profile.id,
-            )
+            db.query(model_cls)
+            .filter(model_cls.id == item_id, model_cls.profile_id == profile.id)
             .first()
         )
         if not obj:
-            raise HTTPException(404, f"简历 {item_id} 不存在")
+            raise HTTPException(404, f"{label} {item_id} 不存在")
         db.delete(obj)
         db.commit()
         return {"ok": True}
 
     @staticmethod
-    def add_reward(
-        db: Session,
-        *,
-        viewer: models.User,
-        data: profile_schema.RewardInfoCreate,
-    ):
-        profile = _get_or_create_profile(db, viewer)
-        obj = portrait_models.RewardInfo(profile_id=profile.id, **data.model_dump())
-        db.add(obj)
-        db.commit()
-        db.refresh(obj)
-        return obj
+    def add_resume(db: Session, *, viewer, data: profile_schema.ResumeInfoCreate):
+        return ProfileService._add_subtable_item(db, viewer=viewer, model_cls=portrait_models.ResumeInfo, data=data)
 
     @staticmethod
-    def update_reward(
-        db: Session,
-        *,
-        viewer: models.User,
-        item_id: int,
-        data: profile_schema.RewardInfoUpdate,
-    ):
-        profile = _get_or_create_profile(db, viewer)
-        obj = (
-            db.query(portrait_models.RewardInfo)
-            .filter(
-                portrait_models.RewardInfo.id == item_id,
-                portrait_models.RewardInfo.profile_id == profile.id,
-            )
-            .first()
-        )
-        if not obj:
-            raise HTTPException(404, f"奖惩 {item_id} 不存在")
-        for k, v in data.model_dump(exclude_unset=True).items():
-            setattr(obj, k, v)
-        db.commit()
-        db.refresh(obj)
-        return obj
+    def update_resume(db: Session, *, viewer, item_id: int, data: profile_schema.ResumeInfoUpdate):
+        return ProfileService._update_subtable_item(db, viewer=viewer, model_cls=portrait_models.ResumeInfo, item_id=item_id, data=data, label="简历")
 
     @staticmethod
-    def delete_reward(db: Session, *, viewer: models.User, item_id: int):
-        profile = _get_or_create_profile(db, viewer)
-        obj = (
-            db.query(portrait_models.RewardInfo)
-            .filter(
-                portrait_models.RewardInfo.id == item_id,
-                portrait_models.RewardInfo.profile_id == profile.id,
-            )
-            .first()
-        )
-        if not obj:
-            raise HTTPException(404, f"奖惩 {item_id} 不存在")
-        db.delete(obj)
-        db.commit()
-        return {"ok": True}
+    def delete_resume(db: Session, *, viewer, item_id: int):
+        return ProfileService._delete_subtable_item(db, viewer=viewer, model_cls=portrait_models.ResumeInfo, item_id=item_id, label="简历")
 
     @staticmethod
-    def add_qualification(
-        db: Session,
-        *,
-        viewer: models.User,
-        data: profile_schema.QualificationInfoCreate,
-    ):
-        profile = _get_or_create_profile(db, viewer)
-        obj = portrait_models.QualificationInfo(profile_id=profile.id, **data.model_dump())
-        db.add(obj)
-        db.commit()
-        db.refresh(obj)
-        return obj
+    def add_reward(db: Session, *, viewer, data: profile_schema.RewardInfoCreate):
+        return ProfileService._add_subtable_item(db, viewer=viewer, model_cls=portrait_models.RewardInfo, data=data)
 
     @staticmethod
-    def update_qualification(
-        db: Session,
-        *,
-        viewer: models.User,
-        item_id: int,
-        data: profile_schema.QualificationInfoUpdate,
-    ):
-        profile = _get_or_create_profile(db, viewer)
-        obj = (
-            db.query(portrait_models.QualificationInfo)
-            .filter(
-                portrait_models.QualificationInfo.id == item_id,
-                portrait_models.QualificationInfo.profile_id == profile.id,
-            )
-            .first()
-        )
-        if not obj:
-            raise HTTPException(404, f"资格 {item_id} 不存在")
-        for k, v in data.model_dump(exclude_unset=True).items():
-            setattr(obj, k, v)
-        db.commit()
-        db.refresh(obj)
-        return obj
+    def update_reward(db: Session, *, viewer, item_id: int, data: profile_schema.RewardInfoUpdate):
+        return ProfileService._update_subtable_item(db, viewer=viewer, model_cls=portrait_models.RewardInfo, item_id=item_id, data=data, label="奖惩")
 
     @staticmethod
-    def delete_qualification(db: Session, *, viewer: models.User, item_id: int):
-        profile = _get_or_create_profile(db, viewer)
-        obj = (
-            db.query(portrait_models.QualificationInfo)
-            .filter(
-                portrait_models.QualificationInfo.id == item_id,
-                portrait_models.QualificationInfo.profile_id == profile.id,
-            )
-            .first()
-        )
-        if not obj:
-            raise HTTPException(404, f"资格 {item_id} 不存在")
-        db.delete(obj)
-        db.commit()
-        return {"ok": True}
+    def delete_reward(db: Session, *, viewer, item_id: int):
+        return ProfileService._delete_subtable_item(db, viewer=viewer, model_cls=portrait_models.RewardInfo, item_id=item_id, label="奖惩")
 
     @staticmethod
-    def add_achievement(
-        db: Session,
-        *,
-        viewer: models.User,
-        data: profile_schema.AchievementInfoCreate,
-    ):
-        profile = _get_or_create_profile(db, viewer)
-        obj = portrait_models.AchievementInfo(profile_id=profile.id, **data.model_dump())
-        db.add(obj)
-        db.commit()
-        db.refresh(obj)
-        return obj
+    def add_qualification(db: Session, *, viewer, data: profile_schema.QualificationInfoCreate):
+        return ProfileService._add_subtable_item(db, viewer=viewer, model_cls=portrait_models.QualificationInfo, data=data)
 
     @staticmethod
-    def update_achievement(
-        db: Session,
-        *,
-        viewer: models.User,
-        item_id: int,
-        data: profile_schema.AchievementInfoUpdate,
-    ):
-        profile = _get_or_create_profile(db, viewer)
-        obj = (
-            db.query(portrait_models.AchievementInfo)
-            .filter(
-                portrait_models.AchievementInfo.id == item_id,
-                portrait_models.AchievementInfo.profile_id == profile.id,
-            )
-            .first()
-        )
-        if not obj:
-            raise HTTPException(404, f"成果 {item_id} 不存在")
-        for k, v in data.model_dump(exclude_unset=True).items():
-            setattr(obj, k, v)
-        db.commit()
-        db.refresh(obj)
-        return obj
+    def update_qualification(db: Session, *, viewer, item_id: int, data: profile_schema.QualificationInfoUpdate):
+        return ProfileService._update_subtable_item(db, viewer=viewer, model_cls=portrait_models.QualificationInfo, item_id=item_id, data=data, label="资格")
 
     @staticmethod
-    def delete_achievement(db: Session, *, viewer: models.User, item_id: int):
-        profile = _get_or_create_profile(db, viewer)
-        obj = (
-            db.query(portrait_models.AchievementInfo)
-            .filter(
-                portrait_models.AchievementInfo.id == item_id,
-                portrait_models.AchievementInfo.profile_id == profile.id,
-            )
-            .first()
-        )
-        if not obj:
-            raise HTTPException(404, f"成果 {item_id} 不存在")
-        db.delete(obj)
-        db.commit()
-        return {"ok": True}
+    def delete_qualification(db: Session, *, viewer, item_id: int):
+        return ProfileService._delete_subtable_item(db, viewer=viewer, model_cls=portrait_models.QualificationInfo, item_id=item_id, label="资格")
 
     @staticmethod
-    def add_language(
-        db: Session,
-        *,
-        viewer: models.User,
-        data: profile_schema.LanguageInfoCreate,
-    ):
-        profile = _get_or_create_profile(db, viewer)
-        obj = portrait_models.LanguageInfo(profile_id=profile.id, **data.model_dump())
-        db.add(obj)
-        db.commit()
-        db.refresh(obj)
-        return obj
+    def add_achievement(db: Session, *, viewer, data: profile_schema.AchievementInfoCreate):
+        return ProfileService._add_subtable_item(db, viewer=viewer, model_cls=portrait_models.AchievementInfo, data=data)
 
     @staticmethod
-    def update_language(
-        db: Session,
-        *,
-        viewer: models.User,
-        item_id: int,
-        data: profile_schema.LanguageInfoUpdate,
-    ):
-        profile = _get_or_create_profile(db, viewer)
-        obj = (
-            db.query(portrait_models.LanguageInfo)
-            .filter(
-                portrait_models.LanguageInfo.id == item_id,
-                portrait_models.LanguageInfo.profile_id == profile.id,
-            )
-            .first()
-        )
-        if not obj:
-            raise HTTPException(404, f"语言能力 {item_id} 不存在")
-        for k, v in data.model_dump(exclude_unset=True).items():
-            setattr(obj, k, v)
-        db.commit()
-        db.refresh(obj)
-        return obj
+    def update_achievement(db: Session, *, viewer, item_id: int, data: profile_schema.AchievementInfoUpdate):
+        return ProfileService._update_subtable_item(db, viewer=viewer, model_cls=portrait_models.AchievementInfo, item_id=item_id, data=data, label="成果")
 
     @staticmethod
-    def delete_language(db: Session, *, viewer: models.User, item_id: int):
-        profile = _get_or_create_profile(db, viewer)
-        obj = (
-            db.query(portrait_models.LanguageInfo)
-            .filter(
-                portrait_models.LanguageInfo.id == item_id,
-                portrait_models.LanguageInfo.profile_id == profile.id,
-            )
-            .first()
-        )
-        if not obj:
-            raise HTTPException(404, f"语言能力 {item_id} 不存在")
-        db.delete(obj)
-        db.commit()
-        return {"ok": True}
+    def delete_achievement(db: Session, *, viewer, item_id: int):
+        return ProfileService._delete_subtable_item(db, viewer=viewer, model_cls=portrait_models.AchievementInfo, item_id=item_id, label="成果")
 
-    # ------------------------------------------------------------------
-    # A11 应急先锋队标识 (Week 3 P0.4) — 仅 admin 直改 (用户 2026-10-10 决策)
-    # ------------------------------------------------------------------
+    @staticmethod
+    def add_language(db: Session, *, viewer, data: profile_schema.LanguageInfoCreate):
+        return ProfileService._add_subtable_item(db, viewer=viewer, model_cls=portrait_models.LanguageInfo, data=data)
+
+    @staticmethod
+    def update_language(db: Session, *, viewer, item_id: int, data: profile_schema.LanguageInfoUpdate):
+        return ProfileService._update_subtable_item(db, viewer=viewer, model_cls=portrait_models.LanguageInfo, item_id=item_id, data=data, label="语言能力")
+
+    @staticmethod
+    def delete_language(db: Session, *, viewer, item_id: int):
+        return ProfileService._delete_subtable_item(db, viewer=viewer, model_cls=portrait_models.LanguageInfo, item_id=item_id, label="语言能力")
+
     @staticmethod
     def set_emergency_staff(
         db: Session,

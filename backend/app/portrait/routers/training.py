@@ -10,6 +10,7 @@ portrait /training 路由 (PRD §10.3 占位)
 import io
 from typing import List
 
+from app.portrait.routers._import_common import read_import_dataframe, require_columns
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 
@@ -114,30 +115,10 @@ async def import_training(
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="仅管理员可批量导入培训记录")
 
-    if file.content_type not in [
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "text/csv",
-    ]:
-        raise HTTPException(status_code=400, detail="只支持 Excel 或 CSV 文件")
-
-    # 延迟导入, 避免 app 启动时强制拉 pandas/openpyxl
-    try:
-        import pandas as pd
-    except ImportError:
-        raise HTTPException(status_code=500, detail="pandas 未安装, 无法解析 Excel")
+    df, pd = await read_import_dataframe(file)
 
     try:
-        contents = await file.read()
-        buffer = io.BytesIO(contents)
-        if file.content_type == "text/csv":
-            df = pd.read_csv(buffer)
-        else:
-            df = pd.read_excel(buffer)
-
-        for col in _TRAINING_REQUIRED_COLS:
-            if col not in df.columns:
-                raise HTTPException(status_code=400, detail=f"缺少必填列: {col}")
+        require_columns(df, _TRAINING_REQUIRED_COLS)
 
         valid_rows: list[training_schema.TrainingImportRow] = []
         parse_failures: list[dict] = []

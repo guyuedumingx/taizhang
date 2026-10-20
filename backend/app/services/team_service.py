@@ -1,5 +1,6 @@
 from typing import Any, List, Optional, Dict
 from collections import defaultdict
+from app.services import domain_events
 from fastapi import HTTPException
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import func
@@ -222,12 +223,13 @@ class TeamService:
         if user.team_id == team_id:
             raise HTTPException(status_code=400, detail="用户已经在团队中")
 
-        # G7 组员调换历史: 在改 team_id 之前调用, record_transfer 从 user.team_id 现读原组。
+        # G7 组员调换历史: 在改 team_id 之前 (处理器从 user.team_id 现读原组)。
         # 放在上面那个 400 之后 —— 同组重复加入不应该留下历史记录。
-        # 局部 import: 核心 service 层不依赖 portrait 扩展层
-        from app.portrait.services.group_transfer_service import record_transfer
-
-        record_transfer(db, user=user, to_team_id=team_id, operator_user_id=current_user_id)
+        # Phase 4: 局部 import 反向依赖已改为中性事件 (portrait 侧自注册处理器)
+        domain_events.dispatch(
+            domain_events.EVENT_USER_TEAM_CHANGED,
+            db, user=user, to_team_id=team_id, operator_user_id=current_user_id,
+        )
 
         # 添加用户到团队
         user.team_id = team_id
@@ -256,11 +258,11 @@ class TeamService:
         if user.team_id != team_id:
             raise HTTPException(status_code=400, detail="用户不在团队中")
 
-        # G7 组员调换历史: to_team_id=None → 记录 to_group="未分组"
-        # 局部 import: 核心 service 层不依赖 portrait 扩展层
-        from app.portrait.services.group_transfer_service import record_transfer
-
-        record_transfer(db, user=user, to_team_id=None, operator_user_id=current_user_id)
+        # G7 组员调换历史: to_team_id=None → 记录 to_group="未分组" (Phase 4: 事件化)
+        domain_events.dispatch(
+            domain_events.EVENT_USER_TEAM_CHANGED,
+            db, user=user, to_team_id=None, operator_user_id=current_user_id,
+        )
 
         # 从团队中移除用户
         user.team_id = None

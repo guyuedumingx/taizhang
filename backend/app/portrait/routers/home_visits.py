@@ -19,6 +19,7 @@ from io import BytesIO
 from typing import Optional
 from urllib.parse import quote
 
+from app.portrait.routers._import_common import read_import_dataframe_sync
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
@@ -422,25 +423,9 @@ def import_home_visits(
     同一个线程池里跑, 依赖 session 与端点体不会跨线程并发操作同一个连接。
     async 端点会在另一个线程池线程里执行, 与依赖 session 并发使用同一连接。
     """
-    if file.content_type not in {
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "text/csv",
-    }:
-        raise HTTPException(status_code=400, detail="只支持 Excel 或 CSV 文件")
-    try:
-        import pandas as pd
-    except ImportError as exc:
-        raise HTTPException(status_code=500, detail=f"pandas 未安装, 无法解析 Excel: {exc}")
+    df, pd = read_import_dataframe_sync(file)
 
     try:
-        contents = file.file.read()
-        buffer = BytesIO(contents)
-        df = (
-            pd.read_csv(buffer)
-            if file.content_type == "text/csv"
-            else pd.read_excel(buffer)
-        )
         missing = [c for c in _HOME_VISIT_REQUIRED if c not in df.columns]
         if missing:
             raise HTTPException(

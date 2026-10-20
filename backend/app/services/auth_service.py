@@ -16,15 +16,16 @@ PASSWORD_MAX_AGE_DAYS = 90
 
 
 def _get_is_first_login(db: Session, user_id: int) -> bool:
-    """读取 portrait_user_metadata.is_first_login. 行不存在时返回 False.
+    """读取首次登录标志 (Phase 4 起存 users.is_first_login).
 
-    行为:
-      - 有 metadata 行 → 返回行的 is_first_login
-      - 无 metadata 行 → 返回 False (兼容旧用户, 不强制改密)
-
-    仅在创建新用户和首次注册时建 metadata 行 (is_first_login=True).
+    兼容读: 列为 NULL 的存量用户回落旧表 portrait_user_metadata ——
+    迁移脚本回填后回落分支自然失活, 保留一个过渡期。
     """
-    # 延迟导入避免循环依赖
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        return False
+    if user.is_first_login is not None:
+        return bool(user.is_first_login)
     from app.portrait.models.user_metadata import PortraitUserMetadata
     meta = (
         db.query(PortraitUserMetadata)
@@ -35,17 +36,11 @@ def _get_is_first_login(db: Session, user_id: int) -> bool:
 
 
 def _set_is_first_login(db: Session, user_id: int, value: bool) -> None:
-    """更新或新建 portrait_user_metadata.is_first_login"""
-    from app.portrait.models.user_metadata import PortraitUserMetadata
-    meta = (
-        db.query(PortraitUserMetadata)
-        .filter(PortraitUserMetadata.user_id == user_id)
-        .first()
-    )
-    if meta:
-        meta.is_first_login = value
-    else:
-        db.add(PortraitUserMetadata(user_id=user_id, is_first_login=value))
+    """更新 users.is_first_login (旧表 portrait_user_metadata 不再写)"""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        return
+    user.is_first_login = value
     db.commit()
 
 

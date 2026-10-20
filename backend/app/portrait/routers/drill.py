@@ -3,6 +3,10 @@ import io
 from datetime import date
 from typing import Optional
 
+from app.portrait.routers._import_common import (
+    read_import_dataframe,
+    require_columns,
+)
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
 
@@ -114,24 +118,9 @@ async def import_drills(
     file: UploadFile = File(...),
 ):
     _require_admin(current_user)
-    if file.content_type not in {
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "text/csv",
-    }:
-        raise HTTPException(status_code=400, detail="只支持 Excel 或 CSV 文件")
+    df, pd = await read_import_dataframe(file)
+    require_columns(df, _DRILL_COLS)
     try:
-        import pandas as pd
-    except ImportError as exc:
-        raise HTTPException(status_code=500, detail=f"pandas 未安装, 无法解析 Excel: {exc}")
-
-    try:
-        contents = await file.read()
-        buffer = io.BytesIO(contents)
-        df = pd.read_csv(buffer) if file.content_type == "text/csv" else pd.read_excel(buffer)
-        missing = [col for col in _DRILL_COLS if col not in df.columns]
-        if missing:
-            raise HTTPException(status_code=400, detail=f"缺少必填列: {', '.join(missing)}")
 
         rows = []
         parse_failures = []

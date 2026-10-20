@@ -209,3 +209,14 @@ class GroupTransferService:
 
 
 group_transfer_service = GroupTransferService()
+
+# Phase 4: 组员调换留痕改为事件注册 —— 核心层 (team/user service) 只 dispatch
+# 中性事件名, 不再反向 import 本模块; 单独部署台账核心时本模块不加载也零影响。
+from app.services import domain_events as _domain_events
+
+
+def _on_user_team_changed(db, *, user, to_team_id, operator_user_id):
+    record_transfer(db, user=user, to_team_id=to_team_id, operator_user_id=operator_user_id)
+
+
+_domain_events.register(_domain_events.EVENT_USER_TEAM_CHANGED, _on_user_team_changed)
