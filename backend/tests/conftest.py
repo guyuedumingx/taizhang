@@ -139,7 +139,7 @@ def admin_user(db: Session) -> models.User:
         username="admin",
         ehr_id="1000001",
         name="测试管理员",
-        password="admin123",
+        password="Admin123!",
         department="测试部门",
         is_superuser=True,
         is_active=True,
@@ -156,7 +156,7 @@ def normal_user(db: Session) -> models.User:
 
     赋 'user' 角色（生产默认角色），否则 casbin 侧无任何放行。
     """
-    user = create_random_user(db, email="user@example.com", password="user123")
+    user = create_random_user(db, email="user@example.com", password="User123!")
     casbin_service.add_role_for_user(str(user.id), "user")
     return user
 

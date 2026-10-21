@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from pydantic import BaseModel, validator
 
 from app.core.ehr_validator import EhrIdStr
+from app.core.password_validator import validate_password_strength
 
 
 # 共享属性
@@ -25,11 +26,25 @@ class UserCreate(UserBase):
     name: str
     roles: Optional[List[str]] = None
 
+    # 2026-10-21 决策: 密码策略全局统一 (见 app/core/password_validator.py)。
+    # 此前建号接口对密码**零校验**, 前端只要求"至少 6 个字符" —— 管理员可以
+    # 建出 6 位纯数字的账号, 与 Excel 导入端的复杂度要求自相矛盾。
+    @validator("password")
+    def _password_policy(cls, v: str) -> str:
+        return validate_password_strength(v, label="密码")
+
 
 # 更新用户时的属性
 class UserUpdate(UserBase):
     password: Optional[str] = None
     roles: Optional[list[str]] = None
+
+    # 管理员重置密码走同一条规则 (传了才校验, 不传=不改密码)
+    @validator("password")
+    def _password_policy(cls, v: Optional[str]) -> Optional[str]:
+        if v is None or v == "":
+            return v
+        return validate_password_strength(v, label="新密码")
 
 
 # 自助更新白名单 (Phase 0: 评审 P0-3)。

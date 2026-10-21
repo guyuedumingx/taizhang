@@ -11,7 +11,7 @@ from app.core.security import verify_password
 def test_authenticate_user(db: Session, normal_user: models.User):
     """测试用户登录"""
     # 验证正确的凭据
-    token = auth_service.authenticate_user(db, ehr_id=normal_user.ehr_id, password="password123")
+    token = auth_service.authenticate_user(db, ehr_id=normal_user.ehr_id, password="Password123!")
     
     # 验证结果
     assert token
@@ -26,7 +26,7 @@ def test_authenticate_user(db: Session, normal_user: models.User):
     
     # 测试不存在的用户
     with pytest.raises(HTTPException) as excinfo:
-        auth_service.authenticate_user(db, ehr_id="9999999", password="password123")
+        auth_service.authenticate_user(db, ehr_id="9999999", password="Password123!")
     assert excinfo.value.status_code == 401
 
 # 测试用户注册
@@ -36,7 +36,7 @@ def test_register_user(db: Session):
     user_in = schemas.UserCreate(
         username="registeruser",
         ehr_id="1234567",  # 7位数字
-        password="password123",
+        password="Password123!",
         name="注册用户",
         department="测试部门"
     )
@@ -60,8 +60,8 @@ def test_change_password(db: Session, normal_user: models.User):
     """测试修改密码"""
     # 修改密码数据
     password_data = schemas.PasswordChange(
-        current_password="password123",
-        new_password="newpassword123"
+        current_password="Password123!",
+        new_password="NewPassword123!"
     )
     
     # 修改密码
@@ -73,7 +73,7 @@ def test_change_password(db: Session, normal_user: models.User):
     
     # 刷新用户数据
     db.refresh(normal_user)
-    assert verify_password("newpassword123", normal_user.hashed_password)
+    assert verify_password("NewPassword123!", normal_user.hashed_password)
     
     # 测试错误的旧密码
     password_data.current_password = "wrongpassword"

@@ -66,6 +66,16 @@ export async function importUsers(file: File): Promise<{
       'Content-Type': 'multipart/form-data'
     }
   });
-  
+
+  return response.data;
+}
+
+// 下载员工导入 Excel 模板 (决策 2)
+// 模板由后端生成, 前端不再自行拼 CSV —— 两处各写一份列名必然漂移。
+// 4 列: EHR号 / 姓名 / 组别 / 初始密码 (全必填)
+export async function downloadUserImportTemplate(): Promise<Blob> {
+  const response = await api.get('/portrait/templates/excel/user-import', {
+    responseType: 'blob',
+  });
   return response.data;
 } 

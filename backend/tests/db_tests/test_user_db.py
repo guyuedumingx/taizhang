@@ -209,7 +209,7 @@ def test_get_multi_by_team(db: Session, test_user: dict, test_team: dict):
     another_user_in = schemas.UserCreate(
         username="another_user",
         ehr_id="9876543",  # 改为7位
-        password="password123",
+        password="Password123!",
         name="Another User",
         department="Another Department",
         is_active=True,

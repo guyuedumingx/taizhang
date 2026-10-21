@@ -17,7 +17,7 @@ def create_test_user():
         user = User(
             username="testuser",
             ehr_id="1234567",
-            hashed_password=get_password_hash("password123"),
+            hashed_password=get_password_hash("Password123!"),
             name="测试用户",
             department="测试部门",
             is_active=True,

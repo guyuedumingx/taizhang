@@ -3,6 +3,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, field_validator
 
+from app.core.password_validator import validate_password_strength
+
 
 class Token(BaseModel):
     access_token: str
@@ -25,15 +27,17 @@ class PasswordChange(BaseModel):
     current_password: str
     new_password: str
 
-    # Phase 0 (评审 P1-6): 后端密码策略。与前端 PasswordExpiredModal 规则一致
-    # (PRD §3.2 基线): 至少 6 位纯数字。此前后端零校验, 直接调 API 连 6 位
-    # 都不要求 —— 前端规则是唯一防线。强度提升另行立项, 本阶段先做到前后端一致。
+    # 2026-10-21 决策: 密码策略全局统一为「大小写 + 数字 + 特殊字符, ≥8 位」
+    # (决策 2 的导入规则)。此前这里是"至少 6 位纯数字", 与导入端相反 ——
+    # 管理员在 Excel 里填强密码, 员工首登强制改密时却被要求改成 123456,
+    # 安全强度在改密这一步被反向击穿。
+    #
+    # 只校验**新密码**, 不校验旧密码: 存量用户的 6 位纯数字密码仍能登录,
+    # 但改密时必须设成强密码 (这正是要的效果)。
     @field_validator("new_password")
     @classmethod
     def _new_password_policy(cls, v: str) -> str:
-        if len(v) < 6 or not v.isdigit():
-            raise ValueError("新密码必须为至少6位数字")
-        return v
+        return validate_password_strength(v, label="新密码")
 
 
 class PasswordChangeResponse(BaseModel):

@@ -7,13 +7,13 @@ from app import crud, models, schemas
 from app.core.config import settings
 from app.main import app
 from tests.utils.user import create_random_user
-from tests.utils.utils import random_email, random_lower_string
+from tests.utils.utils import random_email, random_lower_string, random_compliant_password
 
 client = TestClient(app)
 
 def test_login_access_token(db: Session):
     """测试用户登录获取访问令牌"""
-    password = random_lower_string()
+    password = random_compliant_password()
     username = random_lower_string(8)
     ehr_id = f"{100_0000 + abs(hash(username)) % 900_0000}"[-7:]
     
@@ -49,7 +49,7 @@ def test_login_access_token(db: Session):
 
 def test_login_access_token_with_wrong_password(db: Session):
     """测试用户使用错误密码登录"""
-    password = random_lower_string()
+    password = random_compliant_password()
     username = random_lower_string(8)
     ehr_id = f"{100_0000 + abs(hash(username)) % 900_0000}"[-7:]
     

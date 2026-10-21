@@ -206,3 +206,40 @@ def download_home_visit_template():
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": 'attachment; filename="home_visit_import_template.xlsx"'},
     )
+
+
+# ============================================================================
+# 员工导入模板 (2026-10-16 决策 2)
+# ============================================================================
+_USER_IMPORT_HEADERS = ["EHR号", "姓名", "组别", "初始密码"]
+_USER_IMPORT_SAMPLE = [
+    "0000001",
+    "张三",
+    "审核一组",
+    "Ab3#efGh9",
+]
+
+
+@router.get("/excel/user-import", summary="下载员工导入 Excel 模板 (决策 2)")
+def download_user_import_template():
+    """员工批量导入模板 — 4 列全必填
+
+    - EHR号: 7 位数字, 唯一, 也是登录标识 (登录走 EHR 号, 不是用户名)
+    - 姓名: 与系统已有姓名不一致时整行失败, 不静默覆盖
+    - 组别: 按**组名**匹配; 匹配不到整行失败, 请先在团队管理里建组
+    - 初始密码: 管理员逐个填。必须同时含大写、小写、数字、特殊字符, 且 >=8 位。
+      不合规整行失败并列出缺哪几项。首登强制改密 (is_first_login) 已实现。
+    """
+    if not _OPENPYXL_AVAILABLE:
+        raise HTTPException(status_code=500, detail="openpyxl 未安装")
+
+    xlsx_bytes = _build_workbook(
+        headers=_USER_IMPORT_HEADERS,
+        sample_row=_USER_IMPORT_SAMPLE,
+        sheet_name="员工导入",
+    )
+    return StreamingResponse(
+        BytesIO(xlsx_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="user_import_template.xlsx"'},
+    )

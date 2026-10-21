@@ -9,11 +9,66 @@ from datetime import datetime
 from app import models, schemas
 from app.api import deps
 from app.core.ehr_validator import validate_ehr_format
+from app.core.password_validator import validate_password_strength
 from app.core.security import get_password_hash
 from app.services.casbin_service import add_role_for_user, remove_role_for_user, get_roles_for_user, get_permissions_for_role
 from app.services.user_service import UserService as user_service
 
 router = APIRouter()
+
+# 员工导入模板列 (2026-10-16 决策 2): 4 列全必填
+#   EHR 号  登录标识 (auth.py:25 authenticate_user(ehr_id=...)), 7 位数字唯一
+#   姓名    与系统已有姓名冲突时报错, 不静默覆盖
+#   组别    按组名匹配; 匹配不到整行失败, 不静默留空 (原实现 team_id 匹配不到
+#           就留 None, 员工成了无组孤儿 —— Rule 12 静默降级)
+#   初始密码 管理员逐个填, 必须含大小写+数字+特殊字符且 ≥8 位
+_USER_IMPORT_COLUMNS = {
+    "EHR号": "ehr_id",
+    "ehr_id": "ehr_id",
+    "姓名": "name",
+    "name": "name",
+    "组别": "team_name",
+    "team_name": "team_name",
+    "初始密码": "password",
+    "password": "password",
+}
+
+
+def _resolve_user_import_columns(df) -> Dict[str, str]:
+    """把 Excel 表头映射成内部字段名。
+
+    中文列名是模板的主形态 (与家访/培训模板一致), 同时接受英文别名,
+    兼容既有调用方。
+
+    Returns:
+        {内部字段名: 实际列名}, 键恒为 ehr_id / name / team_name / password
+    Raises:
+        HTTPException 400: 缺必填列, 消息列出**全部**缺失项
+    """
+    resolved: Dict[str, str] = {}
+    for col in df.columns:
+        field = _USER_IMPORT_COLUMNS.get(str(col).strip())
+        if field:
+            resolved[field] = col
+
+    # 注意比对的是**内部字段名** (resolved 的键), 不是中文表头 —— 两者只有
+    # name 恰好同名, 用中文去查会把另外 3 列全报成缺失。
+    required = {
+        "ehr_id": "EHR号",
+        "name": "姓名",
+        "team_name": "组别",
+        "password": "初始密码",
+    }
+    missing = [label for field, label in required.items() if field not in resolved]
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"缺少必要的列: {', '.join(missing)} "
+                f"(模板共 4 列: EHR号 / 姓名 / 组别 / 初始密码)"
+            ),
+        )
+    return resolved
 
 
 @router.get("/", response_model=schemas.PaginatedResponse[schemas.User])
@@ -196,90 +251,113 @@ def import_users(
         else:
             df = pd.read_excel(buffer)
         
-        # 验证必要的列
-        required_columns = ["username", "ehr_id", "password", "name"]
-        for column in required_columns:
-            if column not in df.columns:
-                raise HTTPException(
-                    status_code=400, detail=f"缺少必要的列: {column}"
-                )
-        
+        # 验证必要的列 (决策 2: 4 列必填, 中文表头为主, 兼容英文别名)
+        cols = _resolve_user_import_columns(df)
+
         # 处理导入结果
         success_count = 0
         failed_users = []
-        
+
         # 处理每一行数据
         for index, row in df.iterrows():
+            # Excel 行号从 2 开始 (第 1 行是表头), 供管理员回到表里定位
+            excel_row = index + 2
+            name_hint = str(row[cols["name"]]) if pd.notna(row[cols["name"]]) else "未知"
             try:
                 # PRD §3.2 + §17.3: 批量导入统一校验 EHR 格式 (恰好 7 位数字)
-                ehr_value = str(row["ehr_id"])
+                ehr_value = str(row[cols["ehr_id"]]).strip()
+                if ehr_value.endswith(".0"):  # Excel 把 7 位 EHR 读成数字时会带 .0
+                    ehr_value = ehr_value[:-2]
                 try:
                     validate_ehr_format(ehr_value)
                 except ValueError as e:
                     failed_users.append({
-                        "row": index + 2,
-                        "username": row["username"] if "username" in row else "未知",
+                        "row": excel_row,
+                        "username": name_hint,
                         "reason": f"EHR号格式错误: {e}",
                     })
                     continue
 
-                # 检查用户名和EHR号是否已存在
-                user_by_username = db.query(models.User).filter(models.User.username == row["username"]).first()
-                user_by_ehr_id = db.query(models.User).filter(models.User.ehr_id == ehr_value).first()
-                
-                if user_by_username:
+                name_value = str(row[cols["name"]]).strip()
+
+                # 决策 2: 初始密码强度校验, 不合规整行失败 (不静默降级成弱密码)
+                password_value = row[cols["password"]]
+                if pd.isna(password_value):
                     failed_users.append({
-                        "row": index + 2,  # Excel行号从1开始，标题占一行
-                        "username": row["username"],
-                        "reason": "用户名已存在"
+                        "row": excel_row,
+                        "username": name_hint,
+                        "reason": "初始密码为空",
                     })
                     continue
-                
+                try:
+                    validate_password_strength(str(password_value), label="初始密码")
+                except ValueError as e:
+                    failed_users.append({
+                        "row": excel_row,
+                        "username": name_hint,
+                        "reason": str(e),
+                    })
+                    continue
+
+                # 组别按名字匹配。匹配不到整行失败 —— 不静默留空, 否则员工成了
+                # 无组孤儿, 后续权限判定 (本项目按组判组长) 会把他当普通员工,
+                # 错得没有任何提示。
+                team_name_value = str(row[cols["team_name"]]).strip()
+                team = (
+                    db.query(models.Team)
+                    .filter(models.Team.name == team_name_value)
+                    .first()
+                )
+                if not team:
+                    failed_users.append({
+                        "row": excel_row,
+                        "username": name_hint,
+                        "reason": f"组别不存在: {team_name_value} (请先在团队管理里建组)",
+                    })
+                    continue
+
+                # EHR 号是登录标识 (auth.py:25), 唯一; 已存在即整行失败并说明原因
+                user_by_ehr_id = db.query(models.User).filter(
+                    models.User.ehr_id == ehr_value
+                ).first()
                 if user_by_ehr_id:
                     failed_users.append({
-                        "row": index + 2,
-                        "username": row["username"],
-                        "reason": "EHR号已存在"
+                        "row": excel_row,
+                        "username": name_hint,
+                        "reason": f"EHR号已存在 ({user_by_ehr_id.name})",
                     })
                     continue
-                
+
                 # 创建用户
                 user = models.User(
-                    username=row["username"],
+                    # username 列 NOT NULL+unique 但不参与登录 (登录走 ehr_id),
+                    # 模板不设该列, 用 EHR 号填充保证唯一且可追溯
+                    username=ehr_value,
                     ehr_id=ehr_value,
-                    hashed_password=get_password_hash(row["password"]),
-                    name=row["name"],
-                    department=row.get("department", ""),
+                    hashed_password=get_password_hash(str(password_value)),
+                    name=name_value,
+                    department="",
                     is_active=True,
                     is_superuser=False,
-                    team_id=None,
-                    last_password_change=datetime.now()
+                    team_id=team.id,
+                    last_password_change=datetime.now(),
                 )
-                
-                # 添加团队（如果提供）
-                if "team_id" in df.columns and not pd.isna(row["team_id"]):
-                    team = db.query(models.Team).filter(models.Team.id == row["team_id"]).first()
-                    if team:
-                        user.team_id = team.id
-                
+
                 db.add(user)
                 db.commit()
                 db.refresh(user)
-                
-                # 添加角色（如果提供）
-                if "role" in df.columns and not pd.isna(row["role"]):
-                    add_role_for_user(str(user.id), row["role"])
-                else:
-                    # 默认角色为普通用户
-                    add_role_for_user(str(user.id), "user")
-                
+
+                # 决策 2 未定义角色列 —— 统一按普通用户建, 组长身份走
+                # teams.leader_id (决策 1), 不在这里靠 casbin 角色表达
+                add_role_for_user(str(user.id), "user")
+
                 success_count += 1
-                
+
             except Exception as e:
                 failed_users.append({
-                    "row": index + 2,
-                    "username": row["username"] if "username" in row else "未知",
-                    "reason": str(e)
+                    "row": excel_row,
+                    "username": name_hint,
+                    "reason": str(e),
                 })
         
         return {
@@ -288,6 +366,11 @@ def import_users(
             "failed_users": failed_users
         }
     
+    except HTTPException:
+        # 上层已显性化的 4xx (如缺列) 必须原样抛出去, 不能被下面的
+        # except Exception 吞成 500 —— 否则管理员看到的是"服务器错误",
+        # 完全不知道是自己 Excel 少了一列。
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"导入用户时发生错误: {str(e)}"

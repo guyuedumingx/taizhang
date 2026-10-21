@@ -10,6 +10,7 @@ import { User, Team, Role, UserCreate, UserUpdate } from '../../types';
 import useDepartments from '../../hooks/useDepartments';
 import type { ColumnsType } from 'antd/es/table';
 import BreadcrumbNav from '../../components/common/BreadcrumbNav';
+import { downloadBlobAsFile } from '../../utils/exportUtils';
 import type { UploadRequestOption } from 'rc-upload/lib/interface';
 
 const { Title } = Typography;
@@ -342,28 +343,16 @@ const UserManagement: React.FC = () => {
     }
   };
   
-  // 下载导入模板
-  const handleDownloadTemplate = () => {
-    // 创建一个包含标题行的CSV内容
-    const csvContent = 'username,ehr_id,password,name,department,role,team_id\n' +
-                      'user1,1234567,password123,用户1,技术部,user,1\n' +
-                      'user2,7654321,password123,用户2,市场部,user,2';
-    
-    // 创建Blob对象
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    // 创建下载链接
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.href = url;
-    link.setAttribute('download', '用户导入模板.csv');
-    document.body.appendChild(link);
-    link.click();
-    
-    // 清理
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  // 下载导入模板 (决策 2)
+  // 模板由后端生成 —— 前端不再自行拼 CSV, 避免两处列名定义漂移
+  const handleDownloadTemplate = async () => {
+    try {
+      const blob = await UserService.downloadImportTemplate();
+      downloadBlobAsFile(blob, '员工导入模板.xlsx');
+    } catch (error) {
+      console.error('下载导入模板失败:', error);
+      message.error('下载导入模板失败, 请稍后重试');
+    }
   };
 
   return (
@@ -448,18 +437,29 @@ const UserManagement: React.FC = () => {
               name="password"
               rules={[
                 { required: !editingUserId, message: '请输入密码' },
-                { min: 6, message: '密码至少6个字符' },
+                { min: 8, message: '密码至少8位' },
+                { pattern: /[A-Z]/, message: '必须含大写字母' },
+                { pattern: /[a-z]/, message: '必须含小写字母' },
+                { pattern: /[0-9]/, message: '必须含数字' },
+                { pattern: /[^A-Za-z0-9\s]/, message: '必须含特殊字符' },
               ]}
             >
               <Input.Password />
             </Form.Item>
           )}
-          
+
           {editingUserId && (
             <Form.Item
               label="密码"
               name="password"
-              extra="如不修改密码，请留空"
+              extra="如不修改密码，请留空；如修改，须至少8位且含大小写字母、数字、特殊字符"
+              rules={[
+                { min: 8, message: '密码至少8位' },
+                { pattern: /[A-Z]/, message: '必须含大写字母' },
+                { pattern: /[a-z]/, message: '必须含小写字母' },
+                { pattern: /[0-9]/, message: '必须含数字' },
+                { pattern: /[^A-Za-z0-9\s]/, message: '必须含特殊字符' },
+              ]}
             >
               <Input.Password />
             </Form.Item>
@@ -563,8 +563,17 @@ const UserManagement: React.FC = () => {
         width={700}
       >
         <Typography.Paragraph>
-          请上传用户数据文件，支持Excel和CSV格式。文件必须包含以下列：username、ehr_id、password、name。
-          其他可选列：department、roles、team_id。
+          请上传员工数据文件，支持 Excel 和 CSV 格式。文件必须包含以下 4 列（均必填）：
+          <br />
+          · <strong>EHR号</strong>：7 位数字，唯一，同时是登录标识（登录用 EHR 号，不用用户名）
+          <br />
+          · <strong>姓名</strong>
+          <br />
+          · <strong>组别</strong>：填组名（如"审核一组"），需与系统已有组名一致
+          <br />
+          · <strong>初始密码</strong>：须同时含大写字母、小写字母、数字、特殊字符，且不少于 8 位
+          <br />
+          任一行不合规整行失败并在下方结果中逐行列出原因，不影响其余行导入。
         </Typography.Paragraph>
         
         <Upload.Dragger
@@ -616,7 +625,7 @@ const UserManagement: React.FC = () => {
                   dataSource={importResult.failed_users}
                   columns={[
                     { title: '行号', dataIndex: 'row', key: 'row' },
-                    { title: '用户名', dataIndex: 'username', key: 'username' },
+                    { title: '姓名', dataIndex: 'username', key: 'username' },
                     { title: '失败原因', dataIndex: 'reason', key: 'reason' }
                   ]}
                   size="small"

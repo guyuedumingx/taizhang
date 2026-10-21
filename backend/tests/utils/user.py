@@ -1,6 +1,6 @@
 from app import crud, models, schemas
 from sqlalchemy.orm import Session
-from .utils import random_lower_string, random_email
+from .utils import random_lower_string, random_email, random_compliant_password
 
 
 def create_random_user(db: Session, email=None, password=None):
@@ -10,7 +10,7 @@ def create_random_user(db: Session, email=None, password=None):
     if email is None:
         email = random_email()
     if password is None:
-        password = random_lower_string()
+        password = random_compliant_password()
     
     # 生成随机用户名和EHR ID
     username = random_lower_string(8)

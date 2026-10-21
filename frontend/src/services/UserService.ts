@@ -107,6 +107,17 @@ export class UserService {
     }
   }
 
+  // 下载员工导入 Excel 模板 (决策 2)
+  // 模板由后端生成, 前端不自行拼 CSV —— 避免两处列名定义漂移
+  static async downloadImportTemplate(): Promise<Blob> {
+    try {
+      return await api.users.downloadUserImportTemplate();
+    } catch (error) {
+      console.error('下载导入模板失败:', error);
+      throw error;
+    }
+  }
+
   // 获取当前用户信息
   static async getCurrentUser(): Promise<User> {
     try {

@@ -140,7 +140,7 @@ def test_get_team_members(db: Session, test_team: dict, test_user: dict):
     # 创建用户
     user_in = schemas.UserCreate(
         username=test_user["username"],
-        password="password123",
+        password="Password123!",
         ehr_id=test_user["ehr_id"],
         name=test_user["name"],
         department=test_user["department"],

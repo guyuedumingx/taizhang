@@ -29,8 +29,8 @@ def test_user() -> Dict[str, Any]:
     return {
         "username": "testuser",
         "ehr_id": "1234567",
-        "password": "password123",
-        "hashed_password": get_password_hash("password123"),
+        "password": "Password123!",
+        "hashed_password": get_password_hash("Password123!"),
         "name": "Test User",
         "department": "Test Department",
         "is_active": True,
@@ -44,8 +44,8 @@ def test_admin() -> Dict[str, Any]:
     return {
         "username": "testadmin",
         "ehr_id": "7654321",
-        "password": "admin123",
-        "hashed_password": get_password_hash("admin123"),
+        "password": "Admin123!",
+        "hashed_password": get_password_hash("Admin123!"),
         "name": "Test Admin",
         "department": "Admin Department",
         "is_active": True,

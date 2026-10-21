@@ -21,7 +21,7 @@ def test_create_user(db: Session):
     user_in = schemas.UserCreate(
         username="testuser",
         ehr_id="1234567",  # 确保是7位数字
-        password="password123",
+        password="Password123!",
         name="测试用户",
         department="测试部门",
         team_id=None,
@@ -88,7 +88,7 @@ def test_delete_user(db: Session):
     user_in = schemas.UserCreate(
         username="deleteuser",
         ehr_id="7654321",  # 确保是7位数字
-        password="password123",
+        password="Password123!",
         name="待删除用户",
         department="测试部门",
         roles=["user"]  # 添加 roles 属性

@@ -82,13 +82,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onFinish, loading }) => {
         name="password"
         rules={[
           { required: true, message: '请输入密码' },
-          { min: 6, message: '密码至少6位数字' },
-          { pattern: /^\d+$/, message: '密码必须是数字' },
+          { min: 8, message: '密码至少8位' },
+          { pattern: /[A-Z]/, message: '密码必须含大写字母' },
+          { pattern: /[a-z]/, message: '密码必须含小写字母' },
+          { pattern: /[0-9]/, message: '密码必须含数字' },
+          { pattern: /[^A-Za-z0-9\s]/, message: '密码必须含特殊字符' },
         ]}
       >
         <Input.Password
           prefix={<LockOutlined className="site-form-item-icon" />}
-          placeholder="6位数字密码"
+          placeholder="至少8位，含大小写字母、数字、特殊字符"
           autoComplete="new-password"
         />
       </Form.Item>
