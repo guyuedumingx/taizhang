@@ -20,6 +20,9 @@ var/
 .installed.cfg
 *.egg
 venv/
+# 注意: 上面 venv/ 按目录名精确匹配, **不匹配** .venv/ (d1d3464 曾把整个
+# backend/.venv 提交进仓库, 就是这个漏网)。两种写法都留着。
+.venv/
 .env
 
 # Node
@@ -29,6 +32,8 @@ yarn-debug.log
 yarn-error.log
 .pnpm-debug.log
 *.log
+# 轮转出来的日志 (backend.log.1 等) —— *.log 盖不住带序号的
+*.log.*
 .DS_Store
 coverage/
 .env.local
