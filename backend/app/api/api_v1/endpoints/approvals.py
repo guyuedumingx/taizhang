@@ -402,20 +402,12 @@ def cancel_approval(
     if not ledger:
         raise HTTPException(status_code=404, detail="台账不存在")
     
-    # 检查台账是否属于当前用户或用户是否为超级管理员
+    # 撤回仅限台账创建人本人（或超级管理员）。
+    # 原先这里还有一段"组长代组员撤回"的分支，但它查询的 models.team_members 表
+    # 从未在 ORM 中定义过 —— 任何非创建人调用都会抛 AttributeError 返回 500，
+    # 而不是 403。已按决策（组长无需帮组员撤回，撤回是台账域自己的管理动作）删除。
     if ledger.created_by_id != current_user.id and not crud.user.is_superuser(current_user):
-        # 检查用户是否在台账所属团队中且有管理权限
-        if ledger.team_id:
-            team_member = db.query(models.team_members).filter(
-                models.team_members.c.team_id == ledger.team_id,
-                models.team_members.c.user_id == current_user.id,
-                models.team_members.c.is_admin == True
-            ).first()
-            
-            if not team_member:
-                raise HTTPException(status_code=403, detail="无权取消此台账的审批流程")
-        else:
-            raise HTTPException(status_code=403, detail="无权取消此台账的审批流程")
+        raise HTTPException(status_code=403, detail="无权取消此台账的审批流程")
     
     # 检查台账状态
     if ledger.status != "active" or ledger.approval_status != "pending":
