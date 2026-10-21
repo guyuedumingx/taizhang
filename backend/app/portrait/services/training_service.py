@@ -16,13 +16,21 @@ from app import models
 from app.core.ehr_validator import validate_ehr_format
 from app.portrait import models as portrait_models
 from app.portrait.schemas import training as training_schema
+from app.services.team_service import TeamService
 
 
-def _can_view_training(viewer: models.User, target_user: models.User) -> bool:
-    """与 profile_service._can_view_profile 一致 (Rule 7 单一模式)"""
+def _can_view_training(db: Session, viewer: models.User, target_user: models.User) -> bool:
+    """与 profile_service._can_view_profile 一致 (Rule 7 单一模式)
+
+    决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id)。
+    """
     if viewer.is_superuser:
         return True
-    if viewer.team_id and viewer.team_id == target_user.team_id:
+    if (
+        TeamService.is_leader(db, viewer)
+        and viewer.team_id
+        and viewer.team_id == target_user.team_id
+    ):
         return True
     if viewer.id == target_user.id:
         return True
@@ -49,7 +57,7 @@ class TrainingService:
         target_user = db.query(models.User).filter(models.User.id == user_id).first()
         if not target_user:
             raise HTTPException(status_code=404, detail="用户不存在")
-        if not _can_view_training(viewer, target_user):
+        if not _can_view_training(db, viewer, target_user):
             raise HTTPException(status_code=403, detail="无权查看该用户的培训记录")
         return (
             db.query(portrait_models.TrainingRecord)

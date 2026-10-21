@@ -37,26 +37,82 @@ def test_get_teams(db: Session, team: models.Team):
 
 
 def test_create_team(db: Session, normal_user: models.User):
-    """测试创建团队"""
+    """测试创建团队
+
+    决策 1 (2026-10-16): 组长身份记在「组」上 (``teams.leader_id``), 且组长
+    必须是本组成员。未指定负责人时本组暂无组长, 创建者**不会**被静默调进
+    新组 (那是"建组 = 换组"的副作用, 且会让新建的组因带成员而无法删除)。
+    """
     # 创建测试数据
     team_in = schemas.TeamCreate(
         name="新团队",
         description="这是一个新团队",
         department="新部门"
     )
-    
+
     # 创建团队
     team = team_service.create_team(db, team_in, normal_user.id)
-    
+
     # 验证创建结果
     assert team.name == "新团队"
     assert team.description == "这是一个新团队"
     assert team.department == "新部门"
-    assert team.leader_id == normal_user.id
-    
+    assert team.leader_id is None, "未指定负责人时不该凭空指定一个组长"
+    db.refresh(normal_user)
+    assert normal_user.team_id is None, "建组不该把创建者静默调进新组"
+
     # 测试创建重复名称的团队
     with pytest.raises(Exception):
         team_service.create_team(db, team_in, normal_user.id)
+
+
+def test_create_team_with_leader(db: Session, normal_user: models.User):
+    """建组时指定负责人 → 该人成为组长并被调入本组
+
+    组长必须在组内 (``teams.leader_id`` 是判据的唯一来源), 所以指定负责人
+    等于把他作为首任组员拉进来。
+    """
+    leader = models.User(
+        username="designated_leader",
+        ehr_id="1234571",
+        hashed_password="hashed_password",
+        name="指定负责人",
+        department="新部门",
+        is_active=True,
+        is_superuser=False,
+    )
+    db.add(leader)
+    db.commit()
+    db.refresh(leader)
+
+    team_in = schemas.TeamCreate(
+        name="有组长的新团队",
+        description="这是一个新团队",
+        department="新部门",
+        leader_id=leader.id,
+    )
+    team = team_service.create_team(db, team_in, normal_user.id)
+
+    assert team.leader_id == leader.id
+    db.refresh(leader)
+    assert leader.team_id == team.id, "负责人应被调入本组"
+
+
+def test_create_team_with_nonexistent_leader(db: Session, normal_user: models.User):
+    """建组时指定不存在的负责人 → 400, 且不留下半截数据"""
+    team_in = schemas.TeamCreate(
+        name="无效负责人的团队",
+        description="这是一个新团队",
+        department="新部门",
+        leader_id=99999999,
+    )
+    with pytest.raises(Exception):
+        team_service.create_team(db, team_in, normal_user.id)
+
+    assert (
+        db.query(models.Team).filter(models.Team.name == "无效负责人的团队").first()
+        is None
+    ), "被拒的建组请求不该留下组"
 
 
 def test_get_team(db: Session, team: models.Team):
@@ -140,7 +196,7 @@ def test_add_user_to_team(db: Session, team: models.Team, normal_user: models.Us
     user_in = schemas.UserCreate(
         username="teamuser",
         ehr_id="1234568",  # 确保是7位数字
-        password="password123",
+        password="Password123!",
         name="团队成员",
         department="测试部门",
     )
@@ -183,7 +239,7 @@ def test_remove_user_from_team(db: Session, team: models.Team, normal_user: mode
     user_in = schemas.UserCreate(
         username="teamuser2",
         ehr_id="1234569",  # 确保是7位数字
-        password="password123",
+        password="Password123!",
         name="团队成员2",
         department="测试部门",
     )

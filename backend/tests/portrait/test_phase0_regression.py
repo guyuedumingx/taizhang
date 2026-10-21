@@ -27,7 +27,8 @@ client = TestClient(app)
 API_PORTRAIT = f"{settings.API_V1_STR}/portrait"
 
 
-def _mk_user(db, username, ehr_id, team_id=None, is_superuser=False):
+def _mk_user(db, username, ehr_id, team_id=None, is_superuser=False, leader: bool = False):
+    """决策 1: ``leader=True`` 把该用户设为其组的 teams.leader_id (组长判据)。"""
     u = models.User(
         username=username, ehr_id=ehr_id, name=username,
         department="P0回归", hashed_password="x",
@@ -36,6 +37,12 @@ def _mk_user(db, username, ehr_id, team_id=None, is_superuser=False):
     db.add(u)
     db.commit()
     db.refresh(u)
+    if leader and team_id is not None:
+        t = db.query(models.Team).filter(models.Team.id == team_id).first()
+        if t is not None:
+            t.leader_id = u.id
+            db.commit()
+            db.refresh(t)
     return u
 
 
@@ -74,7 +81,7 @@ class TestMatrixLeaderPath:
     def test_leader_matrix_no_500(self, db: Session):
         """组长 (team_id 非空) 访问矩阵 —— 修复前必然 TypeError 500"""
         team = _mk_team(db, "P0矩阵组")
-        leader = _mk_user(db, "p0_leader", "3100001", team_id=team.id)
+        leader = _mk_user(db, "p0_leader", "3100001", team_id=team.id, leader=True)
         member = _mk_user(db, "p0_member", "3100002", team_id=team.id)
 
         record = home_visit_service.create_draft(
@@ -92,11 +99,11 @@ class TestMatrixLeaderPath:
     def test_leader_matrix_excludes_other_team(self, db: Session):
         team_a = _mk_team(db, "P0矩阵A组")
         team_b = _mk_team(db, "P0矩阵B组")
-        leader = _mk_user(db, "p0_la", "3200001", team_id=team_a.id)
+        leader = _mk_user(db, "p0_la", "3200001", team_id=team_a.id, leader=True)
         member_a = _mk_user(db, "p0_ma", "3200002", team_id=team_a.id)
         # B 组的记录必须由 B 组自己的组长建 (C1: 跨组成员家访会被拒),
         # 从而验证 A 组长的矩阵确实看不到 B 组数据
-        leader_b = _mk_user(db, "p0_lb", "3200004", team_id=team_b.id)
+        leader_b = _mk_user(db, "p0_lb", "3200004", team_id=team_b.id, leader=True)
         member_b = _mk_user(db, "p0_mb", "3200003", team_id=team_b.id)
 
         rec_a = home_visit_service.create_draft(
@@ -151,7 +158,7 @@ class TestEntryExitImportSavepoint:
 class TestHomeVisitPaginationTotal:
     def test_total_is_query_count_not_page_size(self, db: Session):
         team = _mk_team(db, "P0分页组")
-        leader = _mk_user(db, "p0_pg", "3400001", team_id=team.id)
+        leader = _mk_user(db, "p0_pg", "3400001", team_id=team.id, leader=True)
         for i in range(3):
             member = _mk_user(db, f"p0_pgm{i}", f"340001{i}", team_id=team.id)
             rec = home_visit_service.create_draft(

@@ -99,18 +99,35 @@ const HomeVisits: React.FC = () => {
   // 同组成员下拉数据 (取所有用户, 前端按需过滤)
   const [teamMembers, setTeamMembers] = useState<Array<{ id: number; name: string; ehr_id: string; team_id: number | null }>>([]);
 
-  // 是否可创建家访 (leader 有 teamId; admin 通过 permissions 包含 * 判断)
+  // 决策 1 (2026-10-16): 组长身份由后端口径决定 —— 我所在组的 teams.leader_id 就是我。
+  // 前端不再用 "user.teamId 非空" 猜组长 (那等于"分到组就是组长"), 而是读后端
+  // /portrait/me/permissions 的 is_leader, 与 service 层 TeamService.is_leader 同源。
+  // 后端 is_leader 对超管恒为 False —— 超管的"管理员"身份走 isAdmin 分支。
+  const [isLeader, setIsLeader] = useState(false);
   // 后端 superuser 返回的权限串是 "*:*" (users.py:270), 从不是 "*"
-  const canCreate = !!(
-    user &&
-    (user.teamId || (user.permissions || []).includes('*:*'))
-  );
-  // F11 导入与"家访新建"同一套权限 (组长)。admin 虽然能看全部, 但业务规则
-  // "谁做家访谁签字" 已禁止 admin 新建, 导入同理 —— 后端也会 403, 前端只是
-  // 提前不给入口, 不作为安全边界。
-  const canImport = !!user?.teamId;
+  const isAdmin = !!(user?.permissions || []).includes('*:*');
+
+  useEffect(() => {
+    if (!user) return;
+    PortraitAPI.getMyPermissions()
+      .then((p) => setIsLeader(!!p.is_leader))
+      .catch((err) => {
+        // Rule 12: 失败必须显性化 —— 取不到组长身份时按"非组长"降级并报错,
+        // 不能静默当成组长 (会给不该有权限的人显示按钮)。
+        setIsLeader(false);
+        console.error('获取当前用户画像权限失败:', err);
+        message.error('获取当前用户权限失败, 组长功能入口已隐藏, 请刷新重试');
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  // 是否可创建家访 (仅组长)。业务规则"谁做家访谁签字" → 管理员也不可创建,
+  // 后端 create_draft 对超管显式 403, 前端不给入口 (后端才是安全边界)。
+  const canCreate = isLeader;
+  // F11 导入与"家访新建"同一套权限 (组长), 管理员同样不可导入。
+  const canImport = isLeader;
   // §13 家访批量导出 Excel: 员工 ❌ / 组长 ✅ / 管理员 ✅
-  const canExport = canImport || !!(user?.permissions || []).includes('*:*');
+  const canExport = isLeader || isAdmin;
 
   // ---------------------------------------------------------------- F11/F12
   const [importing, setImporting] = useState(false);

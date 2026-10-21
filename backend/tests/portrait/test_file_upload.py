@@ -27,14 +27,23 @@ API_PORTRAIT = f"{settings.API_V1_STR}/portrait"
 
 @pytest.fixture(scope="function")
 def leader_user(db: Session) -> models.User:
-    """复用 test_home_visits._create_leader 模式"""
+    """复用 test_home_visits._create_leader 模式
+
+    决策 1: 组长 = 所在组的 teams.leader_id。"有 team_id 就算组长"的老口径
+    在隔离库里已不成立 —— 组员不再是组长, 因此复用已有用户时必须核对
+    它是不是其组的 leader_id, 否则拿到的可能只是普通组员。
+    """
     existing = (
         db.query(models.User)
         .filter(models.User.is_superuser == False, models.User.team_id.isnot(None))  # noqa
         .first()
     )
-    if existing:
-        return existing
+    if existing is not None:
+        existing_team = (
+            db.query(models.Team).filter(models.Team.id == existing.team_id).first()
+        )
+        if existing_team is not None and existing_team.leader_id == existing.id:
+            return existing
     team = models.Team(name="文件上传测试组", department="测试部门")
     db.add(team)
     db.commit()
@@ -58,6 +67,10 @@ def leader_user(db: Session) -> models.User:
     db.add(leader)
     db.commit()
     db.refresh(leader)
+    # 决策 1: 把组长指向本人, 否则他只是普通组员
+    team.leader_id = leader.id
+    db.commit()
+    db.refresh(team)
     return leader
 
 

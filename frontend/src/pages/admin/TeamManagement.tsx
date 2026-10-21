@@ -24,6 +24,9 @@ const TeamManagement: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [editingTeamId, setEditingTeamId] = useState<number | null>(null);
+  // 决策 1: 组长必须是**本组成员** (后端 update_team 会校验), 因此编辑态的
+  // 负责人下拉只列本组成员 —— 否则管理员选中一个外组的人, 只会拿到一句 400。
+  const [editingMembers, setEditingMembers] = useState<User[]>([]);
   const [form] = Form.useForm();
   const { options: departmentOptions, filters: departmentFilters } = useDepartments();
 
@@ -61,10 +64,11 @@ const TeamManagement: React.FC = () => {
     form.resetFields();
     setModalTitle('添加团队');
     setEditingTeamId(null);
+    setEditingMembers([]);
     setIsModalVisible(true);
   };
 
-  const showEditModal = (team: Team) => {
+  const showEditModal = async (team: Team) => {
     form.setFieldsValue({
       name: team.name || '',
       department: team.department || '',
@@ -74,6 +78,15 @@ const TeamManagement: React.FC = () => {
     setModalTitle('编辑团队');
     setEditingTeamId(team.id);
     setIsModalVisible(true);
+    // 负责人下拉只列本组成员 (组长必须是本组成员) —— 取不到就明说,
+    // 不能悄悄退回到"全部用户"让管理员选一个必然被后端拒绝的人。
+    try {
+      setEditingMembers(await TeamService.getTeamMembers(team.id));
+    } catch (error) {
+      console.error('加载团队成员失败:', error);
+      setEditingMembers([]);
+      message.error('加载本组成员失败, 无法指定负责人, 请关闭弹窗重试');
+    }
   };
 
   const handleModalOk = async () => {
@@ -277,17 +290,27 @@ const TeamManagement: React.FC = () => {
           <Form.Item
             label="团队负责人"
             name="leader_id"
+            extra={
+              editingTeamId
+                ? '组长必须是本组成员; 空组暂无人可任组长, 请先在「用户管理」里把员工调到本组'
+                : '指定后该员工将加入本组并担任组长 (组长必须是本组成员)'
+            }
           >
             <Select allowClear placeholder="选择负责人">
               {loading ? (
                 <Option value="" disabled>加载中...</Option>
+              ) : editingTeamId ? (
+                // 编辑态: 只列本组成员 (后端 update_team 会校验"组长必须本组")
+                editingMembers.map(user => (
+                  <Option key={user.id} value={user.id}>
+                    {user.name || user.username}
+                  </Option>
+                ))
               ) : users && Array.isArray(users) ? (
                 users
                   .filter(user => {
-                    // 如果正在编辑团队，不过滤部门
-                    if (editingTeamId) return true;
-                    
-                    // 获取当前部门值
+                    // 建组态: 按当前部门缩小范围 (新建的组还没有成员, 只能从
+                    // 全员里挑一个把他拉进来当首任组长)
                     const departmentValue = form.getFieldValue('department');
                     // 只有当部门存在且匹配时才显示相应用户
                     return !departmentValue || !user.department || user.department === departmentValue;

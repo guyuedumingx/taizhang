@@ -29,6 +29,7 @@ from app import models
 from app.portrait import models as portrait_models
 from app.utils.logger import log_info
 from app.portrait.services import workflow_bridge
+from app.services.team_service import TeamService
 
 
 PENDING = "pending"
@@ -108,7 +109,7 @@ class HomeVisitService:
     ) -> portrait_models.HomeVisitRecord:
         """创建家访草稿 (status=draft, 需后续 submit 提交审批)
 
-        权限: 仅 leader (有 team_id 且非 admin) 可创建
+        权限: 仅 leader 可创建 (决策 1: leader = 所在组的 leader_id)
 
         C1 (PRD §7.1) 新增校验:
           - co_visitor_user_id (如传): 必须存在 / active / 同组 / 不等于 visitor / 不等于 visited
@@ -117,7 +118,8 @@ class HomeVisitService:
         """
         if visitor.is_superuser:
             raise HTTPException(status_code=403, detail="管理员不可创建家访 (业务规则: 谁做家访谁签字)")
-        if not visitor.team_id:
+        # 决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id)
+        if not TeamService.is_leader(db, visitor):
             raise HTTPException(status_code=403, detail="仅组长可创建家访记录")
 
         # 被家访人必须存在
@@ -438,16 +440,13 @@ class HomeVisitService:
         if not viewer.is_superuser:
             # user: 仅自己作为被家访人的记录
             # leader: 本组成员作为被家访人的所有记录
-            team_user_ids_subq = (
-                db.query(models.User.id)
-                .filter(
-                    (models.User.team_id == viewer.team_id)
-                    if viewer.team_id
-                    else (models.User.id == -1)
+            # 决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id)
+            if TeamService.is_leader(db, viewer):
+                team_user_ids_subq = (
+                    db.query(models.User.id)
+                    .filter(models.User.team_id == viewer.team_id)
+                    .subquery()
                 )
-                .subquery()
-            )
-            if viewer.team_id is not None:
                 query = query.filter(
                     portrait_models.HomeVisitRecord.visited_user_id.in_(team_user_ids_subq)
                 )
@@ -560,9 +559,14 @@ class HomeVisitService:
             raise HTTPException(status_code=500, detail="家访关联用户不存在")
         # 必须先判 viewer.team_id 非空: users.team_id 是 nullable, Python 里
         # None == None 为 True → 两个未分组用户会被判成同组, 越权读到他人家访详情
-        # (含被访人电话/地址/反馈)。profile_service._can_view_profile:30 有同样的守卫,
-        # 此处漏抄。
-        if viewer.team_id and visited.team_id == viewer.team_id:
+        # (含被访人电话/地址/反馈)。
+        # 决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id) ——
+        # "同组"本身不再等于"有权限看本组", 有权限的只有组长本人。
+        if (
+            TeamService.is_leader(db, viewer)
+            and viewer.team_id
+            and visited.team_id == viewer.team_id
+        ):
             return record
         if record.visited_user_id == viewer.id:
             return record
@@ -596,9 +600,10 @@ class HomeVisitService:
             portrait_models.HomeVisitRecord.status.in_(status_scope)
         )
         if not viewer.is_superuser:
-            if viewer.team_id is not None:
+            # 决策 1: 组长看本组, 其余只看自己
+            if TeamService.is_leader(db, viewer):
                 # Phase 0 (评审 P0-6): 原写法把 Subquery 对象直接用于 Python `in`,
-                # 组长 (team_id 非空) 访问矩阵必然 TypeError → 500。
+                # 组长访问矩阵必然 TypeError → 500。
                 # 正确姿势是 .in_() 下推进 SQL (drill_service._visible_drill_ids_subq 同款)。
                 team_user_ids = (
                     db.query(models.User.id)
@@ -617,7 +622,7 @@ class HomeVisitService:
         # 行集 = 基准全员 (与 drill_service._matrix_row_scope 同口径, 不重复实现)
         q = db.query(models.User).filter(models.User.is_active.is_(True))
         if not viewer.is_superuser:
-            if viewer.team_id is not None:
+            if TeamService.is_leader(db, viewer):
                 q = q.filter(models.User.team_id == viewer.team_id)
             else:
                 q = q.filter(models.User.id == viewer.id)
@@ -726,7 +731,8 @@ class HomeVisitService:
                 status_code=403,
                 detail="管理员不可导入家访 (业务规则: 谁做家访谁签字, 与新建家访一致)",
             )
-        if not importer.team_id:
+        # 决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id)
+        if not TeamService.is_leader(db, importer):
             raise HTTPException(
                 status_code=403, detail="仅组长可批量导入家访记录 (PRD §13)"
             )

@@ -8,6 +8,7 @@ import io
 from app import models, schemas
 from app.core.security import get_password_hash
 from app.services.casbin_service import add_role_for_user, remove_role_for_user, get_roles_for_user
+from app.services.team_service import TeamService
 
 
 class UserService:
@@ -133,6 +134,8 @@ class UserService:
         # G7 组员调换历史: 必须在 setattr 之前 (处理器从 user.team_id 现读原组)。
         # Phase 4: 局部 import 反向依赖已改为中性事件 (portrait 侧自注册处理器)
         if "team_id" in update_data:
+            # 决策 1: 换组 → 原组的组长位若挂着他要清掉 (组长位不能指向外组的人)
+            TeamService.release_leadership_if_left(db, user, user.team_id)
             domain_events.dispatch(
                 domain_events.EVENT_USER_TEAM_CHANGED,
                 db, user=user, to_team_id=update_data["team_id"],

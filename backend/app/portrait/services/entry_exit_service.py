@@ -12,6 +12,7 @@ from app import models
 from app.core.ehr_validator import validate_ehr_format
 from app.portrait import models as portrait_models
 from app.portrait.schemas import entry_exit as entry_exit_schema
+from app.services.team_service import TeamService
 
 
 class EntryExitService:
@@ -27,12 +28,17 @@ class EntryExitService:
         return user
 
     @staticmethod
-    def _can_view(viewer: models.User, target: models.User) -> bool:
+    def _can_view(db: Session, viewer: models.User, target: models.User) -> bool:
+        """决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id)"""
         if viewer.is_superuser:
             return True
         if viewer.id == target.id:
             return True
-        return bool(viewer.team_id and viewer.team_id == target.team_id)
+        return bool(
+            TeamService.is_leader(db, viewer)
+            and viewer.team_id
+            and viewer.team_id == target.team_id
+        )
 
     @staticmethod
     def list_records(
@@ -49,11 +55,12 @@ class EntryExitService:
         query = db.query(portrait_models.EntryExitRecord)
         if ehr_id:
             target = EntryExitService._resolve_user(db, ehr_id)
-            if not EntryExitService._can_view(viewer, target):
+            if not EntryExitService._can_view(db, viewer, target):
                 raise HTTPException(status_code=403, detail="无权查看该员工的出入境记录")
             query = query.filter(portrait_models.EntryExitRecord.user_id == target.id)
         elif not viewer.is_superuser:
-            if viewer.team_id:
+            # 决策 1: 组长看本组, 其余只看自己 (旧判据 team_id 非空即组长)
+            if TeamService.is_leader(db, viewer):
                 team_user_ids = db.query(models.User.id).filter(models.User.team_id == viewer.team_id)
                 query = query.filter(portrait_models.EntryExitRecord.user_id.in_(team_user_ids))
             else:
@@ -126,7 +133,8 @@ class EntryExitService:
     def statistics(db: Session, *, viewer: models.User) -> entry_exit_schema.EntryExitStatistics:
         query = db.query(portrait_models.EntryExitRecord)
         if not viewer.is_superuser:
-            if viewer.team_id:
+            # 决策 1: 组长看本组, 其余只看自己
+            if TeamService.is_leader(db, viewer):
                 ids = db.query(models.User.id).filter(models.User.team_id == viewer.team_id)
                 query = query.filter(portrait_models.EntryExitRecord.user_id.in_(ids))
             else:

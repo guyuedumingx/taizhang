@@ -17,24 +17,26 @@ from app.portrait.services.file_storage_service import (
     delete_upload,
     save_upload,
 )
+from app.services.team_service import TeamService
 from app.utils.logger import log_info
 
 
 router = APIRouter()
 
 
-def _can_upload_files(user: models.User) -> bool:
-    """仅 leader (有 team_id 且非 admin) 或 admin 可上传扫描件.
+def _can_upload_files(db: Session, user: models.User) -> bool:
+    """仅 leader 或 admin 可上传扫描件.
 
     PRD §7.1: 组长做家访, 管理员**只读** (不可编辑家访). 上传扫描件视为"编辑家访",
     所以也限制为 leader (admin 可上传但看不到自己的家访列表, 仅给 leader 备份用).
     MVP: admin + leader 都允许 (admin 偶尔需要给档案补扫描件).
+
+    决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id);
+    旧判据 "team_id 非空" 让任何员工分到组就能上传扫描件。
     """
     if user.is_superuser:
         return True
-    if user.team_id is not None:
-        return True
-    return False
+    return TeamService.is_leader(db, user)
 
 
 @router.post("/upload", summary="C1 扫描件上传 (仅 leader/admin)")
@@ -44,7 +46,7 @@ async def upload_scan(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """上传 PDF/JPG/PNG (≤5MB), 返回 file_path 供家访草稿写入 scan_file_path."""
-    if not _can_upload_files(current_user):
+    if not _can_upload_files(db, current_user):
         raise HTTPException(
             status_code=403,
             detail="仅 leader/admin 可上传扫描件 (PRD §7.1 业务规则)",
@@ -68,7 +70,7 @@ def delete_scan(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """删除扫描件. 防路径遍历在 service 层."""
-    if not _can_upload_files(current_user):
+    if not _can_upload_files(db, current_user):
         raise HTTPException(
             status_code=403,
             detail="仅 leader/admin 可删除扫描件",

@@ -55,6 +55,11 @@ def _create_leader(db: Session) -> models.User:
     db.add(leader)
     db.commit()
     db.refresh(leader)
+    # 决策 1: 组长 = 所在组的 teams.leader_id。旧判据「有 team_id 即组长」
+    # 让任何员工分到组就获得组长权限; 判据改后必须显式把组长指向本人。
+    team.leader_id = leader.id
+    db.commit()
+    db.refresh(team)
     return leader
 
 

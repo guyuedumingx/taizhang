@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.portrait import models as portrait_models
 from app.portrait.models._base import beijing_now
+from app.services.team_service import TeamService
 
 # to_group 是 nullable=False, 但退组 (remove_user_from_team) 会把 team_id 置 None。
 # 用占位值而不是 nullable, 避免改模型 (团队空组名不好认, 且名字列还要留作展示)。
@@ -119,9 +120,14 @@ class GroupTransferService:
     def _viewer_team_id(db: Session, viewer: models.User) -> int:
         """组长的可见范围 = 本组 team_id。
 
-        没有组 / 组已删 → 403, **不静默降级成看全部** (否则等于给所有人开放)。
+        没有组 / 组已删 / 不是本组组长 → 403, **不静默降级成看全部**
+        (否则等于给所有人开放)。
+
+        决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id)。
         """
         if not viewer.team_id:
+            raise HTTPException(status_code=403, detail="仅管理员或组长可查看组员调换历史")
+        if not TeamService.is_leader(db, viewer):
             raise HTTPException(status_code=403, detail="仅管理员或组长可查看组员调换历史")
         team = db.query(models.Team).filter(models.Team.id == viewer.team_id).first()
         if not team:

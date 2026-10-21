@@ -12,6 +12,7 @@ from app import models
 from app.core.ehr_validator import validate_ehr_format
 from app.portrait import models as portrait_models
 from app.portrait.schemas import drill as drill_schema
+from app.services.team_service import TeamService
 
 
 def _resolve_user(db: Session, ehr_id: str) -> models.User:
@@ -33,12 +34,15 @@ def _visible_drill_ids_subq(db: Session, viewer: models.User):
     此前 list_records / get_detail / matrix 三个函数虽然都声明了 viewer 参数,
     但函数体一次都没用过它 —— 三处都是全表直查, 任意登录员工可见全部演练
     记录与参与人。判定语义与 profile_service._can_view_profile 一致
-    (admin → 全员; 同 team_id → 本组; 本人 → 自己)。
+    (admin → 全员; 组长 → 本组; 本人 → 自己)。
+
+    决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id),
+    旧判据 "有 team_id 即组长" 让任何员工分到组就获得组长权限。
     """
     if viewer.is_superuser:
         return None
     part = portrait_models.DrillParticipant
-    if viewer.team_id:
+    if TeamService.is_leader(db, viewer):
         # 组长: 本组任一员工作为参与者参与过的演练
         team_user_ids = (
             db.query(models.User.id)
@@ -71,7 +75,7 @@ def _matrix_row_scope(db: Session, viewer: models.User) -> list[models.User]:
     q = db.query(models.User).filter(models.User.is_active.is_(True))
     if viewer.is_superuser:
         return q.all()
-    if viewer.team_id:
+    if TeamService.is_leader(db, viewer):
         return q.filter(models.User.team_id == viewer.team_id).all()
     return q.filter(models.User.id == viewer.id).all()
 

@@ -6,8 +6,10 @@ G7 组员调换历史测试 (Week 3 P0.5, PRD §11.4)
   B. 集成与回归    — 三个挂钩点, 证明现有调用不受影响
   C. 权限与端点    — 组名重名不越权 / 删除规则 / 无新增入口
 
-测试隔离: tests/conftest.py 的 db 是 **session 级真实 SessionLocal()**, 本文件的
-数据直接写进开发库, 所以每个测试结束都按 id 精确清理 (不按条件模糊删)。
+测试隔离: 根 tests/conftest.py 的 db 已是**函数级隔离内存库** (StaticPool +
+create_all), 每个用例开始时库是全新的 —— 因此本文件不再需要任何"事后清理"
+代码 (原先按 id 精确删库的 _CREATED_USERS/_CREATED_TEAMS 机制已随之移除,
+在隔离库下反而会因跨用例 detached 对象抛 DetachedInstanceError)。
 """
 import uuid
 
@@ -29,12 +31,8 @@ from app.services.user_service import UserService
 API = f"{settings.API_V1_STR}/portrait/group-transfers"
 USERS_API = f"{settings.API_V1_STR}/users"
 
-# 本文件造出来的对象, 测试后按对象精确删除
-# 存**对象**而不是 id: bulk delete 不会同步 session 的 identity map, 那些对象
-# commit 后变 expired, 后续被别的 fixture 访问时会去 reload 一条已经不存在的行
-# —— 本文件实测踩过这个坑 (tests/conftest.py 的 db 是 session 级共享的)。
-_CREATED_TEAMS: list = []
-_CREATED_USERS: list = []
+# 本文件造出来的对象不再需要事后清理: 根 conftest 的 db 是函数级隔离内存库,
+# 每个用例一个全新空库, 用例结束即销毁。
 
 
 def _mk_team(db, name: str) -> models.Team:
@@ -42,12 +40,15 @@ def _mk_team(db, name: str) -> models.Team:
     db.add(team)
     db.commit()
     db.refresh(team)
-    _CREATED_TEAMS.append(team)
     return team
 
 
-def _mk_user(db, name: str, team_id=None, is_superuser=False) -> models.User:
-    """造一个唯一 EHR 号的用户 (EHR 7 位, 与业务校验一致)"""
+def _mk_user(db, name: str, team_id=None, is_superuser=False, leader: bool = False) -> models.User:
+    """造一个唯一 EHR 号的用户 (EHR 7 位, 与业务校验一致)
+
+    决策 1: ``leader=True`` 会把该用户设为其所在组的 ``teams.leader_id`` ——
+    组长判据不再是有 team_id 就算, 组员默认不是组长。
+    """
     ehr_id = None
     for _ in range(20):
         candidate = f"{uuid.uuid4().int % 9000000 + 1000000}"
@@ -70,7 +71,12 @@ def _mk_user(db, name: str, team_id=None, is_superuser=False) -> models.User:
     db.add(user)
     db.commit()
     db.refresh(user)
-    _CREATED_USERS.append(user)
+    if leader and team_id is not None:
+        team = db.query(models.Team).filter(models.Team.id == team_id).first()
+        if team is not None:
+            team.leader_id = user.id
+            db.commit()
+            db.refresh(team)
     return user
 
 
@@ -80,38 +86,18 @@ def _token(user) -> dict:
 
 @pytest.fixture
 def purge(db):
-    """需要时手动清掉本文件造的调换历史 (写语义测试用)"""
+    """清掉本文件造的调换历史 (写语义测试用)
+
+    隔离库下每个用例本来就是空库, 所以这行实际是空操作; 保留它是为了
+    "前置条件显式化" —— 万一哪天 conftest 改回共享库, 这里仍能保证
+    "本用例开始时没有存量调换记录" 这个断言前提是成立的。
+    """
 
     def _do():
-        if _CREATED_USERS:
-            db.query(GroupTransferHistory).filter(
-                GroupTransferHistory.user_id.in_([u.id for u in _CREATED_USERS])
-            ).delete(synchronize_session=False)
-            db.commit()
+        db.query(GroupTransferHistory).delete(synchronize_session=False)
+        db.commit()
 
     return _do
-
-
-@pytest.fixture(autouse=True)
-def _autopurge(db):
-    """每个测试结束后清掉本文件造的数据 (不清理会污染开发库 —— conftest 的 db 是真实连接)"""
-    yield
-    db.rollback()  # 先把测试里失败的事务状态清掉, 否则下面的 commit 会 PendingRollbackError
-    user_ids = [u.id for u in _CREATED_USERS]
-    if user_ids:
-        db.query(GroupTransferHistory).filter(
-            GroupTransferHistory.user_id.in_(user_ids)
-        ).delete(synchronize_session=False)
-        db.query(GroupTransferHistory).filter(
-            GroupTransferHistory.operator_user_id.in_(user_ids)
-        ).delete(synchronize_session=False)
-    # 用 ORM delete 而非 bulk: bulk 不同步 identity map
-    for obj in _CREATED_USERS + _CREATED_TEAMS:
-        db.delete(obj)
-    db.commit()
-    db.expunge_all()  # 清空 identity map, 别让过期对象把后续测试带崩
-    _CREATED_USERS.clear()
-    _CREATED_TEAMS.clear()
 
 
 def _records(db, user) -> list:
@@ -237,7 +223,6 @@ def test_update_user_name_only_writes_no_record(db, purge, normal_user):
     team_a = _mk_team(db, "甲组")
     normal_user.team_id = team_a.id
     db.commit()
-    _CREATED_USERS.append(normal_user)
 
     UserService.update_user(
         db,
@@ -255,7 +240,6 @@ def test_update_user_team_change_without_operator_rejected(db, purge, normal_use
     team_a, team_b = _mk_team(db, "甲组"), _mk_team(db, "乙组")
     normal_user.team_id = team_a.id
     db.commit()
-    _CREATED_USERS.append(normal_user)
     user_update = schemas.UserUpdate(team_id=team_b.id)
 
     with pytest.raises(HTTPException) as exc:
@@ -336,7 +320,7 @@ def test_duplicate_team_names_do_not_leak(db, purge, admin_user):
     assert team_a.id != team_b.id
     start_team = _mk_team(db, f"起点组{uuid.uuid4().hex[:6]}")  # 既不是 A 也不是 B
 
-    leader_a = _mk_user(db, "A组长", team_id=team_a.id)
+    leader_a = _mk_user(db, "A组长", team_id=team_a.id, leader=True)
     moved_user = _mk_user(db, "被调的人", team_id=start_team.id)
     operator = _mk_user(db, "管理员辛")
 
@@ -415,7 +399,7 @@ def test_leader_sees_only_own_team_records_in_items_and_total(db, purge):
 
     client = TestClient(app)
     team_a, team_b = _mk_team(db, "本组"), _mk_team(db, "别组")
-    leader = _mk_user(db, "本组长", team_id=team_a.id)
+    leader = _mk_user(db, "本组长", team_id=team_a.id, leader=True)
     operator = _mk_user(db, "管理员壬")
 
     # 别人: 只在别组调换 → 本组长不该看到
@@ -445,7 +429,7 @@ def test_leader_filtering_outsider_ehr_returns_empty_not_403(db, purge):
 
     client = TestClient(app)
     team_a, team_b = _mk_team(db, "本组"), _mk_team(db, "别组")
-    leader = _mk_user(db, "本组长", team_id=team_a.id)
+    leader = _mk_user(db, "本组长", team_id=team_a.id, leader=True)
     operator = _mk_user(db, "管理员癸")
     outsider = _mk_user(db, "外人", team_id=team_b.id)
     record_transfer(db, user=outsider, to_team_id=team_b.id, operator_user_id=operator.id)

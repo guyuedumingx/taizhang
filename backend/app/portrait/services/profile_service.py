@@ -8,7 +8,7 @@ portrait Profile service
 
 权限模型 (Rule 7: 单一模式, Python 显式判断, 不混 Casbin):
   - admin / is_superuser : 看全部
-  - leader : 看本组 (User.team_id 相等)
+  - leader : 看本组 (决策 1: 该用户是所在组的 teams.leader_id)
   - user   : 只看自己 (User.id 相等)
 """
 from typing import List, Optional
@@ -20,24 +20,32 @@ from sqlalchemy.orm import Session, selectinload
 from app import models
 from app.portrait import models as portrait_models
 from app.portrait.schemas import profile as profile_schema
+from app.services.team_service import TeamService
 from app.utils.logger import log_info
 
 
-def _can_view_profile(viewer: models.User, profile_user: models.User) -> bool:
+def _can_view_profile(db: Session, viewer: models.User, profile_user: models.User) -> bool:
     """判定 viewer 能否查看 profile_user 的档案
     Rule 7: 单一模式, Python 显式判断, 不混 Casbin
+
+    决策 1: 组长判据收口到 TeamService.is_leader (是所在组的 leader_id)。
+    旧判据 "team_id 相等即组长" 让任何员工分到组就获得组长权限。
     """
     if viewer.is_superuser:
         return True
-    if viewer.team_id and viewer.team_id == profile_user.team_id:
+    if (
+        TeamService.is_leader(db, viewer)
+        and viewer.team_id
+        and viewer.team_id == profile_user.team_id
+    ):
         return True
     if viewer.id == profile_user.id:
         return True
     return False
 
 
-def _ensure_can_view(viewer: models.User, profile_user: models.User) -> None:
-    if not _can_view_profile(viewer, profile_user):
+def _ensure_can_view(db: Session, viewer: models.User, profile_user: models.User) -> None:
+    if not _can_view_profile(db, viewer, profile_user):
         raise HTTPException(status_code=403, detail=f"无权查看用户 {profile_user.ehr_id} 的档案")
 
 
@@ -70,7 +78,7 @@ class ProfileService:
         if not target_user:
             raise HTTPException(status_code=404, detail=f"用户 {ehr_id} 不存在")
 
-        _ensure_can_view(viewer, target_user)
+        _ensure_can_view(db, viewer, target_user)
 
         profile = (
             db.query(portrait_models.Profile)
@@ -133,8 +141,8 @@ class ProfileService:
                 query = query.filter(models.User.department == department)
             if team_id:
                 query = query.filter(models.User.team_id == team_id)
-        elif viewer.team_id:
-            # leader: 仅本组
+        elif TeamService.is_leader(db, viewer):
+            # leader: 仅本组 (决策 1: 组长 = 所在组的 leader_id)
             query = query.filter(models.User.team_id == viewer.team_id)
         else:
             # user: 仅自己
@@ -160,7 +168,7 @@ class ProfileService:
                 query = query.filter(models.User.department == department)
             if team_id:
                 query = query.filter(models.User.team_id == team_id)
-        elif viewer.team_id:
+        elif TeamService.is_leader(db, viewer):
             query = query.filter(models.User.team_id == viewer.team_id)
         else:
             query = query.filter(models.User.id == viewer.id)

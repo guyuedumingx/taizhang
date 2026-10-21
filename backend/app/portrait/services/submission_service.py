@@ -14,7 +14,7 @@ portrait Submission 状态机 service (核心)
                          └──withdraw──> cancelled
 
 业务效果 (approval 通过时触发):
-  - special_work   : 暂不写业务表 (P5+ 才接 ProjectSummary)
+  - special_work   : 写 ProjectSummary 落子表 (决策 3, 2026-10-16)
   - profile_edit   : 暂不应用 field 改动 (P5+ 接入)
   - activity_claim : 写 ActivityRecord 落子表 (P0.7)
 

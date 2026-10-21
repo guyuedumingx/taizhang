@@ -20,6 +20,7 @@ from app.portrait.routers import profiles as profiles_router
 from app.portrait.routers import submissions as submissions_router
 from app.portrait.routers import templates as templates_router
 from app.portrait.routers import training as training_router
+from app.services.team_service import TeamService
 
 
 portrait_router = APIRouter()
@@ -40,18 +41,20 @@ def my_permissions(
     Rule 7: Python 显式判断 (与 service 层一致)
     """
     is_admin = bool(current_user.is_superuser)
-    has_team = current_user.team_id is not None
+    # 决策 1: 组长身份判据收口到 TeamService.is_leader (是所在组的 leader_id),
+    # 旧判据 team_id 非空会让任何员工分到组就获得组长权限。
+    is_leader = TeamService.is_leader(db, current_user)
     return {
         "user_id": current_user.id,
         "ehr_id": current_user.ehr_id,
         "is_admin": is_admin,
-        "is_leader": has_team and not is_admin,
+        "is_leader": is_leader,
         "is_user": True,
         "permissions": {
             "portrait_all": ["*"] if is_admin else [],
             "portrait_self": ["read", "update", "create"],
             "portrait_group": (
-                ["read", "update", "create", "export"] if has_team else []
+                ["read", "update", "create", "export"] if is_leader else []
             ),
         },
     }

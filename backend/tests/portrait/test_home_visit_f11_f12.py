@@ -124,7 +124,17 @@ def _make_user(db: Session, *, ehr_id: str, name: str, team_id=None, superuser=F
 
 @pytest.fixture(scope="function")
 def leader(db: Session, team):
-    return _make_user(db, ehr_id=_random_ehr(db), name="F11组长", team_id=team.id)
+    """组长 = 该组的 leader_id (决策 1)。
+
+    旧判据是「有 team_id 即组长」, 所以以前只要把人放进组就行;
+    判据改成 teams.leader_id 后, 组员不再自动是组长 —— 固件必须显式
+    把组长指向 leader, 否则用例会集体变红 (而且是"该红的", 不是误报)。
+    """
+    u = _make_user(db, ehr_id=_random_ehr(db), name="F11组长", team_id=team.id)
+    team.leader_id = u.id
+    db.commit()
+    db.refresh(team)
+    return u
 
 
 @pytest.fixture(scope="function")

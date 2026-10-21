@@ -44,6 +44,7 @@ from app.portrait.routers.templates import (
     _HOME_VISIT_REQUIRED,
 )
 from app.portrait.services import home_visit_service
+from app.services.team_service import TeamService
 
 
 router = APIRouter()
@@ -243,7 +244,7 @@ def export_home_visits(
     那样普通员工虽然只能导出自己那几条, 但 PRD 写的是 ❌, 而且导出的表头带
     团队/岗位/电话, 属于台账性质的数据, 不该让员工拿到自己那条的完整行。
     """
-    if not current_user.is_superuser and not current_user.team_id:
+    if not current_user.is_superuser and not TeamService.is_leader(db, current_user):
         raise HTTPException(
             status_code=403, detail="普通员工不可导出家访明细表 (PRD §13)"
         )
