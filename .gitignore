@@ -50,3 +50,6 @@ frontend/.vite/
 backend/.pytest_cache/
 backend/.coverage
 backend/htmlcov/ 
+# netsync 同步产物与发布包（留在本地，不入库）
+netsync/outsync/
+release/

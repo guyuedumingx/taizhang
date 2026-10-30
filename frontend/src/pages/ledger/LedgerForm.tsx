@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Form, Input, Select, Button, Card, Typography, DatePicker, message, Space, Divider } from 'antd';
+import { Form, Input, Select, Button, Card, Typography, DatePicker, message, Space, Divider, AutoComplete } from 'antd';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { PERMISSIONS } from '../../config';
@@ -352,6 +352,26 @@ const LedgerForm: React.FC = () => {
                     <Option key={option} value={option}>{option}</Option>
                   ))}
                 </Select>
+              </Form.Item>
+            );
+          }
+
+          if (field.type === 'autocomplete') {
+            return (
+              <Form.Item
+                key={field.id}
+                label={field.label || field.name}
+                name={fieldName}
+                rules={[{ required: field.required, message: `请输入${field.label || field.name}` }]}
+              >
+                <AutoComplete
+                  options={(field.options ?? []).map(option => ({ value: option }))}
+                  filterOption={(inputValue, option) =>
+                    (option?.value ?? '').toLowerCase().includes(inputValue.toLowerCase())
+                  }
+                  onBlur={isTrigger ? () => onAutoFillBlur(field) : undefined}
+                  onChange={isTrigger ? (v) => debouncedAutoFill(field.name ?? '', v != null ? String(v) : '') : undefined}
+                />
               </Form.Item>
             );
           }

@@ -386,7 +386,7 @@ const TemplateForm: React.FC = () => {
       }
       
       // 处理选项类型的字段
-      if (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox') {
+      if (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox' || field.type === 'autocomplete') {
         fieldData.options = field.options ? (field.options as string).split(',').map((opt: string) => opt.trim()) : [];
       }
       console.log('[表单提交] 字段数据:', fieldData);
@@ -596,6 +596,7 @@ const TemplateForm: React.FC = () => {
                         <Option value="textarea">多行文本</Option>
                         <Option value="number">数字</Option>
                         <Option value="select">下拉选择</Option>
+                        <Option value="autocomplete">可选可填文本</Option>
                         <Option value="radio">单选</Option>
                         <Option value="checkbox">多选</Option>
                         <Option value="date">日期</Option>
@@ -611,7 +612,7 @@ const TemplateForm: React.FC = () => {
                     >
                       {({ getFieldValue }) => {
                         const fieldType = getFieldValue(['fields', field.name, 'type']);
-                        if (fieldType === 'select' || fieldType === 'radio' || fieldType === 'checkbox') {
+                        if (fieldType === 'select' || fieldType === 'radio' || fieldType === 'checkbox' || fieldType === 'autocomplete') {
                           return (
                             <Form.Item
                               {...field}
